@@ -1,3 +1,4 @@
+import MilitaryLandCalculator from './MilitaryLandCalculator'
 import './App.css'
 
 const tools = [
@@ -79,7 +80,11 @@ function App() {
             </div>
           </div>
         </section>
-
+        <section className="section calculator-section">
+          <div className="section-inner">
+            <MilitaryLandCalculator />
+          </div>
+        </section>
         <section className="section category-section" id="categories">
           <div className="section-inner">
             <p className="section-label">MONEY GUIDE</p>

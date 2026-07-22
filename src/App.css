@@ -302,3 +302,253 @@ a {
     flex-direction: column;
   }
 }
+
+.calculator-section {
+  background: #ffffff;
+}
+
+.calculator {
+  padding: 8px 0;
+}
+
+.calculator-heading {
+  max-width: 760px;
+  margin-bottom: 42px;
+}
+
+.calculator-heading h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: #17324d;
+}
+
+.calculator-heading > p:last-child {
+  margin: 18px 0 0;
+  color: #60758a;
+  line-height: 1.8;
+}
+
+.calculator-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.calculator-form,
+.calculator-results {
+  display: grid;
+  gap: 20px;
+}
+
+.calculator-form {
+  padding: 30px;
+  background: #edf7f5;
+  border: 1px solid #d6e9e5;
+  border-radius: 20px;
+}
+
+.calculator-form label {
+  display: grid;
+  gap: 10px;
+  font-weight: 700;
+  color: #24455c;
+}
+
+.input-with-unit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.input-with-unit input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid #c7d8df;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #17324d;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.input-with-unit input:focus {
+  outline: 3px solid rgba(15, 118, 110, 0.18);
+  border-color: #0f766e;
+}
+
+.input-with-unit > span {
+  min-width: 28px;
+  font-weight: 800;
+  color: #385268;
+}
+
+.reset-button {
+  min-height: 48px;
+  margin-top: 4px;
+  border: 1px solid #0f766e;
+  border-radius: 12px;
+  background: transparent;
+  color: #0f766e;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.reset-button:hover {
+  background: #dff3ef;
+}
+
+.result-card {
+  padding: 26px;
+  background: #ffffff;
+  border: 1px solid #dfe8ee;
+  border-radius: 18px;
+  box-shadow: 0 10px 26px rgba(28, 59, 83, 0.07);
+}
+
+.result-card > span {
+  display: block;
+  margin-bottom: 10px;
+  color: #60758a;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.result-card strong {
+  display: block;
+  color: #0f766e;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  line-height: 1.2;
+}
+
+.result-card small {
+  display: block;
+  margin-top: 10px;
+  color: #7890a2;
+  line-height: 1.6;
+}
+
+.calculator-note {
+  margin: 28px 0 0;
+  padding: 18px 20px;
+  border-left: 4px solid #0f766e;
+  background: #f5f9fb;
+  color: #60758a;
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+@media (max-width: 800px) {
+  .calculator-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .calculator-form {
+    padding: 22px;
+  }
+}
+
+.calculation-mode {
+  margin-top: 4px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #d6e3e7;
+  border-radius: 12px;
+}
+
+.calculator-form .mode-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  width: 100%;
+  color: #24455c;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: left;
+}
+
+.calculator-form .mode-checkbox input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  flex: 0 0 22px;
+  appearance: none;
+  border: 2px solid #0f766e;
+  border-radius: 5px;
+  background: #ffffff;
+  cursor: pointer;
+  position: relative;
+}
+
+.calculator-form .mode-checkbox input:checked {
+  background: #0f766e;
+}
+
+.calculator-form .mode-checkbox input:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 11px;
+  border: solid #ffffff;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+.calculator-form .mode-checkbox span {
+  display: block;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.simulate-button {
+  min-height: 56px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 12px;
+  background: #006d77;
+  color: #ffffff;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(0, 109, 119, 0.26);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.simulate-button:hover:not(:disabled) {
+  background: #00555d;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(0, 109, 119, 0.32);
+}
+
+.simulate-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.simulate-button:disabled {
+  background: #aebfc3;
+  color: #f3f7f8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@media (max-width: 520px) {
+  .mode-checkbox {
+    align-items: flex-start;
+    white-space: normal;
+  }
+}
+
+.form-spacer {
+  height: 20px;
+}
