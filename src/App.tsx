@@ -1,25 +1,119 @@
+import {
+  useState,
+  type KeyboardEvent,
+} from 'react'
 import MilitaryLandCalculator from './MilitaryLandCalculator'
+import MortgageCalculator from './MortgageCalculator'
+import NisaCalculator from './NisaCalculator'
+import IdecoCalculator from './IdecoCalculator'
+// import TaxableIncomeCalculator from './TaxableIncomeCalculator'
 import './App.css'
+type ToolId =
+  | 'military'
+  | 'mortgage'
+  | 'nisa'
+  | 'ideco'
 
-const tools = [
-  {
-    title: '軍用地利回り計算',
-    description: '年間借地料や購入価格から、軍用地の利回りを計算します。',
-    status: '準備中',
-  },
-  {
-    title: '住宅ローン返済計算',
-    description: '借入金額・金利・返済期間から、毎月の返済額を計算します。',
-    status: '準備中',
-  },
-  {
-    title: 'NISA積立計算',
-    description: '毎月の積立額と運用期間から、将来の資産額を試算します。',
-    status: '準備中',
-  },
-]
+const tools: Array<{
+  id: ToolId
+  title: string
+  description: string
+}> = [
+    {
+      id: 'military',
+      title: '軍用地利回り',
+      description:
+        '購入価格と年間借地料から利回りを計算',
+    },
+    {
+      id: 'mortgage',
+      title: '住宅ローン',
+      description:
+        '借入金額から毎月の返済額を計算',
+    },
+    {
+      id: 'nisa',
+      title: 'NISA積立',
+      description:
+        '積立による将来の資産額を計算',
+    },
+    {
+      id: 'ideco',
+      title: 'iDeCo節税',
+      description:
+        '掛金による節税額を計算',
+    },
+  ]
 
 function App() {
+  const [
+    selectedTool,
+    setSelectedTool,
+  ] = useState<ToolId>('military')
+
+  const [
+    isTaxableIncomeOpen,
+    setIsTaxableIncomeOpen,
+  ] = useState(false)
+
+  const toggleTaxableIncome = () => {
+    setIsTaxableIncomeOpen(
+      (currentState) => !currentState,
+    )
+  }
+
+  const handleToolTabKeyDown = (
+    event:
+      KeyboardEvent<HTMLButtonElement>,
+    currentToolId: ToolId,
+  ) => {
+    const currentIndex =
+      tools.findIndex(
+        (tool) =>
+          tool.id === currentToolId,
+      )
+
+    let nextIndex = currentIndex
+
+    if (
+      event.key === 'ArrowRight' ||
+      event.key === 'ArrowDown'
+    ) {
+      nextIndex =
+        (currentIndex + 1) %
+        tools.length
+    } else if (
+      event.key === 'ArrowLeft' ||
+      event.key === 'ArrowUp'
+    ) {
+      nextIndex =
+        (currentIndex -
+          1 +
+          tools.length) %
+        tools.length
+    } else if (event.key === 'Home') {
+      nextIndex = 0
+    } else if (event.key === 'End') {
+      nextIndex = tools.length - 1
+    } else {
+      return
+    }
+
+    event.preventDefault()
+
+    const nextTool = tools[nextIndex]
+
+    setSelectedTool(nextTool.id)
+
+    window.setTimeout(() => {
+      document
+        .getElementById(
+          `tool-tab-${nextTool.id}`,
+        )
+        ?.focus()
+    }, 0)
+  }
+
   return (
     <div className="site">
       <header className="header">
@@ -58,33 +152,202 @@ function App() {
           </div>
         </section>
 
-        <section className="section" id="tools">
+        <section
+          className="section tools-section"
+          id="tools"
+        >
           <div className="section-inner">
-            <p className="section-label">FREE TOOLS</p>
-            <h2>無料シミュレーター</h2>
-            <p className="section-description">
-              数字を入力するだけで、簡単に試算できます。
+            <p className="section-label">
+              FREE TOOLS
             </p>
 
-            <div className="tool-grid">
-              {tools.map((tool) => (
-                <article className="tool-card" key={tool.title}>
-                  <span className="status">{tool.status}</span>
-                  <h3>{tool.title}</h3>
-                  <p>{tool.description}</p>
-                  <button type="button" disabled>
-                    公開までお待ちください
-                  </button>
-                </article>
-              ))}
+            <h2>無料シミュレーター</h2>
+
+            <p className="section-description">
+              数字を入力するだけで、
+              簡単に試算できます。
+            </p>
+
+            <div className="simulator-shell">
+              <div className="tool-tabs-heading">
+                <span>シミュレーターを選択</span>
+                <small>
+                  目的に合った計算ツールを選んでください
+                </small>
+              </div>
+
+              <div
+                className="tool-tabs"
+                role="tablist"
+                aria-label="シミュレーターを選択"
+              >
+                {tools.map((tool) => {
+                  const isSelected =
+                    selectedTool === tool.id
+
+                  return (
+                    <button
+                      id={`tool-tab-${tool.id}`}
+                      className={
+                        isSelected
+                          ? 'tool-tab is-active'
+                          : 'tool-tab'
+                      }
+                      type="button"
+                      role="tab"
+                      aria-selected={isSelected}
+                      aria-controls={
+                        `tool-panel-${tool.id}`
+                      }
+                      tabIndex={
+                        isSelected ? 0 : -1
+                      }
+                      key={tool.id}
+                      onClick={() =>
+                        setSelectedTool(tool.id)
+                      }
+                      onKeyDown={(event) =>
+                        handleToolTabKeyDown(
+                          event,
+                          tool.id,
+                        )
+                      }
+                    >
+                      <strong>
+                        {tool.title}
+                      </strong>
+
+                      <small>
+                        {tool.description}
+                      </small>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="simulator-panels">
+                <div
+                  id="tool-panel-military"
+                  className="tool-panel"
+                  role="tabpanel"
+                  aria-labelledby="tool-tab-military"
+                  hidden={
+                    selectedTool !== 'military'
+                  }
+                >
+                  <MilitaryLandCalculator />
+                </div>
+
+                <div
+                  id="tool-panel-mortgage"
+                  className="tool-panel"
+                  role="tabpanel"
+                  aria-labelledby="tool-tab-mortgage"
+                  hidden={
+                    selectedTool !== 'mortgage'
+                  }
+                >
+                  <MortgageCalculator />
+                </div>
+
+                <div
+                  id="tool-panel-nisa"
+                  className="tool-panel"
+                  role="tabpanel"
+                  aria-labelledby="tool-tab-nisa"
+                  hidden={
+                    selectedTool !== 'nisa'
+                  }
+                >
+                  <NisaCalculator />
+                </div>
+
+                <div
+                  id="tool-panel-ideco"
+                  className="tool-panel"
+                  role="tabpanel"
+                  aria-labelledby="tool-tab-ideco"
+                  hidden={
+                    selectedTool !== 'ideco'
+                  }
+                >
+                  <IdecoCalculator
+                    isTaxableIncomeOpen={
+                      isTaxableIncomeOpen
+                    }
+                    onToggleTaxableIncome={
+                      toggleTaxableIncome
+                    }
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </section>
-        <section className="section calculator-section">
+
+        <section
+          id="tool-panel-military"
+          className="section calculator-section tool-panel"
+          role="tabpanel"
+          aria-labelledby="tool-tab-military"
+          hidden={
+            selectedTool !== 'military'
+          }
+        >
           <div className="section-inner">
             <MilitaryLandCalculator />
           </div>
         </section>
+
+        <section
+          id="tool-panel-mortgage"
+          className="section calculator-section mortgage-section tool-panel"
+          role="tabpanel"
+          aria-labelledby="tool-tab-mortgage"
+          hidden={
+            selectedTool !== 'mortgage'
+          }
+        >
+          <div className="section-inner">
+            <MortgageCalculator />
+          </div>
+        </section>
+
+        <section
+          id="tool-panel-nisa"
+          className="section calculator-section nisa-section tool-panel"
+          role="tabpanel"
+          aria-labelledby="tool-tab-nisa"
+          hidden={
+            selectedTool !== 'nisa'
+          }
+        >
+          <div className="section-inner">
+            <NisaCalculator />
+          </div>
+        </section>
+
+        <section
+          id="tool-panel-ideco"
+          className="section calculator-section ideco-section tool-panel"
+          role="tabpanel"
+          aria-labelledby="tool-tab-ideco"
+          hidden={
+            selectedTool !== 'ideco'
+          }
+        >
+          <div className="section-inner">
+            <IdecoCalculator
+              isTaxableIncomeOpen={
+                isTaxableIncomeOpen
+              }
+              onToggleTaxableIncome={
+                toggleTaxableIncome
+              }
+            />
+          </div>
+        </section>
+
         <section className="section category-section" id="categories">
           <div className="section-inner">
             <p className="section-label">MONEY GUIDE</p>
@@ -134,6 +397,7 @@ function App() {
       </footer>
     </div>
   )
+
 }
 
 export default App

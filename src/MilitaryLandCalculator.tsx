@@ -236,7 +236,8 @@ function MilitaryLandCalculator() {
                 onChange={(event) => {
                   const value = event.target.value
 
-                  if (event.nativeEvent.isComposing) {
+                  if (event.nativeEvent instanceof InputEvent &&
+                      event.nativeEvent.isComposing) {
                     handleAnnualRentChange(value)
                     return
                   }
@@ -277,7 +278,8 @@ function MilitaryLandCalculator() {
                 onChange={(event) => {
                   const value = event.target.value
 
-                  if (event.nativeEvent.isComposing) {
+                  if (event.nativeEvent instanceof InputEvent &&
+                      event.nativeEvent.isComposing) {
                     handlePurchasePriceChange(value)
                     return
                   }
@@ -318,7 +320,8 @@ function MilitaryLandCalculator() {
                 onChange={(event) => {
                   const value = event.target.value
 
-                  if (event.nativeEvent.isComposing) {
+                  if (event.nativeEvent instanceof InputEvent &&
+                      event.nativeEvent.isComposing) {
                     handleMultipleChange(value)
                     return
                   }
