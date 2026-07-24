@@ -285,69 +285,6 @@ function App() {
           </div>
         </section>
 
-        <section
-          id="tool-panel-military"
-          className="section calculator-section tool-panel"
-          role="tabpanel"
-          aria-labelledby="tool-tab-military"
-          hidden={
-            selectedTool !== 'military'
-          }
-        >
-          <div className="section-inner">
-            <MilitaryLandCalculator />
-          </div>
-        </section>
-
-        <section
-          id="tool-panel-mortgage"
-          className="section calculator-section mortgage-section tool-panel"
-          role="tabpanel"
-          aria-labelledby="tool-tab-mortgage"
-          hidden={
-            selectedTool !== 'mortgage'
-          }
-        >
-          <div className="section-inner">
-            <MortgageCalculator />
-          </div>
-        </section>
-
-        <section
-          id="tool-panel-nisa"
-          className="section calculator-section nisa-section tool-panel"
-          role="tabpanel"
-          aria-labelledby="tool-tab-nisa"
-          hidden={
-            selectedTool !== 'nisa'
-          }
-        >
-          <div className="section-inner">
-            <NisaCalculator />
-          </div>
-        </section>
-
-        <section
-          id="tool-panel-ideco"
-          className="section calculator-section ideco-section tool-panel"
-          role="tabpanel"
-          aria-labelledby="tool-tab-ideco"
-          hidden={
-            selectedTool !== 'ideco'
-          }
-        >
-          <div className="section-inner">
-            <IdecoCalculator
-              isTaxableIncomeOpen={
-                isTaxableIncomeOpen
-              }
-              onToggleTaxableIncome={
-                toggleTaxableIncome
-              }
-            />
-          </div>
-        </section>
-
         <section className="section category-section" id="categories">
           <div className="section-inner">
             <p className="section-label">MONEY GUIDE</p>
