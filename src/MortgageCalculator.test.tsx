@@ -1,0 +1,287 @@
+// @vitest-environment jsdom
+
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    within,
+} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+} from 'vitest'
+import MortgageCalculator from './MortgageCalculator'
+
+const fillValidConditions = async () => {
+    const user = userEvent.setup()
+
+    await user.type(
+        screen.getByLabelText('借入金額'),
+        '30000000',
+    )
+    await user.type(
+        screen.getByLabelText('年利'),
+        '1',
+    )
+    await user.type(
+        screen.getByLabelText('返済期間'),
+        '35',
+    )
+
+    return user
+}
+
+describe('MortgageCalculator', () => {
+    afterEach(() => {
+        cleanup()
+        vi.unstubAllGlobals()
+    })
+
+    beforeEach(() => {
+        vi.stubGlobal(
+            'requestAnimationFrame',
+            (callback: FrameRequestCallback) => {
+                callback(0)
+                return 0
+            },
+        )
+    })
+
+    it('starts without field errors', () => {
+        render(<MortgageCalculator />)
+
+        expect(
+            screen.getByText(
+                '借入条件を入力してください。',
+            ),
+        ).toBeTruthy()
+        expect(
+            screen.queryByRole('alert'),
+        ).toBeNull()
+    })
+
+    it('shows all errors after a manual submit and focuses the first field', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        await user.click(
+            screen.getByRole('button', {
+                name: 'シミュレートする',
+            }),
+        )
+
+        const errorSummary =
+            await screen.findByRole('alert')
+
+        expect(
+            errorSummary.textContent,
+        ).toContain(
+            '入力内容を確認してください',
+        )
+        expect(
+            errorSummary.textContent,
+        ).toContain('3件')
+        expect(
+            within(errorSummary).getByText(
+                '借入金額を入力してください。',
+            ),
+        ).toBeTruthy()
+        expect(
+            within(errorSummary).getByText(
+                '年利を入力してください。',
+            ),
+        ).toBeTruthy()
+        expect(
+            within(errorSummary).getByText(
+                '返済期間を入力してください。',
+            ),
+        ).toBeTruthy()
+        expect(document.activeElement).toBe(
+            screen.getByLabelText('借入金額'),
+        )
+    })
+
+    it('calculates the reference equal-payment result', async () => {
+        render(<MortgageCalculator />)
+
+        const user = await fillValidConditions()
+
+        await user.click(
+            screen.getByRole('button', {
+                name: 'シミュレートする',
+            }),
+        )
+
+        expect(
+            screen.getByText(
+                '概算結果を更新しました。',
+            ),
+        ).toBeTruthy()
+        expect(
+            screen.getByText('約84,686円'),
+        ).toBeTruthy()
+        expect(
+            screen.getAllByText('約35,567,998円'),
+        ).toHaveLength(2)
+        expect(
+            screen.getAllByText('約5,567,998円'),
+        ).toHaveLength(2)
+    })
+
+    it('submits through the form, supporting Enter-key form behavior', async () => {
+        const { container } = render(
+            <MortgageCalculator />,
+        )
+
+        await fillValidConditions()
+
+        const form = container.querySelector('form')
+
+        expect(form).not.toBeNull()
+
+        fireEvent.submit(form!)
+
+        expect(
+            screen.getByText('概算結果'),
+        ).toBeTruthy()
+        expect(
+            screen.getByText('約84,686円'),
+        ).toBeTruthy()
+    })
+
+    it('marks a previous manual result as stale after conditions change', async () => {
+        render(<MortgageCalculator />)
+
+        const user = await fillValidConditions()
+
+        await user.click(
+            screen.getByRole('button', {
+                name: 'シミュレートする',
+            }),
+        )
+
+        const annualRate =
+            screen.getByLabelText('年利')
+
+        await user.clear(annualRate)
+        await user.type(annualRate, '1.5')
+
+        expect(
+            screen.getByText(
+                '条件が変更されました。再計算してください。前回の結果を表示しています。',
+            ),
+        ).toBeTruthy()
+        expect(
+            screen.getByText('前回の概算結果'),
+        ).toBeTruthy()
+        expect(
+            screen.getByText('約84,686円'),
+        ).toBeTruthy()
+    })
+
+    it('does not show required errors for untouched fields in auto mode', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        await user.click(
+            screen.getByRole('checkbox', {
+                name: '入力と同時に計算結果を更新する',
+            }),
+        )
+
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '30000000',
+        )
+
+        expect(
+            screen.queryByText(
+                '年利を入力してください。',
+            ),
+        ).toBeNull()
+        expect(
+            screen.queryByText(
+                '返済期間を入力してください。',
+            ),
+        ).toBeNull()
+
+        const annualRate =
+            screen.getByLabelText('年利')
+
+        await user.type(annualRate, '21')
+        await user.tab()
+
+        const annualRateError =
+            document.getElementById(
+                'mortgage-interest-rate-error',
+            )
+
+        expect(
+            annualRateError?.textContent,
+        ).toBe(
+            '年利は0～20％で入力してください。',
+        )
+        expect(
+            screen.queryByText(
+                '返済期間を入力してください。',
+            ),
+        ).toBeNull()
+    })
+
+    it('automatically calculates once all valid conditions are present', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        await user.click(
+            screen.getByRole('checkbox', {
+                name: '入力と同時に計算結果を更新する',
+            }),
+        )
+
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '30000000',
+        )
+        await user.type(
+            screen.getByLabelText('年利'),
+            '1',
+        )
+        await user.type(
+            screen.getByLabelText('返済期間'),
+            '35',
+        )
+
+        expect(
+            screen.getByText(
+                '概算結果を更新しました。',
+            ),
+        ).toBeTruthy()
+        expect(
+            screen.getByText('約84,686円'),
+        ).toBeTruthy()
+    })
+
+    it('limits live announcements to the compact status region', () => {
+        const { container } = render(
+            <MortgageCalculator />,
+        )
+
+        expect(
+            container.querySelectorAll('[aria-live]'),
+        ).toHaveLength(1)
+        expect(
+            container
+                .querySelector('.mortgage-results')
+                ?.hasAttribute('aria-live'),
+        ).toBe(false)
+    })
+})
