@@ -99,6 +99,31 @@ export type MortgageCalculationResult =
         error: MortgageCalculationError
     }
 
+export type MortgageComparisonDifferences = {
+    firstPayment: number
+    lastPayment: number
+    totalPayment: number
+    totalInterest: number
+}
+
+export type MortgageComparison = {
+    input: MortgageInput
+    equalPayment: RepaymentSummary
+    equalPrincipal: RepaymentSummary
+    differences: MortgageComparisonDifferences
+    modelVersion: typeof MORTGAGE_MODEL_VERSION
+}
+
+export type MortgageComparisonResult =
+    | {
+        ok: true
+        comparison: MortgageComparison
+    }
+    | {
+        ok: false
+        error: MortgageCalculationError
+    }
+
 const FULL_WIDTH_NORMALIZATION_FORM = 'NFKC'
 const UNSIGNED_INTEGER_PATTERN = /^\d+$/
 const ANNUAL_RATE_PATTERN = /^\d+(?:\.\d{1,3})?$/
@@ -511,6 +536,61 @@ export const calculateMortgage = (
     }
 }
 
+export const calculateMortgageComparison = (
+    input: MortgageInput,
+): MortgageComparisonResult => {
+    const equalPaymentCalculation = calculateMortgage(
+        input,
+        'equal-payment',
+    )
+
+    if (!equalPaymentCalculation.ok) {
+        return {
+            ok: false,
+            error: equalPaymentCalculation.error,
+        }
+    }
+
+    const equalPrincipalCalculation = calculateMortgage(
+        input,
+        'equal-principal',
+    )
+
+    if (!equalPrincipalCalculation.ok) {
+        return {
+            ok: false,
+            error: equalPrincipalCalculation.error,
+        }
+    }
+
+    const equalPayment = equalPaymentCalculation.result
+    const equalPrincipal = equalPrincipalCalculation.result
+
+    return {
+        ok: true,
+        comparison: {
+            input: { ...input },
+            equalPayment,
+            equalPrincipal,
+            differences: {
+                firstPayment:
+                    equalPrincipal.firstPayment -
+                    equalPayment.firstPayment,
+                lastPayment:
+                    equalPrincipal.lastPayment -
+                    equalPayment.lastPayment,
+                totalPayment:
+                    equalPrincipal.totalPayment -
+                    equalPayment.totalPayment,
+                totalInterest:
+                    equalPrincipal.totalInterest -
+                    equalPayment.totalInterest,
+            },
+            modelVersion: MORTGAGE_MODEL_VERSION,
+        },
+    }
+}
+
 export const roundMortgageYen = (value: number) => {
     if (!Number.isFinite(value) || value < 0) {
         throw new RangeError(
@@ -527,6 +607,73 @@ export const formatMortgageYen = (value: number) =>
 export const formatApproxMortgageYen = (
     value: number,
 ) => `約${formatMortgageYen(value)}`
+
+const getRoundedDifference = (difference: number) =>
+    Math.round(Math.abs(difference))
+
+const formatDifferenceAmount = (difference: number) =>
+    formatApproxMortgageYen(Math.abs(difference))
+
+export const createMortgageComparisonExplanation = (
+    comparison: MortgageComparison,
+) => {
+    const firstPaymentDifference =
+        comparison.differences.firstPayment
+    const totalInterestDifference =
+        comparison.differences.totalInterest
+    const roundedFirstPaymentDifference =
+        getRoundedDifference(firstPaymentDifference)
+    const roundedTotalInterestDifference =
+        getRoundedDifference(totalInterestDifference)
+
+    if (
+        roundedFirstPaymentDifference === 0 &&
+        roundedTotalInterestDifference === 0
+    ) {
+        return 'この条件では、元利均等返済と元金均等返済の初回返済額と支払利息総額に差はありません。'
+    }
+
+    if (roundedFirstPaymentDifference === 0) {
+        const interestDirection =
+            totalInterestDifference > 0 ? '多い' : '少ない'
+
+        return `この条件では初回返済額に差はなく、元金均等返済の支払利息総額は元利均等返済より${formatDifferenceAmount(
+            totalInterestDifference,
+        )}${interestDirection}試算です。`
+    }
+
+    if (roundedTotalInterestDifference === 0) {
+        const firstPaymentDirection =
+            firstPaymentDifference > 0 ? '高い' : '低い'
+
+        return `元金均等返済の初回返済額は、元利均等返済より${formatDifferenceAmount(
+            firstPaymentDifference,
+        )}${firstPaymentDirection}試算です。支払利息総額に差はありません。`
+    }
+
+    const firstPaymentDirection =
+        firstPaymentDifference > 0 ? '高い' : '低い'
+    const interestDirection =
+        totalInterestDifference > 0 ? '多い' : '少ない'
+
+    return `元金均等返済は、元利均等返済より初回返済額が${formatDifferenceAmount(
+        firstPaymentDifference,
+    )}${firstPaymentDirection}一方、支払利息総額は${formatDifferenceAmount(
+        totalInterestDifference,
+    )}${interestDirection}試算です。`
+}
+
+export const createMortgageComparisonInputKey = (
+    input: MortgageInput,
+) =>
+    [
+        input.principal,
+        input.annualRate.toFixed(
+            MORTGAGE_LIMITS.annualRate.maxDecimalPlaces,
+        ),
+        input.paymentCount,
+        MORTGAGE_MODEL_VERSION,
+    ].join('|')
 
 export const createMortgageInputKey = (
     input: MortgageInput,

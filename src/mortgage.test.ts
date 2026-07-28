@@ -3,6 +3,9 @@ import {
     MORTGAGE_LIMITS,
     MORTGAGE_MODEL_VERSION,
     calculateMortgage,
+    calculateMortgageComparison,
+    createMortgageComparisonExplanation,
+    createMortgageComparisonInputKey,
     createMortgageInputKey,
     formatApproxMortgageYen,
     formatLoanAmountForDisplay,
@@ -11,6 +14,7 @@ import {
     normalizeRepaymentYearsText,
     roundMortgageYen,
     validateMortgageFields,
+    type MortgageComparison,
     type MortgageInput,
     type RepaymentMethod,
 } from './mortgage'
@@ -30,6 +34,22 @@ const expectSuccessfulCalculation = (
     }
 
     return calculation.result
+}
+
+const expectSuccessfulComparison = (
+    input: MortgageInput,
+) => {
+    const calculation = calculateMortgageComparison(input)
+
+    expect(calculation.ok).toBe(true)
+
+    if (!calculation.ok) {
+        throw new Error(
+            `Expected a successful comparison, received ${calculation.error}`,
+        )
+    }
+
+    return calculation.comparison
 }
 
 describe('mortgage input normalization', () => {
@@ -342,6 +362,186 @@ describe('fixed monthly mortgage model', () => {
 
         expect(equalPrincipal.totalInterest).toBeLessThanOrEqual(
             equalPayment.totalInterest,
+        )
+    })
+})
+
+describe('mortgage repayment comparison', () => {
+    const standardInput: MortgageInput = {
+        principal: 30_000_000,
+        annualRate: 1,
+        paymentCount: 420,
+    }
+
+    it('calculates both methods from the same input and exposes signed differences', () => {
+        const comparison =
+            expectSuccessfulComparison(standardInput)
+
+        expect(comparison.input).toEqual(standardInput)
+        expect(comparison.equalPayment.method).toBe(
+            'equal-payment',
+        )
+        expect(comparison.equalPrincipal.method).toBe(
+            'equal-principal',
+        )
+        expect(
+            roundMortgageYen(
+                comparison.differences.firstPayment,
+            ),
+        ).toBe(11_743)
+        expect(
+            roundMortgageYen(
+                Math.abs(
+                    comparison.differences.lastPayment,
+                ),
+            ),
+        ).toBe(13_198)
+        expect(
+            roundMortgageYen(
+                Math.abs(
+                    comparison.differences.totalPayment,
+                ),
+            ),
+        ).toBe(305_498)
+        expect(
+            roundMortgageYen(
+                Math.abs(
+                    comparison.differences.totalInterest,
+                ),
+            ),
+        ).toBe(305_498)
+        expect(comparison.modelVersion).toBe(
+            MORTGAGE_MODEL_VERSION,
+        )
+    })
+
+    it('creates the standard comparison explanation from calculated values', () => {
+        const comparison =
+            expectSuccessfulComparison(standardInput)
+
+        expect(
+            createMortgageComparisonExplanation(
+                comparison,
+            ),
+        ).toBe(
+            '元金均等返済は、元利均等返済より初回返済額が約11,743円高い一方、支払利息総額は約305,498円少ない試算です。',
+        )
+    })
+
+    it('treats zero-interest displayed values as equal', () => {
+        const comparison =
+            expectSuccessfulComparison({
+                ...standardInput,
+                annualRate: 0,
+            })
+
+        expect(
+            createMortgageComparisonExplanation(
+                comparison,
+            ),
+        ).toBe(
+            'この条件では、元利均等返済と元金均等返済の初回返済額と支払利息総額に差はありません。',
+        )
+    })
+
+    it('switches the explanation directions for a reversed case', () => {
+        const comparison: MortgageComparison = {
+            input: standardInput,
+            equalPayment: {
+                method: 'equal-payment',
+                firstPayment: 100,
+                lastPayment: 100,
+                totalPayment: 1_100,
+                totalInterest: 1_000,
+                paymentCount: 12,
+                modelVersion: MORTGAGE_MODEL_VERSION,
+            },
+            equalPrincipal: {
+                method: 'equal-principal',
+                firstPayment: 90,
+                lastPayment: 80,
+                totalPayment: 1_300,
+                totalInterest: 1_200,
+                paymentCount: 12,
+                modelVersion: MORTGAGE_MODEL_VERSION,
+            },
+            differences: {
+                firstPayment: -10,
+                lastPayment: -20,
+                totalPayment: 200,
+                totalInterest: 200,
+            },
+            modelVersion: MORTGAGE_MODEL_VERSION,
+        }
+
+        expect(
+            createMortgageComparisonExplanation(
+                comparison,
+            ),
+        ).toBe(
+            '元金均等返済は、元利均等返済より初回返済額が約10円低い一方、支払利息総額は約200円多い試算です。',
+        )
+    })
+
+    it('handles a single equal comparison item without forcing a direction', () => {
+        const comparison: MortgageComparison = {
+            input: standardInput,
+            equalPayment: {
+                method: 'equal-payment',
+                firstPayment: 100,
+                lastPayment: 100,
+                totalPayment: 1_100,
+                totalInterest: 1_000,
+                paymentCount: 12,
+                modelVersion: MORTGAGE_MODEL_VERSION,
+            },
+            equalPrincipal: {
+                method: 'equal-principal',
+                firstPayment: 100,
+                lastPayment: 80,
+                totalPayment: 1_000,
+                totalInterest: 900,
+                paymentCount: 12,
+                modelVersion: MORTGAGE_MODEL_VERSION,
+            },
+            differences: {
+                firstPayment: 0,
+                lastPayment: -20,
+                totalPayment: -100,
+                totalInterest: -100,
+            },
+            modelVersion: MORTGAGE_MODEL_VERSION,
+        }
+
+        expect(
+            createMortgageComparisonExplanation(
+                comparison,
+            ),
+        ).toBe(
+            'この条件では初回返済額に差はなく、元金均等返済の支払利息総額は元利均等返済より約100円少ない試算です。',
+        )
+    })
+
+    it('returns the shared calculation error for invalid input', () => {
+        expect(
+            calculateMortgageComparison({
+                principal: 99_999,
+                annualRate: 1,
+                paymentCount: 420,
+            }),
+        ).toEqual({
+            ok: false,
+            error: 'INVALID_PRINCIPAL',
+        })
+    })
+
+    it('creates a method-independent comparison input key', () => {
+        expect(
+            createMortgageComparisonInputKey(
+                standardInput,
+            ),
+        ).toBe(
+            '30000000|1.000|420|fixed-monthly-v1',
         )
     })
 })
