@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -47,6 +48,12 @@ const FIELD_NAMES: MortgageFieldName[] = [
   'annualInterestRate',
   'repaymentYears',
 ]
+
+const FIELD_INPUT_IDS: Record<MortgageFieldName, string> = {
+  loanAmount: 'mortgage-loan-amount',
+  annualInterestRate: 'mortgage-interest-rate',
+  repaymentYears: 'mortgage-repayment-years',
+}
 
 const EMPTY_VALUES: MortgageFieldValues = {
   loanAmount: '',
@@ -211,6 +218,10 @@ function MortgageCalculator() {
     setManualCalculationError,
   ] = useState<MortgageCalculationError | null>(null)
 
+  const errorSummaryRef =
+    useRef<HTMLDivElement>(null)
+  const pendingErrorSummaryFocusRef =
+    useRef(false)
   const loanAmountRef =
     useRef<HTMLInputElement>(null)
   const annualInterestRateRef =
@@ -296,16 +307,37 @@ function MortgageCalculator() {
     validation,
   ])
 
-  const visibleErrorMessages = FIELD_NAMES.flatMap(
+  const visibleErrorEntries = FIELD_NAMES.flatMap(
     (fieldName) => {
       const error = visibleErrors[fieldName]
 
-      return error ? [error.message] : []
+      return error
+        ? [{
+            fieldName,
+            message: error.message,
+          }]
+        : []
     },
   )
 
   const hasVisibleErrors =
-    visibleErrorMessages.length > 0
+    visibleErrorEntries.length > 0
+  const shouldShowErrorSummary =
+    !isAutoCalculation &&
+    hasSubmitted &&
+    hasVisibleErrors
+
+  useEffect(() => {
+    if (
+      !shouldShowErrorSummary ||
+      !pendingErrorSummaryFocusRef.current
+    ) {
+      return
+    }
+
+    errorSummaryRef.current?.focus()
+    pendingErrorSummaryFocusRef.current = false
+  }, [shouldShowErrorSummary])
 
   const isManualResultStale =
     !isAutoCalculation &&
@@ -463,9 +495,7 @@ function MortgageCalculator() {
     setManualCalculationError(null)
 
     if (!confirmedValidation.ok) {
-      focusFirstInvalidField(
-        confirmedValidation.errors,
-      )
+      pendingErrorSummaryFocusRef.current = true
       return
     }
 
@@ -500,7 +530,20 @@ function MortgageCalculator() {
   const handleCalculationModeChange = (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
-    setIsAutoCalculation(event.target.checked)
+    const nextIsAutoCalculation = event.target.checked
+
+    if (
+      isAutoCalculation &&
+      !nextIsAutoCalculation &&
+      autoCalculationOutcome?.ok
+    ) {
+      setManualCalculation(
+        autoCalculationOutcome.stored,
+      )
+    }
+
+    pendingErrorSummaryFocusRef.current = false
+    setIsAutoCalculation(nextIsAutoCalculation)
     setHasSubmitted(false)
     setManualCalculationError(null)
   }
@@ -625,22 +668,34 @@ function MortgageCalculator() {
             </div>
           </fieldset>
 
-          {hasVisibleErrors && (
+          {shouldShowErrorSummary && (
             <div
+              ref={errorSummaryRef}
               className="mortgage-error-summary"
               role="alert"
               aria-labelledby="mortgage-error-title"
+              tabIndex={-1}
             >
               <strong id="mortgage-error-title">
                 入力内容を確認してください
-                （{visibleErrorMessages.length}件）
+                （{visibleErrorEntries.length}件）
               </strong>
 
               <ul>
-                {visibleErrorMessages.map(
-                  (message) => (
-                    <li key={message}>
-                      {message}
+                {visibleErrorEntries.map(
+                  ({ fieldName, message }) => (
+                    <li key={fieldName}>
+                      <a
+                        href={`#${FIELD_INPUT_IDS[fieldName]}`}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          fieldRefs[
+                            fieldName
+                          ].current?.focus()
+                        }}
+                      >
+                        {message}
+                      </a>
                     </li>
                   ),
                 )}
@@ -694,6 +749,9 @@ function MortgageCalculator() {
               className="mortgage-field__help"
             >
               10万円～10億円の整数で入力してください。
+              本シミュレーター上の計算範囲であり、
+              金融機関の融資条件や審査基準を
+              示すものではありません。
             </small>
 
             {visibleErrors.loanAmount && (

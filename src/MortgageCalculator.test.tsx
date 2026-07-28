@@ -66,7 +66,7 @@ describe('MortgageCalculator', () => {
         ).toBeNull()
     })
 
-    it('shows all errors after a manual submit and focuses the first field', async () => {
+    it('focuses the error summary after a manual submit and links to each invalid field', async () => {
         const user = userEvent.setup()
 
         render(<MortgageCalculator />)
@@ -88,21 +88,28 @@ describe('MortgageCalculator', () => {
         expect(
             errorSummary.textContent,
         ).toContain('3件')
+        expect(document.activeElement).toBe(
+            errorSummary,
+        )
+
+        const loanAmountLink = within(
+            errorSummary,
+        ).getByRole('link', {
+            name: '借入金額を入力してください。',
+        })
         expect(
-            within(errorSummary).getByText(
-                '借入金額を入力してください。',
-            ),
+            within(errorSummary).getByRole('link', {
+                name: '年利を入力してください。',
+            }),
         ).toBeTruthy()
         expect(
-            within(errorSummary).getByText(
-                '年利を入力してください。',
-            ),
+            within(errorSummary).getByRole('link', {
+                name: '返済期間を入力してください。',
+            }),
         ).toBeTruthy()
-        expect(
-            within(errorSummary).getByText(
-                '返済期間を入力してください。',
-            ),
-        ).toBeTruthy()
+
+        await user.click(loanAmountLink)
+
         expect(document.activeElement).toBe(
             screen.getByLabelText('借入金額'),
         )
@@ -234,6 +241,9 @@ describe('MortgageCalculator', () => {
                 '返済期間を入力してください。',
             ),
         ).toBeNull()
+        expect(
+            screen.queryByRole('alert'),
+        ).toBeNull()
     })
 
     it('automatically calculates once all valid conditions are present', async () => {
@@ -268,6 +278,66 @@ describe('MortgageCalculator', () => {
         expect(
             screen.getByText('約84,686円'),
         ).toBeTruthy()
+    })
+
+    it('keeps the current valid result when switching from auto to manual calculation', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        const autoCalculation = screen.getByRole(
+            'checkbox',
+            {
+                name: '入力と同時に計算結果を更新する',
+            },
+        )
+
+        await user.click(autoCalculation)
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '30000000',
+        )
+        await user.type(
+            screen.getByLabelText('年利'),
+            '1',
+        )
+        await user.type(
+            screen.getByLabelText('返済期間'),
+            '35',
+        )
+
+        expect(
+            screen.getByText('約84,686円'),
+        ).toBeTruthy()
+
+        await user.click(autoCalculation)
+
+        expect(
+            screen.getByRole('button', {
+                name: 'シミュレートする',
+            }),
+        ).toBeTruthy()
+        expect(
+            screen.getByText('概算結果'),
+        ).toBeTruthy()
+        expect(
+            screen.getByText('約84,686円'),
+        ).toBeTruthy()
+    })
+
+    it('explains that the loan amount range is a simulator limit, not a lending condition', () => {
+        render(<MortgageCalculator />)
+
+        const help = document.getElementById(
+            'mortgage-loan-amount-help',
+        )
+
+        expect(help?.textContent).toContain(
+            '本シミュレーター上の計算範囲',
+        )
+        expect(help?.textContent).toContain(
+            '金融機関の融資条件や審査基準',
+        )
     })
 
     it('limits live announcements to the compact status region', () => {

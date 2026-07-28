@@ -218,6 +218,28 @@
     line-height: 1.65;
 }
 
+.mortgage-error-summary:focus {
+    outline: 3px solid rgba(181, 71, 71, 0.2);
+    outline-offset: 3px;
+}
+
+.mortgage-error-summary a {
+    color: inherit;
+    font-weight: 700;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+.mortgage-error-summary a:hover {
+    text-decoration-thickness: 2px;
+}
+
+.mortgage-error-summary a:focus-visible {
+    border-radius: 3px;
+    outline: 3px solid rgba(181, 71, 71, 0.2);
+    outline-offset: 2px;
+}
+
 .mortgage-error-summary strong {
     display: block;
     color: #873b3b;
