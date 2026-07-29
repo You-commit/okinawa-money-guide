@@ -625,9 +625,9 @@
 .mortgage-results__empty {
     display: grid;
     place-items: center;
-    align-content: center;
+    align-content: start;
     min-height: 390px;
-    padding: 30px;
+    padding: 84px 30px 30px;
     border: 1px dashed #b8cbd3;
     border-radius: 16px;
     background: #f8fbfc;
@@ -693,6 +693,7 @@
 
     .mortgage-results__empty {
         min-height: 260px;
+        padding-top: 48px;
     }
 }
 
