@@ -67,11 +67,6 @@ const EMPTY_TOUCHED_FIELDS: TouchedFields = {
   repaymentYears: false,
 }
 
-const METHOD_LABELS: Record<RepaymentMethod, string> = {
-  'equal-payment': '元利均等返済',
-  'equal-principal': '元金均等返済',
-}
-
 const CALCULATION_ERROR_MESSAGE =
   '計算処理中に問題が発生しました。入力内容を確認して、もう一度お試しください。'
 
@@ -591,7 +586,7 @@ function MortgageCalculator() {
           noValidate
         >
           <fieldset className="mortgage-method">
-            <legend>主に確認する返済方式</legend>
+            <legend>強調して表示する返済方式</legend>
 
             <div className="mortgage-method__options">
               <label
@@ -931,12 +926,6 @@ function MortgageCalculator() {
               </h3>
             </div>
 
-            {activeCalculation && (
-              <span className="mortgage-results__method">
-                主に確認：
-                {METHOD_LABELS[repaymentMethod]}
-              </span>
-            )}
           </div>
 
           {isManualResultStale && (
@@ -993,7 +982,7 @@ function MortgageCalculator() {
                 <article className="mortgage-comparison-card" data-selected={repaymentMethod === 'equal-payment'} aria-labelledby="mortgage-equal-payment-title">
                   <header className="mortgage-comparison-card__heading">
                     <div><p>毎月の安定を重視</p><h4 id="mortgage-equal-payment-title">元利均等返済</h4></div>
-                    {repaymentMethod === 'equal-payment' && <span>主に確認</span>}
+                    {repaymentMethod === 'equal-payment' && <span>選択中</span>}
                   </header>
                   <dl className="mortgage-comparison-card__values">
                     <div><dt>毎月返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.firstPayment)}</dd><small>毎月の返済額が原則一定</small></div>
@@ -1006,7 +995,7 @@ function MortgageCalculator() {
                 <article className="mortgage-comparison-card" data-selected={repaymentMethod === 'equal-principal'} aria-labelledby="mortgage-equal-principal-title">
                   <header className="mortgage-comparison-card__heading">
                     <div><p>利息の軽減を重視</p><h4 id="mortgage-equal-principal-title">元金均等返済</h4></div>
-                    {repaymentMethod === 'equal-principal' && <span>主に確認</span>}
+                    {repaymentMethod === 'equal-principal' && <span>選択中</span>}
                   </header>
                   <dl className="mortgage-comparison-card__values">
                     <div><dt>初回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.firstPayment)}</dd><small>返済額は徐々に減少</small></div>

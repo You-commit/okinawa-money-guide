@@ -164,6 +164,9 @@ describe('MortgageCalculator', () => {
             '約71,488円',
         )
         expect(screen.getByText('元金均等返済は、元利均等返済より初回返済額が約11,743円高い一方、支払利息総額は約305,498円少ない試算です。')).toBeTruthy()
+        expect(screen.getByText('強調して表示する返済方式')).toBeTruthy()
+        expect(within(equalPayment).getByText('選択中')).toBeTruthy()
+        expect(screen.queryByText(/主に確認/)).toBeNull()
         expect(equalPayment.getAttribute('data-selected')).toBe('true')
     })
 
@@ -380,7 +383,9 @@ describe('MortgageCalculator', () => {
         await user.click(screen.getByRole('radio', { name: /元金均等返済/ }))
 
         expect(equalPayment.getAttribute('data-selected')).toBe('false')
+        expect(within(equalPayment).queryByText('選択中')).toBeNull()
         expect(equalPrincipal.getAttribute('data-selected')).toBe('true')
+        expect(within(equalPrincipal).getByText('選択中')).toBeTruthy()
         expect(screen.queryByText('前回の概算結果')).toBeNull()
         expect(screen.getByText('概算結果を更新しました。')).toBeTruthy()
     })
