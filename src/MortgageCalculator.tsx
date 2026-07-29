@@ -9,8 +9,9 @@ import {
 } from 'react'
 import './MortgageCalculator.css'
 import {
-  calculateMortgage,
-  createMortgageInputKey,
+  calculateMortgageComparison,
+  createMortgageComparisonExplanation,
+  createMortgageComparisonInputKey,
   formatApproxMortgageYen,
   formatLoanAmountForDisplay,
   normalizeAnnualRateText,
@@ -20,9 +21,9 @@ import {
   type MortgageFieldErrors,
   type MortgageFieldName,
   type MortgageFieldValues,
+  type MortgageComparison,
   type MortgageInput,
   type RepaymentMethod,
-  type RepaymentSummary,
 } from './mortgage'
 
 type TouchedFields = Record<MortgageFieldName, boolean>
@@ -30,8 +31,7 @@ type TouchedFields = Record<MortgageFieldName, boolean>
 type StoredCalculation = {
   input: MortgageInput
   inputKey: string
-  method: RepaymentMethod
-  result: RepaymentSummary
+  comparison: MortgageComparison
 }
 
 type CalculatorViewState =
@@ -130,13 +130,11 @@ const normalizeAllFieldsForConfirmation = (
 
 const createStoredCalculation = (
   input: MortgageInput,
-  method: RepaymentMethod,
-  result: RepaymentSummary,
+  comparison: MortgageComparison,
 ): StoredCalculation => ({
   input,
-  inputKey: createMortgageInputKey(input, method),
-  method,
-  result,
+  inputKey: createMortgageComparisonInputKey(input),
+  comparison,
 })
 
 const getResultHeading = (
@@ -242,9 +240,8 @@ function MortgageCalculator() {
 
   const currentInputKey =
     validation.ok
-      ? createMortgageInputKey(
+      ? createMortgageComparisonInputKey(
         validation.input,
-        repaymentMethod,
       )
       : null
 
@@ -253,9 +250,8 @@ function MortgageCalculator() {
       return null
     }
 
-    const calculation = calculateMortgage(
+    const calculation = calculateMortgageComparison(
       validation.input,
-      repaymentMethod,
     )
 
     if (!calculation.ok) {
@@ -269,15 +265,10 @@ function MortgageCalculator() {
       ok: true as const,
       stored: createStoredCalculation(
         validation.input,
-        repaymentMethod,
-        calculation.result,
+        calculation.comparison,
       ),
     }
-  }, [
-    isAutoCalculation,
-    repaymentMethod,
-    validation,
-  ])
+  }, [isAutoCalculation, validation])
 
   const visibleErrors = useMemo(() => {
     if (validation.ok) {
@@ -499,9 +490,8 @@ function MortgageCalculator() {
       return
     }
 
-    const calculation = calculateMortgage(
+    const calculation = calculateMortgageComparison(
       confirmedValidation.input,
-      repaymentMethod,
     )
 
     if (!calculation.ok) {
@@ -514,8 +504,7 @@ function MortgageCalculator() {
     setManualCalculation(
       createStoredCalculation(
         confirmedValidation.input,
-        repaymentMethod,
-        calculation.result,
+        calculation.comparison,
       ),
     )
   }
@@ -524,7 +513,6 @@ function MortgageCalculator() {
     method: RepaymentMethod,
   ) => {
     setRepaymentMethod(method)
-    setManualCalculationError(null)
   }
 
   const handleCalculationModeChange = (
@@ -564,9 +552,6 @@ function MortgageCalculator() {
     Boolean(activeCalculation),
   )
 
-  const resultMethod =
-    activeCalculation?.method ?? repaymentMethod
-
   return (
     <section
       className="mortgage-calculator"
@@ -583,8 +568,8 @@ function MortgageCalculator() {
 
         <p>
           借入金額・年利・返済期間から、
-          元利均等返済または元金均等返済の
-          返済額を試算します。
+          元利均等返済と元金均等返済を
+          同じ条件で比較します。
         </p>
       </header>
 
@@ -606,7 +591,7 @@ function MortgageCalculator() {
           noValidate
         >
           <fieldset className="mortgage-method">
-            <legend>返済方式</legend>
+            <legend>主に確認する返済方式</legend>
 
             <div className="mortgage-method__options">
               <label
@@ -666,6 +651,11 @@ function MortgageCalculator() {
                 </span>
               </label>
             </div>
+
+            <p className="mortgage-method__help">
+              両方式を同じ条件で計算し、
+              選択した方式を結果で強調表示します。
+            </p>
           </fieldset>
 
           {shouldShowErrorSummary && (
@@ -943,7 +933,8 @@ function MortgageCalculator() {
 
             {activeCalculation && (
               <span className="mortgage-results__method">
-                {METHOD_LABELS[resultMethod]}
+                主に確認：
+                {METHOD_LABELS[repaymentMethod]}
               </span>
             )}
           </div>
@@ -973,159 +964,59 @@ function MortgageCalculator() {
 
           {activeCalculation ? (
             <>
+              <div className="mortgage-results__condition-heading">
+                <strong>この条件で比較</strong>
+                <button
+                  className="mortgage-results__edit-button"
+                  type="button"
+                  onClick={() =>
+                    loanAmountRef.current?.focus()
+                  }
+                >
+                  入力条件を確認・変更する
+                </button>
+              </div>
+
               <dl className="mortgage-conditions">
-                <div>
-                  <dt>借入金額</dt>
-                  <dd>
-                    {activeCalculation.input.principal.toLocaleString(
-                      'ja-JP',
-                    )}
-                    円
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>年利</dt>
-                  <dd>
-                    {activeCalculation.input.annualRate.toLocaleString(
-                      'ja-JP',
-                      {
-                        maximumFractionDigits: 3,
-                      },
-                    )}
-                    %
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>返済期間</dt>
-                  <dd>
-                    {activeCalculation.input.paymentCount /
-                      12}
-                    年
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>返済回数</dt>
-                  <dd>
-                    {activeCalculation.input.paymentCount.toLocaleString(
-                      'ja-JP',
-                    )}
-                    回
-                  </dd>
-                </div>
+                <div><dt>借入金額</dt><dd>{activeCalculation.input.principal.toLocaleString('ja-JP')}円</dd></div>
+                <div><dt>年利</dt><dd>{activeCalculation.input.annualRate.toLocaleString('ja-JP', { maximumFractionDigits: 3 })}%</dd></div>
+                <div><dt>返済期間</dt><dd>{activeCalculation.input.paymentCount / 12}年</dd></div>
+                <div><dt>返済回数</dt><dd>{activeCalculation.input.paymentCount.toLocaleString('ja-JP')}回</dd></div>
               </dl>
 
-              <div className="mortgage-result-grid">
-                {resultMethod ===
-                  'equal-payment' ? (
-                  <article className="mortgage-result-card mortgage-result-card--primary">
-                    <span>毎月返済額</span>
-                    <strong>
-                      {formatApproxMortgageYen(
-                        activeCalculation.result
-                          .firstPayment,
-                      )}
-                    </strong>
-                    <small>
-                      毎月の返済額が原則一定
-                    </small>
-                  </article>
-                ) : (
-                  <>
-                    <article className="mortgage-result-card mortgage-result-card--primary">
-                      <span>初回返済額</span>
-                      <strong>
-                        {formatApproxMortgageYen(
-                          activeCalculation.result
-                            .firstPayment,
-                        )}
-                      </strong>
-                      <small>
-                        元金返済額と初回利息の合計
-                      </small>
-                    </article>
-
-                    <article className="mortgage-result-card">
-                      <span>最終回返済額</span>
-                      <strong>
-                        {formatApproxMortgageYen(
-                          activeCalculation.result
-                            .lastPayment,
-                        )}
-                      </strong>
-                      <small>
-                        元金返済額と最終回利息の合計
-                      </small>
-                    </article>
-                  </>
-                )}
-
-                <article className="mortgage-result-card">
-                  <span>総返済額</span>
-                  <strong>
-                    {formatApproxMortgageYen(
-                      activeCalculation.result
-                        .totalPayment,
-                    )}
-                  </strong>
-                  <small>
-                    借入元金と支払利息の合計
-                  </small>
-                </article>
-
-                <article className="mortgage-result-card">
-                  <span>支払利息総額</span>
-                  <strong>
-                    {formatApproxMortgageYen(
-                      activeCalculation.result
-                        .totalInterest,
-                    )}
-                  </strong>
-                  <small>
-                    総返済額から借入元金を差し引いた額
-                  </small>
-                </article>
+              <div className="mortgage-comparison-summary" role="note">
+                <strong>比較のポイント</strong>
+                <p>{createMortgageComparisonExplanation(activeCalculation.comparison)}</p>
               </div>
 
-              <div className="mortgage-total-breakdown">
-                <span>
-                  借入元金
-                  <strong>
-                    {formatApproxMortgageYen(
-                      activeCalculation.input
-                        .principal,
-                    )}
-                  </strong>
-                </span>
+              <div className="mortgage-comparison-grid" aria-label="返済方式の比較結果">
+                <article className="mortgage-comparison-card" data-selected={repaymentMethod === 'equal-payment'} aria-labelledby="mortgage-equal-payment-title">
+                  <header className="mortgage-comparison-card__heading">
+                    <div><p>毎月の安定を重視</p><h4 id="mortgage-equal-payment-title">元利均等返済</h4></div>
+                    {repaymentMethod === 'equal-payment' && <span>主に確認</span>}
+                  </header>
+                  <dl className="mortgage-comparison-card__values">
+                    <div><dt>毎月返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.firstPayment)}</dd><small>毎月の返済額が原則一定</small></div>
+                    <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.lastPayment)}</dd></div>
+                    <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.totalPayment)}</dd></div>
+                    <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.totalInterest)}</dd></div>
+                  </dl>
+                </article>
 
-                <b aria-hidden="true">＋</b>
-
-                <span>
-                  支払利息
-                  <strong>
-                    {formatApproxMortgageYen(
-                      activeCalculation.result
-                        .totalInterest,
-                    )}
-                  </strong>
-                </span>
-
-                <b aria-hidden="true">＝</b>
-
-                <span>
-                  総返済額
-                  <strong>
-                    {formatApproxMortgageYen(
-                      activeCalculation.result
-                        .totalPayment,
-                    )}
-                  </strong>
-                </span>
+                <article className="mortgage-comparison-card" data-selected={repaymentMethod === 'equal-principal'} aria-labelledby="mortgage-equal-principal-title">
+                  <header className="mortgage-comparison-card__heading">
+                    <div><p>利息の軽減を重視</p><h4 id="mortgage-equal-principal-title">元金均等返済</h4></div>
+                    {repaymentMethod === 'equal-principal' && <span>主に確認</span>}
+                  </header>
+                  <dl className="mortgage-comparison-card__values">
+                    <div><dt>初回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.firstPayment)}</dd><small>返済額は徐々に減少</small></div>
+                    <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.lastPayment)}</dd></div>
+                    <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.totalPayment)}</dd></div>
+                    <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.totalInterest)}</dd></div>
+                  </dl>
+                </article>
               </div>
-            </>
-          ) : (
+            </>          ) : (
             <div className="mortgage-results__empty">
               <span aria-hidden="true">¥</span>
               <strong>

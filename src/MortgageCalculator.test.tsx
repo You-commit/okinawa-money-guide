@@ -37,6 +37,18 @@ const fillValidConditions = async () => {
     return user
 }
 
+const expectDefinitionValue = (
+    scope: HTMLElement,
+    label: string,
+    value: string,
+) => {
+    const term = within(scope).getByText(label)
+    const row = term.closest('div')
+
+    expect(row).not.toBeNull()
+    expect(within(row!).getByText(value)).toBeTruthy()
+}
+
 describe('MortgageCalculator', () => {
     afterEach(() => {
         cleanup()
@@ -115,7 +127,7 @@ describe('MortgageCalculator', () => {
         )
     })
 
-    it('calculates the reference equal-payment result', async () => {
+    it('displays both repayment methods and their comparison explanation', async () => {
         render(<MortgageCalculator />)
 
         const user = await fillValidConditions()
@@ -126,20 +138,33 @@ describe('MortgageCalculator', () => {
             }),
         )
 
-        expect(
-            screen.getByText(
-                '概算結果を更新しました。',
-            ),
-        ).toBeTruthy()
-        expect(
-            screen.getByText('約84,686円'),
-        ).toBeTruthy()
-        expect(
-            screen.getAllByText('約35,567,998円'),
-        ).toHaveLength(2)
-        expect(
-            screen.getAllByText('約5,567,998円'),
-        ).toHaveLength(2)
+        expect(screen.getByText('概算結果を更新しました。')).toBeTruthy()
+
+        const equalPayment = screen.getByRole('article', { name: '元利均等返済' })
+        const equalPrincipal = screen.getByRole('article', { name: '元金均等返済' })
+
+        expectDefinitionValue(
+            equalPayment,
+            '毎月返済額',
+            '約84,686円',
+        )
+        expectDefinitionValue(
+            equalPayment,
+            '最終回返済額',
+            '約84,686円',
+        )
+        expectDefinitionValue(
+            equalPrincipal,
+            '初回返済額',
+            '約96,429円',
+        )
+        expectDefinitionValue(
+            equalPrincipal,
+            '最終回返済額',
+            '約71,488円',
+        )
+        expect(screen.getByText('元金均等返済は、元利均等返済より初回返済額が約11,743円高い一方、支払利息総額は約305,498円少ない試算です。')).toBeTruthy()
+        expect(equalPayment.getAttribute('data-selected')).toBe('true')
     })
 
     it('submits through the form, supporting Enter-key form behavior', async () => {
@@ -158,9 +183,13 @@ describe('MortgageCalculator', () => {
         expect(
             screen.getByText('概算結果'),
         ).toBeTruthy()
-        expect(
-            screen.getByText('約84,686円'),
-        ).toBeTruthy()
+        expectDefinitionValue(
+            screen.getByRole('article', {
+                name: '元利均等返済',
+            }),
+            '毎月返済額',
+            '約84,686円',
+        )
     })
 
     it('marks a previous manual result as stale after conditions change', async () => {
@@ -188,9 +217,13 @@ describe('MortgageCalculator', () => {
         expect(
             screen.getByText('前回の概算結果'),
         ).toBeTruthy()
-        expect(
-            screen.getByText('約84,686円'),
-        ).toBeTruthy()
+        expectDefinitionValue(
+            screen.getByRole('article', {
+                name: '元利均等返済',
+            }),
+            '毎月返済額',
+            '約84,686円',
+        )
     })
 
     it('does not show required errors for untouched fields in auto mode', async () => {
@@ -275,9 +308,13 @@ describe('MortgageCalculator', () => {
                 '概算結果を更新しました。',
             ),
         ).toBeTruthy()
-        expect(
-            screen.getByText('約84,686円'),
-        ).toBeTruthy()
+        expectDefinitionValue(
+            screen.getByRole('article', {
+                name: '元利均等返済',
+            }),
+            '毎月返済額',
+            '約84,686円',
+        )
     })
 
     it('keeps the current valid result when switching from auto to manual calculation', async () => {
@@ -306,9 +343,13 @@ describe('MortgageCalculator', () => {
             '35',
         )
 
-        expect(
-            screen.getByText('約84,686円'),
-        ).toBeTruthy()
+        expectDefinitionValue(
+            screen.getByRole('article', {
+                name: '元利均等返済',
+            }),
+            '毎月返済額',
+            '約84,686円',
+        )
 
         await user.click(autoCalculation)
 
@@ -320,9 +361,36 @@ describe('MortgageCalculator', () => {
         expect(
             screen.getByText('概算結果'),
         ).toBeTruthy()
-        expect(
-            screen.getByText('約84,686円'),
-        ).toBeTruthy()
+        expectDefinitionValue(
+            screen.getByRole('article', {
+                name: '元利均等返済',
+            }),
+            '毎月返済額',
+            '約84,686円',
+        )
+    })
+
+    it('changes only the highlighted result when the preferred method changes', async () => {
+        render(<MortgageCalculator />)
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+        const equalPayment = screen.getByRole('article', { name: '元利均等返済' })
+        const equalPrincipal = screen.getByRole('article', { name: '元金均等返済' })
+        await user.click(screen.getByRole('radio', { name: /元金均等返済/ }))
+
+        expect(equalPayment.getAttribute('data-selected')).toBe('false')
+        expect(equalPrincipal.getAttribute('data-selected')).toBe('true')
+        expect(screen.queryByText('前回の概算結果')).toBeNull()
+        expect(screen.getByText('概算結果を更新しました。')).toBeTruthy()
+    })
+
+    it('returns focus to the loan amount field from the result conditions', async () => {
+        render(<MortgageCalculator />)
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', { name: 'シミュレートする' }))
+        await user.click(screen.getByRole('button', { name: '入力条件を確認・変更する' }))
+        expect(document.activeElement).toBe(screen.getByLabelText('借入金額'))
     })
 
     it('explains that the loan amount range is a simulator limit, not a lending condition', () => {
