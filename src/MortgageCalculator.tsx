@@ -914,6 +914,10 @@ function MortgageCalculator() {
           className="mortgage-results"
           aria-labelledby="mortgage-result-title"
           data-stale={isManualResultStale}
+          data-empty={
+            activeCalculation === null &&
+            calculationError === null
+          }
         >
           <div className="mortgage-results__heading">
             <div>

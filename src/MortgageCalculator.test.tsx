@@ -76,6 +76,12 @@ describe('MortgageCalculator', () => {
         expect(
             screen.queryByRole('alert'),
         ).toBeNull()
+        expect(
+            screen
+                .getByText('シミュレーション結果')
+                .closest('section')
+                ?.getAttribute('data-empty'),
+        ).toBe('true')
     })
 
     it('focuses the error summary after a manual submit and links to each invalid field', async () => {
@@ -168,6 +174,12 @@ describe('MortgageCalculator', () => {
         expect(within(equalPayment).getByText('選択中')).toBeTruthy()
         expect(screen.queryByText(/主に確認/)).toBeNull()
         expect(equalPayment.getAttribute('data-selected')).toBe('true')
+        expect(
+            screen
+                .getByText('概算結果')
+                .closest('section')
+                ?.getAttribute('data-empty'),
+        ).toBe('false')
     })
 
     it('submits through the form, supporting Enter-key form behavior', async () => {

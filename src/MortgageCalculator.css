@@ -451,6 +451,10 @@
     background: #fffdf7;
 }
 
+.mortgage-results[data-empty="true"] {
+    grid-template-rows: max-content minmax(390px, 1fr);
+}
+
 .mortgage-results__heading {
     display: flex;
     align-items: flex-start;
@@ -681,6 +685,10 @@
 @media (max-width: 940px) {
     .mortgage-calculator__layout {
         grid-template-columns: 1fr;
+    }
+
+    .mortgage-results[data-empty="true"] {
+        grid-template-rows: max-content minmax(260px, 1fr);
     }
 
     .mortgage-results__empty {
