@@ -452,20 +452,10 @@
     line-height: 1.5;
 }
 
-.mortgage-reset-undo strong,
-.mortgage-reset-undo span {
-    display: block;
-}
-
 .mortgage-reset-undo strong {
+    display: block;
     color: var(--mortgage-green-dark);
     font-size: 0.82rem;
-}
-
-.mortgage-reset-undo span {
-    margin-top: 2px;
-    color: var(--mortgage-muted);
-    font-size: 0.72rem;
 }
 
 .mortgage-reset-undo__button {

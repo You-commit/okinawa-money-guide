@@ -449,14 +449,21 @@ describe('MortgageCalculator', () => {
                 name: '入力と同時に計算結果を更新する',
             }) as HTMLInputElement).checked,
         ).toBe(false)
+        const resetUndo = screen.getByRole(
+            'group',
+            { name: 'リセットの取り消し' },
+        )
         expect(
-            screen.getByText(
-                '入力内容をリセットしました。10秒以内は元に戻せます。',
+            within(resetUndo).getByText(
+                '入力内容をリセットしました。',
             ),
         ).toBeTruthy()
+        expect(
+            within(resetUndo).queryByText(/10秒/),
+        ).toBeNull()
 
         await user.click(
-            screen.getByRole('button', {
+            within(resetUndo).getByRole('button', {
                 name: '元に戻す',
             }),
         )
@@ -508,7 +515,7 @@ describe('MortgageCalculator', () => {
         )
     })
 
-    it('expires the reset undo after ten seconds', () => {
+    it('keeps the reset undo available without a time limit', () => {
         vi.useFakeTimers()
 
         render(<MortgageCalculator />)
@@ -525,25 +532,14 @@ describe('MortgageCalculator', () => {
             }),
         )
 
+        act(() => {
+            vi.advanceTimersByTime(60_000)
+        })
+
         expect(
             screen.getByRole('button', {
                 name: '元に戻す',
             }),
-        ).toBeTruthy()
-
-        act(() => {
-            vi.advanceTimersByTime(10_000)
-        })
-
-        expect(
-            screen.queryByRole('button', {
-                name: '元に戻す',
-            }),
-        ).toBeNull()
-        expect(
-            screen.getByText(
-                '借入条件を入力してください。',
-            ),
         ).toBeTruthy()
     })
 

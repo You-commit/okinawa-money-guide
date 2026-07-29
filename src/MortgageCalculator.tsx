@@ -79,7 +79,6 @@ const EMPTY_TOUCHED_FIELDS: TouchedFields = {
 
 const CALCULATION_ERROR_MESSAGE =
   '計算処理中に問題が発生しました。入力内容を確認して、もう一度お試しください。'
-const RESET_UNDO_DURATION_MS = 10_000
 
 const hasAnyInput = (values: MortgageFieldValues) =>
   FIELD_NAMES.some((fieldName) => values[fieldName] !== '')
@@ -230,8 +229,6 @@ function MortgageCalculator() {
     useRef<HTMLDivElement>(null)
   const pendingErrorSummaryFocusRef =
     useRef(false)
-  const resetUndoTimerRef =
-    useRef<ReturnType<typeof window.setTimeout> | null>(null)
   const loanAmountRef =
     useRef<HTMLInputElement>(null)
   const annualInterestRateRef =
@@ -245,17 +242,7 @@ function MortgageCalculator() {
     repaymentYears: repaymentYearsRef,
   }
 
-  const clearResetUndoTimer = () => {
-    if (resetUndoTimerRef.current === null) {
-      return
-    }
-
-    window.clearTimeout(resetUndoTimerRef.current)
-    resetUndoTimerRef.current = null
-  }
-
   const dismissResetUndo = () => {
-    clearResetUndoTimer()
     setResetSnapshot(null)
     setStatusMessageOverride(null)
   }
@@ -356,15 +343,6 @@ function MortgageCalculator() {
     errorSummaryRef.current?.focus()
     pendingErrorSummaryFocusRef.current = false
   }, [shouldShowErrorSummary])
-
-  useEffect(
-    () => () => {
-      if (resetUndoTimerRef.current !== null) {
-        window.clearTimeout(resetUndoTimerRef.current)
-      }
-    },
-    [],
-  )
 
   const isManualResultStale =
     !isAutoCalculation &&
@@ -581,8 +559,6 @@ function MortgageCalculator() {
   const resetCalculator = () => {
     const shouldOfferUndo = hasAnyInput(values)
 
-    clearResetUndoTimer()
-
     if (shouldOfferUndo) {
       setResetSnapshot({
         values: { ...values },
@@ -594,13 +570,8 @@ function MortgageCalculator() {
         manualCalculationError,
       })
       setStatusMessageOverride(
-        '入力内容をリセットしました。10秒以内は元に戻せます。',
+        '入力内容をリセットしました。',
       )
-      resetUndoTimerRef.current = window.setTimeout(() => {
-        setResetSnapshot(null)
-        setStatusMessageOverride(null)
-        resetUndoTimerRef.current = null
-      }, RESET_UNDO_DURATION_MS)
     } else {
       setResetSnapshot(null)
       setStatusMessageOverride(null)
@@ -625,7 +596,6 @@ function MortgageCalculator() {
       return
     }
 
-    clearResetUndoTimer()
     pendingErrorSummaryFocusRef.current = false
     setValues(resetSnapshot.values)
     setTouchedFields(resetSnapshot.touchedFields)
@@ -1021,7 +991,6 @@ function MortgageCalculator() {
             >
               <p>
                 <strong>入力内容をリセットしました。</strong>
-                <span>10秒以内に元に戻せます。</span>
               </p>
 
               <button
