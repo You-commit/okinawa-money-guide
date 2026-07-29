@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import {
+    act,
     cleanup,
     fireEvent,
     render,
@@ -52,6 +53,7 @@ const expectDefinitionValue = (
 describe('MortgageCalculator', () => {
     afterEach(() => {
         cleanup()
+        vi.useRealTimers()
         vi.unstubAllGlobals()
     })
 
@@ -408,6 +410,162 @@ describe('MortgageCalculator', () => {
         await user.click(screen.getByRole('button', { name: 'シミュレートする' }))
         await user.click(screen.getByRole('button', { name: '入力条件を確認・変更する' }))
         expect(document.activeElement).toBe(screen.getByLabelText('借入金額'))
+    })
+
+    it('restores the previous input, preferred method, calculation mode, and result once after reset', async () => {
+        render(<MortgageCalculator />)
+
+        const user = await fillValidConditions()
+
+        await user.click(
+            screen.getByRole('radio', {
+                name: /元金均等返済/,
+            }),
+        )
+        await user.click(
+            screen.getByRole('checkbox', {
+                name: '入力と同時に計算結果を更新する',
+            }),
+        )
+
+        await user.click(
+            screen.getByRole('button', {
+                name: '入力内容をリセット',
+            }),
+        )
+
+        expect(
+            (screen.getByLabelText(
+                '借入金額',
+            ) as HTMLInputElement).value,
+        ).toBe('')
+        expect(
+            (screen.getByRole('radio', {
+                name: /元利均等返済/,
+            }) as HTMLInputElement).checked,
+        ).toBe(true)
+        expect(
+            (screen.getByRole('checkbox', {
+                name: '入力と同時に計算結果を更新する',
+            }) as HTMLInputElement).checked,
+        ).toBe(false)
+        expect(
+            screen.getByText(
+                '入力内容をリセットしました。10秒以内は元に戻せます。',
+            ),
+        ).toBeTruthy()
+
+        await user.click(
+            screen.getByRole('button', {
+                name: '元に戻す',
+            }),
+        )
+
+        expect(
+            (screen.getByLabelText(
+                '借入金額',
+            ) as HTMLInputElement).value,
+        ).toBe('30,000,000')
+        expect(
+            (screen.getByLabelText(
+                '年利',
+            ) as HTMLInputElement).value,
+        ).toBe('1')
+        expect(
+            (screen.getByLabelText(
+                '返済期間',
+            ) as HTMLInputElement).value,
+        ).toBe('35')
+        expect(
+            (screen.getByRole('radio', {
+                name: /元金均等返済/,
+            }) as HTMLInputElement).checked,
+        ).toBe(true)
+        expect(
+            (screen.getByRole('checkbox', {
+                name: '入力と同時に計算結果を更新する',
+            }) as HTMLInputElement).checked,
+        ).toBe(true)
+        expect(
+            screen.getByText(
+                'リセット前の入力内容を元に戻しました。',
+            ),
+        ).toBeTruthy()
+        expect(
+            screen.queryByRole('button', {
+                name: '元に戻す',
+            }),
+        ).toBeNull()
+        expect(
+            screen
+                .getByRole('article', {
+                    name: '元金均等返済',
+                })
+                .getAttribute('data-selected'),
+        ).toBe('true')
+        expect(document.activeElement).toBe(
+            screen.getByLabelText('借入金額'),
+        )
+    })
+
+    it('expires the reset undo after ten seconds', () => {
+        vi.useFakeTimers()
+
+        render(<MortgageCalculator />)
+
+        fireEvent.change(
+            screen.getByLabelText('借入金額'),
+            {
+                target: { value: '30000000' },
+            },
+        )
+        fireEvent.click(
+            screen.getByRole('button', {
+                name: '入力内容をリセット',
+            }),
+        )
+
+        expect(
+            screen.getByRole('button', {
+                name: '元に戻す',
+            }),
+        ).toBeTruthy()
+
+        act(() => {
+            vi.advanceTimersByTime(10_000)
+        })
+
+        expect(
+            screen.queryByRole('button', {
+                name: '元に戻す',
+            }),
+        ).toBeNull()
+        expect(
+            screen.getByText(
+                '借入条件を入力してください。',
+            ),
+        ).toBeTruthy()
+    })
+
+    it('does not offer undo when reset is used with no input', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        await user.click(
+            screen.getByRole('button', {
+                name: '入力内容をリセット',
+            }),
+        )
+
+        expect(
+            screen.queryByRole('button', {
+                name: '元に戻す',
+            }),
+        ).toBeNull()
+        expect(document.activeElement).toBe(
+            screen.getByLabelText('借入金額'),
+        )
     })
 
     it('explains that the loan amount range is a simulator limit, not a lending condition', () => {

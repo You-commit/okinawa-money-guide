@@ -435,6 +435,62 @@
     background: #dff3ef;
 }
 
+.mortgage-reset-undo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 14px;
+    border: 1px solid #a9d4cf;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.mortgage-reset-undo p {
+    margin: 0;
+    color: var(--mortgage-text);
+    line-height: 1.5;
+}
+
+.mortgage-reset-undo strong,
+.mortgage-reset-undo span {
+    display: block;
+}
+
+.mortgage-reset-undo strong {
+    color: var(--mortgage-green-dark);
+    font-size: 0.82rem;
+}
+
+.mortgage-reset-undo span {
+    margin-top: 2px;
+    color: var(--mortgage-muted);
+    font-size: 0.72rem;
+}
+
+.mortgage-reset-undo__button {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--mortgage-green);
+    border-radius: 9px;
+    background: var(--mortgage-green);
+    color: #ffffff;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.mortgage-reset-undo__button:hover {
+    background: var(--mortgage-green-dark);
+}
+
+.mortgage-reset-undo__button:focus-visible {
+    outline: 3px solid rgba(15, 118, 110, 0.22);
+    outline-offset: 3px;
+}
+
 .mortgage-results {
     display: grid;
     gap: 20px;
@@ -740,6 +796,15 @@
 
     .mortgage-results__method {
         white-space: normal;
+    }
+
+    .mortgage-reset-undo {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .mortgage-reset-undo__button {
+        width: 100%;
     }
 }
 

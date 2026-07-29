@@ -34,6 +34,16 @@ type StoredCalculation = {
   comparison: MortgageComparison
 }
 
+type ResetSnapshot = {
+  values: MortgageFieldValues
+  touchedFields: TouchedFields
+  repaymentMethod: RepaymentMethod
+  isAutoCalculation: boolean
+  hasSubmitted: boolean
+  manualCalculation: StoredCalculation | null
+  manualCalculationError: MortgageCalculationError | null
+}
+
 type CalculatorViewState =
   | 'idle'
   | 'incomplete'
@@ -69,6 +79,7 @@ const EMPTY_TOUCHED_FIELDS: TouchedFields = {
 
 const CALCULATION_ERROR_MESSAGE =
   '計算処理中に問題が発生しました。入力内容を確認して、もう一度お試しください。'
+const RESET_UNDO_DURATION_MS = 10_000
 
 const hasAnyInput = (values: MortgageFieldValues) =>
   FIELD_NAMES.some((fieldName) => values[fieldName] !== '')
@@ -210,11 +221,17 @@ function MortgageCalculator() {
     manualCalculationError,
     setManualCalculationError,
   ] = useState<MortgageCalculationError | null>(null)
+  const [resetSnapshot, setResetSnapshot] =
+    useState<ResetSnapshot | null>(null)
+  const [statusMessageOverride, setStatusMessageOverride] =
+    useState<string | null>(null)
 
   const errorSummaryRef =
     useRef<HTMLDivElement>(null)
   const pendingErrorSummaryFocusRef =
     useRef(false)
+  const resetUndoTimerRef =
+    useRef<ReturnType<typeof window.setTimeout> | null>(null)
   const loanAmountRef =
     useRef<HTMLInputElement>(null)
   const annualInterestRateRef =
@@ -226,6 +243,21 @@ function MortgageCalculator() {
     loanAmount: loanAmountRef,
     annualInterestRate: annualInterestRateRef,
     repaymentYears: repaymentYearsRef,
+  }
+
+  const clearResetUndoTimer = () => {
+    if (resetUndoTimerRef.current === null) {
+      return
+    }
+
+    window.clearTimeout(resetUndoTimerRef.current)
+    resetUndoTimerRef.current = null
+  }
+
+  const dismissResetUndo = () => {
+    clearResetUndoTimer()
+    setResetSnapshot(null)
+    setStatusMessageOverride(null)
   }
 
   const validation = useMemo(
@@ -325,6 +357,15 @@ function MortgageCalculator() {
     pendingErrorSummaryFocusRef.current = false
   }, [shouldShowErrorSummary])
 
+  useEffect(
+    () => () => {
+      if (resetUndoTimerRef.current !== null) {
+        window.clearTimeout(resetUndoTimerRef.current)
+      }
+    },
+    [],
+  )
+
   const isManualResultStale =
     !isAutoCalculation &&
     manualCalculation !== null &&
@@ -387,15 +428,18 @@ function MortgageCalculator() {
     return 'incomplete'
   })()
 
-  const statusMessage = getStatusMessage(
-    viewState,
-    hasVisibleErrors,
-  )
+  const statusMessage =
+    statusMessageOverride ??
+    getStatusMessage(
+      viewState,
+      hasVisibleErrors,
+    )
 
   const updateFieldValue = (
     fieldName: MortgageFieldName,
     value: string,
   ) => {
+    dismissResetUndo()
     setValues((currentValues) => ({
       ...currentValues,
       [fieldName]: value,
@@ -448,6 +492,7 @@ function MortgageCalculator() {
     event: FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault()
+    dismissResetUndo()
 
     const confirmedValues =
       normalizeAllFieldsForConfirmation(values)
@@ -507,12 +552,14 @@ function MortgageCalculator() {
   const handleRepaymentMethodChange = (
     method: RepaymentMethod,
   ) => {
+    dismissResetUndo()
     setRepaymentMethod(method)
   }
 
   const handleCalculationModeChange = (
     event: ChangeEvent<HTMLInputElement>,
   ) => {
+    dismissResetUndo()
     const nextIsAutoCalculation = event.target.checked
 
     if (
@@ -532,6 +579,34 @@ function MortgageCalculator() {
   }
 
   const resetCalculator = () => {
+    const shouldOfferUndo = hasAnyInput(values)
+
+    clearResetUndoTimer()
+
+    if (shouldOfferUndo) {
+      setResetSnapshot({
+        values: { ...values },
+        touchedFields: { ...touchedFields },
+        repaymentMethod,
+        isAutoCalculation,
+        hasSubmitted,
+        manualCalculation,
+        manualCalculationError,
+      })
+      setStatusMessageOverride(
+        '入力内容をリセットしました。10秒以内は元に戻せます。',
+      )
+      resetUndoTimerRef.current = window.setTimeout(() => {
+        setResetSnapshot(null)
+        setStatusMessageOverride(null)
+        resetUndoTimerRef.current = null
+      }, RESET_UNDO_DURATION_MS)
+    } else {
+      setResetSnapshot(null)
+      setStatusMessageOverride(null)
+    }
+
+    pendingErrorSummaryFocusRef.current = false
     setValues(EMPTY_VALUES)
     setTouchedFields(EMPTY_TOUCHED_FIELDS)
     setRepaymentMethod('equal-payment')
@@ -539,7 +614,36 @@ function MortgageCalculator() {
     setHasSubmitted(false)
     setManualCalculation(null)
     setManualCalculationError(null)
-    loanAmountRef.current?.focus()
+
+    if (!shouldOfferUndo) {
+      loanAmountRef.current?.focus()
+    }
+  }
+
+  const restoreReset = () => {
+    if (!resetSnapshot) {
+      return
+    }
+
+    clearResetUndoTimer()
+    pendingErrorSummaryFocusRef.current = false
+    setValues(resetSnapshot.values)
+    setTouchedFields(resetSnapshot.touchedFields)
+    setRepaymentMethod(resetSnapshot.repaymentMethod)
+    setIsAutoCalculation(resetSnapshot.isAutoCalculation)
+    setHasSubmitted(resetSnapshot.hasSubmitted)
+    setManualCalculation(resetSnapshot.manualCalculation)
+    setManualCalculationError(
+      resetSnapshot.manualCalculationError,
+    )
+    setResetSnapshot(null)
+    setStatusMessageOverride(
+      'リセット前の入力内容を元に戻しました。',
+    )
+
+    window.requestAnimationFrame(() => {
+      loanAmountRef.current?.focus()
+    })
   }
 
   const resultHeading = getResultHeading(
@@ -908,6 +1012,27 @@ function MortgageCalculator() {
           >
             入力内容をリセット
           </button>
+
+          {resetSnapshot && (
+            <div
+              className="mortgage-reset-undo"
+              role="group"
+              aria-label="リセットの取り消し"
+            >
+              <p>
+                <strong>入力内容をリセットしました。</strong>
+                <span>10秒以内に元に戻せます。</span>
+              </p>
+
+              <button
+                className="mortgage-reset-undo__button"
+                type="button"
+                onClick={restoreReset}
+              >
+                元に戻す
+              </button>
+            </div>
+          )}
         </form>
 
         <section
