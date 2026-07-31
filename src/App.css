@@ -457,6 +457,10 @@ a {
   line-height: 1.35;
 }
 
+.hero-visual__card > strong span {
+  white-space: nowrap;
+}
+
 .hero-visual__description {
   max-width: 390px;
   margin-top: 14px;
@@ -1629,17 +1633,19 @@ a {
 
   .navigation {
     position: absolute;
-    top: calc(100% + 8px);
+    top: 100%;
     right: var(--omg-page-gutter);
     left: var(--omg-page-gutter);
+    z-index: 1;
     display: none;
     align-items: stretch;
     flex-direction: column;
     gap: 4px;
     padding: 10px;
     border: 1px solid #d4e5e2;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.98);
+    border-top: 0;
+    border-radius: 0 0 18px 18px;
+    background: #ffffff;
     box-shadow: 0 20px 44px rgba(28, 59, 83, 0.16);
   }
 

@@ -266,7 +266,8 @@ function App() {
                   MONEY DECISION SUPPORT
                 </p>
                 <strong>
-                  数字を、納得できる判断へ。
+                  数字を、納得できる
+                  <span>判断へ。</span>
                 </strong>
                 <p className="hero-visual__description">
                   条件に応じた試算と、
