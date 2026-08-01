@@ -18,32 +18,98 @@ const tools: Array<{
   id: ToolId
   title: string
   description: string
+  summary: string
 }> = [
     {
       id: 'military',
       title: '軍用地利回り',
       description:
         '購入価格と年間借地料から利回りを計算',
+      summary:
+        '軍用地の購入を検討するときに、年間借地料からおおよその利回りを確認できます。',
     },
     {
       id: 'mortgage',
       title: '住宅ローン',
       description:
         '借入金額から毎月の返済額を計算',
+      summary:
+        '借入金額や金利、返済期間から、毎月の返済額と総返済額の目安を確認できます。',
     },
     {
       id: 'nisa',
       title: 'NISA積立',
       description:
         '積立による将来の資産額を計算',
+      summary:
+        '毎月の積立額と運用期間から、将来の資産額の目安をシミュレーションできます。',
     },
     {
       id: 'ideco',
       title: 'iDeCo節税',
       description:
         '掛金による節税額を計算',
+      summary:
+        '掛金や所得税率から、将来の資産額と節税効果の目安を確認できます。',
     },
   ]
+
+function ToolIcon({ toolId }: { toolId: ToolId }) {
+  if (toolId === 'military') {
+    return (
+      <svg
+        viewBox="0 0 48 48"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M8 38h32" />
+        <path d="M14 38V17h20v21" />
+        <path d="M19 22h4v4h-4zM27 22h4v4h-4zM19 30h4v4h-4zM27 30h4v4h-4z" />
+        <path d="M10 33c2-4 5-5 8-5M38 33c-2-4-5-5-8-5" />
+      </svg>
+    )
+  }
+
+  if (toolId === 'mortgage') {
+    return (
+      <svg
+        viewBox="0 0 48 48"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M7 23 24 9l17 14" />
+        <path d="M12 21v18h24V21" />
+        <path d="M20 39V28h8v11" />
+      </svg>
+    )
+  }
+
+  if (toolId === 'nisa') {
+    return (
+      <svg
+        viewBox="0 0 48 48"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M10 38V27h7v11M21 38V20h7v18M32 38V13h7v25" />
+        <path d="m10 20 10-7 8 3 11-9" />
+        <path d="M34 7h5v5" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="24" cy="15" r="7" />
+      <path d="M11 39c1-9 6-14 13-14s12 5 13 14" />
+      <path d="M16 32h16" />
+    </svg>
+  )
+}
 
 function App() {
   const [
@@ -56,6 +122,11 @@ function App() {
     setSelectedTool,
   ] = useState<ToolId>('military')
 
+  const selectedToolData =
+    tools.find(
+      (tool) => tool.id === selectedTool,
+    ) ?? tools[0]
+
   const [
     isTaxableIncomeOpen,
     setIsTaxableIncomeOpen,
@@ -65,6 +136,23 @@ function App() {
     setIsTaxableIncomeOpen(
       (currentState) => !currentState,
     )
+  }
+
+  const handleMobileToolSelect = (
+    toolId: ToolId,
+  ) => {
+    setSelectedTool(toolId)
+
+    window.setTimeout(() => {
+      document
+        .getElementById(
+          'mobile-selected-tool',
+        )
+        ?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+    }, 0)
   }
 
   const handleToolTabKeyDown = (
@@ -346,6 +434,136 @@ function App() {
                 <small>
                   目的に合った計算ツールを選んでください
                 </small>
+              </div>
+
+              <div className="mobile-tool-selector">
+                <div className="mobile-tool-selector__heading">
+                  <div>
+                    <strong>シミュレーターを選択</strong>
+                    <small>
+                      4つのツールから、目的に合うものを選べます
+                    </small>
+                  </div>
+                  <span>全4ツール</span>
+                </div>
+
+                <label className="mobile-tool-select">
+                  <span className="sr-only">
+                    シミュレーターを選択
+                  </span>
+                  <span
+                    className={`mobile-tool-icon mobile-tool-icon--${selectedToolData.id}`}
+                    aria-hidden="true"
+                  >
+                    <ToolIcon toolId={selectedToolData.id} />
+                  </span>
+                  <select
+                    value={selectedTool}
+                    onChange={(event) =>
+                      setSelectedTool(
+                        event.target.value as ToolId,
+                      )
+                    }
+                  >
+                    {tools.map((tool) => (
+                      <option value={tool.id} key={tool.id}>
+                        {tool.title}
+                      </option>
+                    ))}
+                  </select>
+                  <span
+                    className="mobile-tool-select__chevron"
+                    aria-hidden="true"
+                  />
+                </label>
+
+                <article
+                  className="mobile-tool-summary"
+                  id="mobile-selected-tool"
+                >
+                  <div className="mobile-tool-summary__header">
+                    <span
+                      className={`mobile-tool-icon mobile-tool-icon--${selectedToolData.id}`}
+                      aria-hidden="true"
+                    >
+                      <ToolIcon toolId={selectedToolData.id} />
+                    </span>
+                    <div>
+                      <h3>{selectedToolData.title}</h3>
+                      <p>{selectedToolData.description}</p>
+                    </div>
+                  </div>
+
+                  <p className="mobile-tool-summary__description">
+                    {selectedToolData.summary}
+                  </p>
+
+                  <a
+                    className="mobile-tool-summary__action"
+                    href={`#tool-panel-${selectedToolData.id}`}
+                  >
+                    このシミュレーターを使う
+                    <span aria-hidden="true">→</span>
+                  </a>
+                </article>
+
+                <div className="mobile-tool-grid-heading">
+                  <span>4つのシミュレーター</span>
+                  <small>
+                    選択中のツールは内容を確認できます
+                  </small>
+                </div>
+
+                <div
+                  className="mobile-tool-grid"
+                  role="group"
+                  aria-label="4つのシミュレーター"
+                >
+                  {tools.map((tool) => {
+                    const isSelected =
+                      selectedTool === tool.id
+
+                    return (
+                      <button
+                        className={
+                          isSelected
+                            ? 'mobile-tool-card is-active'
+                            : 'mobile-tool-card'
+                        }
+                        type="button"
+                        aria-pressed={isSelected}
+                        key={tool.id}
+                        onClick={() =>
+                          handleMobileToolSelect(
+                            tool.id,
+                          )
+                        }
+                      >
+                        <span
+                          className={`mobile-tool-icon mobile-tool-icon--${tool.id}`}
+                          aria-hidden="true"
+                        >
+                          <ToolIcon toolId={tool.id} />
+                        </span>
+
+                        {isSelected && (
+                          <span className="mobile-tool-card__status">
+                            選択中
+                          </span>
+                        )}
+
+                        <strong>{tool.title}</strong>
+                        <small>{tool.description}</small>
+                        <span
+                          className="mobile-tool-card__chevron"
+                          aria-hidden="true"
+                        >
+                          ›
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
               <div
