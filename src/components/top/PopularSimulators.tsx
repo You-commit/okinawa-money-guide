@@ -1,0 +1,129 @@
+import type { MouseEvent } from 'react'
+import {
+  ArrowRightIcon,
+  BuildingIcon,
+  GrowthChartIcon,
+  HouseIcon,
+  ShieldHeartIcon,
+  SimulatorHubIcon,
+  SproutIcon,
+} from './TopIcons'
+
+export type TopSimulatorId = 'military' | 'mortgage' | 'nisa' | 'ideco'
+
+type PopularSimulatorsProps = {
+  onSelectSimulator: (toolId: TopSimulatorId) => void
+}
+
+function SimulatorIcon({ id }: { id: TopSimulatorId | 'insurance' }) {
+  if (id === 'military') {
+    return <BuildingIcon />
+  }
+
+  if (id === 'mortgage') {
+    return <HouseIcon />
+  }
+
+  if (id === 'nisa') {
+    return <GrowthChartIcon />
+  }
+
+  if (id === 'ideco') {
+    return <SproutIcon />
+  }
+
+  return <ShieldHeartIcon />
+}
+
+const simulators: Array<{
+  id: TopSimulatorId | 'insurance'
+  title: string
+  description: string
+  action: string
+  href: string
+}> = [
+  {
+    id: 'military',
+    title: '軍用地投資シミュレーター',
+    description: '利回りや地主金の配当をもとに、収益をシミュレーション',
+    action: 'シミュレーションする',
+    href: '#tool-panel-military',
+  },
+  {
+    id: 'mortgage',
+    title: '住宅ローンシミュレーター',
+    description: '借入可能額や返済額、金利比較で最適なプランを見つける',
+    action: 'シミュレーションする',
+    href: '#tool-panel-mortgage',
+  },
+  {
+    id: 'nisa',
+    title: 'NISAシミュレーター',
+    description: '積立額や利回りから将来の資産額をシミュレーション',
+    action: 'シミュレーションする',
+    href: '#tool-panel-nisa',
+  },
+  {
+    id: 'ideco',
+    title: 'iDeCoシミュレーター',
+    description: '節税メリットや受取額を見通し、老後資産を整理する',
+    action: 'シミュレーションする',
+    href: '#tool-panel-ideco',
+  },
+  {
+    id: 'insurance',
+    title: '保険見直し',
+    description: '保険のバランスや保障内容を学び、見直しをサポート',
+    action: '保険の知識を見る',
+    href: '#categories',
+  },
+]
+
+function PopularSimulators({ onSelectSimulator }: PopularSimulatorsProps) {
+  const handleClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    id: TopSimulatorId | 'insurance',
+  ) => {
+    if (id === 'insurance') {
+      return
+    }
+
+    event.preventDefault()
+    onSelectSimulator(id)
+  }
+
+  return (
+    <section
+      className="top-option02__popular"
+      id="popular-simulators"
+      aria-labelledby="popular-simulators-title"
+    >
+      <div className="top-option02__section-title top-option02__section-title--popular">
+        <span className="top-option02__section-title-icon" aria-hidden="true">
+          <SimulatorHubIcon />
+        </span>
+        <h2 id="popular-simulators-title">人気のシミュレーター</h2>
+      </div>
+      <div className="top-option02__popular-grid">
+        {simulators.map((simulator) => (
+          <article
+            className={`top-option02__simulator-card top-option02__simulator-card--${simulator.id}`}
+            key={simulator.id}
+          >
+            <span className="top-option02__simulator-icon">
+              <SimulatorIcon id={simulator.id} />
+            </span>
+            <h3>{simulator.title}</h3>
+            <p>{simulator.description}</p>
+            <a href={simulator.href} onClick={(event) => handleClick(event, simulator.id)}>
+              {simulator.action}
+              <ArrowRightIcon className="top-option02__card-arrow" />
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+export default PopularSimulators

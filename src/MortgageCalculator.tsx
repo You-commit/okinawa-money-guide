@@ -632,7 +632,9 @@ function MortgageCalculator() {
         </p>
 
         <h2 id="mortgage-title">
-          住宅ローン返済シミュレーター
+          <span>住宅ローン返済</span>
+          <wbr />
+          <span>シミュレーター</span>
         </h2>
 
         <p>

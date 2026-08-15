@@ -16,6 +16,34 @@
     color: var(--mortgage-navy);
 }
 
+.mortgage-calculator :where(h2, h3, h4, p, li, dt, dd, label, small) {
+    min-width: 0;
+    max-width: 100%;
+    word-break: normal;
+    overflow-wrap: break-word;
+}
+
+.mortgage-calculator :where(p, li, dd, label, small) {
+    line-break: strict;
+    text-wrap: pretty;
+}
+
+.mortgage-calculator :where(h2, h3, h4) {
+    line-break: strict;
+    text-wrap: balance;
+}
+
+.mortgage-calculator :where(button, a) {
+    min-width: 0;
+    max-width: 100%;
+}
+
+@supports (word-break: auto-phrase) {
+    .mortgage-calculator :where(h2, h3, h4, p, li, dt, dd, label, small) {
+        word-break: auto-phrase;
+    }
+}
+
 .mortgage-calculator__heading {
     max-width: 760px;
 }
@@ -24,7 +52,13 @@
     margin: 0;
     color: var(--mortgage-navy);
     font-size: clamp(2rem, 4vw, 3rem);
-    letter-spacing: -0.03em;
+    letter-spacing: -0.035em;
+    line-height: 1.28;
+}
+
+.mortgage-calculator__heading h2 > span {
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .mortgage-calculator__heading>p:last-child {
@@ -590,7 +624,6 @@
     container-type: inline-size;
     min-width: 0;
     padding: 19px;
-    overflow: hidden;
     text-align: center;
     border: 1px solid #dfe8ee;
     border-radius: 15px;
@@ -831,16 +864,28 @@
 .mortgage-comparison-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
 .mortgage-comparison-card { min-width: 0; padding: 18px; border: 1px solid #d9e5e9; border-radius: 16px; background: #fff; transition: border-color .18s ease,background .18s ease,box-shadow .18s ease; }
 .mortgage-comparison-card[data-selected="true"] { border: 2px solid #5ca9a1; background: #eef8f6; box-shadow: 0 10px 22px rgba(15,118,110,.1); }
-.mortgage-comparison-card__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; min-height: 62px; padding-bottom: 13px; border-bottom: 1px solid #dfe8ee; }
+.mortgage-comparison-card__heading { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px; min-height: 62px; padding-bottom: 13px; border-bottom: 1px solid #dfe8ee; }
 .mortgage-comparison-card__heading p { margin: 0 0 4px; color: var(--mortgage-muted); font-size: .7rem; font-weight: 700; }
-.mortgage-comparison-card__heading h4 { margin: 0; color: var(--mortgage-navy); font-size: 1.05rem; white-space: nowrap; word-break: keep-all; }
-.mortgage-comparison-card__heading>span { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; background: var(--mortgage-green); color: #fff; font-size: .68rem; font-weight: 800; white-space: nowrap; }
+.mortgage-comparison-card__heading h4 { margin: 0; color: var(--mortgage-navy); font-size: 1.05rem; white-space: normal; overflow-wrap: break-word; word-break: normal; }
+.mortgage-comparison-card__heading>span { flex: 0 0 auto; max-width: 100%; padding: 5px 8px; border-radius: 999px; background: var(--mortgage-green); color: #fff; font-size: .68rem; font-weight: 800; white-space: nowrap; }
 .mortgage-comparison-card__values { display: grid; gap: 0; margin: 0; }
 .mortgage-comparison-card__values>div { container-type: inline-size; min-width: 0; padding: 13px 0; border-bottom: 1px solid #e6eef1; text-align: center; }
 .mortgage-comparison-card__values>div:last-child { padding-bottom: 0; border-bottom: 0; }
 .mortgage-comparison-card__values dt { color: var(--mortgage-muted); font-size: .74rem; font-weight: 700; }
-.mortgage-comparison-card__values dd { margin: 5px 0 0; color: var(--mortgage-green-dark); font-size: clamp(1rem,10cqi,1.45rem); font-weight: 850; font-variant-numeric: tabular-nums; letter-spacing: -.025em; line-height: 1.3; white-space: nowrap; }
+.mortgage-comparison-card__values dd { margin: 5px 0 0; color: var(--mortgage-green-dark); font-size: clamp(.95rem,9cqi,1.45rem); font-weight: 850; font-variant-numeric: tabular-nums; letter-spacing: -.025em; line-height: 1.3; white-space: nowrap; overflow-wrap: normal; word-break: keep-all; }
 .mortgage-comparison-card__values small { display: block; margin-top: 5px; color: var(--mortgage-muted); font-size: .68rem; line-height: 1.5; }
 @media (max-width:760px) { .mortgage-comparison-grid { grid-template-columns: 1fr; } }
 @media (max-width:620px) { .mortgage-results__condition-heading { align-items: flex-start; flex-direction: column; } .mortgage-results__edit-button { width: 100%; min-height: 44px; } }
 @media (max-width:420px) { .mortgage-comparison-card { padding: 15px; } .mortgage-comparison-card__heading { min-height: 0; } }
+
+@media (max-width: 760px) {
+    .mortgage-calculator__heading h2 {
+        font-size: clamp(2.05rem, 9.6vw, 2.8rem);
+        line-height: 1.32;
+    }
+
+    .mortgage-calculator__heading > p:last-child {
+        font-size: 0.95rem;
+        line-height: 1.9;
+    }
+}

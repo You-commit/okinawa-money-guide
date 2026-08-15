@@ -353,7 +353,9 @@ function IdecoCalculator({
         </p>
 
         <h2 id="ideco-title">
-          iDeCo節税シミュレーター
+          <span>iDeCo節税</span>
+          <wbr />
+          <span>シミュレーター</span>
         </h2>
 
         <p>

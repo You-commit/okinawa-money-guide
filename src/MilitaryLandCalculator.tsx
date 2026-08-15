@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 type CalculationResult = {
   calculatedMultiple: number | null
@@ -10,6 +10,28 @@ const emptyResult: CalculationResult = {
   calculatedMultiple: null,
   surfaceYield: null,
   estimatedPrice: null,
+}
+
+const MOBILE_VIEWPORT_QUERY = '(max-width: 760px)'
+
+const scrollToMobileTarget = (target: HTMLElement | null) => {
+  if (target === null ||
+      !window.matchMedia(MOBILE_VIEWPORT_QUERY).matches) {
+    return
+  }
+
+  const behavior = window.matchMedia(
+    '(prefers-reduced-motion: reduce)',
+  ).matches
+    ? 'auto'
+    : 'smooth'
+
+  window.requestAnimationFrame(() => {
+    target.scrollIntoView({
+      behavior,
+      block: 'start',
+    })
+  })
 }
 
 const formatYen = (value: number) =>
@@ -101,6 +123,9 @@ const calculateResults = (
 }
 
 function MilitaryLandCalculator() {
+  const formRef = useRef<HTMLDivElement>(null)
+  const annualRentInputRef = useRef<HTMLInputElement>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
   const [annualRent, setAnnualRent] = useState('')
   const [purchasePrice, setPurchasePrice] = useState('')
   const [multiple, setMultiple] = useState('')
@@ -140,6 +165,10 @@ function MilitaryLandCalculator() {
   const displayedResult = isAutoCalculation
     ? autoResult
     : manualResult ?? emptyResult
+
+  const hasDisplayedResult = Object.values(
+    displayedResult,
+  ).some((value) => value !== null)
 
   const rentValue = Number(getMoneyDigits(annualRent))
   const priceValue = Number(getMoneyDigits(purchasePrice))
@@ -189,6 +218,22 @@ function MilitaryLandCalculator() {
         multiple,
       ),
     )
+
+    scrollToMobileTarget(resultsRef.current)
+  }
+
+  const returnToInputs = () => {
+    scrollToMobileTarget(formRef.current)
+
+    if (!window.matchMedia(MOBILE_VIEWPORT_QUERY).matches) {
+      return
+    }
+
+    window.requestAnimationFrame(() => {
+      annualRentInputRef.current?.focus({
+        preventScroll: true,
+      })
+    })
   }
 
   const resetCalculator = () => {
@@ -208,28 +253,39 @@ function MilitaryLandCalculator() {
       className="calculator"
       aria-labelledby="military-land-title"
     >
-      <div className="calculator-heading">
+      <div className="calculator-heading calculator-heading--military">
         <p className="section-label">
           MILITARY LAND CALCULATOR
         </p>
 
         <h2 id="military-land-title">
-          軍用地利回りシミュレーター
+          <span>軍用地利回り</span>
+          <wbr />
+          <span>シミュレーター</span>
         </h2>
 
         <p>
-          年間借地料と購入価格を入力すると、
-          倍率と表面利回りを計算します。
+          <span className="text-keep">年間借地料と購入価格を</span>
+          <wbr />
+          <span className="text-keep">入力すると、</span>
+          <wbr />
+          <span className="text-keep">倍率と表面利回りを</span>
+          <wbr />
+          <span className="text-keep">計算します。</span>
         </p>
       </div>
 
       <div className="calculator-layout">
-        <div className="calculator-form">
+        <div
+          className="calculator-form"
+          ref={formRef}
+        >
           <label>
             <span>年間借地料</span>
 
             <div className="input-with-unit">
               <input
+                ref={annualRentInputRef}
                 type="text"
                 inputMode="numeric"
                 value={annualRent}
@@ -354,25 +410,34 @@ function MilitaryLandCalculator() {
             <div className="form-spacer" aria-hidden="true"></div>
 
             <div className="calculation-mode">
-                <label className="mode-checkbox">
+              <label className="mode-checkbox">
                 <input
-                    type="checkbox"
-                    checked={isAutoCalculation}
-                    onChange={(event) =>
+                  type="checkbox"
+                  checked={isAutoCalculation}
+                  onChange={(event) =>
                     changeCalculationMode(event.target.checked)
-                    }
+                  }
                 />
 
-                <span>
-                    入力と同時に計算結果を更新する
+                <span className="mode-checkbox__title">
+                  <span>入力と同時に</span>
+                  <span>計算結果を更新する</span>
                 </span>
-                </label>
+              </label>
 
-                <p>
-                {isAutoCalculation
-                    ? '入力内容を変更すると、結果が自動更新されます。'
-                    : 'シミュレートボタンを押すと結果が表示されます。'}
-                </p>
+              <p className="calculation-mode__description">
+                {isAutoCalculation ? (
+                  <>
+                    <span>入力内容を変更すると、</span>
+                    <span>結果が自動更新されます。</span>
+                  </>
+                ) : (
+                  <>
+                    <span>シミュレートボタンを押すと</span>
+                    <span>結果が表示されます。</span>
+                  </>
+                )}
+              </p>
             </div>
 
             {!isAutoCalculation && (
@@ -398,8 +463,28 @@ function MilitaryLandCalculator() {
 
         <div
           className="calculator-results"
+          ref={resultsRef}
+          role="region"
+          aria-label="シミュレーション結果"
           aria-live="polite"
+          tabIndex={-1}
         >
+          {hasDisplayedResult && (
+            <div className="mobile-result-toolbar">
+              <strong className="mobile-result-title">
+                シミュレーション結果
+              </strong>
+
+              <button
+                className="mobile-result-back"
+                type="button"
+                aria-label="入力条件に戻る"
+                onClick={returnToInputs}
+              >
+                入力条件に戻る
+              </button>
+            </div>
+          )}
           <div className="result-card">
             <span>購入倍率</span>
 
@@ -430,7 +515,9 @@ function MilitaryLandCalculator() {
 
           <div className="result-card">
             <span>
-              入力倍率による想定購入価格
+              <span className="text-keep">入力倍率による</span>
+              <wbr />
+              <span className="text-keep">想定購入価格</span>
             </span>
 
             <strong>
@@ -449,9 +536,15 @@ function MilitaryLandCalculator() {
       </div>
 
       <p className="calculator-note">
-        本シミュレーターの結果は概算です。
-        税金、手数料、借入利息、借地料の変動などは
-        含んでいません。
+        <span className="text-keep">本シミュレーターの結果は</span>
+        <wbr />
+        <span className="text-keep">概算です。</span>
+        <wbr />
+        <span className="text-keep">税金、手数料、借入利息、</span>
+        <wbr />
+        <span className="text-keep">借地料の変動などは</span>
+        <wbr />
+        <span className="text-keep">含んでいません。</span>
       </p>
     </section>
   )

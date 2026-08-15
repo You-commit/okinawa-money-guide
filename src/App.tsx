@@ -1,13 +1,23 @@
 import {
   useState,
   type KeyboardEvent,
+  type ReactNode,
 } from 'react'
 import MilitaryLandCalculator from './MilitaryLandCalculator'
 import MortgageCalculator from './MortgageCalculator'
 import NisaCalculator from './NisaCalculator'
 import IdecoCalculator from './IdecoCalculator'
+import TopHeader from './components/top/TopHeader'
+import TopHero from './components/top/TopHero'
+import PopularSimulators, {
+  type TopSimulatorId,
+} from './components/top/PopularSimulators'
+import PurposeGuide from './components/top/PurposeGuide'
+import TrustSection from './components/top/TrustSection'
+import FloatingSimulatorCta from './components/top/FloatingSimulatorCta'
 // import TaxableIncomeCalculator from './TaxableIncomeCalculator'
 import './App.css'
+import './styles/top-redesign-option02.css'
 type ToolId =
   | 'military'
   | 'mortgage'
@@ -17,40 +27,104 @@ type ToolId =
 const tools: Array<{
   id: ToolId
   title: string
-  description: string
-  summary: string
+  description: ReactNode
+  summary: ReactNode
 }> = [
     {
       id: 'military',
       title: '軍用地利回り',
-      description:
-        '購入価格と年間借地料から利回りを計算',
-      summary:
-        '軍用地の購入を検討するときに、年間借地料からおおよその利回りを確認できます。',
+      description: (
+        <>
+          <span className="text-keep">購入価格と</span>
+          <wbr />
+          <span className="text-keep">年間借地料から</span>
+          <wbr />
+          <span className="text-keep">利回りを計算</span>
+        </>
+      ),
+      summary: (
+        <>
+          <span className="text-keep">軍用地の購入を</span>
+          <wbr />
+          <span className="text-keep">検討するときに、</span>
+          <wbr />
+          <span className="text-keep">年間借地料から</span>
+          <wbr />
+          <span className="text-keep">おおよその利回りを</span>
+          <wbr />
+          <span className="text-keep">確認できます。</span>
+        </>
+      ),
     },
     {
       id: 'mortgage',
       title: '住宅ローン',
-      description:
-        '借入金額から毎月の返済額を計算',
-      summary:
-        '借入金額や金利、返済期間から、毎月の返済額と総返済額の目安を確認できます。',
+      description: (
+        <>
+          <span className="text-keep">借入金額から</span>
+          <wbr />
+          <span className="text-keep">毎月の返済額を計算</span>
+        </>
+      ),
+      summary: (
+        <>
+          <span className="text-keep">借入金額や金利、</span>
+          <wbr />
+          <span className="text-keep">返済期間から、</span>
+          <wbr />
+          <span className="text-keep">毎月の返済額と</span>
+          <wbr />
+          <span className="text-keep">総返済額の目安を</span>
+          <wbr />
+          <span className="text-keep">確認できます。</span>
+        </>
+      ),
     },
     {
       id: 'nisa',
       title: 'NISA積立',
-      description:
-        '積立による将来の資産額を計算',
-      summary:
-        '毎月の積立額と運用期間から、将来の資産額の目安をシミュレーションできます。',
+      description: (
+        <>
+          <span className="text-keep">積立による</span>
+          <wbr />
+          <span className="text-keep">将来の資産額を計算</span>
+        </>
+      ),
+      summary: (
+        <>
+          <span className="text-keep">毎月の積立額と</span>
+          <wbr />
+          <span className="text-keep">運用期間から、</span>
+          <wbr />
+          <span className="text-keep">将来の資産額の</span>
+          <wbr />
+          <span className="text-keep">目安を</span>
+          <wbr />
+          <span className="text-keep">シミュレーションできます。</span>
+        </>
+      ),
     },
     {
       id: 'ideco',
       title: 'iDeCo節税',
-      description:
-        '掛金による節税額を計算',
-      summary:
-        '掛金や所得税率から、将来の資産額と節税効果の目安を確認できます。',
+      description: (
+        <>
+          <span className="text-keep">掛金による</span>
+          <wbr />
+          <span className="text-keep">節税額を計算</span>
+        </>
+      ),
+      summary: (
+        <>
+          <span className="text-keep">掛金や所得税率から、</span>
+          <wbr />
+          <span className="text-keep">将来の資産額と</span>
+          <wbr />
+          <span className="text-keep">節税効果の目安を</span>
+          <wbr />
+          <span className="text-keep">確認できます。</span>
+        </>
+      ),
     },
   ]
 
@@ -113,11 +187,6 @@ function ToolIcon({ toolId }: { toolId: ToolId }) {
 
 function App() {
   const [
-    isNavigationOpen,
-    setIsNavigationOpen,
-  ] = useState(false)
-
-  const [
     selectedTool,
     setSelectedTool,
   ] = useState<ToolId>('military')
@@ -144,12 +213,41 @@ function App() {
     setSelectedTool(toolId)
 
     window.setTimeout(() => {
+      const behavior = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches
+        ? 'auto'
+        : 'smooth'
+
       document
         .getElementById(
-          'mobile-selected-tool',
+          `tool-panel-${toolId}`,
         )
         ?.scrollIntoView({
-          behavior: 'smooth',
+          behavior,
+          block: 'start',
+        })
+    }, 0)
+  }
+
+  const handleTopSimulatorSelect = (
+    toolId: TopSimulatorId,
+  ) => {
+    setSelectedTool(toolId)
+
+    window.setTimeout(() => {
+      const behavior = window.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches
+        ? 'auto'
+        : 'smooth'
+
+      document
+        .getElementById(
+          `tool-panel-${toolId}`,
+        )
+        ?.scrollIntoView({
+          behavior,
           block: 'start',
         })
     }, 0)
@@ -208,212 +306,25 @@ function App() {
   }
 
   return (
-    <div className="site" id="top">
-      <header className="header">
-        <div className="header-inner">
-          <a
-            className="site-brand"
-            href="#top"
-            aria-label="沖縄マネーガイド トップへ戻る"
-          >
-            <span
-              className="site-brand__mark"
-              aria-hidden="true"
-            >
-              <span className="site-brand__stone" />
-              <span className="site-brand__wave site-brand__wave--blue" />
-              <span className="site-brand__wave site-brand__wave--green" />
-            </span>
-
-            <span className="site-brand__copy">
-              <strong>沖縄マネーガイド</strong>
-              <small>OKINAWA MONEY GUIDE</small>
-            </span>
-          </a>
-
-          <button
-            className="navigation-toggle"
-            type="button"
-            aria-expanded={isNavigationOpen}
-            aria-controls="site-navigation"
-            onClick={() =>
-              setIsNavigationOpen(
-                (currentState) =>
-                  !currentState,
-              )
-            }
-          >
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-            <span className="sr-only">
-              メニューを開閉する
-            </span>
-          </button>
-
-          <nav
-            id="site-navigation"
-            className={
-              isNavigationOpen
-                ? 'navigation is-open'
-                : 'navigation'
-            }
-            aria-label="メインメニュー"
-          >
-            <a
-              className="navigation__primary"
-              href="#tools"
-              onClick={() =>
-                setIsNavigationOpen(false)
-              }
-            >
-              無料ツール
-            </a>
-            <a
-              href="#categories"
-              onClick={() =>
-                setIsNavigationOpen(false)
-              }
-            >
-              お金の知識
-            </a>
-            <a
-              href="#about"
-              onClick={() =>
-                setIsNavigationOpen(false)
-              }
-            >
-              このサイトについて
-            </a>
-          </nav>
-        </div>
-      </header>
+    <div className="site top-option02" id="top">
+      <TopHeader />
 
       <main>
-        <section
-          className="hero"
-          aria-labelledby="hero-title"
-        >
-          <div className="hero-inner">
-            <div className="hero-copy">
-              <p className="hero-kicker">
-                <span aria-hidden="true" />
-                沖縄で暮らす人のお金の情報サイト
-              </p>
+        <TopHero />
+        <PopularSimulators
+          onSelectSimulator={
+            handleTopSimulatorSelect
+          }
+        />
+        <PurposeGuide />
+        <TrustSection />
 
-              <h1 id="hero-title">
-                <span>沖縄で暮らす人の</span>
-                <span>
-                  <em>お金の判断</em>を、
-                </span>
-                <span>もっと分かりやすく。</span>
-              </h1>
-
-              <p className="hero-description">
-                軍用地、住宅ローン、NISA、iDeCo。
-                沖縄に身近なお金のテーマを、
-                試算と解説で落ち着いて理解できる場所を目指します。
-              </p>
-
-              <div className="hero-actions">
-                <a
-                  className="primary-button"
-                  href="#tools"
-                >
-                  無料ツールを使う
-                  <span aria-hidden="true">→</span>
-                </a>
-                <a
-                  className="secondary-button"
-                  href="#categories"
-                >
-                  お金の知識を見る
-                </a>
-              </div>
-
-              <ul
-                className="hero-points"
-                aria-label="サイトの特徴"
-              >
-                <li>無料で利用</li>
-                <li>登録不要</li>
-                <li>沖縄に身近なテーマ</li>
-              </ul>
-            </div>
-
-            <div
-              className="hero-visual"
-              aria-label="条件入力から比較までの利用イメージ"
-            >
-              <div
-                className="hero-visual__halo"
-                aria-hidden="true"
-              />
-              <div className="hero-visual__card">
-                <p className="hero-visual__label">
-                  MONEY DECISION SUPPORT
-                </p>
-                <strong>
-                  数字を、納得できる
-                  <span>判断へ。</span>
-                </strong>
-                <p className="hero-visual__description">
-                  条件に応じた試算と、
-                  地域に根ざした解説をひとつの場所に。
-                </p>
-
-                <ol className="hero-steps">
-                  <li>
-                    <span>01</span>
-                    <div>
-                      <strong>条件を入力</strong>
-                      <small>数字を入れるだけ</small>
-                    </div>
-                  </li>
-                  <li>
-                    <span>02</span>
-                    <div>
-                      <strong>結果を比較</strong>
-                      <small>違いを見える化</small>
-                    </div>
-                  </li>
-                  <li>
-                    <span>03</span>
-                    <div>
-                      <strong>意味を理解</strong>
-                      <small>判断材料を整理</small>
-                    </div>
-                  </li>
-                </ol>
-
-                <div
-                  className="hero-visual__topics"
-                  aria-label="主なテーマ"
-                >
-                  <span>軍用地</span>
-                  <span>住宅ローン</span>
-                  <span>NISA</span>
-                  <span>iDeCo</span>
-                </div>
-              </div>
-              <div
-                className="hero-visual__wave hero-visual__wave--blue"
-                aria-hidden="true"
-              />
-              <div
-                className="hero-visual__wave hero-visual__wave--green"
-                aria-hidden="true"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section
-          className="section tools-section"
-          id="tools"
-        >
+        <section className="section tools-section">
           <div className="section-inner">
-            <div className="section-heading tools-heading">
+            <div
+              className="section-heading tools-heading"
+              id="tools"
+            >
               <div>
                 <p className="section-label">
                   FREE TOOLS
@@ -422,9 +333,17 @@ function App() {
               </div>
 
               <p className="section-description">
-                目的に合うツールを選び、
-                条件を入力するだけで試算できます。
-                結果は判断材料のひとつとしてご利用ください。
+                <span className="text-keep">目的に合うツールを選び、</span>
+                <wbr />
+                <span className="text-keep">条件を入力するだけで</span>
+                <wbr />
+                <span className="text-keep">試算できます。</span>
+                <wbr />
+                <span className="text-keep">結果は判断材料の</span>
+                <wbr />
+                <span className="text-keep">ひとつとして</span>
+                <wbr />
+                <span className="text-keep">ご利用ください。</span>
               </p>
             </div>
 
@@ -439,9 +358,9 @@ function App() {
               <div className="mobile-tool-selector">
                 <div className="mobile-tool-selector__heading">
                   <div>
-                    <strong>シミュレーターを選択</strong>
+                    <strong>ツールの内容を確認</strong>
                     <small>
-                      4つのツールから、目的に合うものを選べます
+                      選ぶと説明が切り替わります
                     </small>
                   </div>
                   <span>全4ツール</span>
@@ -449,7 +368,7 @@ function App() {
 
                 <label className="mobile-tool-select">
                   <span className="sr-only">
-                    シミュレーターを選択
+                    内容を確認するシミュレーターを選択
                   </span>
                   <span
                     className={`mobile-tool-icon mobile-tool-icon--${selectedToolData.id}`}
@@ -510,7 +429,7 @@ function App() {
                 <div className="mobile-tool-grid-heading">
                   <span>4つのシミュレーター</span>
                   <small>
-                    選択中のツールは内容を確認できます
+                    選ぶとシミュレーターへ移動します
                   </small>
                 </div>
 
@@ -675,46 +594,91 @@ function App() {
           </div>
         </section>
 
-        <section className="section category-section" id="categories">
+        <section className="section category-section">
           <div className="section-inner">
-            <p className="section-label">MONEY GUIDE</p>
-            <h2>沖縄のお金を学ぶ</h2>
+            <div
+              className="section-anchor-heading"
+              id="categories"
+            >
+              <p className="section-label">MONEY GUIDE</p>
+              <h2>沖縄のお金を学ぶ</h2>
+            </div>
 
             <div className="category-grid">
               <article>
                 <h3>ローン</h3>
-                <p>住宅・自動車・教育・軍用地ローンの基礎知識</p>
+                <p>
+                  <span className="text-keep">住宅・自動車・教育・</span>
+                  <wbr />
+                  <span className="text-keep">軍用地ローンの</span>
+                  <wbr />
+                  <span className="text-keep">基礎知識</span>
+                </p>
               </article>
 
               <article>
                 <h3>資産運用</h3>
-                <p>NISA・iDeCo・投資信託を分かりやすく解説</p>
+                <p>
+                  <span className="text-keep">NISA・iDeCo・投資信託を</span>
+                  <wbr />
+                  <span className="text-keep">分かりやすく解説</span>
+                </p>
               </article>
 
               <article>
                 <h3>軍用地</h3>
-                <p>仕組み・利回り・購入時の注意点を紹介</p>
+                <p>
+                  <span className="text-keep">仕組み・利回り・</span>
+                  <wbr />
+                  <span className="text-keep">購入時の注意点を紹介</span>
+                </p>
               </article>
 
               <article>
                 <h3>保険・家計</h3>
-                <p>保険や家計管理に役立つ情報を紹介</p>
+                <p>
+                  <span className="text-keep">保険や家計管理に役立つ</span>
+                  <wbr />
+                  <span className="text-keep">情報を紹介</span>
+                </p>
               </article>
             </div>
           </div>
         </section>
 
-        <section className="section about-section" id="about">
+        <section className="section about-section">
           <div className="section-inner narrow">
-            <p className="section-label">ABOUT</p>
-            <h2>沖縄マネーガイドについて</h2>
+            <div
+              className="section-anchor-heading"
+              id="about"
+            >
+              <p className="section-label">ABOUT</p>
+              <h2>
+                <span className="text-keep">沖縄マネーガイド</span>
+                <wbr />
+                <span className="text-keep">について</span>
+              </h2>
+            </div>
             <p>
-              沖縄マネーガイドは、沖縄で暮らす人がお金について調べる際に、
-              複雑な情報をできるだけ分かりやすく理解できることを目指す情報サイトです。
+              <span className="text-keep">沖縄マネーガイドは、</span>
+              <wbr />
+              <span className="text-keep">沖縄で暮らす人が</span>
+              <wbr />
+              <span className="text-keep">お金について調べる際に、</span>
+              <wbr />
+              <span className="text-keep">複雑な情報を</span>
+              <wbr />
+              <span className="text-keep">できるだけ分かりやすく</span>
+              <wbr />
+              <span className="text-keep">理解できることを目指す</span>
+              <wbr />
+              <span className="text-keep">情報サイトです。</span>
             </p>
           </div>
         </section>
       </main>
+
+      <FloatingSimulatorCta />
 
       <footer className="footer">
         <div className="footer-inner">

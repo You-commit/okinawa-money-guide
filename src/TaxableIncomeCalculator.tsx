@@ -403,8 +403,9 @@ function TaxableIncomeCalculator({
         </p>
 
         <h2 id="taxable-income-title">
-          課税所得・所得税率
-          シミュレーター
+          <span>課税所得・所得税率</span>
+          <wbr />
+          <span>シミュレーター</span>
         </h2>
 
         <p>
