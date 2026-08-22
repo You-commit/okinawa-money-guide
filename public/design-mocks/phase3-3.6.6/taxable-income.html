@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>課税所得補助計算 PCモック | 沖縄マネーガイド</title>
+    <link rel="stylesheet" href="./mock.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へ移動</a>
+    <div class="review-bar">デザイン確認用モック / Productionではありません</div>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="/" aria-label="沖縄マネーガイド Productionトップへ">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="brand-stone"></span><span class="brand-wave brand-wave--blue"></span><span class="brand-wave brand-wave--mint"></span>
+          </span>
+          <span class="brand-copy"><strong>沖縄マネーガイド</strong><small>okinawa money guide</small></span>
+        </a>
+        <nav class="header-nav" aria-label="モックレビュー">
+          <span class="mock-chip">課税所得 / PC MOCK</span>
+          <a href="./trust.html">信頼情報</a>
+          <a class="header-cta" href="./index.html">モック一覧へ</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="page-hero">
+        <div class="hero-inner">
+          <div>
+            <p class="eyebrow">Taxable Income Support</p>
+            <h1>課税所得と所得税率の<br />目安を整理する</h1>
+            <p class="hero-lead">
+              給与収入と主要な所得控除を入力し、iDeCoの試算にも使える所得税率の目安を確認する補助計算です。
+            </p>
+          </div>
+          <div class="hero-meta">
+            <span>POSITIONING</span><strong>税額確定ではなく補助計算</strong>
+            <span>CONNECTION</span><strong>iDeCo試算へ引き継ぐ</strong>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-main">
+        <div class="content-shell">
+          <div class="tax-context-grid" aria-label="計算条件">
+            <div class="context-item"><span>対象年</span><strong>2026年分</strong></div>
+            <div class="context-item"><span>対象税目</span><strong>所得税・住民税参考</strong></div>
+            <div class="context-item"><span>対象外</span><strong>申告要否・加入可否の判定</strong></div>
+          </div>
+
+          <div class="status-note">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>これは表示例です。確定申告書の作成、正式税額の確定、個別の税務助言を行うものではありません。</span>
+          </div>
+
+          <section class="tax-workspace section-block" aria-label="課税所得補助計算の入力と結果">
+            <div class="tax-panel surface-card">
+              <div class="panel-heading">
+                <div><p class="eyebrow">INPUT</p><h2>条件を入力</h2><p>まずは基本項目だけで目安を確認できます。</p></div>
+                <span class="tag">表示例</span>
+              </div>
+
+              <div class="segment" aria-label="入力モードの表示例">
+                <span class="is-active">基本モード</span><span>詳細モード</span>
+              </div>
+
+              <div class="field-group">
+                <div class="field-title"><span>収入</span><small>必須</small></div>
+                <div class="mock-field-grid">
+                  <div class="mock-field mock-field--wide">
+                    <label>給与収入（年収）</label>
+                    <div class="mock-input"><span>5,000,000</span><small>円</small></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <div class="field-title"><span>主要な所得控除</span><small>分かる範囲で入力</small></div>
+                <div class="mock-field-grid">
+                  <div class="mock-field"><label>社会保険料控除</label><div class="mock-input"><span>720,000</span><small>円</small></div></div>
+                  <div class="mock-field"><label>生命保険料控除</label><div class="mock-input"><span>40,000</span><small>円</small></div></div>
+                  <div class="mock-field"><label>配偶者・扶養控除</label><div class="mock-input"><span>0</span><small>円</small></div></div>
+                  <div class="mock-field"><label>その他の控除</label><div class="mock-input"><span>0</span><small>円</small></div></div>
+                </div>
+              </div>
+
+              <div class="mock-action-row">
+                <span class="button-primary">目安を計算する</span>
+                <small>入力内容がそろうと計算できます</small>
+              </div>
+            </div>
+
+            <div class="tax-panel surface-card">
+              <div class="panel-heading">
+                <div><p class="eyebrow">RESULT / DISPLAY SAMPLE</p><h2>所得税率の目安</h2><p>判断に必要な順序で結果を整理します。</p></div>
+                <span class="tag">表示例</span>
+              </div>
+
+              <div class="result-hero">
+                <div><span>課税所得の目安</span><strong>2,320,000円</strong><span>1,000円未満切り捨ての表示例</span></div>
+                <div class="rate-orb"><div><small>限界税率</small><strong>10%</strong></div></div>
+              </div>
+
+              <dl class="breakdown">
+                <div><dt>給与所得</dt><dd>3,560,000円</dd></div>
+                <div><dt>基礎控除</dt><dd>480,000円</dd></div>
+                <div><dt>その他所得控除</dt><dd>760,000円</dd></div>
+                <div><dt>所得控除合計</dt><dd>1,240,000円</dd></div>
+                <div><dt>所得税額の目安</dt><dd>134,500円</dd></div>
+                <div><dt>復興特別所得税</dt><dd>2,824円</dd></div>
+                <div><dt>住民税の参考値</dt><dd>約232,000円</dd></div>
+              </dl>
+
+              <div class="ideco-handoff">
+                <div><strong>この税率をiDeCoの試算に使う</strong><p>所得税率10%を引き継ぎ、節税効果の目安を確認します。</p></div>
+                <a class="button-primary" href="/#tool-panel-ideco">iDeCoへ進む →</a>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-block">
+            <div class="section-heading">
+              <div><p class="eyebrow">DETAIL &amp; SOURCES</p><h2>結果を読む前に確認すること</h2></div>
+              <p>未対応項目と公式手続を分け、計算値だけで判断が完結しない構造にします。</p>
+            </div>
+            <div class="reference-grid">
+              <article class="reference-card surface-card"><h3>計算内訳</h3><p>給与所得控除、所得控除、課税所得、税率適用の順に展開して確認できる設計です。</p></article>
+              <article class="reference-card surface-card"><h3>未対応項目</h3><ul><li>事業・不動産・譲渡所得</li><li>住宅ローン控除等の税額控除</li><li>個別事情による特例判定</li></ul></article>
+              <article class="reference-card surface-card"><h3>一次資料と更新</h3><p>国税庁・総務省等の一次資料を基準に、対象年と最終確認日を明記します。</p></article>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="mock-footer"><div class="footer-inner"><strong>沖縄マネーガイド</strong><a href="./index.html">← WBS 3.6.6 モック一覧へ戻る</a></div></footer>
+  </body>
+</html>
