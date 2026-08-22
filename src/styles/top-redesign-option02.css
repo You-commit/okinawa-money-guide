@@ -224,8 +224,7 @@ html:has(.top-option02) {
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 251, 255, 0.91) 28%, rgba(231, 247, 255, 0.3) 56%, rgba(222, 243, 255, 0.05) 100%),
-    linear-gradient(180deg, #dff3ff 0%, #e9f8ff 55%, #f7fcff 100%);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 251, 255, 0.91) 28%, rgba(231, 247, 255, 0.3) 56%, rgba(222, 243, 255, 0.05) 100%);
 }
 
 .top-option02__hero-photo {
@@ -233,6 +232,10 @@ html:has(.top-option02) {
   inset: 0;
   z-index: -2;
   background-color: #e5f5ff;
+  background-image: url("../assets/top-hero/OMG-TOP-HERO-PHOTO-ISHIGAKI-APPROVED-v1.0-20260816.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .top-option02__hero-inner {
