@@ -7,7 +7,7 @@
     <title>信頼情報 PCモック | 沖縄マネーガイド</title>
     <link rel="stylesheet" href="./mock.css" />
   </head>
-  <body>
+  <body class="mock-page mock-page--trust">
     <a class="skip-link" href="#main">本文へ移動</a>
     <div class="review-bar">デザイン確認用モック / Productionではありません</div>
     <header class="site-header">
@@ -25,14 +25,18 @@
     </header>
 
     <main id="main">
-      <section class="page-hero">
-        <div class="hero-inner">
+      <section class="page-hero trust-hero">
+        <div class="hero-inner trust-hero__inner">
           <div>
             <p class="eyebrow">Trust &amp; Transparency</p>
             <h1>判断材料を届けるための、<br />情報と運営の方針</h1>
             <p class="hero-lead">情報源、基準時点、計算結果、データ、広告・提携について、利用前に確認できる形で明示します。</p>
           </div>
-          <div class="hero-meta"><span>INFORMATION BASE</span><strong>公的な一次資料を優先</strong><span>LAST REVIEW SAMPLE</span><strong>2026年8月時点</strong></div>
+          <div class="trust-hero-console" aria-label="信頼方針の概要">
+            <div class="trust-hero-console__head"><span>TRUST CENTER</span><strong>06</strong></div>
+            <div class="trust-hero-console__grid"><span>一次資料</span><span>更新・訂正</span><span>計算方針</span><span>データ保護</span><span>広告・提携</span><span>問い合わせ</span></div>
+            <p><span aria-hidden="true"></span>最終確認表示例：2026年8月時点</p>
+          </div>
         </div>
       </section>
 

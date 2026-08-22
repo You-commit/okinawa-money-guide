@@ -7,7 +7,7 @@
     <title>お金の知識 PCモック | 沖縄マネーガイド</title>
     <link rel="stylesheet" href="./mock.css" />
   </head>
-  <body>
+  <body class="mock-page mock-page--knowledge">
     <a class="skip-link" href="#main">本文へ移動</a>
     <div class="review-bar">デザイン確認用モック / Productionではありません</div>
     <header class="site-header">
@@ -25,14 +25,19 @@
     </header>
 
     <main id="main">
-      <section class="page-hero">
-        <div class="hero-inner">
+      <section class="page-hero knowledge-hero">
+        <div class="hero-inner knowledge-hero__inner">
           <div>
             <p class="eyebrow">Money Knowledge Hub</p>
             <h1>今の目的から、<br />知るべきお金のことへ</h1>
             <p class="hero-lead">記事を探し回る前に、「何を判断したいか」から基礎知識とシミュレーターを選べる入口です。</p>
           </div>
-          <div class="hero-meta"><span>CORE CATEGORIES</span><strong>借りる / 貯める / 増やす / 備える</strong><span>CONTENT STATUS</span><strong>未公開記事は準備中表示</strong></div>
+          <nav class="knowledge-hero-nav" aria-label="目的別カテゴリ">
+            <a class="knowledge-hero-tile knowledge-hero-tile--borrow" href="#knowledge-borrow"><b>借</b><span>借りる</span><small>住まい・ローン</small></a>
+            <a class="knowledge-hero-tile knowledge-hero-tile--save" href="#knowledge-save"><b>貯</b><span>貯める</span><small>家計・積立</small></a>
+            <a class="knowledge-hero-tile knowledge-hero-tile--grow" href="#knowledge-grow"><b>増</b><span>増やす</span><small>NISA・iDeCo</small></a>
+            <a class="knowledge-hero-tile knowledge-hero-tile--protect" href="#knowledge-protect"><b>備</b><span>備える</span><small>保険・年金</small></a>
+          </nav>
         </div>
       </section>
 
@@ -50,19 +55,19 @@
           <section class="section-block">
             <div class="section-heading"><div><p class="eyebrow">PURPOSE</p><h2>目的から探す</h2></div><p>公開前の知識コンテンツは、存在する記事のように見せず「準備中」と明示します。</p></div>
             <div class="knowledge-grid">
-              <article class="knowledge-card knowledge-card--borrow surface-card">
+              <article class="knowledge-card knowledge-card--borrow surface-card" id="knowledge-borrow">
                 <span class="icon-box" aria-hidden="true">借</span><h3>借りる</h3><p>住宅・教育・軍用地ローンなど、返済を含めて考えるための基礎。</p>
                 <div class="topic-list"><span>金利と返済方法 <small class="preparing">準備中</small></span><span>借入可能額の考え方 <small class="preparing">準備中</small></span></div>
               </article>
-              <article class="knowledge-card knowledge-card--save surface-card">
+              <article class="knowledge-card knowledge-card--save surface-card" id="knowledge-save">
                 <span class="icon-box" aria-hidden="true">貯</span><h3>貯める</h3><p>生活防衛資金と目的別の積立を、無理のない順序で整理。</p>
                 <div class="topic-list"><span>家計の土台づくり <small class="preparing">準備中</small></span><span>目的別積立 <small class="preparing">準備中</small></span></div>
               </article>
-              <article class="knowledge-card knowledge-card--grow surface-card">
+              <article class="knowledge-card knowledge-card--grow surface-card" id="knowledge-grow">
                 <span class="icon-box" aria-hidden="true">増</span><h3>増やす</h3><p>NISA・iDeCo・投資信託を、制度とリスクの両面から理解。</p>
                 <div class="topic-list"><span>NISAの基本 <small class="preparing">準備中</small></span><span>iDeCoの税制 <small class="preparing">準備中</small></span></div>
               </article>
-              <article class="knowledge-card knowledge-card--protect surface-card">
+              <article class="knowledge-card knowledge-card--protect surface-card" id="knowledge-protect">
                 <span class="icon-box" aria-hidden="true">備</span><h3>備える</h3><p>保険・年金・相続を、必要性と優先順位から考えるための入口。</p>
                 <div class="topic-list"><span>保険見直しの基本 <small class="preparing">準備中</small></span><span>公的保障の確認 <small class="preparing">準備中</small></span></div>
               </article>

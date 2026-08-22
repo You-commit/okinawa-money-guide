@@ -7,7 +7,7 @@
     <title>このサイトについて PCモック | 沖縄マネーガイド</title>
     <link rel="stylesheet" href="./mock.css" />
   </head>
-  <body>
+  <body class="mock-page mock-page--about">
     <a class="skip-link" href="#main">本文へ移動</a>
     <div class="review-bar">デザイン確認用モック / Productionではありません</div>
     <header class="site-header">
@@ -25,27 +25,29 @@
     </header>
 
     <main id="main">
-      <section class="page-hero">
-        <div class="hero-inner">
-          <div>
+      <section class="page-hero about-hero">
+        <div class="hero-inner about-hero__inner">
+          <div class="about-hero__copy">
             <p class="eyebrow">About Okinawa Money Guide</p>
             <h1>沖縄のお金の判断を、<br />落ち着いて整理できる場所へ</h1>
             <p class="hero-lead">複雑な制度や数字を、生活者の目線で理解しやすく整え、次の判断へ進むための情報サイトです。</p>
+            <div class="about-hero__principles" aria-label="サイトの姿勢">
+              <span>理解する</span><i aria-hidden="true"></i><span>比べる</span><i aria-hidden="true"></i><span>自分で判断する</span>
+            </div>
           </div>
-          <div class="hero-meta"><span>MISSION</span><strong>分かりやすい判断材料を届ける</strong><span>STANCE</span><strong>断定ではなく理解を支える</strong></div>
         </div>
       </section>
 
       <div class="page-main">
         <div class="content-shell">
           <section class="mission-grid section-block">
-            <article class="mission-story surface-card">
+            <article class="mission-story">
               <p class="eyebrow">OUR PURPOSE</p>
               <h2>知識の量ではなく、<br />自分で判断できる状態をつくる。</h2>
               <p>お金の制度や商品は、言葉が難しく、比較する条件も多くあります。沖縄マネーガイドは、複雑な情報をそのまま並べるのではなく、「何を確認し、どの数字を見て、次に何をするか」が分かる順序で整理します。</p>
               <p>沖縄で暮らす人の住まい、資産形成、軍用地、保険や家計に関する判断を、全国共通の制度と地域の事情を混同せず考えられることを目指します。</p>
             </article>
-            <aside class="audience-card soft-card">
+            <aside class="audience-card">
               <p class="eyebrow">FOR WHOM</p><h2>こんな方のためのサイトです</h2>
               <ul class="check-list">
                 <li>何から調べればよいか分からない</li>
@@ -59,10 +61,10 @@
 
           <section class="section-block">
             <div class="section-heading"><div><p class="eyebrow">WHY OKINAWA</p><h2>沖縄の金融意思決定を支える理由</h2></div><p>全国共通の制度だけでは捉えにくい暮らしの条件を、誇張せず、分けて考えられるようにします。</p></div>
-            <div class="value-grid">
-              <article class="value-card surface-card"><span class="icon-box" aria-hidden="true">地</span><h3>地域の文脈</h3><p>軍用地、車中心の生活、住まいの維持など、沖縄で判断材料になりやすいテーマを整理します。</p></article>
-              <article class="value-card surface-card"><span class="icon-box" aria-hidden="true">標</span><h3>全国基準との区別</h3><p>税制や金融制度の全国共通ルールと、地域固有の事情を混同しない情報設計にします。</p></article>
-              <article class="value-card surface-card"><span class="icon-box" aria-hidden="true">歩</span><h3>次の一歩</h3><p>読むだけで終わらず、試算・一次資料・専門家への確認へ進める道筋を示します。</p></article>
+            <div class="value-grid about-reasons">
+              <article class="value-card"><span class="about-reason-number" aria-hidden="true">01</span><div><p class="eyebrow">LOCAL CONTEXT</p><h3>地域の文脈</h3><p>軍用地、車中心の生活、住まいの維持など、沖縄で判断材料になりやすいテーマを整理します。</p></div></article>
+              <article class="value-card"><span class="about-reason-number" aria-hidden="true">02</span><div><p class="eyebrow">COMMON STANDARD</p><h3>全国基準との区別</h3><p>税制や金融制度の全国共通ルールと、地域固有の事情を混同しない情報設計にします。</p></div></article>
+              <article class="value-card"><span class="about-reason-number" aria-hidden="true">03</span><div><p class="eyebrow">NEXT STEP</p><h3>次の一歩</h3><p>読むだけで終わらず、試算・一次資料・専門家への確認へ進める道筋を示します。</p></div></article>
             </div>
           </section>
 
@@ -76,7 +78,7 @@
 
           <section class="section-block">
             <div class="section-heading"><div><p class="eyebrow">HOW TO READ</p><h2>情報とシミュレーターの読み方</h2></div><p>結果の数字だけを結論にせず、条件・内訳・一次資料まで順に確認します。</p></div>
-            <div class="reading-steps surface-card">
+            <div class="reading-steps about-reading-steps">
               <article class="reading-step"><b>STEP 01</b><h3>目的を決める</h3><p>何を判断したいかを先に言葉にします。</p></article>
               <article class="reading-step"><b>STEP 02</b><h3>前提を読む</h3><p>対象年、対象範囲、含まれない条件を確認します。</p></article>
               <article class="reading-step"><b>STEP 03</b><h3>数字を試す</h3><p>シミュレーターで自分の条件に置き換えます。</p></article>

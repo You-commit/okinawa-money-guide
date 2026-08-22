@@ -7,7 +7,7 @@
     <title>課税所得補助計算 PCモック | 沖縄マネーガイド</title>
     <link rel="stylesheet" href="./mock.css" />
   </head>
-  <body>
+  <body class="mock-page mock-page--taxable">
     <a class="skip-link" href="#main">本文へ移動</a>
     <div class="review-bar">デザイン確認用モック / Productionではありません</div>
     <header class="site-header">
@@ -27,8 +27,8 @@
     </header>
 
     <main id="main">
-      <section class="page-hero">
-        <div class="hero-inner">
+      <section class="page-hero tax-hero">
+        <div class="hero-inner tax-hero__inner">
           <div>
             <p class="eyebrow">Taxable Income Support</p>
             <h1>課税所得と所得税率の<br />目安を整理する</h1>
@@ -36,9 +36,14 @@
               給与収入と主要な所得控除を入力し、iDeCoの試算にも使える所得税率の目安を確認する補助計算です。
             </p>
           </div>
-          <div class="hero-meta">
-            <span>POSITIONING</span><strong>税額確定ではなく補助計算</strong>
-            <span>CONNECTION</span><strong>iDeCo試算へ引き継ぐ</strong>
+          <div class="tax-hero-preview" aria-label="計算結果の表示例">
+            <div class="tax-preview-label"><span>RESULT PREVIEW</span><strong>表示例</strong></div>
+            <div class="tax-preview-primary"><span>課税所得の目安</span><strong>2,320,000<small>円</small></strong></div>
+            <div class="tax-preview-metrics">
+              <div><span>限界税率</span><strong>10%</strong></div>
+              <div><span>所得税額</span><strong>134,500円</strong></div>
+            </div>
+            <div class="tax-preview-route"><span>計算結果</span><i aria-hidden="true">→</i><span>iDeCo試算</span></div>
           </div>
         </div>
       </section>
@@ -57,7 +62,7 @@
           </div>
 
           <section class="tax-workspace section-block" aria-label="課税所得補助計算の入力と結果">
-            <div class="tax-panel surface-card">
+            <div class="tax-panel tax-panel--input surface-card">
               <div class="panel-heading">
                 <div><p class="eyebrow">INPUT</p><h2>条件を入力</h2><p>まずは基本項目だけで目安を確認できます。</p></div>
                 <span class="tag">表示例</span>
@@ -93,7 +98,7 @@
               </div>
             </div>
 
-            <div class="tax-panel surface-card">
+            <div class="tax-panel tax-panel--result surface-card">
               <div class="panel-heading">
                 <div><p class="eyebrow">RESULT / DISPLAY SAMPLE</p><h2>所得税率の目安</h2><p>判断に必要な順序で結果を整理します。</p></div>
                 <span class="tag">表示例</span>
