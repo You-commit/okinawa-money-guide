@@ -41,7 +41,7 @@ function TaxableIncomePage() {
         </>
       }
     >
-      {shouldReturnToIdeco ? <p className="tax-return-context">計算した所得税率だけをiDeCoへ反映できます。給与収入や控除額はURLへ保存しません。</p> : null}
+      {shouldReturnToIdeco ? <p className="tax-return-context">計算した所得税率をiDeCoへ反映できます。</p> : null}
       <TaxableIncomeCalculator onApplyIncomeTaxRate={applyRate} />
     </SimulatorPageShell>
   )
