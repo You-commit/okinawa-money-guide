@@ -40,7 +40,7 @@ const simulators: Array<{
   title: string
   description: string
   action: string
-  href: string
+  href: string | null
 }> = [
   {
     id: 'military',
@@ -74,8 +74,8 @@ const simulators: Array<{
     id: 'insurance',
     title: '保険見直し',
     description: '保険のバランスや保障内容を学び、見直しをサポート',
-    action: '保険の知識を見る',
-    href: '#categories',
+    action: '準備中',
+    href: null,
   },
 ]
 
@@ -115,10 +115,21 @@ function PopularSimulators({ onSelectSimulator }: PopularSimulatorsProps) {
             </span>
             <h3>{simulator.title}</h3>
             <p>{simulator.description}</p>
-            <a href={simulator.href} onClick={(event) => handleClick(event, simulator.id)}>
-              {simulator.action}
-              <ArrowRightIcon className="top-option02__card-arrow" />
-            </a>
+            {simulator.href ? (
+              <a href={simulator.href} onClick={(event) => handleClick(event, simulator.id)}>
+                {simulator.action}
+                <ArrowRightIcon className="top-option02__card-arrow" />
+              </a>
+            ) : (
+              <button
+                className="top-option02__simulator-status"
+                type="button"
+                disabled
+                aria-label={`${simulator.title}は準備中`}
+              >
+                {simulator.action}
+              </button>
+            )}
           </article>
         ))}
       </div>

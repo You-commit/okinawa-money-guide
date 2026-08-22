@@ -656,6 +656,23 @@ html:has(.top-option02) {
   color: #7540bc;
 }
 
+.top-option02__simulator-status {
+  display: flex;
+  align-items: center;
+  align-self: end;
+  justify-content: center;
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #748399;
+  font-family: inherit;
+  font-size: 0.73rem;
+  font-weight: 850;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
 .top-option02__card-arrow {
   width: 17px;
   height: 17px;
@@ -924,6 +941,15 @@ html:has(.top-option02) {
 .top-option02__purpose-card:hover .top-option02__purpose-icon,
 .top-option02__purpose-card:focus-visible .top-option02__purpose-icon {
   transform: scale(1.035);
+}
+
+.top-option02__simulator-card--insurance:hover {
+  box-shadow: 0 5px 15px rgba(15, 52, 90, 0.09);
+  transform: none;
+}
+
+.top-option02__simulator-card--insurance:hover .top-option02__simulator-icon {
+  transform: none;
 }
 
 .top-option02__step-icon {
@@ -1249,6 +1275,14 @@ html:has(.top-option02) {
     margin-top: 0;
     padding-inline: 6px;
     gap: 6px;
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
+  .top-option02__simulator-status {
+    min-height: 44px;
+    margin-top: 0;
+    padding-inline: 6px;
     font-size: 0.7rem;
     line-height: 1.25;
   }
