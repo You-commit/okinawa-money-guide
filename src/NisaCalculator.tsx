@@ -253,7 +253,9 @@ function NisaCalculator() {
         </p>
 
         <h2 id="nisa-title">
-          NISA積立シミュレーター
+          <span>NISA積立</span>
+          <wbr />
+          <span>シミュレーター</span>
         </h2>
 
         <p>
