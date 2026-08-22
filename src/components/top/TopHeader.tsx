@@ -5,20 +5,26 @@ import { ChevronDownIcon, SearchIcon } from './TopIcons'
 
 function BrandMark() {
   return (
-    <span className="top-option02__brand-mark" aria-hidden="true">
-      <span className="top-option02__brand-stone" />
-      <span className="top-option02__brand-wave top-option02__brand-wave--blue" />
-      <span className="top-option02__brand-wave top-option02__brand-wave--mint" />
-    </span>
+    <img
+      className="top-option02__brand-mark"
+      src="/favicon-192x192.png"
+      alt=""
+      aria-hidden="true"
+      width="44"
+      height="44"
+      draggable={false}
+    />
   )
 }
 
 function TopHeader() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false)
   const simulatorMenuRef = useRef<HTMLDetailsElement>(null)
 
   const closeNavigation = () => {
     setIsOpen(false)
+    setIsSimulatorOpen(false)
     simulatorMenuRef.current?.removeAttribute('open')
   }
 
@@ -60,7 +66,11 @@ function TopHeader() {
           }
           aria-label="メインメニュー"
         >
-          <details className="top-option02__simulator-menu" ref={simulatorMenuRef}>
+          <details
+            className="top-option02__simulator-menu"
+            ref={simulatorMenuRef}
+            onToggle={(event) => setIsSimulatorOpen(event.currentTarget.open)}
+          >
             <summary className="top-option02__nav-simulators">
               シミュレーター
               <ChevronDownIcon className="top-option02__nav-chevron" />
@@ -95,6 +105,20 @@ function TopHeader() {
           </Link>
         </nav>
       </div>
+      <nav
+        className={
+          isSimulatorOpen
+            ? 'top-option02__simulator-subnav is-open'
+            : 'top-option02__simulator-subnav'
+        }
+        aria-label="シミュレーター一覧"
+      >
+        {simulatorRoutes.map((item) => (
+          <Link to={item.path} key={item.path} onClick={closeNavigation}>
+            {item.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   )
 }

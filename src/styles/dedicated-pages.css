@@ -119,12 +119,26 @@
 }
 
 .simulator-page--taxable {
-  --page-accent: #087a9c;
-  --page-accent-soft: #eaf6fb;
+  --page-accent: #5f43c7;
+  --page-accent-soft: #f3efff;
 }
 
 .simulator-page--taxable .simulator-page__hero {
-  background: linear-gradient(116deg, #061f54 0%, #075497 58%, #10a7bd 100%);
+  background:
+    linear-gradient(105deg, rgba(79, 55, 192, 0.96), rgba(50, 127, 218, 0.62)),
+    url('../assets/top-hero/OMG-TOP-HERO-PHOTO-ISHIGAKI-APPROVED-v1.0-20260816.png') center 52% / cover no-repeat;
+}
+
+.simulator-page--ideco .simulator-page__benefits article,
+.simulator-page--taxable .simulator-page__benefits article {
+  border-color: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--page-navy);
+}
+
+.simulator-page--ideco .simulator-page__benefits small,
+.simulator-page--taxable .simulator-page__benefits small {
+  color: #536c86;
 }
 
 .simulator-page__hero-inner {
@@ -520,7 +534,7 @@
 .knowledge-hero-tile {
   --category-color: #1769d2;
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-columns: 52px minmax(0, 1fr);
   align-items: center;
   gap: 0 12px;
   min-height: 92px;
@@ -533,15 +547,12 @@
   box-shadow: 0 12px 28px rgba(16, 52, 80, 0.07);
 }
 
-.knowledge-hero-tile b {
-  display: grid;
+.knowledge-hero-tile .knowledge-category-icon {
+  display: block;
   grid-row: 1 / 3;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
-  background: var(--category-color);
-  color: #ffffff;
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
 }
 
 .knowledge-hero-tile span { align-self: end; color: var(--info-navy); font-weight: 900; }
@@ -570,7 +581,7 @@
 .knowledge-card--save { --category-color: #d65b70; }
 .knowledge-card--grow { --category-color: #008f6e; }
 .knowledge-card--protect { --category-color: #344a94; }
-.knowledge-card .info-icon-box { margin-bottom: 15px; background: var(--category-color); color: #ffffff; }
+.knowledge-card__icon { display: block; width: 58px; height: 58px; margin-bottom: 15px; object-fit: contain; }
 .knowledge-card h3 { margin: 0 0 6px; color: var(--info-navy); }
 .knowledge-card > p { min-height: 64px; margin-bottom: 16px; color: var(--info-muted); font-size: 0.72rem; line-height: 1.7; }
 .topic-list { display: grid; gap: 8px; }
@@ -689,9 +700,245 @@
 .not-found-page__main > p:not(:first-child) { color: #60758a; }
 .not-found-page__main a { margin-top: 24px; padding: 12px 22px; border-radius: 999px; background: #0f766e; color: #ffffff; font-weight: 800; text-decoration: none; }
 
+@media (min-width: 901px) {
+  .simulator-page__hero {
+    min-height: 225px;
+  }
+
+  .simulator-page__hero-inner {
+    grid-template-columns: minmax(0, 0.8fr) minmax(560px, 1.2fr);
+    gap: 30px;
+    min-height: 225px;
+    padding: 20px 0 28px;
+  }
+
+  .simulator-page__hero-copy {
+    min-width: 0;
+  }
+
+  .breadcrumb {
+    margin-bottom: 10px;
+  }
+
+  .simulator-page__hero-copy h1 {
+    font-size: clamp(2.2rem, 2.9vw, 2.55rem);
+    white-space: nowrap;
+  }
+
+  .simulator-page--taxable .simulator-page__hero-copy h1 {
+    max-width: 620px;
+    white-space: normal;
+  }
+
+  .simulator-page__hero-copy > p:last-child {
+    margin-top: 9px;
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+
+  .simulator-page__benefits {
+    gap: 10px;
+  }
+
+  .simulator-page__benefits article {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 9px;
+    min-height: 76px;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .simulator-page__benefits b {
+    width: 32px;
+    height: 32px;
+  }
+
+  .simulator-page__benefits strong {
+    font-size: 0.76rem;
+  }
+
+  .simulator-page__benefits small {
+    font-size: 0.61rem;
+  }
+
+  .simulator-page__main {
+    margin-top: -16px;
+    padding-bottom: 64px;
+  }
+
+  .simulator-page__calculator {
+    padding: 22px;
+    border-radius: 15px;
+  }
+
+  .simulator-page .calculator,
+  .simulator-page .mortgage-calculator {
+    padding: 0;
+  }
+
+  .simulator-page .calculator-heading,
+  .simulator-page .mortgage-calculator__heading {
+    max-width: none;
+    margin-bottom: 17px;
+  }
+
+  .simulator-page .calculator-heading h2,
+  .simulator-page .mortgage-calculator__heading h2 {
+    font-size: 1.55rem;
+    line-height: 1.28;
+  }
+
+  .simulator-page .calculator-heading > p:last-child,
+  .simulator-page .mortgage-calculator__heading > p:last-child {
+    margin-top: 8px;
+    font-size: 0.76rem;
+    line-height: 1.65;
+  }
+
+  .simulator-page .calculator-layout {
+    grid-template-columns: minmax(330px, 0.7fr) minmax(0, 1.3fr);
+    gap: 18px;
+  }
+
+  .simulator-page .calculator-form {
+    gap: 14px;
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .simulator-page .calculator-form label {
+    gap: 7px;
+    font-size: 0.82rem;
+  }
+
+  .simulator-page .input-with-unit input,
+  .simulator-page .input-with-unit select {
+    min-height: 45px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+  }
+
+  .simulator-page .form-spacer {
+    height: 4px;
+  }
+
+  .simulator-page .calculation-mode {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .simulator-page .calculator-form .mode-checkbox {
+    font-size: 0.78rem;
+  }
+
+  .simulator-page .calculation-mode > p,
+  .simulator-page .calculation-mode__description {
+    font-size: 0.71rem;
+    line-height: 1.55;
+  }
+
+  .simulator-page .simulate-button,
+  .simulator-page .reset-button,
+  .simulator-page .apply-tax-rate-button {
+    min-height: 46px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+  }
+
+  .simulator-page .calculator-results {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .simulator-page .result-card {
+    min-height: 112px;
+    padding: 16px;
+    border-radius: 13px;
+  }
+
+  .simulator-page .result-card > span {
+    min-height: 34px;
+    margin-bottom: 7px;
+    font-size: 0.76rem;
+  }
+
+  .simulator-page .result-card strong,
+  .simulator-page .result-card.emphasis-result strong {
+    font-size: clamp(1.05rem, 7.5cqi, 1.55rem);
+  }
+
+  .simulator-page .result-card small {
+    margin-top: 7px;
+    font-size: 0.67rem;
+  }
+
+  .simulator-page .calculator-note,
+  .simulator-page .mortgage-note {
+    margin-top: 16px;
+    padding: 13px 15px;
+    font-size: 0.73rem;
+    line-height: 1.7;
+  }
+
+  .simulator-page .mortgage-calculator {
+    gap: 15px;
+  }
+
+  .simulator-page .mortgage-status {
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+  }
+
+  .simulator-page .mortgage-calculator__layout {
+    grid-template-columns: minmax(380px, 0.82fr) minmax(0, 1.18fr);
+    gap: 18px;
+  }
+
+  .simulator-page .mortgage-form,
+  .simulator-page .mortgage-results {
+    gap: 14px;
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .simulator-page .mortgage-method__option {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .simulator-page .mortgage-field {
+    gap: 6px;
+  }
+
+  .simulator-page .mortgage-input-with-unit input {
+    min-height: 45px;
+    border-radius: 10px;
+  }
+
+  .simulator-page .mortgage-mode {
+    padding: 12px;
+  }
+
+  .simulator-page .mortgage-button--primary,
+  .simulator-page .mortgage-button--secondary {
+    min-height: 46px;
+  }
+
+  .simulator-page .mortgage-results[data-empty="true"] {
+    grid-template-rows: max-content minmax(260px, 1fr);
+  }
+
+  .simulator-page .mortgage-results__empty {
+    min-height: 260px;
+    padding: 50px 24px 24px;
+  }
+}
+
 @media (max-width: 1200px) {
   .simulator-page__hero-inner { grid-template-columns: minmax(0, 0.9fr) minmax(460px, 1.1fr); gap: 28px; width: min(100% - 48px, 1120px); }
-  .simulator-page__hero-copy h1 { font-size: clamp(2.1rem, 3.2vw, 2.65rem); }
+  .simulator-page__hero-copy h1 { font-size: clamp(2rem, 3vw, 2.25rem); }
   .simulator-page__main { width: min(100% - 48px, 1120px); }
   .simulator-page__benefits article { padding: 13px; }
   .knowledge-grid { gap: 12px; }
