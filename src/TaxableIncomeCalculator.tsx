@@ -291,6 +291,9 @@ const calculateTaxableIncome = (
 function TaxableIncomeCalculator({
   onApplyIncomeTaxRate,
 }: TaxableIncomeCalculatorProps) {
+  const [inputMode, setInputMode] =
+    useState<'basic' | 'detail'>('basic')
+
   const [
     salaryRevenue,
     setSalaryRevenue,
@@ -379,6 +382,14 @@ function TaxableIncomeCalculator({
   ) => {
     setIsAutoCalculation(checked)
     setManualResult(null)
+  }
+
+  const changeInputMode = (mode: 'basic' | 'detail') => {
+    setInputMode(mode)
+    if (mode === 'basic') {
+      setDeductionInputs({ ...initialDeductionInputs })
+      clearManualResult()
+    }
   }
 
   const handleApplyIncomeTaxRate = () => {
@@ -473,22 +484,42 @@ function TaxableIncomeCalculator({
             入力してください。
           </p>
 
-          <div className="form-subheading">
-            <strong>
-              基礎控除以外の所得控除
-            </strong>
-
-            <p>
-              該当しない項目や
-              分からない項目は、
-              空欄のままで計算できます。
-              基礎控除は自動計算されます。
-            </p>
+          <div className="taxable-input-mode" aria-label="入力モード">
+            <button
+              type="button"
+              className={inputMode === 'basic' ? 'is-active' : ''}
+              aria-pressed={inputMode === 'basic'}
+              onClick={() => changeInputMode('basic')}
+            >
+              基本
+            </button>
+            <button
+              type="button"
+              className={inputMode === 'detail' ? 'is-active' : ''}
+              aria-pressed={inputMode === 'detail'}
+              onClick={() => changeInputMode('detail')}
+            >
+              詳細
+            </button>
           </div>
 
-          <div className="deduction-fields">
-            {deductionFields.map(
-              (field) => (
+          {inputMode === 'detail' ? (
+            <>
+              <div className="form-subheading">
+                <strong>
+                  基礎控除以外の所得控除
+                </strong>
+
+                <p>
+                  該当しない項目や
+                  分からない項目は、
+                  空欄のままで計算できます。
+                  基礎控除は自動計算されます。
+                </p>
+              </div>
+
+              <div className="deduction-fields">
+                {deductionFields.map((field) => (
                 <label key={field.key}>
                   <span>{field.label}</span>
 
@@ -557,9 +588,14 @@ function TaxableIncomeCalculator({
                     {field.help}
                   </small>
                 </label>
-              ),
-            )}
-          </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="taxable-basic-note">
+              基本モードでは給与収入と基礎控除で概算します。社会保険料控除などを反映する場合は「詳細」を選んでください。
+            </p>
+          )}
 
           <div
             className="form-spacer"

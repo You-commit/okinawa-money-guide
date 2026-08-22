@@ -141,15 +141,63 @@ html:has(.top-option02) {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: clamp(24px, 3.05vw, 44px);
+  gap: clamp(14px, 1.2vw, 20px);
   min-width: 0;
   color: #071b42;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   font-weight: 800;
 }
 
 .top-option02__navigation > :where(a, span, button) {
   flex: 0 0 auto;
+}
+
+.top-option02__simulator-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.top-option02__simulator-menu summary {
+  color: inherit;
+  font: inherit;
+  list-style: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.top-option02__simulator-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.top-option02__simulator-menu[open] .top-option02__nav-chevron {
+  transform: rotate(180deg) translateY(2px);
+}
+
+.top-option02__simulator-menu-panel {
+  position: absolute;
+  top: calc(100% + 18px);
+  left: 50%;
+  display: grid;
+  min-width: 210px;
+  padding: 10px;
+  border: 1px solid #dce8f1;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(10, 48, 87, 0.14);
+  transform: translateX(-50%);
+}
+
+.top-option02__simulator-menu-panel a {
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  color: #173b5d;
+  text-decoration: none;
+}
+
+.top-option02__simulator-menu-panel a:hover {
+  background: #eef8f6;
+  color: #087c72;
 }
 
 .top-option02__navigation > a,
@@ -1160,6 +1208,24 @@ html:has(.top-option02) {
     padding: 10px 12px;
   }
 
+  .top-option02__simulator-menu {
+    display: grid;
+  }
+
+  .top-option02__simulator-menu summary {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  .top-option02__simulator-menu-panel {
+    position: static;
+    min-width: 0;
+    margin: 0 6px 6px;
+    padding: 6px;
+    box-shadow: none;
+    transform: none;
+  }
+
   .top-option02__navigation > span[aria-disabled="true"] {
     display: block;
   }
@@ -1258,6 +1324,24 @@ html:has(.top-option02) {
     align-items: center;
     min-height: 44px;
     padding: 10px 12px;
+  }
+
+  .top-option02__simulator-menu {
+    display: grid;
+  }
+
+  .top-option02__simulator-menu summary {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  .top-option02__simulator-menu-panel {
+    position: static;
+    min-width: 0;
+    margin: 0 6px 6px;
+    padding: 6px;
+    box-shadow: none;
+    transform: none;
   }
 
   .top-option02__navigation > span[aria-disabled="true"] {

@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react'
-import TaxableIncomeCalculator from './TaxableIncomeCalculator'
+import { useEffect, useMemo, useState } from 'react'
 
 type IdecoResult = {
   annualContribution: number | null
@@ -161,19 +160,19 @@ const calculateIdeco = (
 }
 
 type IdecoCalculatorProps = {
-  isTaxableIncomeOpen: boolean
-  onToggleTaxableIncome: () => void
+  initialIncomeTaxRate?: number
+  onOpenTaxableIncome: () => void
 }
 
 function IdecoCalculator({
-  isTaxableIncomeOpen,
-  onToggleTaxableIncome,
+  initialIncomeTaxRate,
+  onOpenTaxableIncome,
 }: IdecoCalculatorProps) {
   const [monthlyContribution, setMonthlyContribution] =
     useState('')
 
   const [incomeTaxRate, setIncomeTaxRate] =
-    useState('10')
+    useState(() => String(initialIncomeTaxRate ?? 10))
 
   const [residentTaxRate, setResidentTaxRate] =
     useState('10')
@@ -186,6 +185,13 @@ function IdecoCalculator({
 
   const [manualResult, setManualResult] =
     useState<IdecoResult | null>(null)
+
+  useEffect(() => {
+    if (initialIncomeTaxRate !== undefined) {
+      setIncomeTaxRate(String(initialIncomeTaxRate))
+      setManualResult(null)
+    }
+  }, [initialIncomeTaxRate])
 
   const autoResult = useMemo(
     () =>
@@ -290,20 +296,7 @@ function IdecoCalculator({
   }
 
   const openTaxableIncomeCalculator = () => {
-    if (!isTaxableIncomeOpen) {
-      onToggleTaxableIncome()
-    }
-
-    window.setTimeout(() => {
-      document
-        .getElementById(
-          'taxable-income-accordion',
-        )
-        ?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        })
-    }, 0)
+    onOpenTaxableIncome()
   }
 
   const selectedIncomeTaxRate =
@@ -311,36 +304,6 @@ function IdecoCalculator({
       (item) =>
         String(item.rate) === incomeTaxRate,
     ) ?? incomeTaxRates[0]
-
-  const applyIncomeTaxRate = (
-    rate: number,
-  ) => {
-    handleIncomeTaxRateChange(
-      String(rate),
-    )
-
-    if (isTaxableIncomeOpen) {
-      onToggleTaxableIncome()
-    }
-
-    window.setTimeout(() => {
-      document
-        .getElementById(
-          'ideco-income-tax-rate-field',
-        )
-        ?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        })
-
-      const incomeTaxRateSelect =
-        document.getElementById(
-          'ideco-income-tax-rate-select',
-        ) as HTMLSelectElement | null
-
-      incomeTaxRateSelect?.focus()
-    }, 0)
-  }
 
   return (
     <section
@@ -734,44 +697,6 @@ function IdecoCalculator({
               年間節税額 × 積立期間
             </small>
           </div>
-        </div>
-      </div>
-
-      <div
-        id="taxable-income-accordion"
-        className="taxable-income-accordion"
-      >
-        <button
-          className="taxable-income-toggle"
-          type="button"
-          onClick={onToggleTaxableIncome}
-          aria-expanded={isTaxableIncomeOpen}
-          aria-controls="taxable-income-panel"
-        >
-          <span>
-            {isTaxableIncomeOpen
-              ? '課税所得・所得税率シミュレーターを収める'
-              : '課税所得・所得税率シミュレーターを開く'}
-          </span>
-
-          <span
-            className="taxable-income-toggle-icon"
-            aria-hidden="true"
-          >
-            {isTaxableIncomeOpen ? '▲' : '▼'}
-          </span>
-        </button>
-
-        <div
-          id="taxable-income-panel"
-          className="taxable-income-panel"
-          hidden={!isTaxableIncomeOpen}
-        >
-          <TaxableIncomeCalculator
-            onApplyIncomeTaxRate={
-              applyIncomeTaxRate
-            }
-          />
         </div>
       </div>
 
