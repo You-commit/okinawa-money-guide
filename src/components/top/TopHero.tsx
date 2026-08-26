@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { routes } from '../../app/routes'
 import {
   ArrowRightIcon,
   CalculatorIcon,
@@ -100,16 +102,16 @@ function TopHero() {
             試算と解説で落ち着いて整理できます。
           </p>
           <div className="top-option02__hero-actions">
-            <a className="top-option02__button top-option02__button--primary" href="#popular-simulators">
+            <Link className="top-option02__button top-option02__button--primary" to="/#popular-simulators">
               <CalculatorIcon className="top-option02__button-icon" />
               シミュレーターを始める
               <ArrowRightIcon className="top-option02__button-arrow" />
-            </a>
-            <a className="top-option02__button top-option02__button--secondary" href="#categories">
+            </Link>
+            <Link className="top-option02__button top-option02__button--secondary" to={routes.knowledge}>
               <PlayCircleIcon className="top-option02__play" />
               使い方や学び方を見る
               <ArrowRightIcon className="top-option02__button-arrow" />
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -138,10 +140,10 @@ function TopHero() {
               </span>
             </li>
           </ol>
-          <a className="top-option02__steps-cta" href="#popular-simulators">
+          <Link className="top-option02__steps-cta" to="/#popular-simulators">
             今すぐシミュレーションを始める
             <ChevronRightIcon className="top-option02__steps-arrow" />
-          </a>
+          </Link>
         </aside>
       </div>
     </section>

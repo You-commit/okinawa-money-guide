@@ -399,10 +399,7 @@ a {
 }
 
 .calculation-mode {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
-  column-gap: 12px;
-  row-gap: 5px;
+  display: block;
   margin-top: 4px;
   padding: 16px;
   border: 1px solid #d6e3e7;
@@ -411,9 +408,7 @@ a {
 }
 
 .calculator-form .mode-checkbox {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
-  grid-column: 1 / -1;
+  display: flex;
   align-items: start;
   gap: 12px;
   width: 100%;
@@ -421,6 +416,12 @@ a {
   font-weight: 800;
   text-align: left;
   cursor: pointer;
+}
+
+.calculator-form .mode-checkbox > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .calculator-form .mode-checkbox input {
@@ -467,15 +468,18 @@ a {
 
 .calculation-mode__description {
   display: flex;
-  grid-column: 2;
   flex-wrap: wrap;
   gap: 0 0.35em;
   min-width: 0;
-  margin: 0;
+  margin: 5px 0 0 34px;
   color: #385268;
   font-size: 0.9rem;
   font-weight: 500;
   line-height: 1.65;
+}
+
+.calculation-mode > p:not(.calculation-mode__description) {
+  margin: 5px 0 0 34px;
 }
 
 .simulate-button {
@@ -1426,6 +1430,10 @@ a {
 
   .calculator-form .mode-checkbox {
     align-items: start;
+  }
+
+  .calculator-form .mode-checkbox > span {
+    white-space: normal;
   }
 
   .tax-rate-select-display {
