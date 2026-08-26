@@ -330,6 +330,14 @@ function IdecoCalculator({
 
       <div className="calculator-layout">
         <div className="calculator-form">
+          <div className="simulator-panel-heading">
+            <span aria-hidden="true">01</span>
+            <div>
+              <p>INPUT</p>
+              <h3>条件を入力する</h3>
+            </div>
+          </div>
+
           <label>
             <span>毎月の掛金</span>
 
@@ -608,94 +616,151 @@ function IdecoCalculator({
           className="calculator-results"
           aria-live="polite"
         >
-          <div className="result-card">
-            <span>年間掛金額</span>
-
-            <strong>
-              {displayedResult
-                .annualContribution === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .annualContribution,
-                )}
-            </strong>
-
-            <small>
-              毎月の掛金 × 12か月
-            </small>
+          <div className="simulator-results-heading">
+            <div>
+              <p>RESULT</p>
+              <h3>シミュレーション結果</h3>
+            </div>
+            <span>所得税・住民税の軽減額</span>
           </div>
 
-          <div className="result-card">
-            <span>年間の所得税軽減額</span>
+          <div className="simulator-summary-grid simulator-summary-grid--ideco">
+            <div className="result-card">
+              <span>年間掛金額</span>
 
-            <strong>
-              {displayedResult
-                .incomeTaxSaving === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .incomeTaxSaving,
-                )}
-            </strong>
+              <strong>
+                {displayedResult
+                  .annualContribution === null
+                  ? '―'
+                  : formatYen(
+                    displayedResult
+                      .annualContribution,
+                  )}
+              </strong>
 
-            <small>
-              復興特別所得税を含む概算
-            </small>
+              <small>
+                毎月の掛金 × 12か月
+              </small>
+            </div>
+
+            <div className="result-card">
+              <span>年間の所得税軽減額</span>
+
+              <strong>
+                {displayedResult
+                  .incomeTaxSaving === null
+                  ? '―'
+                  : formatYen(
+                    displayedResult
+                      .incomeTaxSaving,
+                  )}
+              </strong>
+
+              <small>
+                復興特別所得税を含む概算
+              </small>
+            </div>
+
+            <div className="result-card">
+              <span>年間の住民税軽減額</span>
+
+              <strong>
+                {displayedResult
+                  .residentTaxSaving === null
+                  ? '―'
+                  : formatYen(
+                    displayedResult
+                      .residentTaxSaving,
+                  )}
+              </strong>
+
+              <small>
+                年間掛金額 × 住民税率
+              </small>
+            </div>
+
+            <div className="result-card emphasis-result">
+              <span>年間節税額</span>
+
+              <strong>
+                {displayedResult
+                  .annualTaxSaving === null
+                  ? '―'
+                  : formatYen(
+                    displayedResult
+                      .annualTaxSaving,
+                  )}
+              </strong>
+
+              <small>
+                所得税軽減額＋住民税軽減額
+              </small>
+            </div>
+
+            <div className="result-card result-card--total">
+              <span>期間中の節税額合計</span>
+
+              <strong>
+                {displayedResult
+                  .totalTaxSaving === null
+                  ? '―'
+                  : formatYen(
+                    displayedResult
+                      .totalTaxSaving,
+                  )}
+              </strong>
+
+              <small>
+                年間節税額 × 積立期間
+              </small>
+            </div>
           </div>
 
-          <div className="result-card">
-            <span>年間の住民税軽減額</span>
+          <div className="ideco-visual-grid">
+            <div className="simulator-chart-panel simulator-chart-panel--ideco">
+              <div className="simulator-subheading">
+                <div>
+                  <p>TAX SAVING TRAJECTORY</p>
+                  <h3>節税効果の推移</h3>
+                </div>
+                <span>{years > 0 ? `${years.toLocaleString('ja-JP')}年間` : '条件入力後に表示'}</span>
+              </div>
 
-            <strong>
-              {displayedResult
-                .residentTaxSaving === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .residentTaxSaving,
-                )}
-            </strong>
+              {displayedResult.totalTaxSaving !== null && displayedResult.totalTaxSaving > 0 ? (
+                <div className="asset-trajectory asset-trajectory--ideco" aria-label="期間中の節税額推移グラフ">
+                  {[0.25, 0.5, 0.75, 1].map((ratio) => (
+                    <div className="asset-trajectory__point" key={ratio}>
+                      <span>{formatYen(displayedResult.totalTaxSaving! * ratio)}</span>
+                      <div><i style={{ height: `${ratio * 100}%` }} /></div>
+                      <small>{ratio === 1 ? '期間終了' : `${Math.max(1, Math.round(years * ratio))}年後`}</small>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="simulator-chart-empty">条件を入力すると、期間中の節税額を表示します。</div>
+              )}
+            </div>
 
-            <small>
-              年間掛金額 × 住民税率
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>年間節税額</span>
-
-            <strong>
-              {displayedResult
-                .annualTaxSaving === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .annualTaxSaving,
-                )}
-            </strong>
-
-            <small>
-              所得税軽減額＋住民税軽減額
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>期間中の節税額合計</span>
-
-            <strong>
-              {displayedResult
-                .totalTaxSaving === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .totalTaxSaving,
-                )}
-            </strong>
-
-            <small>
-              年間節税額 × 積立期間
-            </small>
+            <div className="simulator-breakdown-panel simulator-breakdown-panel--ideco">
+              <div className="simulator-subheading">
+                <div>
+                  <p>ANNUAL BREAKDOWN</p>
+                  <h3>年間節税額の内訳</h3>
+                </div>
+              </div>
+              <div className="tax-saving-bars">
+                <div>
+                  <span>所得税</span>
+                  <i><b style={{ width: `${displayedResult.annualTaxSaving && displayedResult.incomeTaxSaving !== null ? displayedResult.incomeTaxSaving / displayedResult.annualTaxSaving * 100 : 0}%` }} /></i>
+                  <strong>{displayedResult.incomeTaxSaving === null ? '―' : formatYen(displayedResult.incomeTaxSaving)}</strong>
+                </div>
+                <div>
+                  <span>住民税</span>
+                  <i><b style={{ width: `${displayedResult.annualTaxSaving && displayedResult.residentTaxSaving !== null ? displayedResult.residentTaxSaving / displayedResult.annualTaxSaving * 100 : 0}%` }} /></i>
+                  <strong>{displayedResult.residentTaxSaving === null ? '―' : formatYen(displayedResult.residentTaxSaving)}</strong>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

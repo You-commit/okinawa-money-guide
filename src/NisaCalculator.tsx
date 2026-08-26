@@ -178,6 +178,38 @@ function NisaCalculator() {
     normalizeDecimalInput(investmentYears),
   )
 
+  const finalAssetValue = displayedResult.futureValue
+
+  const assetTrajectory = useMemo(() => {
+    if (finalAssetValue === null || years <= 0) {
+      return []
+    }
+
+    return [0.25, 0.5, 0.75, 1].map((ratio) => {
+      const pointYears = years * ratio
+      const pointResult = calculateNisa(
+        initialInvestment,
+        monthlyContribution,
+        annualReturnRate,
+        String(pointYears),
+      )
+
+      return {
+        label: ratio === 1
+          ? `${years.toLocaleString('ja-JP')}年後`
+          : `${pointYears.toLocaleString('ja-JP', { maximumFractionDigits: 1 })}年後`,
+        value: pointResult.futureValue ?? 0,
+        ratio,
+      }
+    })
+  }, [
+    annualReturnRate,
+    finalAssetValue,
+    initialInvestment,
+    monthlyContribution,
+    years,
+  ])
+
   const canSimulate =
     (initialAmount > 0 || monthlyAmount > 0) &&
     annualReturnRate !== '' &&
@@ -266,6 +298,14 @@ function NisaCalculator() {
 
       <div className="calculator-layout">
         <div className="calculator-form">
+          <div className="simulator-panel-heading">
+            <span aria-hidden="true">01</span>
+            <div>
+              <p>INPUT</p>
+              <h3>条件を入力する</h3>
+            </div>
+          </div>
+
           <label>
             <span>初期投資額（任意）</span>
 
@@ -487,52 +527,86 @@ function NisaCalculator() {
           className="calculator-results"
           aria-live="polite"
         >
-          <div className="result-card">
-            <span>投資元本</span>
-
-            <strong>
-              {displayedResult.totalPrincipal === null
-                ? '―'
-                : formatYen(
-                    displayedResult.totalPrincipal,
-                  )}
-            </strong>
-
-            <small>
-              初期投資額＋積立額の合計
-            </small>
+          <div className="simulator-results-heading">
+            <div>
+              <p>RESULT</p>
+              <h3>シミュレーション結果</h3>
+            </div>
+            <span>毎月末積立・月次複利</span>
           </div>
 
-          <div className="result-card">
-            <span>運用収益</span>
+          <div className="simulator-summary-grid simulator-summary-grid--nisa">
+            <div className="result-card">
+              <span>投資元本</span>
 
-            <strong>
-              {displayedResult.investmentGain === null
-                ? '―'
-                : formatYen(
-                    displayedResult.investmentGain,
-                  )}
-            </strong>
+              <strong>
+                {displayedResult.totalPrincipal === null
+                  ? '―'
+                  : formatYen(
+                      displayedResult.totalPrincipal,
+                    )}
+              </strong>
 
-            <small>
-              将来資産額−投資元本
-            </small>
+              <small>
+                初期投資額＋積立額の合計
+              </small>
+            </div>
+
+            <div className="result-card result-card--gain">
+              <span>運用収益</span>
+
+              <strong>
+                {displayedResult.investmentGain === null
+                  ? '―'
+                  : formatYen(
+                      displayedResult.investmentGain,
+                    )}
+              </strong>
+
+              <small>
+                将来資産額−投資元本
+              </small>
+            </div>
+
+            <div className="result-card emphasis-result">
+              <span>将来の資産額</span>
+
+              <strong>
+                {displayedResult.futureValue === null
+                  ? '―'
+                  : formatYen(
+                      displayedResult.futureValue,
+                    )}
+              </strong>
+
+              <small>
+                毎月末積立・月次複利による概算
+              </small>
+            </div>
           </div>
 
-          <div className="result-card">
-            <span>将来の資産額</span>
+          <div className="simulator-chart-panel simulator-chart-panel--nisa">
+            <div className="simulator-subheading">
+              <div>
+                <p>ASSET TRAJECTORY</p>
+                <h3>資産の推移イメージ</h3>
+              </div>
+              <span>{years > 0 ? `運用期間 ${years.toLocaleString('ja-JP')}年` : '条件入力後に表示'}</span>
+            </div>
 
-            <strong>
-              {displayedResult.futureValue === null
-                ? '―'
-                : formatYen(
-                    displayedResult.futureValue,
-                  )}
-            </strong>
-
-            <small>
-              毎月末積立・月次複利による概算
-            </small>
+            {assetTrajectory.length > 0 && finalAssetValue ? (
+              <div className="asset-trajectory" aria-label="資産推移の概算グラフ">
+                {assetTrajectory.map((point) => (
+                  <div className="asset-trajectory__point" key={point.ratio}>
+                    <span>{formatYen(point.value)}</span>
+                    <div><i style={{ height: `${Math.max(14, point.value / finalAssetValue * 100)}%` }} /></div>
+                    <small>{point.label}</small>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="simulator-chart-empty">条件を入力すると、資産推移の概算を表示します。</div>
+            )}
           </div>
         </div>
       </div>

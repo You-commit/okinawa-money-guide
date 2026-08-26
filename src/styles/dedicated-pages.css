@@ -989,3 +989,406 @@
   .site-footer .footer-inner { align-items: flex-start; }
   .site-footer nav { justify-content: flex-start; }
 }
+
+/* WBS 3.6.11: approved PC simulator-body alignment */
+.simulator-panel-heading,
+.simulator-results-heading,
+.simulator-subheading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.simulator-panel-heading {
+  justify-content: flex-start;
+  padding-bottom: 13px;
+  border-bottom: 1px solid color-mix(in srgb, var(--page-accent) 18%, #dce8ef);
+}
+
+.simulator-panel-heading > span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--page-accent);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.simulator-panel-heading p,
+.simulator-results-heading p,
+.simulator-subheading p {
+  margin: 0 0 3px;
+  color: var(--page-accent);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.simulator-panel-heading h3,
+.simulator-results-heading h3,
+.simulator-subheading h3 {
+  margin: 0;
+  color: var(--page-navy);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.simulator-results-heading > span,
+.simulator-subheading > span {
+  color: #718699;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.simulator-summary-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.simulator-summary-grid--military,
+.simulator-summary-grid--ideco {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.simulator-summary-grid--nisa,
+.simulator-summary-grid--taxable {
+  grid-template-columns: 1fr;
+}
+
+.simulator-chart-panel,
+.simulator-breakdown-panel {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #dce8ef;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(24, 57, 82, 0.055);
+}
+
+.simulator-chart-empty {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  margin-top: 14px;
+  border: 1px dashed #c9d8df;
+  border-radius: 11px;
+  background: #f8fbfc;
+  color: #7890a2;
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.asset-trajectory {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  height: 230px;
+  margin-top: 14px;
+  padding: 16px 12px 10px;
+  border-radius: 11px;
+  background:
+    repeating-linear-gradient(to top, transparent 0 47px, #e7eef2 48px),
+    linear-gradient(180deg, #fbfdfd, #f5faf8);
+}
+
+.asset-trajectory__point {
+  display: grid;
+  grid-template-rows: 32px minmax(0, 1fr) 26px;
+  gap: 5px;
+  height: 100%;
+  min-width: 0;
+  text-align: center;
+}
+
+.asset-trajectory__point > span {
+  overflow: hidden;
+  color: var(--page-accent);
+  font-size: 0.62rem;
+  font-weight: 850;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-trajectory__point > div {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 0;
+}
+
+.asset-trajectory__point i {
+  display: block;
+  width: min(54px, 72%);
+  min-height: 12px;
+  border-radius: 7px 7px 2px 2px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--page-accent) 58%, #ffffff), var(--page-accent));
+  box-shadow: 0 7px 14px color-mix(in srgb, var(--page-accent) 14%, transparent);
+}
+
+.asset-trajectory__point small {
+  color: #657d91;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.simulator-breakdown-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+  margin: 14px 0 0;
+}
+
+.simulator-breakdown-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5edf1;
+}
+
+.simulator-breakdown-list dt {
+  color: #60758a;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.simulator-breakdown-list dd {
+  margin: 0;
+  color: var(--page-navy);
+  font-size: 0.82rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.ideco-visual-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.tax-saving-bars {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.tax-saving-bars > div {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.tax-saving-bars span {
+  color: #60758a;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.tax-saving-bars i {
+  display: block;
+  overflow: hidden;
+  height: 10px;
+  border-radius: 999px;
+  background: #e6e0f8;
+}
+
+.tax-saving-bars b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--page-accent);
+}
+
+.tax-saving-bars strong {
+  color: var(--page-accent);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.taxable-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.apply-tax-rate-button--panel {
+  width: 100%;
+}
+
+@media (min-width: 901px) {
+  .simulator-page__calculator {
+    padding: 20px;
+  }
+
+  .simulator-page .calculator-heading,
+  .simulator-page .mortgage-calculator__heading {
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .simulator-page .calculator-layout {
+    grid-template-columns: minmax(330px, 0.68fr) minmax(0, 1.32fr);
+    gap: 16px;
+  }
+
+  .simulator-page .calculator-form {
+    gap: 12px;
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .simulator-page .calculator-results {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    align-content: start;
+  }
+
+  .simulator-page .input-with-unit input,
+  .simulator-page .input-with-unit select {
+    min-height: 44px;
+  }
+
+  .simulator-page .result-card {
+    min-height: 118px;
+    padding: 15px;
+    border-radius: 11px;
+    box-shadow: 0 6px 16px rgba(24, 57, 82, 0.055);
+  }
+
+  .simulator-page .result-card > span {
+    min-height: 32px;
+    margin-bottom: 6px;
+    font-size: 0.7rem;
+  }
+
+  .simulator-page .result-card strong,
+  .simulator-page .result-card.emphasis-result strong {
+    font-size: clamp(1rem, 7cqi, 1.48rem);
+  }
+
+  .simulator-page .result-card small {
+    margin-top: 6px;
+    font-size: 0.62rem;
+    line-height: 1.5;
+  }
+
+  .simulator-summary-grid--military {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .simulator-summary-grid--nisa,
+  .simulator-summary-grid--taxable {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .simulator-summary-grid--ideco {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .simulator-page--military .result-card--accent,
+  .simulator-page--nisa .result-card--gain,
+  .simulator-page--ideco .result-card--total,
+  .simulator-page--taxable .result-card--total {
+    border-color: color-mix(in srgb, var(--page-accent) 38%, #dce8ef);
+    background: color-mix(in srgb, var(--page-accent-soft) 72%, #ffffff);
+  }
+
+  .ideco-visual-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
+  }
+
+  .taxable-breakdown-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .taxable-breakdown-grid .result-card {
+    min-height: 105px;
+    padding: 13px;
+  }
+
+  .taxable-breakdown-grid .result-card > span {
+    min-height: 30px;
+  }
+}
+
+@media (max-width: 900px) {
+  .simulator-results-heading,
+  .simulator-subheading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .simulator-results-heading > span,
+  .simulator-subheading > span {
+    text-align: left;
+  }
+
+  .simulator-summary-grid--nisa,
+  .simulator-summary-grid--taxable {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .simulator-summary-grid--nisa .emphasis-result,
+  .simulator-summary-grid--taxable .result-card--total {
+    grid-column: 1 / -1;
+  }
+
+  .taxable-breakdown-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .simulator-summary-grid,
+  .simulator-summary-grid--military,
+  .simulator-summary-grid--ideco,
+  .simulator-summary-grid--nisa,
+  .simulator-summary-grid--taxable,
+  .simulator-breakdown-list {
+    grid-template-columns: 1fr;
+  }
+
+  .simulator-summary-grid--nisa .emphasis-result,
+  .simulator-summary-grid--taxable .result-card--total {
+    grid-column: auto;
+  }
+
+  .asset-trajectory {
+    gap: 6px;
+    height: 205px;
+    padding-inline: 4px;
+  }
+
+  .asset-trajectory__point > span {
+    font-size: 0.55rem;
+  }
+
+  .tax-saving-bars > div {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .tax-saving-bars strong {
+    grid-column: 2;
+  }
+}

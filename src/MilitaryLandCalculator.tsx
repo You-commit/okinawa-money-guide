@@ -280,6 +280,14 @@ function MilitaryLandCalculator() {
           className="calculator-form"
           ref={formRef}
         >
+          <div className="simulator-panel-heading">
+            <span aria-hidden="true">01</span>
+            <div>
+              <p>INPUT</p>
+              <h3>条件を入力する</h3>
+            </div>
+          </div>
+
           <label>
             <span>年間借地料</span>
 
@@ -469,6 +477,14 @@ function MilitaryLandCalculator() {
           aria-live="polite"
           tabIndex={-1}
         >
+          <div className="simulator-results-heading">
+            <div>
+              <p>RESULT</p>
+              <h3>シミュレーション結果</h3>
+            </div>
+            <span>入力条件にもとづく概算</span>
+          </div>
+
           {hasDisplayedResult && (
             <div className="mobile-result-toolbar">
               <strong className="mobile-result-title">
@@ -485,52 +501,82 @@ function MilitaryLandCalculator() {
               </button>
             </div>
           )}
-          <div className="result-card">
-            <span>購入倍率</span>
+          <div className="simulator-summary-grid simulator-summary-grid--military">
+            <div className="result-card">
+              <span>購入倍率</span>
 
-            <strong>
-              {displayedResult.calculatedMultiple === null
-                ? '―'
-                : `${displayedResult.calculatedMultiple.toFixed(2)}倍`}
-            </strong>
+              <strong>
+                {displayedResult.calculatedMultiple === null
+                  ? '―'
+                  : `${displayedResult.calculatedMultiple.toFixed(2)}倍`}
+              </strong>
 
-            <small>
-              購入価格 ÷ 年間借地料
-            </small>
+              <small>
+                購入価格 ÷ 年間借地料
+              </small>
+            </div>
+
+            <div className="result-card emphasis-result">
+              <span>表面利回り</span>
+
+              <strong>
+                {displayedResult.surfaceYield === null
+                  ? '―'
+                  : `${displayedResult.surfaceYield.toFixed(2)}%`}
+              </strong>
+
+              <small>
+                年間借地料 ÷ 購入価格 × 100
+              </small>
+            </div>
+
+            <div className="result-card">
+              <span>年間借地料</span>
+
+              <strong>
+                {hasDisplayedResult && rentValue > 0
+                  ? formatYen(rentValue)
+                  : '―'}
+              </strong>
+
+              <small>入力した年間の借地料</small>
+            </div>
+
+            <div className="result-card result-card--accent">
+              <span>
+                <span className="text-keep">入力倍率による</span>
+                <wbr />
+                <span className="text-keep">想定購入価格</span>
+              </span>
+
+              <strong>
+                {displayedResult.estimatedPrice === null
+                  ? '―'
+                  : formatYen(
+                      displayedResult.estimatedPrice,
+                    )}
+              </strong>
+
+              <small>
+                年間借地料 × 倍率
+              </small>
+            </div>
           </div>
 
-          <div className="result-card">
-            <span>表面利回り</span>
-
-            <strong>
-              {displayedResult.surfaceYield === null
-                ? '―'
-                : `${displayedResult.surfaceYield.toFixed(2)}%`}
-            </strong>
-
-            <small>
-              年間借地料 ÷ 購入価格 × 100
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>
-              <span className="text-keep">入力倍率による</span>
-              <wbr />
-              <span className="text-keep">想定購入価格</span>
-            </span>
-
-            <strong>
-              {displayedResult.estimatedPrice === null
-                ? '―'
-                : formatYen(
-                    displayedResult.estimatedPrice,
-                  )}
-            </strong>
-
-            <small>
-              年間借地料 × 倍率
-            </small>
+          <div className="simulator-breakdown-panel simulator-breakdown-panel--military">
+            <div className="simulator-subheading">
+              <div>
+                <p>BREAKDOWN</p>
+                <h3>利回りと購入価格の内訳</h3>
+              </div>
+              <span>税金・経費控除前</span>
+            </div>
+            <dl className="simulator-breakdown-list">
+              <div><dt>年間借地料</dt><dd>{hasDisplayedResult && rentValue > 0 ? formatYen(rentValue) : '―'}</dd></div>
+              <div><dt>購入価格</dt><dd>{hasDisplayedResult && priceValue > 0 ? formatYen(priceValue) : '―'}</dd></div>
+              <div><dt>購入倍率</dt><dd>{displayedResult.calculatedMultiple === null ? '―' : `${displayedResult.calculatedMultiple.toFixed(2)} 倍`}</dd></div>
+              <div><dt>表面利回り</dt><dd>{displayedResult.surfaceYield === null ? '―' : `${displayedResult.surfaceYield.toFixed(2)} %`}</dd></div>
+            </dl>
           </div>
         </div>
       </div>

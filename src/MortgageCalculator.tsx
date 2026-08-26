@@ -661,6 +661,14 @@ function MortgageCalculator() {
           onSubmit={handleSubmit}
           noValidate
         >
+          <div className="simulator-panel-heading">
+            <span aria-hidden="true">01</span>
+            <div>
+              <p>INPUT</p>
+              <h3>ローン条件を入力</h3>
+            </div>
+          </div>
+
           <fieldset className="mortgage-method">
             <legend>強調して表示する返済方式</legend>
 

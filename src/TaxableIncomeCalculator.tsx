@@ -429,6 +429,14 @@ function TaxableIncomeCalculator({
 
       <div className="calculator-layout">
         <div className="calculator-form">
+          <div className="simulator-panel-heading">
+            <span aria-hidden="true">01</span>
+            <div>
+              <p>INPUT</p>
+              <h3>条件を入力する</h3>
+            </div>
+          </div>
+
           <label>
             <span>年間の給与収入</span>
 
@@ -651,206 +659,63 @@ function TaxableIncomeCalculator({
           className="calculator-results"
           aria-live="polite"
         >
-          <div className="result-card">
-            <span>
-              給与所得控除相当額
-            </span>
-
-            <strong>
-              {displayedResult
-                .salaryIncomeDeduction ===
-                null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .salaryIncomeDeduction,
-                )}
-            </strong>
-
-            <small>
-              給与収入から差し引かれる金額
-            </small>
+          <div className="simulator-results-heading">
+            <div>
+              <p>RESULT</p>
+              <h3>シミュレーション結果</h3>
+            </div>
+            <span>2026年分・給与所得の概算</span>
           </div>
 
-          <div className="result-card">
-            <span>給与所得</span>
+          <div className="simulator-summary-grid simulator-summary-grid--taxable">
+            <div className="result-card emphasis-result">
+              <span>課税所得</span>
+              <strong>{displayedResult.taxableIncome === null ? '―' : formatYen(displayedResult.taxableIncome)}</strong>
+              <small>1,000円未満切捨て</small>
+            </div>
 
-            <strong>
-              {displayedResult
-                .salaryIncome === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .salaryIncome,
-                )}
-            </strong>
+            <div className="result-card emphasis-result">
+              <span>所得税率</span>
+              <strong>{displayedResult.incomeTaxRate === null ? '―' : `${displayedResult.incomeTaxRate}%`}</strong>
+              <small>課税所得に適用される税率</small>
+            </div>
 
-            <small>
-              給与収入－給与所得控除相当額
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>基礎控除</span>
-
-            <strong>
-              {displayedResult
-                .basicDeduction === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .basicDeduction,
-                )}
-            </strong>
-
-            <small>
-              給与所得から自動判定
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>
-              基礎控除以外の所得控除
-            </span>
-
-            <strong>
-              {displayedResult
-                .otherDeductions === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .otherDeductions,
-                )}
-            </strong>
-
-            <small>
-              入力した所得控除の合計
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>所得控除合計</span>
-
-            <strong>
-              {displayedResult
-                .totalDeductions === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .totalDeductions,
-                )}
-            </strong>
-
-            <small>
-              基礎控除＋その他の所得控除
-            </small>
-          </div>
-
-          <div className="result-card emphasis-result">
-            <span>課税所得</span>
-
-            <strong>
-              {displayedResult
-                .taxableIncome === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .taxableIncome,
-                )}
-            </strong>
-
-            <small>
-              1,000円未満切捨て
-            </small>
-          </div>
-
-          <div className="result-card emphasis-result">
-            <span>所得税率</span>
-
-            <strong>
-              {displayedResult
-                .incomeTaxRate === null
-                ? '―'
-                : `${displayedResult.incomeTaxRate}%`}
-            </strong>
-
-            <small>
-              課税所得に適用される税率
-            </small>
+            <div className="result-card result-card--total">
+              <span>所得税等の合計</span>
+              <strong>{displayedResult.totalIncomeTax === null ? '―' : formatYen(displayedResult.totalIncomeTax)}</strong>
+              <small>100円未満切捨ての概算</small>
+            </div>
           </div>
 
           <button
-            className="apply-tax-rate-button"
+            className="apply-tax-rate-button apply-tax-rate-button--panel"
             type="button"
             onClick={handleApplyIncomeTaxRate}
-            disabled={
-              displayedResult.incomeTaxRate ===
-              null
-            }
+            disabled={displayedResult.incomeTaxRate === null}
           >
-            {displayedResult.incomeTaxRate ===
-              null
+            {displayedResult.incomeTaxRate === null
               ? '所得税率を計算してください'
               : `この${displayedResult.incomeTaxRate}%をiDeCoに反映する`}
           </button>
 
-          <div className="result-card">
-            <span>所得税額</span>
+          <div className="simulator-breakdown-panel simulator-breakdown-panel--taxable">
+            <div className="simulator-subheading">
+              <div>
+                <p>CALCULATION BREAKDOWN</p>
+                <h3>計算の内訳</h3>
+              </div>
+              <span>正式税額を確定するものではありません</span>
+            </div>
 
-            <strong>
-              {displayedResult
-                .baseIncomeTax === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .baseIncomeTax,
-                )}
-            </strong>
-
-            <small>
-              税額控除適用前の概算
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>
-              復興特別所得税
-            </span>
-
-            <strong>
-              {displayedResult
-                .reconstructionSpecialIncomeTax ===
-                null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .reconstructionSpecialIncomeTax,
-                )}
-            </strong>
-
-            <small>
-              所得税額の2.1％
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>
-              所得税等の合計
-            </span>
-
-            <strong>
-              {displayedResult
-                .totalIncomeTax === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .totalIncomeTax,
-                )}
-            </strong>
-
-            <small>
-              100円未満切捨ての概算
-            </small>
+            <div className="taxable-breakdown-grid">
+              <div className="result-card"><span>給与所得控除相当額</span><strong>{displayedResult.salaryIncomeDeduction === null ? '―' : formatYen(displayedResult.salaryIncomeDeduction)}</strong><small>給与収入から差し引かれる金額</small></div>
+              <div className="result-card"><span>給与所得</span><strong>{displayedResult.salaryIncome === null ? '―' : formatYen(displayedResult.salaryIncome)}</strong><small>給与収入－給与所得控除相当額</small></div>
+              <div className="result-card"><span>基礎控除</span><strong>{displayedResult.basicDeduction === null ? '―' : formatYen(displayedResult.basicDeduction)}</strong><small>給与所得から自動判定</small></div>
+              <div className="result-card"><span>基礎控除以外の所得控除</span><strong>{displayedResult.otherDeductions === null ? '―' : formatYen(displayedResult.otherDeductions)}</strong><small>入力した所得控除の合計</small></div>
+              <div className="result-card"><span>所得控除合計</span><strong>{displayedResult.totalDeductions === null ? '―' : formatYen(displayedResult.totalDeductions)}</strong><small>基礎控除＋その他の所得控除</small></div>
+              <div className="result-card"><span>所得税額</span><strong>{displayedResult.baseIncomeTax === null ? '―' : formatYen(displayedResult.baseIncomeTax)}</strong><small>税額控除適用前の概算</small></div>
+              <div className="result-card"><span>復興特別所得税</span><strong>{displayedResult.reconstructionSpecialIncomeTax === null ? '―' : formatYen(displayedResult.reconstructionSpecialIncomeTax)}</strong><small>所得税額の2.1％</small></div>
+            </div>
           </div>
         </div>
       </div>
