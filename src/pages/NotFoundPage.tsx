@@ -8,7 +8,7 @@ function NotFoundPage() {
       <main id="main-content" className="not-found-page__main">
         <p>404</p>
         <h1>ページが見つかりません</h1>
-        <p>URLをご確認いただくか、トップページから目的の情報をお探しください。</p>
+        <p>ページのアドレスをご確認いただくか、トップページから目的の情報をお探しください。</p>
         <Link to={routes.home}>トップへ戻る</Link>
       </main>
     </SiteLayout>
