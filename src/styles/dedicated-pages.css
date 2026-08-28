@@ -936,6 +936,104 @@
   }
 }
 
+/* WBS 3.6.11 round 2: iDeCo tax and contribution hierarchy */
+.ideco-longterm-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.simulator-page--ideco .result-card--contribution-total {
+  border-color: #b9a9ee;
+  background: #f5f2ff;
+}
+
+.simulator-page--ideco .ideco-longterm-summary .result-card--total {
+  border-color: #d0c4f4;
+  background: #faf8ff;
+}
+
+.ideco-trajectory-wrap {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.ideco-trajectory-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  color: #6d6488;
+  font-size: 0.62rem;
+  font-weight: 750;
+}
+
+.ideco-trajectory-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ideco-trajectory-legend i {
+  width: 11px;
+  height: 8px;
+  background: #6441c8;
+}
+
+.ideco-trajectory-legend span:nth-child(2) i {
+  background: #a692e5;
+}
+
+.asset-trajectory--ideco {
+  margin-top: 0;
+}
+
+.asset-trajectory--ideco .ideco-trajectory__plot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+}
+
+.asset-trajectory--ideco .ideco-trajectory__plot > i {
+  width: min(25px, 36%);
+  min-height: 2px;
+  border-radius: 5px 5px 1px 1px;
+  box-shadow: none;
+}
+
+.asset-trajectory--ideco .ideco-trajectory__contribution {
+  background: linear-gradient(180deg, #8f73df, #6441c8);
+}
+
+.asset-trajectory--ideco .ideco-trajectory__saving {
+  background: linear-gradient(180deg, #c9bdf0, #a692e5);
+}
+
+.ideco-trajectory-note {
+  margin: 0;
+  color: #746d89;
+  font-size: 0.64rem;
+  text-align: right;
+}
+
+@media (min-width: 901px) {
+  .simulator-page--ideco .simulator-summary-grid--ideco {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .simulator-page--ideco .simulator-summary-grid--ideco .emphasis-result {
+    border-color: #8f73df;
+    background: #f3efff;
+  }
+}
+
+@media (max-width: 700px) {
+  .ideco-longterm-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 1200px) {
   .simulator-page__hero-inner { grid-template-columns: minmax(0, 0.9fr) minmax(460px, 1.1fr); gap: 28px; width: min(100% - 48px, 1120px); }
   .simulator-page__hero-copy h1 { font-size: clamp(2rem, 3vw, 2.25rem); }
@@ -1390,5 +1488,145 @@
 
   .tax-saving-bars strong {
     grid-column: 2;
+  }
+}
+
+/* WBS 3.6.11 round 2: NISA principal/gain trajectory */
+.simulator-page--nisa .result-card--future {
+  border-color: #72c89f;
+  background: #eefaf4;
+}
+
+.simulator-page--nisa .simulator-summary-grid--nisa .result-card:nth-child(2) {
+  border-color: #a9c8f1;
+  background: #f3f7ff;
+}
+
+.simulator-page--nisa .simulator-summary-grid--nisa .result-card--gain {
+  border-color: #a9d8bf;
+  background: #f4fbf7;
+}
+
+.nisa-trajectory-wrap {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.nisa-trajectory-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  color: #657d91;
+  font-size: 0.64rem;
+  font-weight: 750;
+}
+
+.nisa-trajectory-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nisa-trajectory-legend i {
+  width: 11px;
+  height: 8px;
+  background: #168f5d;
+}
+
+.nisa-trajectory-legend span:nth-child(2) i {
+  background: #a7dc88;
+}
+
+.nisa-trajectory-legend span:nth-child(3) i {
+  width: 16px;
+  height: 2px;
+  background: #1769d2;
+}
+
+.asset-trajectory--nisa {
+  margin-top: 0;
+}
+
+.asset-trajectory--nisa .nisa-trajectory__plot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.asset-trajectory--nisa .nisa-trajectory__plot > i {
+  flex: 0 0 auto;
+  width: min(62px, 72%);
+  min-height: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.asset-trajectory--nisa .nisa-trajectory__plot > .nisa-trajectory__gain {
+  border-top: 2px solid #1769d2;
+  border-radius: 7px 7px 0 0;
+  background: #a7dc88;
+}
+
+.asset-trajectory--nisa .nisa-trajectory__plot > .nisa-trajectory__principal {
+  background: #168f5d;
+}
+
+@media (min-width: 901px) {
+  .simulator-page--nisa .simulator-summary-grid--nisa {
+    grid-template-columns: 1.16fr 1fr 1fr;
+  }
+
+  .simulator-page--nisa .result-card--future strong {
+    font-size: clamp(1.05rem, 1.55vw, 1.7rem);
+  }
+}
+
+/* WBS 3.6.11 round 2: military-land result hierarchy */
+.military-primary-results,
+.military-support-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.simulator-page--military .military-primary-results .result-card {
+  min-height: 142px;
+  padding: 18px;
+}
+
+.simulator-page--military .military-primary-results .result-card > span {
+  color: #276379;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.simulator-page--military .military-primary-results .result-card strong {
+  margin-top: 14px;
+  font-size: clamp(1.55rem, 2.35vw, 2.4rem);
+}
+
+.simulator-page--military .military-result-card--yield {
+  border-color: #6cb8aa;
+  background: #edf9f6;
+}
+
+.simulator-page--military .military-result-card--multiple {
+  border-color: #a7cbe3;
+  background: #f3f9fd;
+}
+
+.simulator-page--military .military-support-results .result-card {
+  min-height: 110px;
+  padding: 14px 16px;
+}
+
+@media (max-width: 620px) {
+  .military-primary-results,
+  .military-support-results {
+    grid-template-columns: 1fr;
   }
 }

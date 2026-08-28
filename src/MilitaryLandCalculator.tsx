@@ -501,22 +501,8 @@ function MilitaryLandCalculator() {
               </button>
             </div>
           )}
-          <div className="simulator-summary-grid simulator-summary-grid--military">
-            <div className="result-card">
-              <span>購入倍率</span>
-
-              <strong>
-                {displayedResult.calculatedMultiple === null
-                  ? '―'
-                  : `${displayedResult.calculatedMultiple.toFixed(2)}倍`}
-              </strong>
-
-              <small>
-                購入価格 ÷ 年間借地料
-              </small>
-            </div>
-
-            <div className="result-card emphasis-result">
+          <div className="military-primary-results">
+            <div className="result-card emphasis-result military-result-card--yield">
               <span>表面利回り</span>
 
               <strong>
@@ -530,6 +516,22 @@ function MilitaryLandCalculator() {
               </small>
             </div>
 
+            <div className="result-card military-result-card--multiple">
+              <span>購入倍率</span>
+
+              <strong>
+                {displayedResult.calculatedMultiple === null
+                  ? '―'
+                  : `${displayedResult.calculatedMultiple.toFixed(2)}倍`}
+              </strong>
+
+              <small>
+                購入価格 ÷ 年間借地料
+              </small>
+            </div>
+          </div>
+
+          <div className="military-support-results">
             <div className="result-card">
               <span>年間借地料</span>
 
@@ -567,7 +569,7 @@ function MilitaryLandCalculator() {
             <div className="simulator-subheading">
               <div>
                 <p>BREAKDOWN</p>
-                <h3>利回りと購入価格の内訳</h3>
+                <h3>年間収益と購入条件の内訳</h3>
               </div>
               <span>税金・経費控除前</span>
             </div>

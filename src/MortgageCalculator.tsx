@@ -10,6 +10,7 @@ import {
 import './MortgageCalculator.css'
 import {
   calculateMortgageComparison,
+  calculateMortgageTrajectory,
   createMortgageComparisonExplanation,
   createMortgageComparisonInputKey,
   formatApproxMortgageYen,
@@ -23,6 +24,7 @@ import {
   type MortgageFieldValues,
   type MortgageComparison,
   type MortgageInput,
+  type MortgageTrajectoryPoint,
   type RepaymentMethod,
 } from './mortgage'
 
@@ -52,6 +54,88 @@ type CalculatorViewState =
   | 'calculated'
   | 'stale'
   | 'calculation-error'
+
+type MortgageTrajectoryChartProps = {
+  title: string
+  tone: 'blue' | 'green'
+  points: MortgageTrajectoryPoint[]
+  paymentCount: number
+}
+
+const formatMortgageChartYen = (value: number) =>
+  `${Math.round(value / 10_000).toLocaleString('ja-JP')}万円`
+
+function MortgageTrajectoryChart({
+  title,
+  tone,
+  points,
+  paymentCount,
+}: MortgageTrajectoryChartProps) {
+  const maxTotal = Math.max(
+    1,
+    ...points.map(
+      (point) =>
+        point.cumulativePrincipal + point.cumulativeInterest,
+    ),
+  )
+
+  return (
+    <article
+      className="mortgage-trajectory-card"
+      data-tone={tone}
+    >
+      <header>
+        <h4>{title}</h4>
+        <span>
+          <i className="mortgage-trajectory-legend__principal" />
+          元金
+          <i className="mortgage-trajectory-legend__interest" />
+          利息
+        </span>
+      </header>
+      <div
+        className="mortgage-trajectory"
+        aria-label={`${title}の元金と利息の累計推移`}
+      >
+        {points.map((point) => {
+          const total =
+            point.cumulativePrincipal +
+            point.cumulativeInterest
+          const totalHeight = total / maxTotal * 100
+          const interestRatio =
+            total > 0
+              ? point.cumulativeInterest / total * 100
+              : 0
+
+          return (
+            <div
+              className="mortgage-trajectory__point"
+              key={point.paymentNumber}
+            >
+              <span>
+                {point.paymentNumber === paymentCount
+                  ? formatMortgageChartYen(total)
+                  : ''}
+              </span>
+              <div className="mortgage-trajectory__plot">
+                <i style={{ height: `${totalHeight}%` }}>
+                  <b style={{ height: `${interestRatio}%` }} />
+                </i>
+              </div>
+              <small>
+                {point.paymentNumber === 0
+                  ? '開始'
+                  : point.paymentNumber === paymentCount
+                    ? '完済'
+                    : `${Math.round(point.paymentNumber / 12)}年`}
+              </small>
+            </div>
+          )
+        })}
+      </div>
+    </article>
+  )
+}
 
 const FIELD_NAMES: MortgageFieldName[] = [
   'loanAmount',
@@ -355,6 +439,30 @@ function MortgageCalculator() {
         ? autoCalculationOutcome.stored
         : null
       : manualCalculation
+
+  const mortgageTrajectories = useMemo(() => {
+    if (activeCalculation === null) {
+      return null
+    }
+
+    const equalPayment = calculateMortgageTrajectory(
+      activeCalculation.input,
+      'equal-payment',
+    )
+    const equalPrincipal = calculateMortgageTrajectory(
+      activeCalculation.input,
+      'equal-principal',
+    )
+
+    if (!equalPayment.ok || !equalPrincipal.ok) {
+      return null
+    }
+
+    return {
+      equalPayment: equalPayment.points,
+      equalPrincipal: equalPrincipal.points,
+    }
+  }, [activeCalculation])
 
   const calculationError =
     isAutoCalculation
@@ -1061,32 +1169,7 @@ function MortgageCalculator() {
 
           {activeCalculation ? (
             <>
-              <div className="mortgage-results__condition-heading">
-                <strong>この条件で比較</strong>
-                <button
-                  className="mortgage-results__edit-button"
-                  type="button"
-                  onClick={() =>
-                    loanAmountRef.current?.focus()
-                  }
-                >
-                  入力条件を確認・変更する
-                </button>
-              </div>
-
-              <dl className="mortgage-conditions">
-                <div><dt>借入金額</dt><dd>{activeCalculation.input.principal.toLocaleString('ja-JP')}円</dd></div>
-                <div><dt>年利</dt><dd>{activeCalculation.input.annualRate.toLocaleString('ja-JP', { maximumFractionDigits: 3 })}%</dd></div>
-                <div><dt>返済期間</dt><dd>{activeCalculation.input.paymentCount / 12}年</dd></div>
-                <div><dt>返済回数</dt><dd>{activeCalculation.input.paymentCount.toLocaleString('ja-JP')}回</dd></div>
-              </dl>
-
-              <div className="mortgage-comparison-summary" role="note">
-                <strong>比較のポイント</strong>
-                <p>{createMortgageComparisonExplanation(activeCalculation.comparison)}</p>
-              </div>
-
-              <div className="mortgage-comparison-grid" aria-label="返済方式の比較結果">
+              <div className="mortgage-results-overview" aria-label="返済方式の比較結果">
                 <article className="mortgage-comparison-card" data-selected={repaymentMethod === 'equal-payment'} aria-labelledby="mortgage-equal-payment-title">
                   <header className="mortgage-comparison-card__heading">
                     <div><p>毎月の安定を重視</p><h4 id="mortgage-equal-payment-title">元利均等返済</h4></div>
@@ -1112,7 +1195,71 @@ function MortgageCalculator() {
                     <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.totalInterest)}</dd></div>
                   </dl>
                 </article>
+
+                <article className="mortgage-comparison-delta" role="note">
+                  <header>
+                    <p>COMPARISON</p>
+                    <h4>2方式の差額</h4>
+                  </header>
+                  <dl>
+                    <div>
+                      <dt>総返済額の差</dt>
+                      <dd>{formatApproxMortgageYen(Math.abs(activeCalculation.comparison.differences.totalPayment))}</dd>
+                    </div>
+                    <div>
+                      <dt>支払利息の差</dt>
+                      <dd>{formatApproxMortgageYen(Math.abs(activeCalculation.comparison.differences.totalInterest))}</dd>
+                    </div>
+                  </dl>
+                  <p>{createMortgageComparisonExplanation(activeCalculation.comparison)}</p>
+                </article>
               </div>
+
+              {mortgageTrajectories && (
+                <section className="mortgage-trajectories-section" aria-labelledby="mortgage-trajectories-title">
+                  <header>
+                    <div>
+                      <p>PAYMENT TRAJECTORY</p>
+                      <h4 id="mortgage-trajectories-title">返済額の推移イメージ</h4>
+                    </div>
+                    <span>元金と利息の累計</span>
+                  </header>
+                  <div className="mortgage-trajectories-grid">
+                    <MortgageTrajectoryChart
+                      title="元利均等返済"
+                      tone="blue"
+                      points={mortgageTrajectories.equalPayment}
+                      paymentCount={activeCalculation.input.paymentCount}
+                    />
+                    <MortgageTrajectoryChart
+                      title="元金均等返済"
+                      tone="green"
+                      points={mortgageTrajectories.equalPrincipal}
+                      paymentCount={activeCalculation.input.paymentCount}
+                    />
+                  </div>
+                </section>
+              )}
+
+              <div className="mortgage-results__condition-heading mortgage-results__condition-heading--compact">
+                <strong>入力条件</strong>
+                <button
+                  className="mortgage-results__edit-button"
+                  type="button"
+                  onClick={() =>
+                    loanAmountRef.current?.focus()
+                  }
+                >
+                  入力条件を確認・変更する
+                </button>
+              </div>
+
+              <dl className="mortgage-conditions mortgage-conditions--compact">
+                <div><dt>借入金額</dt><dd>{activeCalculation.input.principal.toLocaleString('ja-JP')}円</dd></div>
+                <div><dt>年利</dt><dd>{activeCalculation.input.annualRate.toLocaleString('ja-JP', { maximumFractionDigits: 3 })}%</dd></div>
+                <div><dt>返済期間</dt><dd>{activeCalculation.input.paymentCount / 12}年</dd></div>
+                <div><dt>返済回数</dt><dd>{activeCalculation.input.paymentCount.toLocaleString('ja-JP')}回</dd></div>
+              </dl>
             </>          ) : (
             <div className="mortgage-results__empty">
               <span aria-hidden="true">¥</span>

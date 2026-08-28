@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 type IdecoResult = {
   annualContribution: number | null
+  totalContribution: number | null
   incomeTaxSaving: number | null
   residentTaxSaving: number | null
   annualTaxSaving: number | null
@@ -10,6 +11,7 @@ type IdecoResult = {
 
 const emptyResult: IdecoResult = {
   annualContribution: null,
+  totalContribution: null,
   incomeTaxSaving: null,
   residentTaxSaving: null,
   annualTaxSaving: null,
@@ -150,8 +152,12 @@ const calculateIdeco = (
   const totalTaxSaving =
     annualTaxSaving * years
 
+  const totalContribution =
+    annualContribution * years
+
   return {
     annualContribution,
+    totalContribution,
     incomeTaxSaving,
     residentTaxSaving,
     annualTaxSaving,
@@ -227,6 +233,11 @@ function IdecoCalculator({
 
   const years = Number(
     normalizeDecimalInput(contributionYears),
+  )
+
+  const longTermDisplayMax = Math.max(
+    displayedResult.totalContribution ?? 0,
+    displayedResult.totalTaxSaving ?? 0,
   )
 
   const canSimulate =
@@ -626,24 +637,6 @@ function IdecoCalculator({
 
           <div className="simulator-summary-grid simulator-summary-grid--ideco">
             <div className="result-card">
-              <span>年間掛金額</span>
-
-              <strong>
-                {displayedResult
-                  .annualContribution === null
-                  ? '―'
-                  : formatYen(
-                    displayedResult
-                      .annualContribution,
-                  )}
-              </strong>
-
-              <small>
-                毎月の掛金 × 12か月
-              </small>
-            </div>
-
-            <div className="result-card">
               <span>年間の所得税軽減額</span>
 
               <strong>
@@ -680,7 +673,7 @@ function IdecoCalculator({
             </div>
 
             <div className="result-card emphasis-result">
-              <span>年間節税額</span>
+              <span>年間節税効果（合計）</span>
 
               <strong>
                 {displayedResult
@@ -694,6 +687,45 @@ function IdecoCalculator({
 
               <small>
                 所得税軽減額＋住民税軽減額
+              </small>
+            </div>
+
+          </div>
+
+          <div className="ideco-longterm-summary" aria-label="掛金と節税効果の期間累計">
+            <div className="result-card">
+              <span>年間掛金額</span>
+
+              <strong>
+                {displayedResult
+                  .annualContribution === null
+                  ? '―'
+                  : formatYen(
+                    displayedResult
+                      .annualContribution,
+                  )}
+              </strong>
+
+              <small>
+                毎月の掛金 × 12か月
+              </small>
+            </div>
+
+            <div className="result-card result-card--contribution-total">
+              <span>掛金累計</span>
+
+              <strong>
+                {displayedResult
+                  .totalContribution === null
+                  ? '―'
+                  : formatYen(
+                    displayedResult
+                      .totalContribution,
+                  )}
+              </strong>
+
+              <small>
+                年間掛金額 × 積立期間
               </small>
             </div>
 
@@ -720,24 +752,40 @@ function IdecoCalculator({
             <div className="simulator-chart-panel simulator-chart-panel--ideco">
               <div className="simulator-subheading">
                 <div>
-                  <p>TAX SAVING TRAJECTORY</p>
-                  <h3>節税効果の推移</h3>
+                  <p>LONG-TERM TRAJECTORY</p>
+                  <h3>掛金累計と節税効果の推移</h3>
                 </div>
                 <span>{years > 0 ? `${years.toLocaleString('ja-JP')}年間` : '条件入力後に表示'}</span>
               </div>
 
-              {displayedResult.totalTaxSaving !== null && displayedResult.totalTaxSaving > 0 ? (
-                <div className="asset-trajectory asset-trajectory--ideco" aria-label="期間中の節税額推移グラフ">
-                  {[0.25, 0.5, 0.75, 1].map((ratio) => (
-                    <div className="asset-trajectory__point" key={ratio}>
-                      <span>{formatYen(displayedResult.totalTaxSaving! * ratio)}</span>
-                      <div><i style={{ height: `${ratio * 100}%` }} /></div>
-                      <small>{ratio === 1 ? '期間終了' : `${Math.max(1, Math.round(years * ratio))}年後`}</small>
-                    </div>
-                  ))}
+              {displayedResult.totalTaxSaving !== null && displayedResult.totalContribution !== null && longTermDisplayMax > 0 ? (
+                <div className="ideco-trajectory-wrap">
+                  <div className="ideco-trajectory-legend" aria-hidden="true">
+                    <span><i />掛金累計</span>
+                    <span><i />節税額累計</span>
+                  </div>
+                  <div className="asset-trajectory asset-trajectory--ideco" aria-label="掛金累計と期間中の節税額推移グラフ">
+                    {[0.25, 0.5, 0.75, 1].map((ratio) => (
+                      <div className="asset-trajectory__point" key={ratio}>
+                        <span>{formatYen(displayedResult.totalContribution! * ratio)}</span>
+                        <div className="ideco-trajectory__plot">
+                          <i
+                            className="ideco-trajectory__contribution"
+                            style={{ height: `${displayedResult.totalContribution! * ratio / longTermDisplayMax * 100}%` }}
+                          />
+                          <i
+                            className="ideco-trajectory__saving"
+                            style={{ height: `${displayedResult.totalTaxSaving! * ratio / longTermDisplayMax * 100}%` }}
+                          />
+                        </div>
+                        <small>{ratio === 1 ? '期間終了' : `${Math.max(1, Math.round(years * ratio))}年後`}</small>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="ideco-trajectory-note">掛金累計には運用益を含みません。</p>
                 </div>
               ) : (
-                <div className="simulator-chart-empty">条件を入力すると、期間中の節税額を表示します。</div>
+                <div className="simulator-chart-empty">条件を入力すると、掛金累計と期間中の節税額を表示します。</div>
               )}
             </div>
 

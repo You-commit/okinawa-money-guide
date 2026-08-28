@@ -198,7 +198,9 @@ function NisaCalculator() {
         label: ratio === 1
           ? `${years.toLocaleString('ja-JP')}年後`
           : `${pointYears.toLocaleString('ja-JP', { maximumFractionDigits: 1 })}年後`,
-        value: pointResult.futureValue ?? 0,
+        principal: pointResult.totalPrincipal ?? 0,
+        gain: pointResult.investmentGain ?? 0,
+        futureValue: pointResult.futureValue ?? 0,
         ratio,
       }
     })
@@ -536,8 +538,24 @@ function NisaCalculator() {
           </div>
 
           <div className="simulator-summary-grid simulator-summary-grid--nisa">
+            <div className="result-card emphasis-result result-card--future">
+              <span>将来の資産額</span>
+
+              <strong>
+                {displayedResult.futureValue === null
+                  ? '―'
+                  : formatYen(
+                      displayedResult.futureValue,
+                    )}
+              </strong>
+
+              <small>
+                毎月末積立・月次複利による概算
+              </small>
+            </div>
+
             <div className="result-card">
-              <span>投資元本</span>
+              <span>積立元本の合計</span>
 
               <strong>
                 {displayedResult.totalPrincipal === null
@@ -568,21 +586,6 @@ function NisaCalculator() {
               </small>
             </div>
 
-            <div className="result-card emphasis-result">
-              <span>将来の資産額</span>
-
-              <strong>
-                {displayedResult.futureValue === null
-                  ? '―'
-                  : formatYen(
-                      displayedResult.futureValue,
-                    )}
-              </strong>
-
-              <small>
-                毎月末積立・月次複利による概算
-              </small>
-            </div>
           </div>
 
           <div className="simulator-chart-panel simulator-chart-panel--nisa">
@@ -595,14 +598,35 @@ function NisaCalculator() {
             </div>
 
             {assetTrajectory.length > 0 && finalAssetValue ? (
-              <div className="asset-trajectory" aria-label="資産推移の概算グラフ">
-                {assetTrajectory.map((point) => (
-                  <div className="asset-trajectory__point" key={point.ratio}>
-                    <span>{formatYen(point.value)}</span>
-                    <div><i style={{ height: `${Math.max(14, point.value / finalAssetValue * 100)}%` }} /></div>
-                    <small>{point.label}</small>
-                  </div>
-                ))}
+              <div className="nisa-trajectory-wrap">
+                <div className="nisa-trajectory-legend" aria-hidden="true">
+                  <span><i />積立元本</span>
+                  <span><i />運用益</span>
+                  <span><i />将来資産額</span>
+                </div>
+                <div className="asset-trajectory asset-trajectory--nisa" aria-label="元本と運用益を含む資産推移の概算グラフ">
+                  {assetTrajectory.map((point) => {
+                    const principalHeight = point.principal / finalAssetValue * 100
+                    const gainHeight = point.gain / finalAssetValue * 100
+
+                    return (
+                      <div className="asset-trajectory__point" key={point.ratio}>
+                        <span>{formatYen(point.futureValue)}</span>
+                        <div className="nisa-trajectory__plot">
+                          <i
+                            className="nisa-trajectory__gain"
+                            style={{ height: `${gainHeight}%` }}
+                          />
+                          <i
+                            className="nisa-trajectory__principal"
+                            style={{ height: `${principalHeight}%` }}
+                          />
+                        </div>
+                        <small>{point.label}</small>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             ) : (
               <div className="simulator-chart-empty">条件を入力すると、資産推移の概算を表示します。</div>

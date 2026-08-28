@@ -4,6 +4,7 @@ import {
     MORTGAGE_MODEL_VERSION,
     calculateMortgage,
     calculateMortgageComparison,
+    calculateMortgageTrajectory,
     createMortgageComparisonExplanation,
     createMortgageComparisonInputKey,
     createMortgageInputKey,
@@ -195,6 +196,48 @@ describe('fixed monthly mortgage model', () => {
         annualRate: 1,
         paymentCount: 420,
     }
+
+    it.each([
+        'equal-payment',
+        'equal-principal',
+    ] as const)('builds a %s trajectory consistent with the approved totals', (method) => {
+        const summary = expectSuccessfulCalculation(
+            standardInput,
+            method,
+        )
+        const trajectory = calculateMortgageTrajectory(
+            standardInput,
+            method,
+        )
+
+        expect(trajectory.ok).toBe(true)
+
+        if (!trajectory.ok) {
+            throw new Error(
+                `Expected a successful trajectory, received ${trajectory.error}`,
+            )
+        }
+
+        const firstPoint = trajectory.points[0]
+        const lastPoint = trajectory.points.at(-1)
+
+        expect(firstPoint).toEqual({
+            paymentNumber: 0,
+            cumulativePrincipal: 0,
+            cumulativeInterest: 0,
+        })
+        expect(lastPoint?.paymentNumber).toBe(
+            standardInput.paymentCount,
+        )
+        expect(lastPoint?.cumulativePrincipal).toBeCloseTo(
+            standardInput.principal,
+            5,
+        )
+        expect(lastPoint?.cumulativeInterest).toBeCloseTo(
+            summary.totalInterest,
+            5,
+        )
+    })
 
     it('matches the equal-payment reference values', () => {
         const result = expectSuccessfulCalculation(

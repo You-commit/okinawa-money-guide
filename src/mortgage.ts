@@ -124,6 +124,22 @@ export type MortgageComparisonResult =
         error: MortgageCalculationError
     }
 
+export type MortgageTrajectoryPoint = {
+    paymentNumber: number
+    cumulativePrincipal: number
+    cumulativeInterest: number
+}
+
+export type MortgageTrajectoryResult =
+    | {
+        ok: true
+        points: MortgageTrajectoryPoint[]
+    }
+    | {
+        ok: false
+        error: MortgageCalculationError
+    }
+
 const FULL_WIDTH_NORMALIZATION_FORM = 'NFKC'
 const UNSIGNED_INTEGER_PATTERN = /^\d+$/
 const ANNUAL_RATE_PATTERN = /^\d+(?:\.\d{1,3})?$/
@@ -533,6 +549,79 @@ export const calculateMortgage = (
             paymentCount,
             modelVersion: MORTGAGE_MODEL_VERSION,
         },
+    }
+}
+
+/**
+ * 正式な固定月次モデルと同じ前提で、返済推移表示に使う
+ * 元金・利息の累計値を返します。
+ */
+export const calculateMortgageTrajectory = (
+    input: MortgageInput,
+    method: RepaymentMethod,
+    segmentCount = 6,
+): MortgageTrajectoryResult => {
+    const calculation = calculateMortgage(input, method)
+
+    if (!calculation.ok) {
+        return calculation
+    }
+
+    const { principal, annualRate, paymentCount } = input
+    const monthlyRate = annualRate / 100 / 12
+    const payment = calculation.result.firstPayment
+    const segments = Math.max(1, Math.min(segmentCount, paymentCount))
+    const paymentNumbers = Array.from(
+        new Set(
+            Array.from(
+                { length: segments + 1 },
+                (_, index) => Math.round(paymentCount * index / segments),
+            ),
+        ),
+    )
+
+    const points = paymentNumbers.map((paymentNumber) => {
+        let cumulativePrincipal: number
+        let cumulativeInterest: number
+
+        if (method === 'equal-payment') {
+            if (monthlyRate === 0) {
+                cumulativePrincipal = principal * paymentNumber / paymentCount
+                cumulativeInterest = 0
+            } else {
+                const compoundFactor = Math.pow(1 + monthlyRate, paymentNumber)
+                const remainingBalance =
+                    principal * compoundFactor -
+                    payment * ((compoundFactor - 1) / monthlyRate)
+
+                cumulativePrincipal = principal - remainingBalance
+                cumulativeInterest =
+                    payment * paymentNumber - cumulativePrincipal
+            }
+        } else {
+            const principalPayment = principal / paymentCount
+            cumulativePrincipal = principalPayment * paymentNumber
+            cumulativeInterest =
+                monthlyRate *
+                (
+                    paymentNumber * principal -
+                    principalPayment * paymentNumber * (paymentNumber - 1) / 2
+                )
+        }
+
+        return {
+            paymentNumber,
+            cumulativePrincipal: Math.min(
+                principal,
+                Math.max(0, cumulativePrincipal),
+            ),
+            cumulativeInterest: Math.max(0, cumulativeInterest),
+        }
+    })
+
+    return {
+        ok: true,
+        points,
     }
 }
 
