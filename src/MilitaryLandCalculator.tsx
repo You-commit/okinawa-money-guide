@@ -448,25 +448,37 @@ function MilitaryLandCalculator() {
               </p>
             </div>
 
-            {!isAutoCalculation && (
-
-            <button
-              className="simulate-button"
-              type="button"
-              onClick={simulate}
-              disabled={!canSimulate}
-            >
-              シミュレートする
-            </button>
-          )}
-
-          <button
-            className="reset-button"
-            type="button"
-            onClick={resetCalculator}
+          <div
+            className="simulator-form-actions"
+            data-single={isAutoCalculation}
           >
-            入力内容をリセット
-          </button>
+            <button
+              className="reset-button"
+              type="button"
+              onClick={resetCalculator}
+            >
+              入力内容をリセット
+            </button>
+
+            {!isAutoCalculation && (
+              <button
+                className="simulate-button"
+                type="button"
+                onClick={simulate}
+                disabled={!canSimulate}
+              >
+                シミュレートする
+              </button>
+            )}
+          </div>
+
+          <aside className="simulator-input-point simulator-input-point--military">
+            <strong>入力のポイント</strong>
+            <p>
+              年間借地料は年額、購入価格は総額を入力してください。
+              表面利回りは税金・経費控除前の概算です。
+            </p>
+          </aside>
         </div>
 
         <div
@@ -501,7 +513,7 @@ function MilitaryLandCalculator() {
               </button>
             </div>
           )}
-          <div className="military-primary-results">
+          <div className="military-kpi-grid" aria-label="軍用地の主要結果">
             <div className="result-card emphasis-result military-result-card--yield">
               <span>表面利回り</span>
 
@@ -529,10 +541,8 @@ function MilitaryLandCalculator() {
                 購入価格 ÷ 年間借地料
               </small>
             </div>
-          </div>
 
-          <div className="military-support-results">
-            <div className="result-card">
+            <div className="result-card military-result-card--rent">
               <span>年間借地料</span>
 
               <strong>
@@ -544,7 +554,7 @@ function MilitaryLandCalculator() {
               <small>入力した年間の借地料</small>
             </div>
 
-            <div className="result-card result-card--accent">
+            <div className="result-card result-card--accent military-result-card--price">
               <span>
                 <span className="text-keep">入力倍率による</span>
                 <wbr />
@@ -579,6 +589,35 @@ function MilitaryLandCalculator() {
               <div><dt>購入倍率</dt><dd>{displayedResult.calculatedMultiple === null ? '―' : `${displayedResult.calculatedMultiple.toFixed(2)} 倍`}</dd></div>
               <div><dt>表面利回り</dt><dd>{displayedResult.surfaceYield === null ? '―' : `${displayedResult.surfaceYield.toFixed(2)} %`}</dd></div>
             </dl>
+          </div>
+
+          <div className="military-result-detail-grid">
+            <section className="military-formula-panel" aria-labelledby="military-formula-title">
+              <div className="simulator-subheading">
+                <div>
+                  <p>CALCULATION</p>
+                  <h3 id="military-formula-title">利回りと倍率の計算関係</h3>
+                </div>
+              </div>
+              <dl>
+                <div>
+                  <dt>年間借地料 ÷ 購入価格 × 100</dt>
+                  <dd>{displayedResult.surfaceYield === null ? '―' : `${displayedResult.surfaceYield.toFixed(2)} %`}</dd>
+                </div>
+                <div>
+                  <dt>購入価格 ÷ 年間借地料</dt>
+                  <dd>{displayedResult.calculatedMultiple === null ? '―' : `${displayedResult.calculatedMultiple.toFixed(2)} 倍`}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <aside className="military-result-guide">
+              <strong>結果の見方</strong>
+              <p>
+                表面利回りと購入倍率は、入力した借地料と購入価格の関係を示します。
+                税金・維持費・借入利息などは含みません。
+              </p>
+            </aside>
           </div>
         </div>
       </div>

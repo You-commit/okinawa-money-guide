@@ -185,19 +185,27 @@ function NisaCalculator() {
       return []
     }
 
-    return [0.25, 0.5, 0.75, 1].map((ratio) => {
+    return Array.from({ length: 7 }, (_, index) => index / 6).map((ratio) => {
       const pointYears = years * ratio
-      const pointResult = calculateNisa(
-        initialInvestment,
-        monthlyContribution,
-        annualReturnRate,
-        String(pointYears),
-      )
+      const pointResult = ratio === 0
+        ? {
+            totalPrincipal: initialAmount,
+            investmentGain: 0,
+            futureValue: initialAmount,
+          }
+        : calculateNisa(
+            initialInvestment,
+            monthlyContribution,
+            annualReturnRate,
+            String(pointYears),
+          )
 
       return {
-        label: ratio === 1
-          ? `${years.toLocaleString('ja-JP')}年後`
-          : `${pointYears.toLocaleString('ja-JP', { maximumFractionDigits: 1 })}年後`,
+        label: ratio === 0
+          ? '開始'
+          : ratio === 1
+            ? '終了'
+            : `${pointYears.toLocaleString('ja-JP', { maximumFractionDigits: 1 })}年後`,
         principal: pointResult.totalPrincipal ?? 0,
         gain: pointResult.investmentGain ?? 0,
         futureValue: pointResult.futureValue ?? 0,
@@ -210,7 +218,33 @@ function NisaCalculator() {
     initialInvestment,
     monthlyContribution,
     years,
+    initialAmount,
   ])
+
+  const assetAreaGraph = useMemo(() => {
+    if (assetTrajectory.length === 0 || !finalAssetValue) {
+      return null
+    }
+
+    const width = 600
+    const bottom = 180
+    const plotHeight = 150
+    const pointStep = width / (assetTrajectory.length - 1)
+    const toY = (value: number) =>
+      bottom - value / finalAssetValue * plotHeight
+    const principalPoints = assetTrajectory.map((point, index) =>
+      `${index * pointStep},${toY(point.principal)}`,
+    )
+    const totalPoints = assetTrajectory.map((point, index) =>
+      `${index * pointStep},${toY(point.futureValue)}`,
+    )
+
+    return {
+      principalArea: `0,${bottom} ${principalPoints.join(' ')} ${width},${bottom}`,
+      gainArea: `${totalPoints.join(' ')} ${[...principalPoints].reverse().join(' ')}`,
+      totalLine: totalPoints.join(' '),
+    }
+  }, [assetTrajectory, finalAssetValue])
 
   const canSimulate =
     (initialAmount > 0 || monthlyAmount > 0) &&
@@ -505,24 +539,29 @@ function NisaCalculator() {
             </p>
           </div>
 
-          {!isAutoCalculation && (
-            <button
-              className="simulate-button"
-              type="button"
-              onClick={simulate}
-              disabled={!canSimulate}
-            >
-              シミュレートする
-            </button>
-          )}
-
-          <button
-            className="reset-button"
-            type="button"
-            onClick={resetCalculator}
+          <div
+            className="simulator-form-actions"
+            data-single={isAutoCalculation}
           >
-            入力内容をリセット
-          </button>
+            <button
+              className="reset-button"
+              type="button"
+              onClick={resetCalculator}
+            >
+              入力内容をリセット
+            </button>
+
+            {!isAutoCalculation && (
+              <button
+                className="simulate-button"
+                type="button"
+                onClick={simulate}
+                disabled={!canSimulate}
+              >
+                シミュレートする
+              </button>
+            )}
+          </div>
         </div>
 
         <div
@@ -586,6 +625,16 @@ function NisaCalculator() {
               </small>
             </div>
 
+            <div className="result-card result-card--tax-free-note">
+              <span>非課税メリット</span>
+
+              <strong>別途確認</strong>
+
+              <small>
+                税率や売却時期により異なるため、金額は表示していません
+              </small>
+            </div>
+
           </div>
 
           <div className="simulator-chart-panel simulator-chart-panel--nisa">
@@ -597,39 +646,49 @@ function NisaCalculator() {
               <span>{years > 0 ? `運用期間 ${years.toLocaleString('ja-JP')}年` : '条件入力後に表示'}</span>
             </div>
 
-            {assetTrajectory.length > 0 && finalAssetValue ? (
+            {assetAreaGraph ? (
               <div className="nisa-trajectory-wrap">
                 <div className="nisa-trajectory-legend" aria-hidden="true">
                   <span><i />積立元本</span>
                   <span><i />運用益</span>
                   <span><i />将来資産額</span>
                 </div>
-                <div className="asset-trajectory asset-trajectory--nisa" aria-label="元本と運用益を含む資産推移の概算グラフ">
-                  {assetTrajectory.map((point) => {
-                    const principalHeight = point.principal / finalAssetValue * 100
-                    const gainHeight = point.gain / finalAssetValue * 100
-
-                    return (
-                      <div className="asset-trajectory__point" key={point.ratio}>
-                        <span>{formatYen(point.futureValue)}</span>
-                        <div className="nisa-trajectory__plot">
-                          <i
-                            className="nisa-trajectory__gain"
-                            style={{ height: `${gainHeight}%` }}
-                          />
-                          <i
-                            className="nisa-trajectory__principal"
-                            style={{ height: `${principalHeight}%` }}
-                          />
-                        </div>
-                        <small>{point.label}</small>
-                      </div>
-                    )
-                  })}
+                <div className="nisa-area-graph" aria-label="元本と運用益を含む資産推移の概算グラフ">
+                  <svg viewBox="0 0 600 200" role="img" aria-hidden="true" preserveAspectRatio="none">
+                    <g className="nisa-area-graph__grid">
+                      <line x1="0" y1="30" x2="600" y2="30" />
+                      <line x1="0" y1="80" x2="600" y2="80" />
+                      <line x1="0" y1="130" x2="600" y2="130" />
+                      <line x1="0" y1="180" x2="600" y2="180" />
+                    </g>
+                    <polygon className="nisa-area-graph__principal" points={assetAreaGraph.principalArea} />
+                    <polygon className="nisa-area-graph__gain" points={assetAreaGraph.gainArea} />
+                    <polyline className="nisa-area-graph__total" points={assetAreaGraph.totalLine} />
+                  </svg>
+                  <div className="nisa-area-graph__labels" aria-hidden="true">
+                    {assetTrajectory.map((point) => (
+                      <span key={point.ratio}>{point.label}</span>
+                    ))}
+                  </div>
+                  <strong>{formatYen(finalAssetValue!)}</strong>
                 </div>
               </div>
             ) : (
-              <div className="simulator-chart-empty">条件を入力すると、資産推移の概算を表示します。</div>
+              <div className="nisa-area-graph nisa-area-graph--empty" aria-label="資産推移（未計算）">
+                <svg viewBox="0 0 600 200" aria-hidden="true" preserveAspectRatio="none">
+                  <g className="nisa-area-graph__grid">
+                    <line x1="0" y1="30" x2="600" y2="30" />
+                    <line x1="0" y1="80" x2="600" y2="80" />
+                    <line x1="0" y1="130" x2="600" y2="130" />
+                    <line x1="0" y1="180" x2="600" y2="180" />
+                  </g>
+                  <polyline className="nisa-area-graph__placeholder" points="0,180 100,168 200,150 300,125 400,98 500,65 600,28" />
+                </svg>
+                <div className="nisa-area-graph__labels" aria-hidden="true">
+                  <span>開始</span><span>―</span><span>―</span><span>―</span><span>―</span><span>―</span><span>終了</span>
+                </div>
+                <p>条件を入力すると、資産推移の概算を表示します。</p>
+              </div>
             )}
           </div>
         </div>

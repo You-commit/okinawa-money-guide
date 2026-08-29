@@ -635,24 +635,29 @@ function TaxableIncomeCalculator({
             </p>
           </div>
 
-          {!isAutoCalculation && (
-            <button
-              className="simulate-button"
-              type="button"
-              onClick={simulate}
-              disabled={!canSimulate}
-            >
-              シミュレートする
-            </button>
-          )}
-
-          <button
-            className="reset-button"
-            type="button"
-            onClick={resetCalculator}
+          <div
+            className="simulator-form-actions"
+            data-single={isAutoCalculation}
           >
-            入力内容をリセット
-          </button>
+            <button
+              className="reset-button"
+              type="button"
+              onClick={resetCalculator}
+            >
+              入力内容をリセット
+            </button>
+
+            {!isAutoCalculation && (
+              <button
+                className="simulate-button"
+                type="button"
+                onClick={simulate}
+                disabled={!canSimulate}
+              >
+                シミュレートする
+              </button>
+            )}
+          </div>
         </div>
 
         <div

@@ -240,6 +240,62 @@ function IdecoCalculator({
     displayedResult.totalTaxSaving ?? 0,
   )
 
+  const idecoTrajectory = useMemo(() => {
+    if (
+      displayedResult.totalContribution === null ||
+      displayedResult.totalTaxSaving === null ||
+      longTermDisplayMax <= 0
+    ) {
+      return []
+    }
+
+    return Array.from({ length: 7 }, (_, index) => {
+      const ratio = index / 6
+
+      return {
+        ratio,
+        label: ratio === 0
+          ? '開始'
+          : ratio === 1
+            ? '終了'
+            : `${Math.max(1, Math.round(years * ratio))}年後`,
+        contribution: displayedResult.totalContribution! * ratio,
+        saving: displayedResult.totalTaxSaving! * ratio,
+      }
+    })
+  }, [
+    displayedResult.totalContribution,
+    displayedResult.totalTaxSaving,
+    longTermDisplayMax,
+    years,
+  ])
+
+  const idecoAreaGraph = useMemo(() => {
+    if (idecoTrajectory.length === 0 || longTermDisplayMax <= 0) {
+      return null
+    }
+
+    const width = 600
+    const bottom = 180
+    const plotHeight = 150
+    const pointStep = width / (idecoTrajectory.length - 1)
+    const toY = (value: number) =>
+      bottom - value / longTermDisplayMax * plotHeight
+    const contributionPoints = idecoTrajectory.map((point, index) =>
+      `${index * pointStep},${toY(point.contribution)}`,
+    )
+    const savingPoints = idecoTrajectory.map((point, index) =>
+      `${index * pointStep},${toY(point.saving)}`,
+    )
+
+    return {
+      contributionArea: `0,${bottom} ${contributionPoints.join(' ')} ${width},${bottom}`,
+      contributionLine: contributionPoints.join(' '),
+      savingArea: `0,${bottom} ${savingPoints.join(' ')} ${width},${bottom}`,
+      savingLine: savingPoints.join(' '),
+    }
+  }, [idecoTrajectory, longTermDisplayMax])
+
   const canSimulate =
     monthlyAmount > 0 &&
     incomeRate >= 0 &&
@@ -603,24 +659,36 @@ function IdecoCalculator({
             </p>
           </div>
 
-          {!isAutoCalculation && (
-            <button
-              className="simulate-button"
-              type="button"
-              onClick={simulate}
-              disabled={!canSimulate}
-            >
-              シミュレートする
-            </button>
-          )}
-
-          <button
-            className="reset-button"
-            type="button"
-            onClick={resetCalculator}
+          <div
+            className="simulator-form-actions"
+            data-single={isAutoCalculation}
           >
-            入力内容をリセット
-          </button>
+            <button
+              className="reset-button"
+              type="button"
+              onClick={resetCalculator}
+            >
+              入力内容をリセット
+            </button>
+
+            {!isAutoCalculation && (
+              <button
+                className="simulate-button"
+                type="button"
+                onClick={simulate}
+                disabled={!canSimulate}
+              >
+                シミュレートする
+              </button>
+            )}
+          </div>
+
+          <aside className="simulator-input-point simulator-input-point--ideco">
+            <strong>入力のポイント</strong>
+            <p>
+              掛金と税率を入力すると、年間と積立期間全体の節税効果を比較できます。
+            </p>
+          </aside>
         </div>
 
         <div
@@ -635,6 +703,7 @@ function IdecoCalculator({
             <span>所得税・住民税の軽減額</span>
           </div>
 
+          <div className="ideco-kpi-grid" aria-label="iDeCoの主要結果">
           <div className="simulator-summary-grid simulator-summary-grid--ideco">
             <div className="result-card">
               <span>年間の所得税軽減額</span>
@@ -747,6 +816,7 @@ function IdecoCalculator({
               </small>
             </div>
           </div>
+          </div>
 
           <div className="ideco-visual-grid">
             <div className="simulator-chart-panel simulator-chart-panel--ideco">
@@ -758,34 +828,49 @@ function IdecoCalculator({
                 <span>{years > 0 ? `${years.toLocaleString('ja-JP')}年間` : '条件入力後に表示'}</span>
               </div>
 
-              {displayedResult.totalTaxSaving !== null && displayedResult.totalContribution !== null && longTermDisplayMax > 0 ? (
+              {idecoAreaGraph ? (
                 <div className="ideco-trajectory-wrap">
                   <div className="ideco-trajectory-legend" aria-hidden="true">
                     <span><i />掛金累計</span>
                     <span><i />節税額累計</span>
                   </div>
-                  <div className="asset-trajectory asset-trajectory--ideco" aria-label="掛金累計と期間中の節税額推移グラフ">
-                    {[0.25, 0.5, 0.75, 1].map((ratio) => (
-                      <div className="asset-trajectory__point" key={ratio}>
-                        <span>{formatYen(displayedResult.totalContribution! * ratio)}</span>
-                        <div className="ideco-trajectory__plot">
-                          <i
-                            className="ideco-trajectory__contribution"
-                            style={{ height: `${displayedResult.totalContribution! * ratio / longTermDisplayMax * 100}%` }}
-                          />
-                          <i
-                            className="ideco-trajectory__saving"
-                            style={{ height: `${displayedResult.totalTaxSaving! * ratio / longTermDisplayMax * 100}%` }}
-                          />
-                        </div>
-                        <small>{ratio === 1 ? '期間終了' : `${Math.max(1, Math.round(years * ratio))}年後`}</small>
-                      </div>
-                    ))}
+                  <div className="ideco-area-graph" aria-label="掛金累計と期間中の節税額推移グラフ">
+                    <svg viewBox="0 0 600 200" role="img" aria-hidden="true" preserveAspectRatio="none">
+                      <g className="ideco-area-graph__grid">
+                        <line x1="0" y1="30" x2="600" y2="30" />
+                        <line x1="0" y1="80" x2="600" y2="80" />
+                        <line x1="0" y1="130" x2="600" y2="130" />
+                        <line x1="0" y1="180" x2="600" y2="180" />
+                      </g>
+                      <polygon className="ideco-area-graph__contribution" points={idecoAreaGraph.contributionArea} />
+                      <polygon className="ideco-area-graph__saving" points={idecoAreaGraph.savingArea} />
+                      <polyline className="ideco-area-graph__contribution-line" points={idecoAreaGraph.contributionLine} />
+                      <polyline className="ideco-area-graph__saving-line" points={idecoAreaGraph.savingLine} />
+                    </svg>
+                    <div className="ideco-area-graph__labels" aria-hidden="true">
+                      {idecoTrajectory.map((point) => (
+                        <span key={point.ratio}>{point.label}</span>
+                      ))}
+                    </div>
                   </div>
                   <p className="ideco-trajectory-note">掛金累計には運用益を含みません。</p>
                 </div>
               ) : (
-                <div className="simulator-chart-empty">条件を入力すると、掛金累計と期間中の節税額を表示します。</div>
+                <div className="ideco-area-graph ideco-area-graph--empty" aria-label="掛金累計と節税額推移（未計算）">
+                  <svg viewBox="0 0 600 200" aria-hidden="true" preserveAspectRatio="none">
+                    <g className="ideco-area-graph__grid">
+                      <line x1="0" y1="30" x2="600" y2="30" />
+                      <line x1="0" y1="80" x2="600" y2="80" />
+                      <line x1="0" y1="130" x2="600" y2="130" />
+                      <line x1="0" y1="180" x2="600" y2="180" />
+                    </g>
+                    <polyline className="ideco-area-graph__placeholder" points="0,180 100,170 200,150 300,125 400,96 500,64 600,30" />
+                  </svg>
+                  <div className="ideco-area-graph__labels" aria-hidden="true">
+                    <span>開始</span><span>―</span><span>―</span><span>―</span><span>―</span><span>―</span><span>終了</span>
+                  </div>
+                  <p>条件を入力すると、掛金累計と節税額を表示します。</p>
+                </div>
               )}
             </div>
 

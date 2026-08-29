@@ -137,6 +137,102 @@ function MortgageTrajectoryChart({
   )
 }
 
+function MortgageEmptyResults() {
+  const emptyMethods = [
+    { title: '元利均等返済', tone: 'blue' as const },
+    { title: '元金均等返済', tone: 'green' as const },
+  ]
+
+  return (
+    <div className="mortgage-empty-skeleton">
+      <div
+        className="mortgage-results-overview mortgage-results-overview--empty"
+        aria-label="返済方式の比較結果（未計算）"
+      >
+        {emptyMethods.map((method) => (
+          <article
+            className="mortgage-comparison-card"
+            data-tone={method.tone}
+            key={method.title}
+          >
+            <header className="mortgage-comparison-card__heading">
+              <div>
+                <p>条件入力後に表示</p>
+                <h4>{method.title}</h4>
+              </div>
+            </header>
+            <dl className="mortgage-comparison-card__values">
+              {['毎月返済額', '最終回返済額', '総返済額', '支払利息総額'].map((label) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>―</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        ))}
+
+        <article className="mortgage-comparison-delta">
+          <header>
+            <p>COMPARISON</p>
+            <h4>2方式の差額</h4>
+          </header>
+          <dl>
+            <div><dt>総返済額の差</dt><dd>―</dd></div>
+            <div><dt>支払利息の差</dt><dd>―</dd></div>
+          </dl>
+          <p>条件を入力すると、2つの返済方式の差額を表示します。</p>
+        </article>
+      </div>
+
+      <section className="mortgage-trajectories-section mortgage-trajectories-section--empty">
+        <header>
+          <div>
+            <p>PAYMENT TRAJECTORY</p>
+            <h4>返済額の推移イメージ</h4>
+          </div>
+          <span>条件入力後に表示</span>
+        </header>
+        <div className="mortgage-trajectories-grid">
+          {emptyMethods.map((method) => (
+            <article
+              className="mortgage-trajectory-card"
+              data-tone={method.tone}
+              key={method.title}
+            >
+              <header>
+                <h4>{method.title}</h4>
+                <span>元金・利息</span>
+              </header>
+              <div className="mortgage-trajectory mortgage-trajectory--empty" aria-hidden="true">
+                {[12, 24, 36, 48, 60, 72, 84].map((height, index) => (
+                  <div className="mortgage-trajectory__point" key={height}>
+                    <span />
+                    <div className="mortgage-trajectory__plot">
+                      <i style={{ height: `${height}%` }}><b /></i>
+                    </div>
+                    <small>{index === 0 ? '開始' : index === 6 ? '完済' : '―'}</small>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <div className="mortgage-results__condition-heading mortgage-results__condition-heading--compact">
+        <strong>入力条件</strong>
+        <span>条件入力後に表示</span>
+      </div>
+      <dl className="mortgage-conditions mortgage-conditions--compact">
+        {['借入金額', '年利', '返済期間', '返済回数'].map((label) => (
+          <div key={label}><dt>{label}</dt><dd>―</dd></div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
 const FIELD_NAMES: MortgageFieldName[] = [
   'loanAmount',
   'annualInterestRate',
@@ -1084,22 +1180,27 @@ function MortgageCalculator() {
             </p>
           </div>
 
-          {!isAutoCalculation && (
-            <button
-              className="mortgage-button mortgage-button--primary"
-              type="submit"
-            >
-              シミュレートする
-            </button>
-          )}
-
-          <button
-            className="mortgage-button mortgage-button--secondary"
-            type="button"
-            onClick={resetCalculator}
+          <div
+            className="mortgage-form-actions"
+            data-single={isAutoCalculation}
           >
-            入力内容をリセット
-          </button>
+            <button
+              className="mortgage-button mortgage-button--secondary"
+              type="button"
+              onClick={resetCalculator}
+            >
+              入力内容をリセット
+            </button>
+
+            {!isAutoCalculation && (
+              <button
+                className="mortgage-button mortgage-button--primary"
+                type="submit"
+              >
+                シミュレートする
+              </button>
+            )}
+          </div>
 
           {resetSnapshot && (
             <div
@@ -1120,6 +1221,14 @@ function MortgageCalculator() {
               </button>
             </div>
           )}
+
+          <aside className="simulator-input-point simulator-input-point--mortgage">
+            <strong>入力のポイント</strong>
+            <p>
+              同じ借入条件で2つの返済方式を比較します。
+              期間や金利を変えて、毎月返済額と総返済額の違いを確認してください。
+            </p>
+          </aside>
         </form>
 
         <section
@@ -1260,16 +1369,9 @@ function MortgageCalculator() {
                 <div><dt>返済期間</dt><dd>{activeCalculation.input.paymentCount / 12}年</dd></div>
                 <div><dt>返済回数</dt><dd>{activeCalculation.input.paymentCount.toLocaleString('ja-JP')}回</dd></div>
               </dl>
-            </>          ) : (
-            <div className="mortgage-results__empty">
-              <span aria-hidden="true">¥</span>
-              <strong>
-                ここに概算結果が表示されます
-              </strong>
-              <p>
-                借入金額・年利・返済期間を入力してください。
-              </p>
-            </div>
+            </>
+          ) : (
+            <MortgageEmptyResults />
           )}
         </section>
       </div>

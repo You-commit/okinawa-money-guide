@@ -1630,3 +1630,588 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* WBS 3.6.11 round 3: page-specific approved PC simulator density */
+.simulator-form-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: 9px;
+}
+
+.simulator-form-actions[data-single="true"] {
+  grid-template-columns: 1fr;
+}
+
+.simulator-form-actions > :is(.simulate-button, .reset-button) {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.military-kpi-grid,
+.ideco-kpi-grid {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 901px) {
+  .simulator-page__calculator {
+    padding: 15px;
+    border-radius: 14px;
+  }
+
+  .simulator-page .calculator-layout {
+    grid-template-columns: minmax(340px, 0.64fr) minmax(0, 1.36fr);
+    gap: 13px;
+  }
+
+  .simulator-page .calculator-form {
+    align-content: start;
+    gap: 9px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #fbfdfd;
+  }
+
+  .simulator-panel-heading {
+    padding-bottom: 9px;
+  }
+
+  .simulator-panel-heading > span {
+    flex-basis: 31px;
+    width: 31px;
+    height: 31px;
+    font-size: 0.63rem;
+  }
+
+  .simulator-panel-heading h3,
+  .simulator-results-heading h3,
+  .simulator-subheading h3 {
+    font-size: 0.96rem;
+  }
+
+  .simulator-page .calculator-results {
+    gap: 10px;
+  }
+
+  .simulator-page .calculator-form > label {
+    grid-template-columns: minmax(116px, 0.82fr) minmax(0, 1.18fr);
+    align-items: center;
+    gap: 8px;
+    font-size: 0.74rem;
+  }
+
+  .simulator-page .calculator-form > label > span:first-child {
+    line-height: 1.45;
+  }
+
+  .simulator-page .input-with-unit {
+    gap: 7px;
+  }
+
+  .simulator-page .input-with-unit input,
+  .simulator-page .input-with-unit select {
+    min-height: 38px;
+    padding-inline: 11px;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .simulator-page .input-with-unit > span {
+    min-width: 22px;
+    font-size: 0.73rem;
+  }
+
+  .simulator-page .form-spacer {
+    height: 0;
+  }
+
+  .simulator-page .calculation-mode {
+    margin-top: 0;
+    padding: 9px 10px;
+    border-radius: 8px;
+  }
+
+  .simulator-page .calculator-form .mode-checkbox {
+    gap: 8px;
+    font-size: 0.7rem;
+  }
+
+  .simulator-page .calculator-form .mode-checkbox input {
+    width: 18px;
+    height: 18px;
+    margin-top: 0;
+  }
+
+  .simulator-page .calculator-form .mode-checkbox input:checked::after {
+    top: 1px;
+    left: 5px;
+    width: 5px;
+    height: 9px;
+  }
+
+  .simulator-page .calculation-mode > p,
+  .simulator-page .calculation-mode__description {
+    margin: 3px 0 0 26px;
+    font-size: 0.62rem;
+    line-height: 1.45;
+  }
+
+  .simulator-page .simulate-button,
+  .simulator-page .reset-button,
+  .simulator-page .apply-tax-rate-button {
+    min-height: 40px;
+    border-radius: 7px;
+    font-size: 0.75rem;
+  }
+
+  .simulator-page .result-card {
+    min-height: 105px;
+    padding: 12px;
+    border-radius: 9px;
+    box-shadow: 0 5px 13px rgba(24, 57, 82, 0.05);
+  }
+
+  .simulator-page .result-card > span {
+    min-height: 29px;
+    margin-bottom: 4px;
+    font-size: 0.65rem;
+    line-height: 1.45;
+  }
+
+  .simulator-page .result-card strong,
+  .simulator-page .result-card.emphasis-result strong {
+    font-size: clamp(0.95rem, 6.8cqi, 1.42rem);
+  }
+
+  .simulator-page .result-card small {
+    margin-top: 5px;
+    font-size: 0.57rem;
+    line-height: 1.42;
+  }
+
+  .simulator-chart-panel,
+  .simulator-breakdown-panel {
+    padding: 13px;
+    border-radius: 10px;
+  }
+
+  .simulator-page .calculator-note {
+    margin-top: 10px;
+    padding: 10px 13px;
+    font-size: 0.65rem;
+    line-height: 1.55;
+  }
+
+  /* Military land: four KPI cards on the same visual line. */
+  .simulator-page--military .military-kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .simulator-page--military .military-kpi-grid .result-card {
+    min-height: 126px;
+    padding: 13px 11px;
+    text-align: center;
+  }
+
+  .simulator-page--military .military-kpi-grid .result-card > span {
+    color: #35596f;
+    font-size: 0.67rem;
+    font-weight: 850;
+  }
+
+  .simulator-page--military .military-kpi-grid .result-card strong {
+    margin-top: 8px;
+    font-size: clamp(1.12rem, 7.6cqi, 1.8rem);
+  }
+
+  .simulator-page--military .military-result-card--yield {
+    border-color: #88cdb4;
+    background: #effaf4;
+  }
+
+  .simulator-page--military .military-result-card--multiple {
+    border-color: #a8c9ee;
+    background: #f2f7fd;
+  }
+
+  .simulator-page--military .military-result-card--rent {
+    border-color: #cebaf2;
+    background: #f8f4ff;
+  }
+
+  .simulator-page--military .military-result-card--rent strong {
+    color: #7541c7;
+  }
+
+  .simulator-page--military .military-result-card--price {
+    border-color: #f0c49e;
+    background: #fff8f1;
+  }
+
+  .simulator-page--military .military-result-card--price strong {
+    color: #d96617;
+  }
+
+  .simulator-page--military .simulator-breakdown-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .simulator-page--military .simulator-breakdown-list > div {
+    display: grid;
+    align-content: center;
+    min-height: 72px;
+    padding: 9px 10px;
+    border: 1px solid #e1eaef;
+    border-radius: 8px;
+    background: #fbfdfd;
+    text-align: center;
+  }
+
+  .simulator-page--military .simulator-breakdown-list dd {
+    margin-top: 5px;
+  }
+
+  /* NISA: four KPI cards and one dominant area chart. */
+  .simulator-page--nisa .simulator-summary-grid--nisa {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .simulator-page--nisa .simulator-summary-grid--nisa .result-card {
+    min-height: 118px;
+  }
+
+  .simulator-page--nisa .result-card--tax-free-note {
+    border-color: #efcf9a;
+    background: #fff9ef;
+  }
+
+  .simulator-page--nisa .result-card--tax-free-note strong {
+    color: #d17a16;
+    font-size: clamp(0.9rem, 6cqi, 1.22rem);
+  }
+
+  .simulator-page--nisa .simulator-chart-panel--nisa {
+    min-height: 328px;
+  }
+
+  .nisa-trajectory-wrap {
+    gap: 5px;
+    margin-top: 7px;
+  }
+
+  /* iDeCo: six KPI cards in the approved horizontal hierarchy. */
+  .simulator-page--ideco .ideco-kpi-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .simulator-page--ideco :is(.simulator-summary-grid--ideco, .ideco-longterm-summary) {
+    display: contents;
+  }
+
+  .simulator-page--ideco .ideco-kpi-grid .result-card {
+    min-height: 125px;
+    padding: 11px 9px;
+    text-align: center;
+  }
+
+  .simulator-page--ideco .ideco-kpi-grid .result-card > span {
+    min-height: 38px;
+  }
+
+  .simulator-page--ideco .ideco-kpi-grid .emphasis-result {
+    border: 2px solid #8061dc;
+    background: #f3efff;
+  }
+
+  .simulator-page--ideco .ideco-visual-grid {
+    grid-template-columns: minmax(0, 1.28fr) minmax(230px, 0.72fr);
+    gap: 10px;
+  }
+
+  .simulator-page--ideco .simulator-chart-panel--ideco,
+  .simulator-page--ideco .simulator-breakdown-panel--ideco {
+    min-height: 282px;
+  }
+
+  .simulator-page--ideco .tax-saving-bars {
+    gap: 22px;
+    margin-top: 30px;
+  }
+
+  /* Taxable income follows the iDeCo visual family without changing its content. */
+  .simulator-page--taxable .calculator-layout {
+    grid-template-columns: minmax(350px, 0.64fr) minmax(0, 1.36fr);
+  }
+
+  .simulator-page--taxable .simulator-summary-grid--taxable {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .simulator-page--taxable .taxable-breakdown-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .simulator-page--taxable .taxable-breakdown-grid .result-card {
+    min-height: 92px;
+    padding: 10px;
+  }
+
+  .simulator-page--taxable .apply-tax-rate-button--panel {
+    justify-self: end;
+    width: min(100%, 360px);
+  }
+}
+
+.nisa-area-graph,
+.ideco-area-graph {
+  position: relative;
+  min-width: 0;
+  padding: 5px 4px 0;
+}
+
+.nisa-area-graph svg,
+.ideco-area-graph svg {
+  display: block;
+  width: 100%;
+  height: 225px;
+  overflow: visible;
+}
+
+.nisa-area-graph__grid line,
+.ideco-area-graph__grid line {
+  stroke: #dce8e7;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.nisa-area-graph__principal {
+  fill: #0e9a63;
+  opacity: 0.92;
+}
+
+.nisa-area-graph__gain {
+  fill: #a9df89;
+  opacity: 0.82;
+}
+
+.nisa-area-graph__total {
+  fill: none;
+  stroke: #1769d2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.nisa-area-graph__labels,
+.ideco-area-graph__labels {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-top: 3px;
+  color: #62798c;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.nisa-area-graph > strong {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  padding: 5px 8px;
+  border: 1px solid #86b1eb;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #1769d2;
+  font-size: 0.72rem;
+}
+
+.nisa-area-graph--empty,
+.ideco-area-graph--empty {
+  margin-top: 9px;
+  border-radius: 8px;
+  background: #fbfdfd;
+}
+
+.nisa-area-graph--empty svg,
+.ideco-area-graph--empty svg {
+  opacity: 0.58;
+}
+
+.nisa-area-graph__placeholder,
+.ideco-area-graph__placeholder {
+  fill: none;
+  stroke: #c0d0d7;
+  stroke-dasharray: 7 7;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.nisa-area-graph--empty p,
+.ideco-area-graph--empty p {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: min(90%, 360px);
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #75899a;
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.ideco-area-graph__contribution {
+  fill: #cfc4f3;
+  opacity: 0.75;
+}
+
+.ideco-area-graph__saving {
+  fill: #7454cc;
+  opacity: 0.42;
+}
+
+.ideco-area-graph__contribution-line,
+.ideco-area-graph__saving-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.ideco-area-graph__contribution-line {
+  stroke: #6441c8;
+}
+
+.ideco-area-graph__saving-line {
+  stroke: #a38ee2;
+}
+
+@media (max-width: 900px) {
+  .military-kpi-grid,
+  .ideco-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .simulator-page--ideco :is(.simulator-summary-grid--ideco, .ideco-longterm-summary) {
+    display: contents;
+  }
+}
+
+@media (max-width: 520px) {
+  .simulator-form-actions,
+  .military-kpi-grid,
+  .ideco-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-area-graph svg,
+  .ideco-area-graph svg {
+    height: 190px;
+  }
+
+  .nisa-area-graph__labels,
+  .ideco-area-graph__labels {
+    font-size: 0.5rem;
+  }
+}
+
+.simulator-input-point {
+  padding: 10px 11px;
+  border: 1px solid color-mix(in srgb, var(--page-accent) 24%, #dce8ef);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--page-accent-soft) 72%, #ffffff);
+}
+
+.simulator-input-point strong {
+  display: block;
+  color: var(--page-accent);
+  font-size: 0.7rem;
+}
+
+.simulator-input-point p {
+  margin: 4px 0 0;
+  color: #60758a;
+  font-size: 0.61rem;
+  line-height: 1.55;
+}
+
+.military-result-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.28fr) minmax(220px, 0.72fr);
+  gap: 10px;
+}
+
+.military-formula-panel,
+.military-result-guide {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #dce8ef;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.military-formula-panel dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0 0;
+}
+
+.military-formula-panel dl > div {
+  display: grid;
+  gap: 5px;
+  padding: 9px;
+  border-radius: 7px;
+  background: #f7fafc;
+}
+
+.military-formula-panel dt {
+  color: #60758a;
+  font-size: 0.61rem;
+  font-weight: 700;
+}
+
+.military-formula-panel dd {
+  margin: 0;
+  color: var(--page-accent);
+  font-size: 0.86rem;
+  font-weight: 850;
+}
+
+.military-result-guide {
+  border-color: #cbe2d7;
+  background: #f5fbf8;
+}
+
+.military-result-guide strong {
+  color: #14764d;
+  font-size: 0.72rem;
+}
+
+.military-result-guide p {
+  margin: 8px 0 0;
+  color: #5c7368;
+  font-size: 0.62rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 700px) {
+  .military-result-detail-grid,
+  .military-formula-panel dl {
+    grid-template-columns: 1fr;
+  }
+}
