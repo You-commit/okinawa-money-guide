@@ -2775,10 +2775,9 @@
 }
 
 .military-period-bars {
-  display: flex;
+  display: grid;
   align-items: flex-end;
-  justify-content: space-around;
-  gap: 8px;
+  gap: 4px;
   height: 184px;
   padding: 22px 14px 0;
 }
@@ -2789,7 +2788,7 @@
   align-items: end;
   justify-items: center;
   min-width: 0;
-  width: 18%;
+  width: 100%;
   height: 100%;
 }
 
@@ -2798,14 +2797,6 @@
   font-size: 0.48rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-}
-
-.military-period-bars > div:first-child strong {
-  justify-self: start;
-}
-
-.military-period-bars > div:last-child strong {
-  justify-self: end;
 }
 
 .military-period-bars i {

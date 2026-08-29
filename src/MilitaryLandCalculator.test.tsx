@@ -545,6 +545,32 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     expect(screen.getByText('物件単体：20年後 500.0万円')).toBeTruthy()
   })
 
+  it('uses compact labels and equal columns when the period chart has six bars', async () => {
+    const { container } = render(<MilitaryLandCalculator />)
+
+    const user = await fillValidConditions()
+    await fillAnnualCosts(user)
+    await fillScenarioPeriod(user)
+    await user.click(screen.getByRole('radio', { name: 'あり' }))
+    await user.type(screen.getByLabelText(/借入額/), '10000000')
+    await user.type(screen.getByLabelText(/借入期間/), '15')
+    await user.type(screen.getByLabelText(/金利（年率）/), '1.5')
+    await user.click(screen.getByRole('button', {
+      name: 'シミュレートする',
+    }))
+
+    const periodChart = container.querySelector(
+      '.military-period-bars',
+    ) as HTMLDivElement
+
+    expect(periodChart.style.gridTemplateColumns).toBe(
+      'repeat(6, minmax(0, 1fr))',
+    )
+    expect(screen.getAllByText('250万円')).toHaveLength(4)
+    expect(screen.getAllByText('125万円')).toHaveLength(2)
+    expect(screen.queryByText('250.0万円')).toBeNull()
+  })
+
   it('provides an accessible tooltip for the scenario period', () => {
     render(<MilitaryLandCalculator />)
 

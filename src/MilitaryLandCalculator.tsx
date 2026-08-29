@@ -70,6 +70,15 @@ const formatManYen = (value: number) =>
     maximumFractionDigits: 1,
   }).format(value / 10_000)}万円`
 
+const formatPeriodManYen = (value: number) => {
+  const amount = value / 10_000
+
+  return `${new Intl.NumberFormat('ja-JP', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: Number.isInteger(amount) ? 0 : 1,
+  }).format(amount)}万円`
+}
+
 const formatSignedExpense = (value: number) =>
   value > 0 ? `−${formatYen(value)}` : formatYen(0)
 
@@ -791,10 +800,15 @@ function MilitaryLandCalculator() {
               <article className="military-period-chart">
                 <header><strong>期間ごとの物件単体収支</strong><small>単純計算</small></header>
                 {periodEarnings.length > 0 ? (
-                  <div className="military-period-bars">
+                  <div
+                    className="military-period-bars"
+                    style={{
+                      gridTemplateColumns: `repeat(${periodEarnings.length}, minmax(0, 1fr))`,
+                    }}
+                  >
                     {periodEarnings.map((period) => (
                       <div key={period.label}>
-                        <strong>{formatManYen(period.propertyValue)}</strong>
+                        <strong>{formatPeriodManYen(period.propertyValue)}</strong>
                         <i
                           style={{ height: `${Math.max(8, (Math.abs(period.propertyValue) / maximumPeriodEarning) * 100)}%` }}
                           data-negative={period.propertyValue < 0}
