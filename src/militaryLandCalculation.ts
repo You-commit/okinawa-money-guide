@@ -10,7 +10,6 @@ export type MilitaryLandCalculationResult = {
   managementExpenses: number | null
   annualInterest: number | null
   interestAdjustedAnnualIncome: number | null
-  saleCosts: number | null
   leaseYears: number | null
 }
 
@@ -20,7 +19,6 @@ export type MilitaryLandCalculationInputs = {
   leaseYears: string
   fixedAssetTax: string
   managementExpenses: string
-  saleCostRate: string
   hasLoan: boolean
   loanAmount: string
   interestRate: string
@@ -38,7 +36,6 @@ export const emptyMilitaryLandResult: MilitaryLandCalculationResult = {
   managementExpenses: null,
   annualInterest: null,
   interestAdjustedAnnualIncome: null,
-  saleCosts: null,
   leaseYears: null,
 }
 
@@ -76,7 +73,6 @@ export const calculateMilitaryLandResults = ({
   leaseYears,
   fixedAssetTax,
   managementExpenses,
-  saleCostRate,
   hasLoan,
   loanAmount,
   interestRate,
@@ -90,11 +86,10 @@ export const calculateMilitaryLandResults = ({
 
   const tax = parseMoney(fixedAssetTax)
   const expenses = parseMoney(managementExpenses)
-  const selectedLeaseYears = Math.max(
-    1,
-    Number(normalizeIntegerInput(leaseYears)) || 50,
-  )
-  const saleCosts = price * (parseDecimal(saleCostRate) / 100)
+  const parsedLeaseYears = Number(normalizeIntegerInput(leaseYears))
+  const selectedLeaseYears = parsedLeaseYears > 0
+    ? parsedLeaseYears
+    : null
   const annualInterest = hasLoan
     ? parseMoney(loanAmount) * (parseDecimal(interestRate) / 100)
     : 0
@@ -114,7 +109,6 @@ export const calculateMilitaryLandResults = ({
     managementExpenses: expenses,
     annualInterest,
     interestAdjustedAnnualIncome: coreAnnualIncome - annualInterest,
-    saleCosts,
     leaseYears: selectedLeaseYears,
   }
 }

@@ -1,4 +1,5 @@
 import {
+  useId,
   useMemo,
   useRef,
   useState,
@@ -31,7 +32,7 @@ type NumberFieldProps = {
 }
 
 const MOBILE_VIEWPORT_QUERY = '(max-width: 760px)'
-const DATA_UPDATED_AT = '2026年8月29日'
+const CALCULATION_MODEL = '軍用地シミュレーター v1.1'
 
 const scrollToMobileTarget = (target: HTMLElement | null) => {
   if (
@@ -196,16 +197,81 @@ function NumberField({
   )
 }
 
+type ScenarioPeriodFieldProps = {
+  value: string
+  onChange: (value: string) => void
+}
+
+function ScenarioPeriodField({
+  value,
+  onChange,
+}: ScenarioPeriodFieldProps) {
+  const inputId = useId()
+  const tooltipId = useId()
+
+  return (
+    <div className="military-input-row military-scenario-period-field">
+      <div className="military-scenario-period-label">
+        <label htmlFor={inputId}>長期シナリオ期間</label>
+        <button
+          className="military-scenario-tooltip-trigger"
+          type="button"
+          aria-label="長期シナリオ期間の説明"
+          aria-describedby={tooltipId}
+        >
+          i
+        </button>
+        <span
+          className="military-scenario-tooltip"
+          id={tooltipId}
+          role="tooltip"
+        >
+          現在の入力条件が変わらないと仮定した単純シナリオを、何年間表示するかを指定します。実際の契約期間や将来の収益を予測するものではありません。
+        </span>
+      </div>
+      <div className="input-with-unit">
+        <input
+          id={inputId}
+          type="text"
+          inputMode="numeric"
+          value={value}
+          aria-describedby={tooltipId}
+          onChange={(event) => {
+            const nextValue = event.target.value
+
+            if (
+              event.nativeEvent instanceof InputEvent &&
+              event.nativeEvent.isComposing
+            ) {
+              onChange(nextValue)
+              return
+            }
+
+            onChange(normalizeIntegerInput(nextValue))
+          }}
+          onCompositionEnd={(event) => {
+            onChange(normalizeIntegerInput(event.currentTarget.value))
+          }}
+          onBlur={(event) => {
+            onChange(normalizeIntegerInput(event.currentTarget.value))
+          }}
+          placeholder="表示年数を入力"
+        />
+        <span>年</span>
+      </div>
+    </div>
+  )
+}
+
 function MilitaryLandCalculator() {
   const formRef = useRef<HTMLDivElement>(null)
   const annualRentInputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const [annualRent, setAnnualRent] = useState('')
   const [purchasePrice, setPurchasePrice] = useState('')
-  const [leaseYears, setLeaseYears] = useState('50')
+  const [leaseYears, setLeaseYears] = useState('')
   const [fixedAssetTax, setFixedAssetTax] = useState('')
   const [managementExpenses, setManagementExpenses] = useState('')
-  const [saleCostRate, setSaleCostRate] = useState('5')
   const [hasLoan, setHasLoan] = useState(false)
   const [loanAmount, setLoanAmount] = useState('')
   const [loanTerm, setLoanTerm] = useState('')
@@ -221,7 +287,6 @@ function MilitaryLandCalculator() {
       leaseYears,
       fixedAssetTax,
       managementExpenses,
-      saleCostRate,
       hasLoan,
       loanAmount,
       interestRate,
@@ -232,7 +297,6 @@ function MilitaryLandCalculator() {
       leaseYears,
       fixedAssetTax,
       managementExpenses,
-      saleCostRate,
       hasLoan,
       loanAmount,
       interestRate,
@@ -286,10 +350,9 @@ function MilitaryLandCalculator() {
   const resetCalculator = () => {
     setAnnualRent('')
     setPurchasePrice('')
-    setLeaseYears('50')
+    setLeaseYears('')
     setFixedAssetTax('')
     setManagementExpenses('')
-    setSaleCostRate('5')
     setHasLoan(false)
     setLoanAmount('')
     setLoanTerm('')
@@ -412,12 +475,8 @@ function MilitaryLandCalculator() {
             inputRef={annualRentInputRef}
             onChange={(value) => updateInput(setAnnualRent, value)}
           />
-          <NumberField
-            label="借地期間"
+          <ScenarioPeriodField
             value={leaseYears}
-            placeholder="例：50"
-            unit="年"
-            integer
             onChange={(value) => updateInput(setLeaseYears, value)}
           />
           <MoneyField
@@ -432,17 +491,6 @@ function MilitaryLandCalculator() {
             placeholder="例：15,000"
             onChange={(value) => updateInput(setManagementExpenses, value)}
           />
-          <NumberField
-            label="売却時の諸費用（概算）"
-            value={saleCostRate}
-            placeholder="例：5"
-            unit="%"
-            onChange={(value) => updateInput(setSaleCostRate, value)}
-          />
-          <p className="military-field-note">
-            現在の主要結果・長期シナリオには反映していない参考条件です。
-          </p>
-
           <fieldset className="military-loan-choice">
             <legend>金利（借入がある場合）</legend>
             <label>
@@ -547,7 +595,6 @@ function MilitaryLandCalculator() {
               <li>借地料は年間の収入額です。</li>
               <li>固定資産税・管理費は年額で入力してください。</li>
               <li>借入利息は主要結果と分けた参考値です。</li>
-              <li>売却諸費用は主要結果・長期シナリオには反映しません。</li>
             </ul>
           </aside>
         </div>
@@ -565,7 +612,7 @@ function MilitaryLandCalculator() {
               <p>RESULT</p>
               <h3>シミュレーション結果</h3>
             </div>
-            <span>データ更新日：{DATA_UPDATED_AT}</span>
+            <span>計算モデル：{CALCULATION_MODEL}</span>
           </div>
 
           {hasDisplayedResult ? (
@@ -734,18 +781,13 @@ function MilitaryLandCalculator() {
               <span>購入倍率</span>
               <strong>{displayedResult.calculatedMultiple === null ? '―' : `${displayedResult.calculatedMultiple.toFixed(2)}倍`}</strong>
             </div>
-            <div>
-              <span>売却時の諸費用（概算）</span>
-              <strong>{displayedResult.saleCosts === null ? '―' : formatYen(displayedResult.saleCosts)}</strong>
-            </div>
-            <p>売却時の諸費用は参考条件です。現在の主要結果・長期シナリオには反映していません。</p>
+            <p>主要結果は物件の収益性を表し、借入条件は参考結果として分けて表示しています。</p>
           </div>
         </div>
       </div>
 
       <div className="military-calculator-footer">
         <p className="calculator-note">本シミュレーションは、入力した固定資産税や管理費などの条件が継続した場合の概算です。借地料改定、税制、契約条件などにより結果は変動します。</p>
-        <span>データ更新日：{DATA_UPDATED_AT}</span>
       </div>
     </section>
   )

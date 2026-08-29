@@ -2293,6 +2293,78 @@
   gap: 6px;
 }
 
+.simulator-page--military .military-scenario-period-field {
+  display: grid;
+  gap: 10px;
+  color: #24455c;
+  font-weight: 700;
+}
+
+.simulator-page--military .military-scenario-period-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.simulator-page--military .military-scenario-period-label > label {
+  display: inline;
+  color: inherit;
+  font: inherit;
+}
+
+.simulator-page--military .military-scenario-tooltip-trigger {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid #8fb5ad;
+  border-radius: 50%;
+  background: #f3faf8;
+  color: #287e70;
+  font: inherit;
+  font-size: 0.62rem;
+  line-height: 1;
+  cursor: help;
+}
+
+.simulator-page--military .military-scenario-tooltip-trigger:focus {
+  border-color: #167866;
+  outline: 3px solid rgba(22, 120, 102, 0.18);
+  outline-offset: 2px;
+}
+
+.simulator-page--military .military-scenario-tooltip {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  z-index: 30;
+  width: min(280px, calc(100vw - 80px));
+  padding: 9px 11px;
+  border: 1px solid #cddfdb;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(25, 57, 78, 0.14);
+  color: #4d6774;
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.65;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-3px);
+  transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
+}
+
+.simulator-page--military .military-scenario-tooltip-trigger:is(:hover, :focus) + .military-scenario-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 .simulator-page--military .military-input-row em {
   padding: 2px 4px;
   border-radius: 3px;
@@ -2711,7 +2783,7 @@
 
 .military-formula-strip {
   display: grid;
-  grid-template-columns: minmax(120px, 0.35fr) minmax(160px, 0.45fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1.65fr);
   gap: 8px;
 }
 
@@ -2753,14 +2825,6 @@
   flex: 1;
 }
 
-.military-calculator-footer > span {
-  padding-bottom: 10px;
-  color: #708595;
-  font-size: 0.6rem;
-  font-weight: 750;
-  white-space: nowrap;
-}
-
 .simulator-page--military .simulator-page__notes {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -2798,6 +2862,13 @@
 
   .simulator-page--military .military-expanded-form > label {
     grid-template-columns: minmax(165px, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .simulator-page--military .military-scenario-period-field {
+    grid-template-columns: minmax(165px, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: 8px;
+    font-size: 0.74rem;
   }
 
   .simulator-page--military .military-kpi-grid .result-card {
@@ -2853,7 +2924,4 @@
     flex-direction: column;
   }
 
-  .military-calculator-footer > span {
-    padding-bottom: 0;
-  }
 }

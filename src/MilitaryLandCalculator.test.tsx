@@ -23,7 +23,6 @@ const baseCalculationInputs = {
   leaseYears: '50',
   fixedAssetTax: '35000',
   managementExpenses: '15000',
-  saleCostRate: '5',
   hasLoan: false,
   loanAmount: '',
   interestRate: '',
@@ -76,9 +75,26 @@ const fillAnnualCosts = async (
   )
 }
 
-const runManualCalculationWithAnnualCosts = async () => {
+const fillScenarioPeriod = async (
+  user: ReturnType<typeof userEvent.setup>,
+  years = '50',
+) => {
+  await user.type(
+    screen.getByRole('textbox', {
+      name: '長期シナリオ期間',
+    }),
+    years,
+  )
+}
+
+const runManualCalculationWithAnnualCosts = async (
+  scenarioYears?: string,
+) => {
   const user = await fillValidConditions()
   await fillAnnualCosts(user)
+  if (scenarioYears) {
+    await fillScenarioPeriod(user, scenarioYears)
+  }
   await user.click(
     screen.getByRole('button', {
       name: 'シミュレートする',
@@ -365,16 +381,36 @@ describe('MilitaryLandCalculator approved core calculation rules', () => {
   it('prevents invalid decimal input from producing NaN', () => {
     const result = calculateMilitaryLandResults({
       ...baseCalculationInputs,
-      saleCostRate: '.',
       hasLoan: true,
       loanAmount: '10000000',
       interestRate: '.',
     })
 
-    expect(result.saleCosts).toBe(0)
     expect(result.annualInterest).toBe(0)
     expect(result.interestAdjustedAnnualIncome).toBe(250000)
     expect(Object.values(result).some(Number.isNaN)).toBe(false)
+  })
+
+  it('does not fall back to 50 years when the scenario period is blank', () => {
+    const result = calculateMilitaryLandResults({
+      ...baseCalculationInputs,
+      leaseYears: '',
+    })
+
+    expect(result.leaseYears).toBeNull()
+    expect(result.coreAnnualIncome).toBe(250000)
+  })
+
+  it('has no sale-cost result or calculation dependency', () => {
+    const legacyInputs = {
+      ...baseCalculationInputs,
+      saleCostRate: '99',
+    }
+    const result = calculateMilitaryLandResults(legacyInputs)
+
+    expect(result).not.toHaveProperty('saleCosts')
+    expect(result.coreAnnualIncome).toBe(250000)
+    expect(result.expenseAdjustedYield).toBeCloseTo(1.666666, 5)
   })
 })
 
@@ -392,26 +428,72 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
   it('shows the long-term total as core annual income multiplied by years', async () => {
     render(<MilitaryLandCalculator />)
 
-    await runManualCalculationWithAnnualCosts()
+    await runManualCalculationWithAnnualCosts('50')
 
     expect(screen.getByText('50年後の累計 1,250.0万円')).toBeTruthy()
   })
 
-  it('does not mix sale costs into the long-term scenario', async () => {
+  it('starts with an empty long-term scenario period instead of 50 years', () => {
     render(<MilitaryLandCalculator />)
 
-    const user = await fillValidConditions()
-    await fillAnnualCosts(user)
-    const saleCostInput = screen.getByLabelText(/売却時の諸費用/)
-    await user.clear(saleCostInput)
-    await user.type(saleCostInput, '99')
-    await user.click(
-      screen.getByRole('button', {
-        name: 'シミュレートする',
-      }),
-    )
+    const scenarioPeriod = screen.getByRole('textbox', {
+      name: '長期シナリオ期間',
+    }) as HTMLInputElement
 
-    expect(screen.getByText('50年後の累計 1,250.0万円')).toBeTruthy()
+    expect(scenarioPeriod.value).toBe('')
+    expect(scenarioPeriod.placeholder).toBe('表示年数を入力')
+    expect(screen.queryByDisplayValue('50')).toBeNull()
+  })
+
+  it('calculates all core KPIs without a long-term scenario period', async () => {
+    render(<MilitaryLandCalculator />)
+
+    await runManualCalculationWithAnnualCosts()
+
+    expect(screen.getByText('2.00%')).toBeTruthy()
+    expect(screen.getAllByText('1.67%').length).toBeGreaterThan(0)
+    expect(screen.getByText('25.0万円')).toBeTruthy()
+    expect(screen.getByText('60.0年')).toBeTruthy()
+  })
+
+  it('does not generate long-term charts while the scenario period is blank', async () => {
+    const { container } = render(<MilitaryLandCalculator />)
+
+    await runManualCalculationWithAnnualCosts()
+
+    expect(container.querySelector('.military-chart-total')).toBeNull()
+    expect(screen.getAllByText('条件入力後に表示します')).toHaveLength(2)
+  })
+
+  it('uses the entered scenario period for the long-term calculation', async () => {
+    render(<MilitaryLandCalculator />)
+
+    await runManualCalculationWithAnnualCosts('20')
+
+    expect(screen.getByText('20年後の累計 500.0万円')).toBeTruthy()
+  })
+
+  it('provides an accessible tooltip for the scenario period', () => {
+    render(<MilitaryLandCalculator />)
+
+    const trigger = screen.getByRole('button', {
+      name: '長期シナリオ期間の説明',
+    }) as HTMLButtonElement
+    const tooltip = screen.getByRole('tooltip')
+
+    expect(tooltip.textContent).toContain(
+      '現在の入力条件が変わらないと仮定した単純シナリオを、何年間表示するかを指定します。',
+    )
+    expect(trigger.tabIndex).toBe(0)
+    expect(trigger.getAttribute('aria-describedby')).toBe(tooltip.id)
+    trigger.focus()
+    expect(document.activeElement).toBe(trigger)
+  })
+
+  it('does not render a sale-cost input', () => {
+    render(<MilitaryLandCalculator />)
+
+    expect(screen.queryByLabelText(/売却時の諸費用/)).toBeNull()
   })
 
   it('does not mix borrowing interest into the core long-term scenario', async () => {
@@ -419,6 +501,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
 
     const user = await fillValidConditions()
     await fillAnnualCosts(user)
+    await fillScenarioPeriod(user)
     await user.click(screen.getByRole('radio', { name: 'あり' }))
     await user.type(screen.getByLabelText(/借入額/), '10000000')
     await user.type(screen.getByLabelText(/金利（年率）/), '1.5')
@@ -448,7 +531,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     expect(automaticCalculation.checked).toBe(true)
     expect((screen.getByLabelText(/年間借地料/) as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText(/購入価格/) as HTMLInputElement).value).toBe('')
-    expect((screen.getByLabelText(/借地期間/) as HTMLInputElement).value).toBe('50')
+    expect((screen.getByRole('textbox', { name: '長期シナリオ期間' }) as HTMLInputElement).value).toBe('')
   })
 
   it('supports an automatic-to-manual-to-automatic calculation round trip', async () => {
