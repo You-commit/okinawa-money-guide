@@ -123,6 +123,30 @@ describe('MilitaryLandCalculator mobile result navigation', () => {
     expect(scrollIntoView).not.toHaveBeenCalled()
   })
 
+  it('reflects annual taxes and expenses in the net yield results', async () => {
+    setMobileViewport(false)
+    render(<MilitaryLandCalculator />)
+
+    const user = await fillValidConditions()
+    await user.type(
+      screen.getByLabelText(/固定資産税/),
+      '35000',
+    )
+    await user.type(
+      screen.getByLabelText(/管理費・その他経費/),
+      '15000',
+    )
+    await user.click(
+      screen.getByRole('button', {
+        name: 'シミュレートする',
+      }),
+    )
+
+    expect(screen.getAllByText('1.67%').length).toBeGreaterThan(0)
+    expect(screen.getByText('25.0万円')).toBeTruthy()
+    expect(screen.getByText('60.0年')).toBeTruthy()
+  })
+
   it('does not move the viewport while automatic calculation updates', async () => {
     setMobileViewport(true)
     render(<MilitaryLandCalculator />)

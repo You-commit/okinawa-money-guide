@@ -1,22 +1,79 @@
-import { useMemo, useRef, useState } from 'react'
+import {
+  useMemo,
+  useRef,
+  useState,
+  type Ref,
+} from 'react'
+import { routes } from './app/routes'
 
 type CalculationResult = {
   calculatedMultiple: number | null
   surfaceYield: number | null
-  estimatedPrice: number | null
+  netYield: number | null
+  annualNetIncome: number | null
+  paybackYears: number | null
+  annualRent: number | null
+  purchasePrice: number | null
+  fixedAssetTax: number | null
+  managementExpenses: number | null
+  annualInterest: number | null
+  saleCosts: number | null
+  leaseYears: number | null
+}
+
+type CalculationInputs = {
+  annualRent: string
+  purchasePrice: string
+  leaseYears: string
+  fixedAssetTax: string
+  managementExpenses: string
+  saleCostRate: string
+  hasLoan: boolean
+  loanAmount: string
+  interestRate: string
+}
+
+type MoneyFieldProps = {
+  label: string
+  value: string
+  placeholder: string
+  onChange: (value: string) => void
+  inputRef?: Ref<HTMLInputElement>
+  required?: boolean
+}
+
+type NumberFieldProps = {
+  label: string
+  value: string
+  placeholder: string
+  unit: string
+  onChange: (value: string) => void
+  integer?: boolean
 }
 
 const emptyResult: CalculationResult = {
   calculatedMultiple: null,
   surfaceYield: null,
-  estimatedPrice: null,
+  netYield: null,
+  annualNetIncome: null,
+  paybackYears: null,
+  annualRent: null,
+  purchasePrice: null,
+  fixedAssetTax: null,
+  managementExpenses: null,
+  annualInterest: null,
+  saleCosts: null,
+  leaseYears: null,
 }
 
 const MOBILE_VIEWPORT_QUERY = '(max-width: 760px)'
+const DATA_UPDATED_AT = '2026年8月29日'
 
 const scrollToMobileTarget = (target: HTMLElement | null) => {
-  if (target === null ||
-      !window.matchMedia(MOBILE_VIEWPORT_QUERY).matches) {
+  if (
+    target === null ||
+    !window.matchMedia(MOBILE_VIEWPORT_QUERY).matches
+  ) {
     return
   }
 
@@ -41,85 +98,189 @@ const formatYen = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value)
 
-/**
- * 全角の数字や記号を半角へ変換します。
- *
- * 例：
- * ３００，０００ → 300,000
- * ５０．５ → 50.5
- */
-const convertToHalfWidth = (value: string) => {
-  return value.normalize('NFKC')
-}
+const formatManYen = (value: number) =>
+  `${new Intl.NumberFormat('ja-JP', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value / 10_000)}万円`
 
-/**
- * 金額欄から数字以外を取り除きます。
- */
-const getMoneyDigits = (value: string) => {
-  return convertToHalfWidth(value).replace(/[^\d]/g, '')
-}
+const formatSignedExpense = (value: number) =>
+  value > 0 ? `−${formatYen(value)}` : formatYen(0)
 
-/**
- * 金額を3桁ごとのカンマ区切りにします。
- */
+const convertToHalfWidth = (value: string) =>
+  value.normalize('NFKC')
+
+const getMoneyDigits = (value: string) =>
+  convertToHalfWidth(value).replace(/[^\d]/g, '')
+
 const formatMoneyInput = (value: string) => {
   const digits = getMoneyDigits(value)
 
-  if (digits === '') {
-    return ''
-  }
-
-  return Number(digits).toLocaleString('ja-JP')
+  return digits === ''
+    ? ''
+    : Number(digits).toLocaleString('ja-JP')
 }
 
-/**
- * 倍率欄では数字と小数点1つだけを残します。
- *
- * 例：
- * ５０．５倍 → 50.5
- */
-const normalizeMultipleInput = (value: string) => {
+const normalizeDecimalInput = (value: string) => {
   const converted = convertToHalfWidth(value)
     .replace(/,/g, '')
     .replace(/[^\d.]/g, '')
-
   const [integerPart, ...decimalParts] = converted.split('.')
 
-  if (decimalParts.length === 0) {
-    return integerPart
-  }
-
-  return `${integerPart}.${decimalParts.join('')}`
+  return decimalParts.length === 0
+    ? integerPart
+    : `${integerPart}.${decimalParts.join('')}`
 }
 
-/**
- * 入力内容から各計算結果を求めます。
- */
-const calculateResults = (
-  annualRent: string,
-  purchasePrice: string,
-  multiple: string,
-): CalculationResult => {
-  const rent = Number(getMoneyDigits(annualRent))
-  const price = Number(getMoneyDigits(purchasePrice))
-  const selectedMultiple = Number(normalizeMultipleInput(multiple))
+const normalizeIntegerInput = (value: string) =>
+  convertToHalfWidth(value).replace(/[^\d]/g, '')
+
+const parseMoney = (value: string) =>
+  Number(getMoneyDigits(value))
+
+const parseDecimal = (value: string) =>
+  Number(normalizeDecimalInput(value))
+
+const calculateResults = ({
+  annualRent,
+  purchasePrice,
+  leaseYears,
+  fixedAssetTax,
+  managementExpenses,
+  saleCostRate,
+  hasLoan,
+  loanAmount,
+  interestRate,
+}: CalculationInputs): CalculationResult => {
+  const rent = parseMoney(annualRent)
+  const price = parseMoney(purchasePrice)
+
+  if (rent <= 0 || price <= 0) {
+    return emptyResult
+  }
+
+  const tax = parseMoney(fixedAssetTax)
+  const expenses = parseMoney(managementExpenses)
+  const selectedLeaseYears = Math.max(
+    1,
+    Number(normalizeIntegerInput(leaseYears)) || 50,
+  )
+  const saleCosts = price * (parseDecimal(saleCostRate) / 100)
+  const annualInterest = hasLoan
+    ? parseMoney(loanAmount) * (parseDecimal(interestRate) / 100)
+    : 0
+  const annualNetIncome = rent - tax - expenses - annualInterest
 
   return {
-    calculatedMultiple:
-      rent > 0 && price > 0
-        ? price / rent
-        : null,
-
-    surfaceYield:
-      rent > 0 && price > 0
-        ? (rent / price) * 100
-        : null,
-
-    estimatedPrice:
-      rent > 0 && selectedMultiple > 0
-        ? rent * selectedMultiple
-        : null,
+    calculatedMultiple: price / rent,
+    surfaceYield: (rent / price) * 100,
+    netYield: (annualNetIncome / price) * 100,
+    annualNetIncome,
+    paybackYears: annualNetIncome > 0
+      ? price / annualNetIncome
+      : null,
+    annualRent: rent,
+    purchasePrice: price,
+    fixedAssetTax: tax,
+    managementExpenses: expenses,
+    annualInterest,
+    saleCosts,
+    leaseYears: selectedLeaseYears,
   }
+}
+
+function MoneyField({
+  label,
+  value,
+  placeholder,
+  onChange,
+  inputRef,
+  required = false,
+}: MoneyFieldProps) {
+  return (
+    <label className="military-input-row">
+      <span>
+        {label}
+        {required ? <em>必須</em> : null}
+      </span>
+      <div className="input-with-unit">
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode="numeric"
+          value={value}
+          onChange={(event) => {
+            const nextValue = event.target.value
+
+            if (
+              event.nativeEvent instanceof InputEvent &&
+              event.nativeEvent.isComposing
+            ) {
+              onChange(nextValue)
+              return
+            }
+
+            onChange(formatMoneyInput(nextValue))
+          }}
+          onCompositionEnd={(event) => {
+            onChange(formatMoneyInput(event.currentTarget.value))
+          }}
+          onBlur={(event) => {
+            onChange(formatMoneyInput(event.currentTarget.value))
+          }}
+          placeholder={placeholder}
+        />
+        <span>円</span>
+      </div>
+    </label>
+  )
+}
+
+function NumberField({
+  label,
+  value,
+  placeholder,
+  unit,
+  onChange,
+  integer = false,
+}: NumberFieldProps) {
+  const normalize = integer
+    ? normalizeIntegerInput
+    : normalizeDecimalInput
+
+  return (
+    <label className="military-input-row">
+      <span>{label}</span>
+      <div className="input-with-unit">
+        <input
+          type="text"
+          inputMode={integer ? 'numeric' : 'decimal'}
+          value={value}
+          onChange={(event) => {
+            const nextValue = event.target.value
+
+            if (
+              event.nativeEvent instanceof InputEvent &&
+              event.nativeEvent.isComposing
+            ) {
+              onChange(nextValue)
+              return
+            }
+
+            onChange(normalize(nextValue))
+          }}
+          onCompositionEnd={(event) => {
+            onChange(normalize(event.currentTarget.value))
+          }}
+          onBlur={(event) => {
+            onChange(normalize(event.currentTarget.value))
+          }}
+          placeholder={placeholder}
+        />
+        <span>{unit}</span>
+      </div>
+    </label>
+  )
 }
 
 function MilitaryLandCalculator() {
@@ -128,97 +289,72 @@ function MilitaryLandCalculator() {
   const resultsRef = useRef<HTMLDivElement>(null)
   const [annualRent, setAnnualRent] = useState('')
   const [purchasePrice, setPurchasePrice] = useState('')
-  const [multiple, setMultiple] = useState('')
-
-  /**
-   * false：ボタンを押したときに計算
-   * true：入力と同時に自動計算
-   *
-   * 初期値をfalseにしているため、
-   * デフォルトはボタン計算方式です。
-   */
+  const [leaseYears, setLeaseYears] = useState('50')
+  const [fixedAssetTax, setFixedAssetTax] = useState('')
+  const [managementExpenses, setManagementExpenses] = useState('')
+  const [saleCostRate, setSaleCostRate] = useState('5')
+  const [hasLoan, setHasLoan] = useState(false)
+  const [loanAmount, setLoanAmount] = useState('')
+  const [loanTerm, setLoanTerm] = useState('')
+  const [interestRate, setInterestRate] = useState('')
   const [isAutoCalculation, setIsAutoCalculation] = useState(false)
-
-  /**
-   * ボタンを押して計算した結果を保存します。
-   */
   const [manualResult, setManualResult] =
     useState<CalculationResult | null>(null)
 
-  /**
-   * 自動計算用の結果です。
-   * 入力内容が変わるたびに再計算されます。
-   */
-  const autoResult = useMemo(
-    () => calculateResults(
+  const calculationInputs = useMemo<CalculationInputs>(
+    () => ({
       annualRent,
       purchasePrice,
-      multiple,
-    ),
-    [annualRent, purchasePrice, multiple],
+      leaseYears,
+      fixedAssetTax,
+      managementExpenses,
+      saleCostRate,
+      hasLoan,
+      loanAmount,
+      interestRate,
+    }),
+    [
+      annualRent,
+      purchasePrice,
+      leaseYears,
+      fixedAssetTax,
+      managementExpenses,
+      saleCostRate,
+      hasLoan,
+      loanAmount,
+      interestRate,
+    ],
   )
 
-  /**
-   * 現在の計算方式に応じて、
-   * 表示する結果を切り替えます。
-   */
+  const autoResult = useMemo(
+    () => calculateResults(calculationInputs),
+    [calculationInputs],
+  )
+
   const displayedResult = isAutoCalculation
     ? autoResult
     : manualResult ?? emptyResult
-
-  const hasDisplayedResult = Object.values(
-    displayedResult,
-  ).some((value) => value !== null)
-
-  const rentValue = Number(getMoneyDigits(annualRent))
-  const priceValue = Number(getMoneyDigits(purchasePrice))
-  const multipleValue = Number(normalizeMultipleInput(multiple))
-
-  /**
-   * 年間借地料に加え、
-   * 購入価格または倍率のどちらかが入力されていれば
-   * シミュレートボタンを使用できます。
-   */
+  const hasDisplayedResult = displayedResult.surfaceYield !== null
   const canSimulate =
-    rentValue > 0 &&
-    (priceValue > 0 || multipleValue > 0)
+    parseMoney(annualRent) > 0 &&
+    parseMoney(purchasePrice) > 0
 
-  /**
-   * 手動計算モード中に入力内容が変わった場合、
-   * 古い結果を消します。
-   *
-   * 入力内容と結果が食い違うことを防ぐためです。
-   */
   const clearManualResult = () => {
     if (!isAutoCalculation) {
       setManualResult(null)
     }
   }
 
-  const handleAnnualRentChange = (value: string) => {
-    setAnnualRent(value)
-    clearManualResult()
-  }
-
-  const handlePurchasePriceChange = (value: string) => {
-    setPurchasePrice(value)
-    clearManualResult()
-  }
-
-  const handleMultipleChange = (value: string) => {
-    setMultiple(value)
+  const updateInput = (
+    setter: (value: string) => void,
+    value: string,
+  ) => {
+    setter(value)
     clearManualResult()
   }
 
   const simulate = () => {
-    setManualResult(
-      calculateResults(
-        annualRent,
-        purchasePrice,
-        multiple,
-      ),
-    )
-
+    setManualResult(calculateResults(calculationInputs))
     scrollToMobileTarget(resultsRef.current)
   }
 
@@ -230,16 +366,21 @@ function MilitaryLandCalculator() {
     }
 
     window.requestAnimationFrame(() => {
-      annualRentInputRef.current?.focus({
-        preventScroll: true,
-      })
+      annualRentInputRef.current?.focus({ preventScroll: true })
     })
   }
 
   const resetCalculator = () => {
     setAnnualRent('')
     setPurchasePrice('')
-    setMultiple('')
+    setLeaseYears('50')
+    setFixedAssetTax('')
+    setManagementExpenses('')
+    setSaleCostRate('5')
+    setHasLoan(false)
+    setLoanAmount('')
+    setLoanTerm('')
+    setInterestRate('')
     setManualResult(null)
   }
 
@@ -248,38 +389,98 @@ function MilitaryLandCalculator() {
     setManualResult(null)
   }
 
+  const trajectory = useMemo(() => {
+    if (
+      displayedResult.annualNetIncome === null ||
+      displayedResult.leaseYears === null ||
+      displayedResult.saleCosts === null
+    ) {
+      return []
+    }
+
+    const totalYears = displayedResult.leaseYears
+    const checkpoints = Array.from(
+      new Set(
+        Array.from({ length: 6 }, (_, index) =>
+          Math.round((totalYears * index) / 5),
+        ),
+      ),
+    )
+
+    return checkpoints.map((year) => ({
+      year,
+      value:
+        displayedResult.annualNetIncome! * year -
+        (year === totalYears ? displayedResult.saleCosts! : 0),
+    }))
+  }, [displayedResult])
+
+  const periodEarnings = useMemo(() => {
+    if (trajectory.length < 2 || displayedResult.saleCosts === null) {
+      return []
+    }
+
+    return trajectory.slice(1).map((point, index) => {
+      const previous = trajectory[index]
+      const isLast = index === trajectory.length - 2
+
+      return {
+        label: `${point.year}年後`,
+        value:
+          (point.year - previous.year) *
+            (displayedResult.annualNetIncome ?? 0) -
+          (isLast ? displayedResult.saleCosts! : 0),
+      }
+    })
+  }, [displayedResult, trajectory])
+
+  const lineGraph = useMemo(() => {
+    if (trajectory.length === 0) {
+      return null
+    }
+
+    const values = trajectory.map((point) => point.value)
+    const minimum = Math.min(0, ...values)
+    const maximum = Math.max(0, ...values)
+    const range = Math.max(1, maximum - minimum)
+    const pointList = trajectory.map((point, index) => {
+      const x = 24 + (552 * index) / (trajectory.length - 1)
+      const y = 164 - ((point.value - minimum) / range) * 132
+
+      return { ...point, x, y }
+    })
+    const zeroY = 164 - ((0 - minimum) / range) * 132
+
+    return {
+      points: pointList,
+      line: pointList.map((point) => `${point.x},${point.y}`).join(' '),
+      area: [
+        `${pointList[0].x},${zeroY}`,
+        ...pointList.map((point) => `${point.x},${point.y}`),
+        `${pointList[pointList.length - 1].x},${zeroY}`,
+      ].join(' '),
+      zeroY,
+    }
+  }, [trajectory])
+
+  const maximumPeriodEarning = Math.max(
+    1,
+    ...periodEarnings.map((period) => Math.abs(period.value)),
+  )
+
   return (
     <section
-      className="calculator"
+      className="calculator calculator--military-expanded"
       aria-labelledby="military-land-title"
     >
       <div className="calculator-heading calculator-heading--military">
-        <p className="section-label">
-          MILITARY LAND CALCULATOR
-        </p>
-
-        <h2 id="military-land-title">
-          <span>軍用地利回り</span>
-          <wbr />
-          <span>シミュレーター</span>
-        </h2>
-
-        <p>
-          <span className="text-keep">年間借地料と購入価格を</span>
-          <wbr />
-          <span className="text-keep">入力すると、</span>
-          <wbr />
-          <span className="text-keep">倍率と表面利回りを</span>
-          <wbr />
-          <span className="text-keep">計算します。</span>
-        </p>
+        <p className="section-label">MILITARY LAND CALCULATOR</p>
+        <h2 id="military-land-title">軍用地利回りシミュレーター</h2>
+        <p>購入価格・年間借地料・経費から、実質利回りと将来収益を概算します。</p>
       </div>
 
-      <div className="calculator-layout">
-        <div
-          className="calculator-form"
-          ref={formRef}
-        >
+      <div className="calculator-layout military-calculator-layout">
+        <div className="calculator-form military-expanded-form" ref={formRef}>
           <div className="simulator-panel-heading">
             <span aria-hidden="true">01</span>
             <div>
@@ -288,179 +489,133 @@ function MilitaryLandCalculator() {
             </div>
           </div>
 
-          <label>
-            <span>年間借地料</span>
+          <MoneyField
+            label="購入価格"
+            value={purchasePrice}
+            placeholder="例：25,000,000"
+            required
+            onChange={(value) => updateInput(setPurchasePrice, value)}
+          />
+          <MoneyField
+            label="年間借地料（年間地代）"
+            value={annualRent}
+            placeholder="例：1,750,000"
+            required
+            inputRef={annualRentInputRef}
+            onChange={(value) => updateInput(setAnnualRent, value)}
+          />
+          <NumberField
+            label="借地期間"
+            value={leaseYears}
+            placeholder="例：50"
+            unit="年"
+            integer
+            onChange={(value) => updateInput(setLeaseYears, value)}
+          />
+          <MoneyField
+            label="固定資産税（年額）"
+            value={fixedAssetTax}
+            placeholder="例：35,000"
+            onChange={(value) => updateInput(setFixedAssetTax, value)}
+          />
+          <MoneyField
+            label="管理費・その他経費（年額）"
+            value={managementExpenses}
+            placeholder="例：15,000"
+            onChange={(value) => updateInput(setManagementExpenses, value)}
+          />
+          <NumberField
+            label="売却時の諸費用（概算）"
+            value={saleCostRate}
+            placeholder="例：5"
+            unit="%"
+            onChange={(value) => updateInput(setSaleCostRate, value)}
+          />
 
-            <div className="input-with-unit">
+          <fieldset className="military-loan-choice">
+            <legend>金利（借入がある場合）</legend>
+            <label>
               <input
-                ref={annualRentInputRef}
-                type="text"
-                inputMode="numeric"
-                value={annualRent}
-                onChange={(event) => {
-                  const value = event.target.value
-
-                  if (event.nativeEvent instanceof InputEvent &&
-                      event.nativeEvent.isComposing) {
-                    handleAnnualRentChange(value)
-                    return
-                  }
-
-                  handleAnnualRentChange(
-                    formatMoneyInput(value),
-                  )
+                type="radio"
+                name="military-loan"
+                checked={!hasLoan}
+                onChange={() => {
+                  setHasLoan(false)
+                  clearManualResult()
                 }}
-                onCompositionEnd={(event) => {
-                  handleAnnualRentChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                onBlur={(event) => {
-                  handleAnnualRentChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                placeholder="例：300,000"
               />
-
-              <span>円</span>
-            </div>
-          </label>
-
-          <label>
-            <span>購入価格</span>
-
-            <div className="input-with-unit">
+              なし
+            </label>
+            <label>
               <input
-                type="text"
-                inputMode="numeric"
-                value={purchasePrice}
-                onChange={(event) => {
-                  const value = event.target.value
-
-                  if (event.nativeEvent instanceof InputEvent &&
-                      event.nativeEvent.isComposing) {
-                    handlePurchasePriceChange(value)
-                    return
-                  }
-
-                  handlePurchasePriceChange(
-                    formatMoneyInput(value),
-                  )
+                type="radio"
+                name="military-loan"
+                checked={hasLoan}
+                onChange={() => {
+                  setHasLoan(true)
+                  clearManualResult()
                 }}
-                onCompositionEnd={(event) => {
-                  handlePurchasePriceChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                onBlur={(event) => {
-                  handlePurchasePriceChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                placeholder="例：15,000,000"
               />
+              あり
+            </label>
+          </fieldset>
 
-              <span>円</span>
+          {hasLoan ? (
+            <div className="military-loan-fields" aria-label="借入条件（任意）">
+              <strong>借入条件（任意）</strong>
+              <MoneyField
+                label="借入額"
+                value={loanAmount}
+                placeholder="例：10,000,000"
+                onChange={(value) => updateInput(setLoanAmount, value)}
+              />
+              <NumberField
+                label="借入期間"
+                value={loanTerm}
+                placeholder="例：20"
+                unit="年"
+                integer
+                onChange={(value) => updateInput(setLoanTerm, value)}
+              />
+              <NumberField
+                label="金利（年率）"
+                value={interestRate}
+                placeholder="例：1.5"
+                unit="%"
+                onChange={(value) => updateInput(setInterestRate, value)}
+              />
             </div>
-          </label>
+          ) : null}
 
-          <label>
-            <span>確認したい倍率</span>
-
-            <div className="input-with-unit">
+          <div className="calculation-mode">
+            <label className="mode-checkbox">
               <input
-                type="text"
-                inputMode="decimal"
-                value={multiple}
-                onChange={(event) => {
-                  const value = event.target.value
-
-                  if (event.nativeEvent instanceof InputEvent &&
-                      event.nativeEvent.isComposing) {
-                    handleMultipleChange(value)
-                    return
-                  }
-
-                  handleMultipleChange(
-                    normalizeMultipleInput(value),
-                  )
-                }}
-                onCompositionEnd={(event) => {
-                  handleMultipleChange(
-                    normalizeMultipleInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                onBlur={(event) => {
-                  handleMultipleChange(
-                    normalizeMultipleInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                placeholder="例：50"
+                type="checkbox"
+                checked={isAutoCalculation}
+                onChange={(event) =>
+                  changeCalculationMode(event.target.checked)
+                }
               />
+              <span className="mode-checkbox__title">
+                入力と同時に計算結果を更新する
+              </span>
+            </label>
+            <p className="calculation-mode__description">
+              {isAutoCalculation
+                ? '入力内容を変更すると結果が自動更新されます。'
+                : '計算ボタンを押すと結果が表示されます。'}
+            </p>
+          </div>
 
-              <span>倍</span>
-            </div>
-          </label>
-
-            <div className="form-spacer" aria-hidden="true"></div>
-
-            <div className="calculation-mode">
-              <label className="mode-checkbox">
-                <input
-                  type="checkbox"
-                  checked={isAutoCalculation}
-                  onChange={(event) =>
-                    changeCalculationMode(event.target.checked)
-                  }
-                />
-
-                <span className="mode-checkbox__title">
-                  <span>入力と同時に</span>
-                  <span>計算結果を更新する</span>
-                </span>
-              </label>
-
-              <p className="calculation-mode__description">
-                {isAutoCalculation ? (
-                  <>
-                    <span>入力内容を変更すると、</span>
-                    <span>結果が自動更新されます。</span>
-                  </>
-                ) : (
-                  <>
-                    <span>シミュレートボタンを押すと</span>
-                    <span>結果が表示されます。</span>
-                  </>
-                )}
-              </p>
-            </div>
-
-          <div
-            className="simulator-form-actions"
-            data-single={isAutoCalculation}
-          >
+          <div className="simulator-form-actions" data-single={isAutoCalculation}>
             <button
               className="reset-button"
               type="button"
               onClick={resetCalculator}
             >
-              入力内容をリセット
+              リセット
             </button>
-
-            {!isAutoCalculation && (
+            {!isAutoCalculation ? (
               <button
                 className="simulate-button"
                 type="button"
@@ -469,40 +624,39 @@ function MilitaryLandCalculator() {
               >
                 シミュレートする
               </button>
-            )}
+            ) : null}
           </div>
 
           <aside className="simulator-input-point simulator-input-point--military">
             <strong>入力のポイント</strong>
-            <p>
-              年間借地料は年額、購入価格は総額を入力してください。
-              表面利回りは税金・経費控除前の概算です。
-            </p>
+            <ul>
+              <li>借地料は年間の収入額です。</li>
+              <li>税金・管理費は年額で入力してください。</li>
+              <li>借入利息は初年度相当の単純計算です。</li>
+              <li>売却諸費用は将来収益の最終年に控除します。</li>
+            </ul>
           </aside>
         </div>
 
         <div
-          className="calculator-results"
+          className="calculator-results military-expanded-results"
           ref={resultsRef}
           role="region"
           aria-label="シミュレーション結果"
           aria-live="polite"
           tabIndex={-1}
         >
-          <div className="simulator-results-heading">
+          <div className="simulator-results-heading military-results-heading">
             <div>
               <p>RESULT</p>
               <h3>シミュレーション結果</h3>
             </div>
-            <span>入力条件にもとづく概算</span>
+            <span>データ更新日：{DATA_UPDATED_AT}</span>
           </div>
 
-          {hasDisplayedResult && (
+          {hasDisplayedResult ? (
             <div className="mobile-result-toolbar">
-              <strong className="mobile-result-title">
-                シミュレーション結果
-              </strong>
-
+              <strong className="mobile-result-title">シミュレーション結果</strong>
               <button
                 className="mobile-result-back"
                 type="button"
@@ -512,127 +666,145 @@ function MilitaryLandCalculator() {
                 入力条件に戻る
               </button>
             </div>
-          )}
+          ) : null}
+
           <div className="military-kpi-grid" aria-label="軍用地の主要結果">
             <div className="result-card emphasis-result military-result-card--yield">
               <span>表面利回り</span>
-
               <strong>
                 {displayedResult.surfaceYield === null
                   ? '―'
                   : `${displayedResult.surfaceYield.toFixed(2)}%`}
               </strong>
-
-              <small>
-                年間借地料 ÷ 購入価格 × 100
-              </small>
+              <small>年間借地料 ÷ 購入価格</small>
             </div>
-
-            <div className="result-card military-result-card--multiple">
-              <span>購入倍率</span>
-
+            <div className="result-card military-result-card--net-yield">
+              <span>実質利回り</span>
               <strong>
-                {displayedResult.calculatedMultiple === null
+                {displayedResult.netYield === null
                   ? '―'
-                  : `${displayedResult.calculatedMultiple.toFixed(2)}倍`}
+                  : `${displayedResult.netYield.toFixed(2)}%`}
               </strong>
-
-              <small>
-                購入価格 ÷ 年間借地料
-              </small>
+              <small>税金・経費・借入利息控除後</small>
             </div>
-
-            <div className="result-card military-result-card--rent">
-              <span>年間借地料</span>
-
+            <div className="result-card military-result-card--income">
+              <span>年間手取り収益</span>
               <strong>
-                {hasDisplayedResult && rentValue > 0
-                  ? formatYen(rentValue)
-                  : '―'}
-              </strong>
-
-              <small>入力した年間の借地料</small>
-            </div>
-
-            <div className="result-card result-card--accent military-result-card--price">
-              <span>
-                <span className="text-keep">入力倍率による</span>
-                <wbr />
-                <span className="text-keep">想定購入価格</span>
-              </span>
-
-              <strong>
-                {displayedResult.estimatedPrice === null
+                {displayedResult.annualNetIncome === null
                   ? '―'
-                  : formatYen(
-                      displayedResult.estimatedPrice,
-                    )}
+                  : formatManYen(displayedResult.annualNetIncome)}
               </strong>
-
-              <small>
-                年間借地料 × 倍率
-              </small>
+              <small>年間借地料から年間経費を控除</small>
+            </div>
+            <div className="result-card military-result-card--payback">
+              <span>回収期間（概算）</span>
+              <strong>
+                {displayedResult.paybackYears === null
+                  ? '―'
+                  : `${displayedResult.paybackYears.toFixed(1)}年`}
+              </strong>
+              <small>購入価格 ÷ 年間手取り収益</small>
             </div>
           </div>
 
-          <div className="simulator-breakdown-panel simulator-breakdown-panel--military">
-            <div className="simulator-subheading">
-              <div>
-                <p>BREAKDOWN</p>
-                <h3>年間収益と購入条件の内訳</h3>
-              </div>
-              <span>税金・経費控除前</span>
-            </div>
-            <dl className="simulator-breakdown-list">
-              <div><dt>年間借地料</dt><dd>{hasDisplayedResult && rentValue > 0 ? formatYen(rentValue) : '―'}</dd></div>
-              <div><dt>購入価格</dt><dd>{hasDisplayedResult && priceValue > 0 ? formatYen(priceValue) : '―'}</dd></div>
-              <div><dt>購入倍率</dt><dd>{displayedResult.calculatedMultiple === null ? '―' : `${displayedResult.calculatedMultiple.toFixed(2)} 倍`}</dd></div>
-              <div><dt>表面利回り</dt><dd>{displayedResult.surfaceYield === null ? '―' : `${displayedResult.surfaceYield.toFixed(2)} %`}</dd></div>
-            </dl>
-          </div>
-
-          <div className="military-result-detail-grid">
-            <section className="military-formula-panel" aria-labelledby="military-formula-title">
+          <div className="military-breakdown-and-guide">
+            <section className="simulator-breakdown-panel simulator-breakdown-panel--military">
               <div className="simulator-subheading">
                 <div>
-                  <p>CALCULATION</p>
-                  <h3 id="military-formula-title">利回りと倍率の計算関係</h3>
+                  <p>BREAKDOWN</p>
+                  <h3>収益の内訳（年間）</h3>
                 </div>
               </div>
-              <dl>
-                <div>
-                  <dt>年間借地料 ÷ 購入価格 × 100</dt>
-                  <dd>{displayedResult.surfaceYield === null ? '―' : `${displayedResult.surfaceYield.toFixed(2)} %`}</dd>
-                </div>
-                <div>
-                  <dt>購入価格 ÷ 年間借地料</dt>
-                  <dd>{displayedResult.calculatedMultiple === null ? '―' : `${displayedResult.calculatedMultiple.toFixed(2)} 倍`}</dd>
-                </div>
+              <dl className="military-income-breakdown">
+                <div><dt>年間借地料（収入）</dt><dd>{displayedResult.annualRent === null ? '―' : formatYen(displayedResult.annualRent)}</dd></div>
+                <div><dt>固定資産税</dt><dd>{displayedResult.fixedAssetTax === null ? '―' : formatSignedExpense(displayedResult.fixedAssetTax)}</dd></div>
+                <div><dt>管理費・その他経費</dt><dd>{displayedResult.managementExpenses === null ? '―' : formatSignedExpense(displayedResult.managementExpenses)}</dd></div>
+                {hasLoan ? <div><dt>借入利息（概算）</dt><dd>{displayedResult.annualInterest === null ? '―' : formatSignedExpense(displayedResult.annualInterest)}</dd></div> : null}
+                <div className="military-breakdown-total"><dt>年間手取り収益</dt><dd>{displayedResult.annualNetIncome === null ? '―' : formatYen(displayedResult.annualNetIncome)}</dd></div>
+                <div><dt>実質利回り</dt><dd>{displayedResult.netYield === null ? '―' : `${displayedResult.netYield.toFixed(2)}%`}</dd></div>
               </dl>
             </section>
 
-            <aside className="military-result-guide">
-              <strong>結果の見方</strong>
-              <p>
-                表面利回りと購入倍率は、入力した借地料と購入価格の関係を示します。
-                税金・維持費・借入利息などは含みません。
-              </p>
+            <aside className="military-net-yield-guide">
+              <span aria-hidden="true">i</span>
+              <div>
+                <strong>実質利回りとは</strong>
+                <p>年間借地料から固定資産税や管理費、借入利息の概算を差し引いた手取り収益をもとにした利回りです。</p>
+                <a href={`${routes.knowledge}#borrow`}>
+                  利回りの考え方を詳しく見る <span aria-hidden="true">→</span>
+                </a>
+              </div>
             </aside>
+          </div>
+
+          <section className="military-future-panel" aria-labelledby="military-future-title">
+            <div className="simulator-subheading">
+              <div>
+                <p>FUTURE INCOME</p>
+                <h3 id="military-future-title">将来の収益シミュレーション（手取りベース）</h3>
+              </div>
+              <span>売却諸費用は最終年に控除</span>
+            </div>
+
+            <div className="military-future-grid">
+              <article className="military-line-chart">
+                <header><strong>累計手取り収益の推移</strong><small>概算</small></header>
+                {lineGraph ? (
+                  <>
+                    <svg viewBox="0 0 600 190" role="img" aria-label="累計手取り収益の推移グラフ">
+                      <line x1="24" y1={lineGraph.zeroY} x2="576" y2={lineGraph.zeroY} className="military-chart-axis" />
+                      <polygon points={lineGraph.area} className="military-chart-area" />
+                      <polyline points={lineGraph.line} className="military-chart-line" />
+                      {lineGraph.points.map((point) => <circle key={point.year} cx={point.x} cy={point.y} r="4" />)}
+                    </svg>
+                    <div className="military-chart-labels">
+                      {lineGraph.points.map((point) => <span key={point.year}>{point.year === 0 ? '現在' : `${point.year}年後`}</span>)}
+                    </div>
+                    <strong className="military-chart-total">
+                      {trajectory.length > 0 ? `${trajectory[trajectory.length - 1].year}年後の累計 ${formatManYen(trajectory[trajectory.length - 1].value)}` : '―'}
+                    </strong>
+                  </>
+                ) : <div className="military-chart-empty">条件入力後に表示します</div>}
+              </article>
+
+              <article className="military-period-chart">
+                <header><strong>期間ごとの手取り収益</strong><small>概算</small></header>
+                {periodEarnings.length > 0 ? (
+                  <div className="military-period-bars">
+                    {periodEarnings.map((period) => (
+                      <div key={period.label}>
+                        <strong>{formatManYen(period.value)}</strong>
+                        <i
+                          style={{ height: `${Math.max(8, (Math.abs(period.value) / maximumPeriodEarning) * 100)}%` }}
+                          data-negative={period.value < 0}
+                        />
+                        <span>{period.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : <div className="military-chart-empty">条件入力後に表示します</div>}
+              </article>
+            </div>
+          </section>
+
+          <div className="military-formula-strip">
+            <div>
+              <span>購入倍率</span>
+              <strong>{displayedResult.calculatedMultiple === null ? '―' : `${displayedResult.calculatedMultiple.toFixed(2)}倍`}</strong>
+            </div>
+            <div>
+              <span>売却時の諸費用（概算）</span>
+              <strong>{displayedResult.saleCosts === null ? '―' : formatYen(displayedResult.saleCosts)}</strong>
+            </div>
+            <p>借入利息は借入額と年率から求めた初年度相当の概算です。元金返済額は手取り収益から控除していません。</p>
           </div>
         </div>
       </div>
 
-      <p className="calculator-note">
-        <span className="text-keep">本シミュレーターの結果は</span>
-        <wbr />
-        <span className="text-keep">概算です。</span>
-        <wbr />
-        <span className="text-keep">税金、手数料、借入利息、</span>
-        <wbr />
-        <span className="text-keep">借地料の変動などは</span>
-        <wbr />
-        <span className="text-keep">含んでいません。</span>
-      </p>
+      <div className="military-calculator-footer">
+        <p className="calculator-note">本シミュレーションは現在の入力条件が継続した場合の概算です。借地料改定、税制、契約条件などにより結果は変動します。</p>
+        <span>データ更新日：{DATA_UPDATED_AT}</span>
+      </div>
     </section>
   )
 }
