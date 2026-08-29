@@ -2603,7 +2603,7 @@
 
 .simulator-page--military .military-loan-reference dl {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
 }
@@ -2650,6 +2650,10 @@
   line-height: 1.6;
 }
 
+.simulator-page--military .military-future-note--repayment {
+  color: #665c8e;
+}
+
 .military-line-chart,
 .military-period-chart {
   min-width: 0;
@@ -2683,6 +2687,33 @@
   overflow: visible;
 }
 
+.military-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 7px;
+  color: #607687;
+  font-size: 0.55rem;
+  font-weight: 750;
+}
+
+.military-chart-legend span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.military-chart-legend i {
+  width: 16px;
+  height: 3px;
+  border-radius: 999px;
+  background: #159a51;
+}
+
+.military-chart-legend span:nth-child(2) i {
+  background: #7567c9;
+}
+
 .military-chart-axis {
   stroke: #cddce4;
   stroke-width: 1;
@@ -2702,10 +2733,19 @@
   vector-effect: non-scaling-stroke;
 }
 
+.military-chart-line--repayment {
+  stroke: #7567c9;
+  stroke-dasharray: 7 5;
+}
+
 .military-line-chart circle {
   fill: #159a51;
   stroke: #fff;
   stroke-width: 2;
+}
+
+.military-line-chart .military-chart-point--repayment {
+  fill: #7567c9;
 }
 
 .military-chart-labels {
@@ -2718,10 +2758,20 @@
 
 .military-chart-total {
   display: block;
-  margin-top: 8px;
+  margin-top: 0;
   color: #16884b;
   font-size: 0.68rem;
   text-align: right;
+}
+
+.military-chart-totals {
+  display: grid;
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.military-chart-total--repayment {
+  color: #6859b5;
 }
 
 .military-period-bars {

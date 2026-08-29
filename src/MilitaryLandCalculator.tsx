@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { routes } from './app/routes'
 import {
+  buildMilitaryLandScenario,
   calculateMilitaryLandResults,
   emptyMilitaryLandResult,
   type MilitaryLandCalculationInputs,
@@ -289,6 +290,7 @@ function MilitaryLandCalculator() {
       managementExpenses,
       hasLoan,
       loanAmount,
+      loanTerm,
       interestRate,
     }),
     [
@@ -299,6 +301,7 @@ function MilitaryLandCalculator() {
       managementExpenses,
       hasLoan,
       loanAmount,
+      loanTerm,
       interestRate,
     ],
   )
@@ -366,26 +369,12 @@ function MilitaryLandCalculator() {
   }
 
   const trajectory = useMemo(() => {
-    if (
-      displayedResult.coreAnnualIncome === null ||
-      displayedResult.leaseYears === null
-    ) {
-      return []
-    }
-
-    const totalYears = displayedResult.leaseYears
-    const checkpoints = Array.from(
-      new Set(
-        Array.from({ length: 6 }, (_, index) =>
-          Math.round((totalYears * index) / 5),
-        ),
-      ),
-    )
-
-    return checkpoints.map((year) => ({
-      year,
-      value: displayedResult.coreAnnualIncome! * year,
-    }))
+    return buildMilitaryLandScenario({
+      coreAnnualIncome: displayedResult.coreAnnualIncome,
+      scenarioYears: displayedResult.leaseYears,
+      annualPayment: displayedResult.annualPayment,
+      loanTermYears: displayedResult.loanTermYears,
+    })
   }, [displayedResult])
 
   const periodEarnings = useMemo(() => {
@@ -398,36 +387,59 @@ function MilitaryLandCalculator() {
 
       return {
         label: `${point.year}年後`,
-        value:
-          (point.year - previous.year) *
-            (displayedResult.coreAnnualIncome ?? 0),
+        propertyValue: point.propertyValue - previous.propertyValue,
+        repaymentValue:
+          point.repaymentValue !== null &&
+          previous.repaymentValue !== null
+            ? point.repaymentValue - previous.repaymentValue
+            : null,
       }
     })
-  }, [displayedResult, trajectory])
+  }, [trajectory])
 
   const lineGraph = useMemo(() => {
     if (trajectory.length === 0) {
       return null
     }
 
-    const values = trajectory.map((point) => point.value)
+    const values = trajectory.flatMap((point) =>
+      point.repaymentValue === null
+        ? [point.propertyValue]
+        : [point.propertyValue, point.repaymentValue],
+    )
     const minimum = Math.min(0, ...values)
     const maximum = Math.max(0, ...values)
     const range = Math.max(1, maximum - minimum)
     const pointList = trajectory.map((point, index) => {
       const x = 24 + (552 * index) / (trajectory.length - 1)
-      const y = 164 - ((point.value - minimum) / range) * 132
+      const propertyY = 164 - (
+        (point.propertyValue - minimum) / range
+      ) * 132
+      const repaymentY = point.repaymentValue === null
+        ? null
+        : 164 - ((point.repaymentValue - minimum) / range) * 132
 
-      return { ...point, x, y }
+      return { ...point, x, propertyY, repaymentY }
     })
     const zeroY = 164 - ((0 - minimum) / range) * 132
 
     return {
       points: pointList,
-      line: pointList.map((point) => `${point.x},${point.y}`).join(' '),
+      propertyLine: pointList
+        .map((point) => `${point.x},${point.propertyY}`)
+        .join(' '),
+      repaymentLine: pointList.every(
+        (point) => point.repaymentY !== null,
+      )
+        ? pointList
+          .map((point) => `${point.x},${point.repaymentY}`)
+          .join(' ')
+        : null,
       area: [
         `${pointList[0].x},${zeroY}`,
-        ...pointList.map((point) => `${point.x},${point.y}`),
+        ...pointList.map(
+          (point) => `${point.x},${point.propertyY}`,
+        ),
         `${pointList[pointList.length - 1].x},${zeroY}`,
       ].join(' '),
       zeroY,
@@ -436,8 +448,12 @@ function MilitaryLandCalculator() {
 
   const maximumPeriodEarning = Math.max(
     1,
-    ...periodEarnings.map((period) => Math.abs(period.value)),
+    ...periodEarnings.map((period) =>
+      Math.abs(period.propertyValue),
+    ),
   )
+  const finalTrajectoryPoint =
+    trajectory[trajectory.length - 1]
 
   return (
     <section
@@ -544,7 +560,7 @@ function MilitaryLandCalculator() {
                 onChange={(value) => updateInput(setInterestRate, value)}
               />
               <p className="military-field-note">
-                借入期間は参考入力です。現在の主要結果・長期シナリオには反映していません。
+                借入額・借入期間・金利から、元利均等返済による概算返済額を計算します。
               </p>
             </div>
           ) : null}
@@ -594,7 +610,7 @@ function MilitaryLandCalculator() {
             <ul>
               <li>借地料は年間の収入額です。</li>
               <li>固定資産税・管理費は年額で入力してください。</li>
-              <li>借入利息は主要結果と分けた参考値です。</li>
+              <li>借入返済額は主要結果と分けた参考値です。</li>
             </ul>
           </aside>
         </div>
@@ -708,16 +724,20 @@ function MilitaryLandCalculator() {
             <aside className="military-loan-reference" aria-label="借入条件の参考結果">
               <div>
                 <strong>借入条件の参考結果</strong>
-                <p>元金返済額・元利返済額は推定していません。</p>
+                <p>元利均等返済を仮定した概算です。実際の金利、返済方式、手数料、融資条件は金融機関により異なります。融資審査、借入可能額、担保評価、金融機関固有の条件を算定するものではありません。</p>
               </div>
               <dl>
                 <div>
-                  <dt>概算年間利息</dt>
-                  <dd>{displayedResult.annualInterest === null ? '―' : formatYen(displayedResult.annualInterest)}</dd>
+                  <dt>毎月返済額（概算）</dt>
+                  <dd>{displayedResult.monthlyPayment === null ? '―' : formatYen(displayedResult.monthlyPayment)}</dd>
                 </div>
                 <div>
-                  <dt>利息考慮後年間収支（参考）</dt>
-                  <dd>{displayedResult.interestAdjustedAnnualIncome === null ? '―' : formatYen(displayedResult.interestAdjustedAnnualIncome)}</dd>
+                  <dt>年間返済額（概算）</dt>
+                  <dd>{displayedResult.annualPayment === null ? '―' : formatYen(displayedResult.annualPayment)}</dd>
+                </div>
+                <div>
+                  <dt>返済後年間収支（参考）</dt>
+                  <dd>{displayedResult.afterRepaymentAnnualIncome === null ? '―' : formatYen(displayedResult.afterRepaymentAnnualIncome)}</dd>
                 </div>
               </dl>
             </aside>
@@ -737,32 +757,47 @@ function MilitaryLandCalculator() {
                 <header><strong>累計年間収支の推移</strong><small>単純計算</small></header>
                 {lineGraph ? (
                   <>
+                    {lineGraph.repaymentLine ? (
+                      <div className="military-chart-legend" aria-label="グラフの凡例">
+                        <span><i />物件単体</span>
+                        <span><i />返済考慮後（参考）</span>
+                      </div>
+                    ) : null}
                     <svg viewBox="0 0 600 190" role="img" aria-label="累計年間収支の推移グラフ">
                       <line x1="24" y1={lineGraph.zeroY} x2="576" y2={lineGraph.zeroY} className="military-chart-axis" />
                       <polygon points={lineGraph.area} className="military-chart-area" />
-                      <polyline points={lineGraph.line} className="military-chart-line" />
-                      {lineGraph.points.map((point) => <circle key={point.year} cx={point.x} cy={point.y} r="4" />)}
+                      <polyline points={lineGraph.propertyLine} className="military-chart-line military-chart-line--property" />
+                      {lineGraph.repaymentLine ? <polyline points={lineGraph.repaymentLine} className="military-chart-line military-chart-line--repayment" /> : null}
+                      {lineGraph.points.map((point) => <circle className="military-chart-point--property" key={`property-${point.year}`} cx={point.x} cy={point.propertyY} r="4" />)}
+                      {lineGraph.repaymentLine ? lineGraph.points.map((point) => <circle className="military-chart-point--repayment" key={`repayment-${point.year}`} cx={point.x} cy={point.repaymentY ?? 0} r="4" />) : null}
                     </svg>
-                    <div className="military-chart-labels">
+                    <div className="military-chart-labels" style={{ gridTemplateColumns: `repeat(${lineGraph.points.length}, minmax(0, 1fr))` }}>
                       {lineGraph.points.map((point) => <span key={point.year}>{point.year === 0 ? '現在' : `${point.year}年後`}</span>)}
                     </div>
-                    <strong className="military-chart-total">
-                      {trajectory.length > 0 ? `${trajectory[trajectory.length - 1].year}年後の累計 ${formatManYen(trajectory[trajectory.length - 1].value)}` : '―'}
-                    </strong>
+                    <div className="military-chart-totals">
+                      <strong className="military-chart-total">
+                        {trajectory.length > 0 ? `物件単体：${trajectory[trajectory.length - 1].year}年後 ${formatManYen(trajectory[trajectory.length - 1].propertyValue)}` : '―'}
+                      </strong>
+                      {finalTrajectoryPoint?.repaymentValue != null ? (
+                        <strong className="military-chart-total military-chart-total--repayment">
+                          返済考慮後：{finalTrajectoryPoint.year}年後 {formatManYen(finalTrajectoryPoint.repaymentValue)}
+                        </strong>
+                      ) : null}
+                    </div>
                   </>
                 ) : <div className="military-chart-empty">条件入力後に表示します</div>}
               </article>
 
               <article className="military-period-chart">
-                <header><strong>期間ごとの年間収支</strong><small>単純計算</small></header>
+                <header><strong>期間ごとの物件単体収支</strong><small>単純計算</small></header>
                 {periodEarnings.length > 0 ? (
                   <div className="military-period-bars">
                     {periodEarnings.map((period) => (
                       <div key={period.label}>
-                        <strong>{formatManYen(period.value)}</strong>
+                        <strong>{formatManYen(period.propertyValue)}</strong>
                         <i
-                          style={{ height: `${Math.max(8, (Math.abs(period.value) / maximumPeriodEarning) * 100)}%` }}
-                          data-negative={period.value < 0}
+                          style={{ height: `${Math.max(8, (Math.abs(period.propertyValue) / maximumPeriodEarning) * 100)}%` }}
+                          data-negative={period.propertyValue < 0}
                         />
                         <span>{period.label}</span>
                       </div>
@@ -774,6 +809,11 @@ function MilitaryLandCalculator() {
             <p className="military-future-note">
               現在の入力条件が変わらないと仮定した単純シナリオです。将来の収益を予測・保証するものではありません。
             </p>
+            {displayedResult.annualPayment !== null && displayedResult.loanTermYears !== null ? (
+              <p className="military-future-note military-future-note--repayment">
+                返済考慮後（参考）は{displayedResult.loanTermYears}年目まで年間返済額を差し引き、{displayedResult.loanTermYears + 1}年目以降は物件単体と同じ年間収支で積み上げます。
+              </p>
+            ) : null}
           </section>
 
           <div className="military-formula-strip">

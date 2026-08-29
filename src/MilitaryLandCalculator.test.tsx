@@ -15,7 +15,12 @@ import {
   vi,
 } from 'vitest'
 import MilitaryLandCalculator from './MilitaryLandCalculator'
-import { calculateMilitaryLandResults } from './militaryLandCalculation'
+import {
+  buildMilitaryLandScenario,
+  calculateAnnualIncomeAfterRepayment,
+  calculateLevelPaymentLoan,
+  calculateMilitaryLandResults,
+} from './militaryLandCalculation'
 
 const baseCalculationInputs = {
   annualRent: '300000',
@@ -25,6 +30,7 @@ const baseCalculationInputs = {
   managementExpenses: '15000',
   hasLoan: false,
   loanAmount: '',
+  loanTerm: '',
   interestRate: '',
 }
 
@@ -289,82 +295,83 @@ describe('MilitaryLandCalculator approved core calculation rules', () => {
     expect(result.paybackYears).toBeNull()
   })
 
-  it('uses zero annual interest when borrowing is disabled', () => {
+  it('does not calculate borrowing references when borrowing is disabled', () => {
     const result = calculateMilitaryLandResults({
       ...baseCalculationInputs,
       loanAmount: '10000000',
+      loanTerm: '20',
       interestRate: '1.5',
     })
 
-    expect(result.annualInterest).toBe(0)
-    expect(result.interestAdjustedAnnualIncome).toBe(250000)
+    expect(result.monthlyPayment).toBeNull()
+    expect(result.annualPayment).toBeNull()
+    expect(result.afterRepaymentAnnualIncome).toBeNull()
   })
 
-  it('calculates borrowing reference values when borrowing is enabled', () => {
+  it('calculates level-payment borrowing reference values when borrowing is enabled', () => {
     const result = calculateMilitaryLandResults({
       ...baseCalculationInputs,
       hasLoan: true,
       loanAmount: '10000000',
+      loanTerm: '20',
       interestRate: '1.5',
     })
 
-    expect(result.annualInterest).toBe(150000)
-    expect(result.interestAdjustedAnnualIncome).toBe(100000)
+    expect(result.monthlyPayment).toBeCloseTo(48254.540888, 5)
+    expect(result.annualPayment).toBeCloseTo(579054.490658, 5)
+    expect(result.afterRepaymentAnnualIncome).toBeCloseTo(-329054.490658, 5)
   })
 
-  it('calculates approximate annual interest as loan amount times rate', () => {
+  it('calculates a zero-interest loan as principal divided by payment count', () => {
+    const result = calculateLevelPaymentLoan({
+      principal: 1200000,
+      annualRatePercent: 0,
+      termYears: 10,
+    })
+
+    expect(result?.monthlyPayment).toBe(10000)
+    expect(result?.annualPayment).toBe(120000)
+  })
+
+  it.each([
+    ['empty loan amount', '', '20', '1.5'],
+    ['zero loan amount', '0', '20', '1.5'],
+    ['empty loan term', '10000000', '', '1.5'],
+    ['zero loan term', '10000000', '0', '1.5'],
+    ['empty interest rate', '10000000', '20', ''],
+  ])('leaves borrowing references uncalculated for %s', (
+    _label,
+    loanAmount,
+    loanTerm,
+    interestRate,
+  ) => {
     const result = calculateMilitaryLandResults({
       ...baseCalculationInputs,
       hasLoan: true,
-      loanAmount: '10000000',
-      interestRate: '1.5',
+      loanAmount,
+      loanTerm,
+      interestRate,
     })
 
-    expect(result.annualInterest).toBe(150000)
+    expect(result.monthlyPayment).toBeNull()
+    expect(result.annualPayment).toBeNull()
+    expect(result.afterRepaymentAnnualIncome).toBeNull()
   })
 
-  it('does not mix borrowing interest into core annual income', () => {
-    const result = calculateMilitaryLandResults({
+  it('keeps all core KPIs unchanged when borrowing conditions change', () => {
+    const withoutLoan = calculateMilitaryLandResults(baseCalculationInputs)
+    const withLoan = calculateMilitaryLandResults({
       ...baseCalculationInputs,
       hasLoan: true,
       loanAmount: '10000000',
+      loanTerm: '20',
       interestRate: '1.5',
     })
 
-    expect(result.coreAnnualIncome).toBe(250000)
-  })
-
-  it('does not mix borrowing interest into expense-adjusted yield', () => {
-    const result = calculateMilitaryLandResults({
-      ...baseCalculationInputs,
-      hasLoan: true,
-      loanAmount: '10000000',
-      interestRate: '1.5',
-    })
-
-    expect(result.expenseAdjustedYield).toBeCloseTo(1.666666, 5)
-  })
-
-  it('does not mix borrowing interest into the core payback period', () => {
-    const result = calculateMilitaryLandResults({
-      ...baseCalculationInputs,
-      hasLoan: true,
-      loanAmount: '10000000',
-      interestRate: '1.5',
-    })
-
-    expect(result.paybackYears).toBe(60)
-  })
-
-  it('calculates interest-adjusted annual income as a separate reference value', () => {
-    const result = calculateMilitaryLandResults({
-      ...baseCalculationInputs,
-      hasLoan: true,
-      loanAmount: '10000000',
-      interestRate: '1.5',
-    })
-
-    expect(result.interestAdjustedAnnualIncome).toBe(100000)
+    expect(withLoan.surfaceYield).toBe(withoutLoan.surfaceYield)
+    expect(withLoan.expenseAdjustedYield).toBe(withoutLoan.expenseAdjustedYield)
+    expect(withLoan.coreAnnualIncome).toBe(withoutLoan.coreAnnualIncome)
+    expect(withLoan.paybackYears).toBe(withoutLoan.paybackYears)
   })
 
   it('returns empty results instead of dividing by zero', () => {
@@ -383,11 +390,13 @@ describe('MilitaryLandCalculator approved core calculation rules', () => {
       ...baseCalculationInputs,
       hasLoan: true,
       loanAmount: '10000000',
+      loanTerm: '20',
       interestRate: '.',
     })
 
-    expect(result.annualInterest).toBe(0)
-    expect(result.interestAdjustedAnnualIncome).toBe(250000)
+    expect(result.monthlyPayment).toBeNull()
+    expect(result.annualPayment).toBeNull()
+    expect(result.afterRepaymentAnnualIncome).toBeNull()
     expect(Object.values(result).some(Number.isNaN)).toBe(false)
   })
 
@@ -414,6 +423,69 @@ describe('MilitaryLandCalculator approved core calculation rules', () => {
   })
 })
 
+describe('MilitaryLandCalculator loan repayment and scenario rules', () => {
+  const standardLoan = calculateLevelPaymentLoan({
+    principal: 10000000,
+    annualRatePercent: 1.5,
+    termYears: 20,
+  })!
+
+  it('uses the repayment-adjusted annual income during the loan term only', () => {
+    expect(calculateAnnualIncomeAfterRepayment({
+      coreAnnualIncome: 1700000,
+      annualPayment: standardLoan.annualPayment,
+      loanTermYears: 20,
+      year: 20,
+    })).toBeCloseTo(1120945.509341, 5)
+    expect(calculateAnnualIncomeAfterRepayment({
+      coreAnnualIncome: 1700000,
+      annualPayment: standardLoan.annualPayment,
+      loanTermYears: 20,
+      year: 21,
+    })).toBe(1700000)
+  })
+
+  it('subtracts repayments only through the loan end in a longer scenario', () => {
+    const scenario = buildMilitaryLandScenario({
+      coreAnnualIncome: 1700000,
+      scenarioYears: 50,
+      annualPayment: standardLoan.annualPayment,
+      loanTermYears: 20,
+    })
+    const year20 = scenario.find((point) => point.year === 20)
+    const year50 = scenario.find((point) => point.year === 50)
+
+    expect(year20?.repaymentValue).toBeCloseTo(22418910.186832, 5)
+    expect(year50?.propertyValue).toBe(85000000)
+    expect(year50?.repaymentValue).toBeCloseTo(73418910.186832, 5)
+  })
+
+  it('treats every displayed year as repayment period when the scenario is shorter than the loan', () => {
+    const scenario = buildMilitaryLandScenario({
+      coreAnnualIncome: 1700000,
+      scenarioYears: 10,
+      annualPayment: standardLoan.annualPayment,
+      loanTermYears: 20,
+    })
+    const finalPoint = scenario[scenario.length - 1]
+
+    expect(finalPoint.year).toBe(10)
+    expect(finalPoint.repaymentValue).toBeCloseTo(
+      (1700000 - standardLoan.annualPayment) * 10,
+      5,
+    )
+  })
+
+  it('does not generate a scenario without a long-term period', () => {
+    expect(buildMilitaryLandScenario({
+      coreAnnualIncome: 1700000,
+      scenarioYears: null,
+      annualPayment: standardLoan.annualPayment,
+      loanTermYears: 20,
+    })).toEqual([])
+  })
+})
+
 describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
   beforeEach(() => {
     setMobileViewport(false)
@@ -430,7 +502,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
 
     await runManualCalculationWithAnnualCosts('50')
 
-    expect(screen.getByText('50年後の累計 1,250.0万円')).toBeTruthy()
+    expect(screen.getByText('物件単体：50年後 1,250.0万円')).toBeTruthy()
   })
 
   it('starts with an empty long-term scenario period instead of 50 years', () => {
@@ -450,7 +522,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
 
     await runManualCalculationWithAnnualCosts()
 
-    expect(screen.getByText('2.00%')).toBeTruthy()
+    expect(screen.getAllByText('2.00%').length).toBeGreaterThan(0)
     expect(screen.getAllByText('1.67%').length).toBeGreaterThan(0)
     expect(screen.getByText('25.0万円')).toBeTruthy()
     expect(screen.getByText('60.0年')).toBeTruthy()
@@ -470,7 +542,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
 
     await runManualCalculationWithAnnualCosts('20')
 
-    expect(screen.getByText('20年後の累計 500.0万円')).toBeTruthy()
+    expect(screen.getByText('物件単体：20年後 500.0万円')).toBeTruthy()
   })
 
   it('provides an accessible tooltip for the scenario period', () => {
@@ -496,7 +568,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     expect(screen.queryByLabelText(/売却時の諸費用/)).toBeNull()
   })
 
-  it('does not mix borrowing interest into the core long-term scenario', async () => {
+  it('shows level-payment results and a repayment-adjusted long-term comparison', async () => {
     render(<MilitaryLandCalculator />)
 
     const user = await fillValidConditions()
@@ -504,6 +576,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     await fillScenarioPeriod(user)
     await user.click(screen.getByRole('radio', { name: 'あり' }))
     await user.type(screen.getByLabelText(/借入額/), '10000000')
+    await user.type(screen.getByLabelText(/借入期間/), '20')
     await user.type(screen.getByLabelText(/金利（年率）/), '1.5')
     await user.click(
       screen.getByRole('button', {
@@ -511,9 +584,47 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
       }),
     )
 
-    expect(screen.getByText('50年後の累計 1,250.0万円')).toBeTruthy()
-    expect(screen.getByText('￥150,000')).toBeTruthy()
-    expect(screen.getByText('￥100,000')).toBeTruthy()
+    expect(screen.getByText('物件単体：50年後 1,250.0万円')).toBeTruthy()
+    expect(screen.getByText('￥48,255')).toBeTruthy()
+    expect(screen.getByText('￥579,054')).toBeTruthy()
+    expect(screen.getByText('-￥329,054')).toBeTruthy()
+    expect(screen.getByText(/返済考慮後：50年後/)).toBeTruthy()
+    expect(screen.getByText('返済考慮後（参考）')).toBeTruthy()
+  })
+
+  it('keeps borrowing reference values uncalculated until all required loan inputs exist', async () => {
+    render(<MilitaryLandCalculator />)
+
+    const user = await fillValidConditions()
+    await user.click(screen.getByRole('radio', { name: 'あり' }))
+    await user.type(screen.getByLabelText(/借入額/), '10000000')
+    await user.type(screen.getByLabelText(/借入期間/), '20')
+    await user.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    expect(screen.getByText('借入条件の参考結果')).toBeTruthy()
+    expect(screen.getAllByText('―')).toHaveLength(3)
+    expect(screen.getAllByText('2.00%').length).toBeGreaterThan(0)
+  })
+
+  it('updates borrowing references automatically when loan conditions change', async () => {
+    render(<MilitaryLandCalculator />)
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('checkbox', {
+      name: '入力と同時に計算結果を更新する',
+    }))
+    await user.type(screen.getByLabelText(/年間借地料/), '300000')
+    await user.type(screen.getByLabelText(/購入価格/), '15000000')
+    await user.click(screen.getByRole('radio', { name: 'あり' }))
+    await user.type(screen.getByLabelText(/借入額/), '10000000')
+    await user.type(screen.getByLabelText(/借入期間/), '20')
+    const rate = screen.getByLabelText(/金利（年率）/)
+    await user.type(rate, '1.5')
+
+    expect(screen.getByText('￥48,255')).toBeTruthy()
+    await user.clear(rate)
+    await user.type(rate, '0')
+    expect(screen.getByText('￥41,667')).toBeTruthy()
   })
 
   it('keeps automatic calculation enabled after reset and clears result inputs', async () => {
@@ -526,12 +637,22 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     await user.click(automaticCalculation)
     await user.type(screen.getByLabelText(/年間借地料/), '300000')
     await user.type(screen.getByLabelText(/購入価格/), '15000000')
+    await user.click(screen.getByRole('radio', { name: 'あり' }))
+    await user.type(screen.getByLabelText(/借入額/), '10000000')
+    await user.type(screen.getByLabelText(/借入期間/), '20')
+    await user.type(screen.getByLabelText(/金利（年率）/), '1.5')
+    await user.type(screen.getByRole('textbox', { name: '長期シナリオ期間' }), '50')
     await user.click(screen.getByRole('button', { name: 'リセット' }))
 
     expect(automaticCalculation.checked).toBe(true)
     expect((screen.getByLabelText(/年間借地料/) as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText(/購入価格/) as HTMLInputElement).value).toBe('')
     expect((screen.getByRole('textbox', { name: '長期シナリオ期間' }) as HTMLInputElement).value).toBe('')
+    expect((screen.getByRole('radio', { name: 'なし' }) as HTMLInputElement).checked).toBe(true)
+    await user.click(screen.getByRole('radio', { name: 'あり' }))
+    expect((screen.getByLabelText(/借入額/) as HTMLInputElement).value).toBe('')
+    expect((screen.getByLabelText(/借入期間/) as HTMLInputElement).value).toBe('')
+    expect((screen.getByLabelText(/金利（年率）/) as HTMLInputElement).value).toBe('')
   })
 
   it('supports an automatic-to-manual-to-automatic calculation round trip', async () => {
