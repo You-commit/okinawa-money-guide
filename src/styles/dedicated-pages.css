@@ -2349,6 +2349,13 @@
   font-size: 0.7rem;
 }
 
+.simulator-page--military .military-field-note {
+  margin: -2px 0 2px;
+  color: #6b7f8d;
+  font-size: 0.58rem;
+  line-height: 1.55;
+}
+
 .simulator-page--military .simulator-input-point ul {
   display: grid;
   gap: 3px;
@@ -2488,6 +2495,68 @@
   text-decoration: none;
 }
 
+.simulator-page--military .military-missing-cost-warning {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid #ead7a6;
+  border-radius: 8px;
+  background: #fffaf0;
+  color: #775d22;
+  font-size: 0.62rem;
+  line-height: 1.6;
+}
+
+.simulator-page--military .military-loan-reference {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.72fr) minmax(0, 1.28fr);
+  gap: 12px;
+  align-items: center;
+  padding: 11px 13px;
+  border: 1px solid #d7e8e4;
+  border-radius: 9px;
+  background: #f4faf8;
+}
+
+.simulator-page--military .military-loan-reference > div strong {
+  color: #1d6f65;
+  font-size: 0.72rem;
+}
+
+.simulator-page--military .military-loan-reference > div p {
+  margin: 4px 0 0;
+  color: #647a73;
+  font-size: 0.58rem;
+  line-height: 1.55;
+}
+
+.simulator-page--military .military-loan-reference dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.simulator-page--military .military-loan-reference dl > div {
+  padding: 8px 10px;
+  border: 1px solid #dce8e4;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.simulator-page--military .military-loan-reference dt {
+  color: #647a73;
+  font-size: 0.58rem;
+  font-weight: 750;
+}
+
+.simulator-page--military .military-loan-reference dd {
+  margin: 4px 0 0;
+  color: #167866;
+  font-size: 0.75rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
 .military-future-panel {
   padding: 13px;
   border: 1px solid #dce8ef;
@@ -2500,6 +2569,13 @@
   grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
   gap: 10px;
   margin-top: 10px;
+}
+
+.simulator-page--military .military-future-note {
+  margin: 9px 0 0;
+  color: #687e8d;
+  font-size: 0.59rem;
+  line-height: 1.6;
 }
 
 .military-line-chart,
@@ -2762,6 +2838,8 @@
 
   .military-income-breakdown,
   .military-formula-strip,
+  .simulator-page--military .military-loan-reference,
+  .simulator-page--military .military-loan-reference dl,
   .simulator-page--military .simulator-page__notes {
     grid-template-columns: 1fr;
   }

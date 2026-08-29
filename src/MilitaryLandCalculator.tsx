@@ -5,33 +5,12 @@ import {
   type Ref,
 } from 'react'
 import { routes } from './app/routes'
-
-type CalculationResult = {
-  calculatedMultiple: number | null
-  surfaceYield: number | null
-  netYield: number | null
-  annualNetIncome: number | null
-  paybackYears: number | null
-  annualRent: number | null
-  purchasePrice: number | null
-  fixedAssetTax: number | null
-  managementExpenses: number | null
-  annualInterest: number | null
-  saleCosts: number | null
-  leaseYears: number | null
-}
-
-type CalculationInputs = {
-  annualRent: string
-  purchasePrice: string
-  leaseYears: string
-  fixedAssetTax: string
-  managementExpenses: string
-  saleCostRate: string
-  hasLoan: boolean
-  loanAmount: string
-  interestRate: string
-}
+import {
+  calculateMilitaryLandResults,
+  emptyMilitaryLandResult,
+  type MilitaryLandCalculationInputs,
+  type MilitaryLandCalculationResult,
+} from './militaryLandCalculation'
 
 type MoneyFieldProps = {
   label: string
@@ -49,21 +28,6 @@ type NumberFieldProps = {
   unit: string
   onChange: (value: string) => void
   integer?: boolean
-}
-
-const emptyResult: CalculationResult = {
-  calculatedMultiple: null,
-  surfaceYield: null,
-  netYield: null,
-  annualNetIncome: null,
-  paybackYears: null,
-  annualRent: null,
-  purchasePrice: null,
-  fixedAssetTax: null,
-  managementExpenses: null,
-  annualInterest: null,
-  saleCosts: null,
-  leaseYears: null,
 }
 
 const MOBILE_VIEWPORT_QUERY = '(max-width: 760px)'
@@ -137,57 +101,6 @@ const normalizeIntegerInput = (value: string) =>
 
 const parseMoney = (value: string) =>
   Number(getMoneyDigits(value))
-
-const parseDecimal = (value: string) =>
-  Number(normalizeDecimalInput(value))
-
-const calculateResults = ({
-  annualRent,
-  purchasePrice,
-  leaseYears,
-  fixedAssetTax,
-  managementExpenses,
-  saleCostRate,
-  hasLoan,
-  loanAmount,
-  interestRate,
-}: CalculationInputs): CalculationResult => {
-  const rent = parseMoney(annualRent)
-  const price = parseMoney(purchasePrice)
-
-  if (rent <= 0 || price <= 0) {
-    return emptyResult
-  }
-
-  const tax = parseMoney(fixedAssetTax)
-  const expenses = parseMoney(managementExpenses)
-  const selectedLeaseYears = Math.max(
-    1,
-    Number(normalizeIntegerInput(leaseYears)) || 50,
-  )
-  const saleCosts = price * (parseDecimal(saleCostRate) / 100)
-  const annualInterest = hasLoan
-    ? parseMoney(loanAmount) * (parseDecimal(interestRate) / 100)
-    : 0
-  const annualNetIncome = rent - tax - expenses - annualInterest
-
-  return {
-    calculatedMultiple: price / rent,
-    surfaceYield: (rent / price) * 100,
-    netYield: (annualNetIncome / price) * 100,
-    annualNetIncome,
-    paybackYears: annualNetIncome > 0
-      ? price / annualNetIncome
-      : null,
-    annualRent: rent,
-    purchasePrice: price,
-    fixedAssetTax: tax,
-    managementExpenses: expenses,
-    annualInterest,
-    saleCosts,
-    leaseYears: selectedLeaseYears,
-  }
-}
 
 function MoneyField({
   label,
@@ -299,9 +212,9 @@ function MilitaryLandCalculator() {
   const [interestRate, setInterestRate] = useState('')
   const [isAutoCalculation, setIsAutoCalculation] = useState(false)
   const [manualResult, setManualResult] =
-    useState<CalculationResult | null>(null)
+    useState<MilitaryLandCalculationResult | null>(null)
 
-  const calculationInputs = useMemo<CalculationInputs>(
+  const calculationInputs = useMemo<MilitaryLandCalculationInputs>(
     () => ({
       annualRent,
       purchasePrice,
@@ -327,13 +240,13 @@ function MilitaryLandCalculator() {
   )
 
   const autoResult = useMemo(
-    () => calculateResults(calculationInputs),
+    () => calculateMilitaryLandResults(calculationInputs),
     [calculationInputs],
   )
 
   const displayedResult = isAutoCalculation
     ? autoResult
-    : manualResult ?? emptyResult
+    : manualResult ?? emptyMilitaryLandResult
   const hasDisplayedResult = displayedResult.surfaceYield !== null
   const canSimulate =
     parseMoney(annualRent) > 0 &&
@@ -354,7 +267,7 @@ function MilitaryLandCalculator() {
   }
 
   const simulate = () => {
-    setManualResult(calculateResults(calculationInputs))
+    setManualResult(calculateMilitaryLandResults(calculationInputs))
     scrollToMobileTarget(resultsRef.current)
   }
 
@@ -391,9 +304,8 @@ function MilitaryLandCalculator() {
 
   const trajectory = useMemo(() => {
     if (
-      displayedResult.annualNetIncome === null ||
-      displayedResult.leaseYears === null ||
-      displayedResult.saleCosts === null
+      displayedResult.coreAnnualIncome === null ||
+      displayedResult.leaseYears === null
     ) {
       return []
     }
@@ -409,27 +321,23 @@ function MilitaryLandCalculator() {
 
     return checkpoints.map((year) => ({
       year,
-      value:
-        displayedResult.annualNetIncome! * year -
-        (year === totalYears ? displayedResult.saleCosts! : 0),
+      value: displayedResult.coreAnnualIncome! * year,
     }))
   }, [displayedResult])
 
   const periodEarnings = useMemo(() => {
-    if (trajectory.length < 2 || displayedResult.saleCosts === null) {
+    if (trajectory.length < 2) {
       return []
     }
 
     return trajectory.slice(1).map((point, index) => {
       const previous = trajectory[index]
-      const isLast = index === trajectory.length - 2
 
       return {
         label: `${point.year}年後`,
         value:
           (point.year - previous.year) *
-            (displayedResult.annualNetIncome ?? 0) -
-          (isLast ? displayedResult.saleCosts! : 0),
+            (displayedResult.coreAnnualIncome ?? 0),
       }
     })
   }, [displayedResult, trajectory])
@@ -476,7 +384,7 @@ function MilitaryLandCalculator() {
       <div className="calculator-heading calculator-heading--military">
         <p className="section-label">MILITARY LAND CALCULATOR</p>
         <h2 id="military-land-title">軍用地利回りシミュレーター</h2>
-        <p>購入価格・年間借地料・経費から、実質利回りと将来収益を概算します。</p>
+        <p>購入価格・年間借地料・経費から、費用控除後利回りと長期収支の単純シナリオを概算します。</p>
       </div>
 
       <div className="calculator-layout military-calculator-layout">
@@ -531,6 +439,9 @@ function MilitaryLandCalculator() {
             unit="%"
             onChange={(value) => updateInput(setSaleCostRate, value)}
           />
+          <p className="military-field-note">
+            現在の主要結果・長期シナリオには反映していない参考条件です。
+          </p>
 
           <fieldset className="military-loan-choice">
             <legend>金利（借入がある場合）</legend>
@@ -584,6 +495,9 @@ function MilitaryLandCalculator() {
                 unit="%"
                 onChange={(value) => updateInput(setInterestRate, value)}
               />
+              <p className="military-field-note">
+                借入期間は参考入力です。現在の主要結果・長期シナリオには反映していません。
+              </p>
             </div>
           ) : null}
 
@@ -631,9 +545,9 @@ function MilitaryLandCalculator() {
             <strong>入力のポイント</strong>
             <ul>
               <li>借地料は年間の収入額です。</li>
-              <li>税金・管理費は年額で入力してください。</li>
-              <li>借入利息は初年度相当の単純計算です。</li>
-              <li>売却諸費用は将来収益の最終年に控除します。</li>
+              <li>固定資産税・管理費は年額で入力してください。</li>
+              <li>借入利息は主要結果と分けた参考値です。</li>
+              <li>売却諸費用は主要結果・長期シナリオには反映しません。</li>
             </ul>
           </aside>
         </div>
@@ -679,33 +593,40 @@ function MilitaryLandCalculator() {
               <small>年間借地料 ÷ 購入価格</small>
             </div>
             <div className="result-card military-result-card--net-yield">
-              <span>実質利回り</span>
+              <span>費用控除後利回り</span>
               <strong>
-                {displayedResult.netYield === null
+                {displayedResult.expenseAdjustedYield === null
                   ? '―'
-                  : `${displayedResult.netYield.toFixed(2)}%`}
+                  : `${displayedResult.expenseAdjustedYield.toFixed(2)}%`}
               </strong>
-              <small>税金・経費・借入利息控除後</small>
+              <small>実質利回りの目安</small>
             </div>
             <div className="result-card military-result-card--income">
-              <span>年間手取り収益</span>
+              <span>年間収支（概算）</span>
               <strong>
-                {displayedResult.annualNetIncome === null
+                {displayedResult.coreAnnualIncome === null
                   ? '―'
-                  : formatManYen(displayedResult.annualNetIncome)}
+                  : formatManYen(displayedResult.coreAnnualIncome)}
               </strong>
-              <small>年間借地料から年間経費を控除</small>
+              <small>年間借地料から入力した年間費用を控除</small>
             </div>
             <div className="result-card military-result-card--payback">
-              <span>回収期間（概算）</span>
+              <span>購入価格ベースの回収期間（概算）</span>
               <strong>
                 {displayedResult.paybackYears === null
                   ? '―'
                   : `${displayedResult.paybackYears.toFixed(1)}年`}
               </strong>
-              <small>購入価格 ÷ 年間手取り収益</small>
+              <small>購入価格 ÷ 年間収支</small>
             </div>
           </div>
+
+          {hasDisplayedResult &&
+          (fixedAssetTax === '' || managementExpenses === '') ? (
+            <p className="military-missing-cost-warning" role="note">
+              未入力の年間費用は0円として仮計算しています。実際の費用をご確認ください。
+            </p>
+          ) : null}
 
           <div className="military-breakdown-and-guide">
             <section className="simulator-breakdown-panel simulator-breakdown-panel--military">
@@ -719,17 +640,16 @@ function MilitaryLandCalculator() {
                 <div><dt>年間借地料（収入）</dt><dd>{displayedResult.annualRent === null ? '―' : formatYen(displayedResult.annualRent)}</dd></div>
                 <div><dt>固定資産税</dt><dd>{displayedResult.fixedAssetTax === null ? '―' : formatSignedExpense(displayedResult.fixedAssetTax)}</dd></div>
                 <div><dt>管理費・その他経費</dt><dd>{displayedResult.managementExpenses === null ? '―' : formatSignedExpense(displayedResult.managementExpenses)}</dd></div>
-                {hasLoan ? <div><dt>借入利息（概算）</dt><dd>{displayedResult.annualInterest === null ? '―' : formatSignedExpense(displayedResult.annualInterest)}</dd></div> : null}
-                <div className="military-breakdown-total"><dt>年間手取り収益</dt><dd>{displayedResult.annualNetIncome === null ? '―' : formatYen(displayedResult.annualNetIncome)}</dd></div>
-                <div><dt>実質利回り</dt><dd>{displayedResult.netYield === null ? '―' : `${displayedResult.netYield.toFixed(2)}%`}</dd></div>
+                <div className="military-breakdown-total"><dt>年間収支（概算）</dt><dd>{displayedResult.coreAnnualIncome === null ? '―' : formatYen(displayedResult.coreAnnualIncome)}</dd></div>
+                <div><dt>費用控除後利回り</dt><dd>{displayedResult.expenseAdjustedYield === null ? '―' : `${displayedResult.expenseAdjustedYield.toFixed(2)}%`}</dd></div>
               </dl>
             </section>
 
             <aside className="military-net-yield-guide">
               <span aria-hidden="true">i</span>
               <div>
-                <strong>実質利回りとは</strong>
-                <p>年間借地料から固定資産税や管理費、借入利息の概算を差し引いた手取り収益をもとにした利回りです。</p>
+                <strong>費用控除後利回りとは</strong>
+                <p>年間借地料から、入力した固定資産税と管理費・その他経費を差し引いた年間収支をもとにした、実質利回りの目安です。</p>
                 <a href={`${routes.knowledge}#borrow`}>
                   利回りの考え方を詳しく見る <span aria-hidden="true">→</span>
                 </a>
@@ -737,21 +657,40 @@ function MilitaryLandCalculator() {
             </aside>
           </div>
 
+          {hasLoan ? (
+            <aside className="military-loan-reference" aria-label="借入条件の参考結果">
+              <div>
+                <strong>借入条件の参考結果</strong>
+                <p>元金返済額・元利返済額は推定していません。</p>
+              </div>
+              <dl>
+                <div>
+                  <dt>概算年間利息</dt>
+                  <dd>{displayedResult.annualInterest === null ? '―' : formatYen(displayedResult.annualInterest)}</dd>
+                </div>
+                <div>
+                  <dt>利息考慮後年間収支（参考）</dt>
+                  <dd>{displayedResult.interestAdjustedAnnualIncome === null ? '―' : formatYen(displayedResult.interestAdjustedAnnualIncome)}</dd>
+                </div>
+              </dl>
+            </aside>
+          ) : null}
+
           <section className="military-future-panel" aria-labelledby="military-future-title">
             <div className="simulator-subheading">
               <div>
-                <p>FUTURE INCOME</p>
-                <h3 id="military-future-title">将来の収益シミュレーション（手取りベース）</h3>
+                <p>LONG-TERM SCENARIO</p>
+                <h3 id="military-future-title">長期収支の単純シナリオ（年間収支ベース）</h3>
               </div>
-              <span>売却諸費用は最終年に控除</span>
+              <span>現在の入力条件を固定</span>
             </div>
 
             <div className="military-future-grid">
               <article className="military-line-chart">
-                <header><strong>累計手取り収益の推移</strong><small>概算</small></header>
+                <header><strong>累計年間収支の推移</strong><small>単純計算</small></header>
                 {lineGraph ? (
                   <>
-                    <svg viewBox="0 0 600 190" role="img" aria-label="累計手取り収益の推移グラフ">
+                    <svg viewBox="0 0 600 190" role="img" aria-label="累計年間収支の推移グラフ">
                       <line x1="24" y1={lineGraph.zeroY} x2="576" y2={lineGraph.zeroY} className="military-chart-axis" />
                       <polygon points={lineGraph.area} className="military-chart-area" />
                       <polyline points={lineGraph.line} className="military-chart-line" />
@@ -768,7 +707,7 @@ function MilitaryLandCalculator() {
               </article>
 
               <article className="military-period-chart">
-                <header><strong>期間ごとの手取り収益</strong><small>概算</small></header>
+                <header><strong>期間ごとの年間収支</strong><small>単純計算</small></header>
                 {periodEarnings.length > 0 ? (
                   <div className="military-period-bars">
                     {periodEarnings.map((period) => (
@@ -785,6 +724,9 @@ function MilitaryLandCalculator() {
                 ) : <div className="military-chart-empty">条件入力後に表示します</div>}
               </article>
             </div>
+            <p className="military-future-note">
+              現在の入力条件が変わらないと仮定した単純シナリオです。将来の収益を予測・保証するものではありません。
+            </p>
           </section>
 
           <div className="military-formula-strip">
@@ -796,13 +738,13 @@ function MilitaryLandCalculator() {
               <span>売却時の諸費用（概算）</span>
               <strong>{displayedResult.saleCosts === null ? '―' : formatYen(displayedResult.saleCosts)}</strong>
             </div>
-            <p>借入利息は借入額と年率から求めた初年度相当の概算です。元金返済額は手取り収益から控除していません。</p>
+            <p>売却時の諸費用は参考条件です。現在の主要結果・長期シナリオには反映していません。</p>
           </div>
         </div>
       </div>
 
       <div className="military-calculator-footer">
-        <p className="calculator-note">本シミュレーションは現在の入力条件が継続した場合の概算です。借地料改定、税制、契約条件などにより結果は変動します。</p>
+        <p className="calculator-note">本シミュレーションは、入力した固定資産税や管理費などの条件が継続した場合の概算です。借地料改定、税制、契約条件などにより結果は変動します。</p>
         <span>データ更新日：{DATA_UPDATED_AT}</span>
       </div>
     </section>
