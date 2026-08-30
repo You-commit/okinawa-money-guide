@@ -6,6 +6,7 @@ import {
   type ChangeEvent,
   type FocusEvent,
   type FormEvent,
+  type KeyboardEvent,
 } from 'react'
 import './MortgageCalculator.css'
 import MoneyInput from './components/form/MoneyInput'
@@ -16,6 +17,7 @@ import {
   createMortgageComparisonInputKey,
   formatApproxMortgageYen,
   formatLoanAmountForDisplay,
+  MORTGAGE_LIMITS,
   normalizeAnnualRateText,
   normalizeRepaymentYearsText,
   validateMortgageFields,
@@ -190,7 +192,7 @@ function MortgageEmptyResults() {
         <header>
           <div>
             <p>PAYMENT TRAJECTORY</p>
-            <h4>返済額の推移イメージ</h4>
+            <h4>累計返済額の推移</h4>
           </div>
           <span>条件入力後に表示</span>
         </header>
@@ -260,6 +262,33 @@ const EMPTY_TOUCHED_FIELDS: TouchedFields = {
 
 const CALCULATION_ERROR_MESSAGE =
   '計算処理中に問題が発生しました。入力内容を確認して、もう一度お試しください。'
+
+const getRepaymentYearsSliderState = (
+  value: string,
+) => {
+  const normalized = normalizeRepaymentYearsText(value)
+  const parsed = Number(normalized)
+  const isValid =
+    /^\d+$/.test(normalized) &&
+    parsed >= MORTGAGE_LIMITS.repaymentYears.min &&
+    parsed <= MORTGAGE_LIMITS.repaymentYears.max
+
+  if (isValid) {
+    return {
+      value: String(parsed),
+      valueText: `${parsed}年`,
+      isEmpty: false,
+    }
+  }
+
+  return {
+    value: String(MORTGAGE_LIMITS.repaymentYears.min),
+    valueText: normalized === ''
+      ? '未入力'
+      : '入力値を確認してください',
+    isEmpty: normalized === '',
+  }
+}
 
 const hasAnyInput = (values: MortgageFieldValues) =>
   FIELD_NAMES.some((fieldName) => values[fieldName] !== '')
@@ -732,6 +761,17 @@ function MortgageCalculator() {
     )
   }
 
+  const handleFormKeyDown = (
+    event: KeyboardEvent<HTMLFormElement>,
+  ) => {
+    if (
+      event.key === 'Enter' &&
+      event.target instanceof HTMLInputElement
+    ) {
+      event.preventDefault()
+    }
+  }
+
   const handleRepaymentMethodChange = (
     method: RepaymentMethod,
   ) => {
@@ -825,6 +865,10 @@ function MortgageCalculator() {
     isManualResultStale,
     Boolean(activeCalculation),
   )
+  const repaymentYearsSlider =
+    getRepaymentYearsSliderState(
+      values.repaymentYears,
+    )
 
   return (
     <section
@@ -864,6 +908,7 @@ function MortgageCalculator() {
           className="mortgage-form"
           aria-labelledby="mortgage-title"
           onSubmit={handleSubmit}
+          onKeyDown={handleFormKeyDown}
           noValidate
         >
           <div className="simulator-panel-heading">
@@ -1139,6 +1184,34 @@ function MortgageCalculator() {
               <span>年</span>
             </div>
 
+            <div
+              className="mortgage-repayment-slider"
+              data-empty={repaymentYearsSlider.isEmpty}
+            >
+              <input
+                id="mortgage-repayment-years-slider"
+                type="range"
+                min={MORTGAGE_LIMITS.repaymentYears.min}
+                max={MORTGAGE_LIMITS.repaymentYears.max}
+                step="1"
+                value={repaymentYearsSlider.value}
+                aria-label="返済期間スライダー"
+                aria-valuetext={repaymentYearsSlider.valueText}
+                aria-describedby="mortgage-repayment-years-help"
+                onChange={(event) =>
+                  updateFieldValue(
+                    'repaymentYears',
+                    event.target.value,
+                  )
+                }
+              />
+              <output
+                htmlFor="mortgage-repayment-years-slider"
+              >
+                {repaymentYearsSlider.valueText}
+              </output>
+            </div>
+
             <small
               id="mortgage-repayment-years-help"
               className="mortgage-field__help"
@@ -1176,7 +1249,7 @@ function MortgageCalculator() {
             <p>
               {isAutoCalculation
                 ? '未操作の項目にはエラーを表示せず、有効な条件がそろった時点で自動計算します。'
-                : '入力後にEnterキー、またはシミュレートボタンで計算できます。'}
+                : '入力後にシミュレートボタンを押すと計算できます。'}
             </p>
           </div>
 
@@ -1329,7 +1402,7 @@ function MortgageCalculator() {
                   <header>
                     <div>
                       <p>PAYMENT TRAJECTORY</p>
-                      <h4 id="mortgage-trajectories-title">返済額の推移イメージ</h4>
+                      <h4 id="mortgage-trajectories-title">累計返済額の推移</h4>
                     </div>
                     <span>元金と利息の累計</span>
                   </header>
@@ -1347,6 +1420,19 @@ function MortgageCalculator() {
                       paymentCount={activeCalculation.input.paymentCount}
                     />
                   </div>
+                  <aside
+                    className="mortgage-trajectory-guide"
+                    aria-label="グラフの見方"
+                  >
+                    <strong>グラフの見方</strong>
+                    <p>
+                      濃色は累計元金、淡色は累計利息です。
+                      各時点までの返済内訳の積み上がりを示し、
+                      元利均等と元金均等の違いを比較できます。
+                      金融機関固有の端数処理などを
+                      完全に再現するものではありません。
+                    </p>
+                  </aside>
                 </section>
               )}
 

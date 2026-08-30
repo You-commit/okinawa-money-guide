@@ -1761,3 +1761,95 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Mortgage UX: synchronized repayment-period slider. */
+.mortgage-repayment-slider {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+}
+
+.mortgage-repayment-slider input {
+    width: 100%;
+    accent-color: var(--mortgage-green);
+    cursor: pointer;
+}
+
+.mortgage-repayment-slider input:focus-visible {
+    border-radius: 999px;
+    outline: 3px solid rgba(15, 118, 110, 0.18);
+    outline-offset: 4px;
+}
+
+.mortgage-repayment-slider output {
+    min-width: 5.5em;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #edf4f8;
+    color: #466277;
+    font-size: 0.7rem;
+    font-weight: 750;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.mortgage-repayment-slider[data-empty="true"] input {
+    opacity: 0.62;
+}
+
+/* Mortgage UX: concise guide for the cumulative repayment charts. */
+.mortgage-trajectory-guide {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 8px 12px;
+    padding: 9px 11px;
+    border: 1px solid #dce7f1;
+    border-radius: 9px;
+    background: #f8fbfe;
+    color: #607589;
+}
+
+.mortgage-trajectory-guide strong {
+    color: #315873;
+    font-size: 0.68rem;
+    white-space: nowrap;
+}
+
+.mortgage-trajectory-guide p {
+    margin: 0;
+    font-size: 0.64rem;
+    line-height: 1.55;
+}
+
+/* Mortgage UX: success stays visible without competing with errors. */
+.simulator-page.simulator-page--mortgage .mortgage-status[data-tone="success"] {
+    justify-self: start;
+    min-height: 28px;
+    max-width: min(100%, 32rem);
+    padding: 4px 10px;
+    border-color: #c7dfdc;
+    border-radius: 999px;
+    background: #f2f8f7;
+    color: #356a66;
+    font-size: 0.68rem;
+    line-height: 1.4;
+}
+
+.simulator-page.simulator-page--mortgage .mortgage-status[data-tone="success"] > span {
+    flex-basis: 6px;
+    width: 6px;
+    height: 6px;
+    background: #5d9993;
+}
+
+.simulator-page.simulator-page--mortgage .mortgage-status[data-tone="success"] strong {
+    font-weight: 700;
+}
+
+@media (max-width: 520px) {
+    .mortgage-trajectory-guide {
+        grid-template-columns: 1fr;
+    }
+}

@@ -84,6 +84,62 @@ describe('MortgageCalculator', () => {
                 .closest('section')
                 ?.getAttribute('data-empty'),
         ).toBe('true')
+        expect(
+            (screen.getByLabelText(
+                '返済期間スライダー',
+            ) as HTMLInputElement).value,
+        ).toBe('1')
+        expect(
+            screen
+                .getByLabelText('返済期間スライダー')
+                .getAttribute('aria-valuetext'),
+        ).toBe('未入力')
+    })
+
+    it('does not submit or validate the whole form when Enter is pressed in an incomplete field', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        const loanAmount =
+            screen.getByLabelText('借入金額')
+
+        await user.type(loanAmount, '30000000')
+        await user.type(loanAmount, '{Enter}')
+
+        expect(screen.queryByRole('alert')).toBeNull()
+        expect(
+            screen.queryByText('年利を入力してください。'),
+        ).toBeNull()
+        expect(
+            screen.queryByText('返済期間を入力してください。'),
+        ).toBeNull()
+        expect(
+            screen
+                .getByText('シミュレーション結果')
+                .closest('section')
+                ?.getAttribute('data-empty'),
+        ).toBe('true')
+    })
+
+    it('does not calculate when Enter is pressed in a field after valid input', async () => {
+        render(<MortgageCalculator />)
+        const user = await fillValidConditions()
+
+        await user.type(
+            screen.getByLabelText('返済期間'),
+            '{Enter}',
+        )
+
+        expect(
+            screen
+                .getByText('シミュレーション結果')
+                .closest('section')
+                ?.getAttribute('data-empty'),
+        ).toBe('true')
+        expect(
+            screen.queryByText('概算結果を更新しました。'),
+        ).toBeNull()
     })
 
     it('focuses the error summary after a manual submit and links to each invalid field', async () => {
@@ -99,6 +155,15 @@ describe('MortgageCalculator', () => {
 
         const errorSummary =
             await screen.findByRole('alert')
+
+        expect(errorSummary.className).toContain(
+            'mortgage-error-summary',
+        )
+        expect(
+            document
+                .querySelector('.mortgage-status')
+                ?.getAttribute('data-tone'),
+        ).not.toBe('success')
 
         expect(
             errorSummary.textContent,
@@ -177,6 +242,27 @@ describe('MortgageCalculator', () => {
         expect(screen.queryByText(/主に確認/)).toBeNull()
         expect(equalPayment.getAttribute('data-selected')).toBe('true')
         expect(
+            screen.getByRole('heading', {
+                name: '累計返済額の推移',
+            }),
+        ).toBeTruthy()
+        const graphGuide = screen.getByRole(
+            'complementary',
+            { name: 'グラフの見方' },
+        )
+        expect(graphGuide.textContent).toContain(
+            '濃色は累計元金、淡色は累計利息',
+        )
+        expect(graphGuide.textContent).toContain(
+            '金融機関固有の端数処理',
+        )
+        expect(
+            screen
+                .getByText('概算結果を更新しました。')
+                .closest('.mortgage-status')
+                ?.getAttribute('data-tone'),
+        ).toBe('success')
+        expect(
             screen
                 .getByText('概算結果')
                 .closest('section')
@@ -184,22 +270,101 @@ describe('MortgageCalculator', () => {
         ).toBe('false')
     })
 
-    it('submits through the form, supporting Enter-key form behavior', async () => {
-        const { container } = render(
-            <MortgageCalculator />,
-        )
+    it('calculates when the focused simulate button is activated with Enter', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
 
         await fillValidConditions()
 
-        const form = container.querySelector('form')
-
-        expect(form).not.toBeNull()
-
-        fireEvent.submit(form!)
+        const simulateButton = screen.getByRole(
+            'button',
+            { name: 'シミュレートする' },
+        )
+        simulateButton.focus()
+        await user.keyboard('{Enter}')
 
         expect(
             screen.getByText('概算結果'),
         ).toBeTruthy()
+        expectDefinitionValue(
+            screen.getByRole('article', {
+                name: '元利均等返済',
+            }),
+            '毎月返済額',
+            '約84,686円',
+        )
+    })
+
+    it('keeps the repayment period input and slider synchronized at both limits without calculating in manual mode', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        const periodInput = screen.getByLabelText(
+            '返済期間',
+        ) as HTMLInputElement
+        const slider = screen.getByLabelText(
+            '返済期間スライダー',
+        ) as HTMLInputElement
+
+        fireEvent.change(slider, {
+            target: { value: '2' },
+        })
+        fireEvent.change(slider, {
+            target: { value: '1' },
+        })
+        expect(periodInput.value).toBe('1')
+        expect(slider.value).toBe('1')
+
+        fireEvent.change(slider, {
+            target: { value: '50' },
+        })
+        expect(periodInput.value).toBe('50')
+        expect(slider.value).toBe('50')
+
+        await user.clear(periodInput)
+        await user.type(periodInput, '20')
+
+        expect(slider.value).toBe('20')
+        expect(slider.getAttribute('aria-valuetext')).toBe(
+            '20年',
+        )
+        expect(
+            screen
+                .getByText('シミュレーション結果')
+                .closest('section')
+                ?.getAttribute('data-empty'),
+        ).toBe('true')
+    })
+
+    it('automatically recalculates when the repayment period slider changes in auto mode', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        await user.click(screen.getByRole('checkbox', {
+            name: '入力と同時に計算結果を更新する',
+        }))
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '30000000',
+        )
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '{Enter}',
+        )
+        await user.type(
+            screen.getByLabelText('年利'),
+            '1',
+        )
+
+        fireEvent.change(
+            screen.getByLabelText('返済期間スライダー'),
+            { target: { value: '35' } },
+        )
+
+        expect(screen.getByText('概算結果')).toBeTruthy()
         expectDefinitionValue(
             screen.getByRole('article', {
                 name: '元利均等返済',
@@ -294,6 +459,7 @@ describe('MortgageCalculator', () => {
         expect(
             screen.queryByRole('alert'),
         ).toBeNull()
+        expect(document.body.textContent).not.toContain('NaN')
     })
 
     it('automatically calculates once all valid conditions are present', async () => {
@@ -440,6 +606,11 @@ describe('MortgageCalculator', () => {
             ) as HTMLInputElement).value,
         ).toBe('')
         expect(
+            screen
+                .getByLabelText('返済期間スライダー')
+                .getAttribute('aria-valuetext'),
+        ).toBe('未入力')
+        expect(
             (screen.getByRole('radio', {
                 name: /元利均等返済/,
             }) as HTMLInputElement).checked,
@@ -481,6 +652,11 @@ describe('MortgageCalculator', () => {
         expect(
             (screen.getByLabelText(
                 '返済期間',
+            ) as HTMLInputElement).value,
+        ).toBe('35')
+        expect(
+            (screen.getByLabelText(
+                '返済期間スライダー',
             ) as HTMLInputElement).value,
         ).toBe('35')
         expect(
