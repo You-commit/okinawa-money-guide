@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import MoneyInput from './components/form/MoneyInput'
+import { getMoneyInputDigits } from './utils/moneyInput'
 import {
   getBasicDeduction2026,
   taxRules2026,
@@ -120,38 +122,14 @@ const deductionFields: Array<{
     },
   ]
 
-const convertToHalfWidth = (
-  value: string,
-) => value.normalize('NFKC')
-
-const getMoneyDigits = (value: string) =>
-  convertToHalfWidth(value).replace(
-    /[^\d]/g,
-    '',
-  )
-
 const getMoneyValue = (value: string) => {
-  const digits = getMoneyDigits(value)
+  const digits = getMoneyInputDigits(value)
 
   if (digits === '') {
     return 0
   }
 
   return Number(digits)
-}
-
-const formatMoneyInput = (
-  value: string,
-) => {
-  const digits = getMoneyDigits(value)
-
-  if (digits === '') {
-    return ''
-  }
-
-  return Number(digits).toLocaleString(
-    'ja-JP',
-  )
 }
 
 const formatYen = (value: number) =>
@@ -441,45 +419,9 @@ function TaxableIncomeCalculator({
             <span>年間の給与収入</span>
 
             <div className="input-with-unit">
-              <input
-                type="text"
-                inputMode="numeric"
+              <MoneyInput
                 value={salaryRevenue}
-                onChange={(event) => {
-                  const value =
-                    event.target.value
-
-                  if (
-                    (event.nativeEvent as InputEvent).isComposing
-                  ) {
-                    handleSalaryRevenueChange(
-                      value,
-                    )
-                    return
-                  }
-
-                  handleSalaryRevenueChange(
-                    formatMoneyInput(value),
-                  )
-                }}
-                onCompositionEnd={(
-                  event,
-                ) => {
-                  handleSalaryRevenueChange(
-                    formatMoneyInput(
-                      event.currentTarget
-                        .value,
-                    ),
-                  )
-                }}
-                onBlur={(event) => {
-                  handleSalaryRevenueChange(
-                    formatMoneyInput(
-                      event.currentTarget
-                        .value,
-                    ),
-                  )
-                }}
+                onValueChange={handleSalaryRevenueChange}
                 placeholder="例：5,000,000"
               />
 
@@ -532,58 +474,16 @@ function TaxableIncomeCalculator({
                   <span>{field.label}</span>
 
                   <div className="input-with-unit">
-                    <input
-                      type="text"
-                      inputMode="numeric"
+                    <MoneyInput
                       value={
                         deductionInputs[
                         field.key
                         ]
                       }
-                      onChange={(
-                        event,
-                      ) => {
-                        const value =
-                          event.target
-                            .value
-
-                        if (
-                          (event.nativeEvent as InputEvent).isComposing
-                        ) {
-                          handleDeductionChange(
-                            field.key,
-                            value,
-                          )
-                          return
-                        }
-
+                      onValueChange={(value) => {
                         handleDeductionChange(
                           field.key,
-                          formatMoneyInput(
-                            value,
-                          ),
-                        )
-                      }}
-                      onCompositionEnd={(
-                        event,
-                      ) => {
-                        handleDeductionChange(
-                          field.key,
-                          formatMoneyInput(
-                            event
-                              .currentTarget
-                              .value,
-                          ),
-                        )
-                      }}
-                      onBlur={(event) => {
-                        handleDeductionChange(
-                          field.key,
-                          formatMoneyInput(
-                            event
-                              .currentTarget
-                              .value,
-                          ),
+                          value,
                         )
                       }}
                       placeholder="0"

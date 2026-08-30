@@ -6,6 +6,7 @@ import {
   type Ref,
 } from 'react'
 import { routes } from './app/routes'
+import MoneyInput from './components/form/MoneyInput'
 import {
   buildMilitaryLandScenario,
   calculateMilitaryLandResults,
@@ -13,6 +14,10 @@ import {
   type MilitaryLandCalculationInputs,
   type MilitaryLandCalculationResult,
 } from './militaryLandCalculation'
+import {
+  getMoneyInputDigits,
+  normalizeMoneyInputCharacters,
+} from './utils/moneyInput'
 
 type MoneyFieldProps = {
   label: string
@@ -82,22 +87,8 @@ const formatPeriodManYen = (value: number) => {
 const formatSignedExpense = (value: number) =>
   value > 0 ? `−${formatYen(value)}` : formatYen(0)
 
-const convertToHalfWidth = (value: string) =>
-  value.normalize('NFKC')
-
-const getMoneyDigits = (value: string) =>
-  convertToHalfWidth(value).replace(/[^\d]/g, '')
-
-const formatMoneyInput = (value: string) => {
-  const digits = getMoneyDigits(value)
-
-  return digits === ''
-    ? ''
-    : Number(digits).toLocaleString('ja-JP')
-}
-
 const normalizeDecimalInput = (value: string) => {
-  const converted = convertToHalfWidth(value)
+  const converted = normalizeMoneyInputCharacters(value)
     .replace(/,/g, '')
     .replace(/[^\d.]/g, '')
   const [integerPart, ...decimalParts] = converted.split('.')
@@ -108,10 +99,10 @@ const normalizeDecimalInput = (value: string) => {
 }
 
 const normalizeIntegerInput = (value: string) =>
-  convertToHalfWidth(value).replace(/[^\d]/g, '')
+  normalizeMoneyInputCharacters(value).replace(/[^\d]/g, '')
 
 const parseMoney = (value: string) =>
-  Number(getMoneyDigits(value))
+  Number(getMoneyInputDigits(value))
 
 function MoneyField({
   label,
@@ -128,30 +119,10 @@ function MoneyField({
         {required ? <em>必須</em> : null}
       </span>
       <div className="input-with-unit">
-        <input
+        <MoneyInput
           ref={inputRef}
-          type="text"
-          inputMode="numeric"
           value={value}
-          onChange={(event) => {
-            const nextValue = event.target.value
-
-            if (
-              event.nativeEvent instanceof InputEvent &&
-              event.nativeEvent.isComposing
-            ) {
-              onChange(nextValue)
-              return
-            }
-
-            onChange(formatMoneyInput(nextValue))
-          }}
-          onCompositionEnd={(event) => {
-            onChange(formatMoneyInput(event.currentTarget.value))
-          }}
-          onBlur={(event) => {
-            onChange(formatMoneyInput(event.currentTarget.value))
-          }}
+          onValueChange={onChange}
           placeholder={placeholder}
         />
         <span>円</span>

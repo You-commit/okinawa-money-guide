@@ -1,4 +1,9 @@
 import { useMemo, useState } from 'react'
+import MoneyInput from './components/form/MoneyInput'
+import {
+  getMoneyInputDigits,
+  normalizeMoneyInputCharacters,
+} from './utils/moneyInput'
 
 type NisaResult = {
   totalPrincipal: number | null
@@ -12,26 +17,8 @@ const emptyResult: NisaResult = {
   futureValue: null,
 }
 
-const convertToHalfWidth = (value: string) => {
-  return value.normalize('NFKC')
-}
-
-const getMoneyDigits = (value: string) => {
-  return convertToHalfWidth(value).replace(/[^\d]/g, '')
-}
-
-const formatMoneyInput = (value: string) => {
-  const digits = getMoneyDigits(value)
-
-  if (digits === '') {
-    return ''
-  }
-
-  return Number(digits).toLocaleString('ja-JP')
-}
-
 const normalizeDecimalInput = (value: string) => {
-  const converted = convertToHalfWidth(value)
+  const converted = normalizeMoneyInputCharacters(value)
     .replace(/,/g, '')
     .replace(/[^\d.]/g, '')
 
@@ -58,11 +45,11 @@ const calculateNisa = (
   investmentYears: string,
 ): NisaResult => {
   const initialAmount = Number(
-    getMoneyDigits(initialInvestment),
+    getMoneyInputDigits(initialInvestment),
   )
 
   const monthlyAmount = Number(
-    getMoneyDigits(monthlyContribution),
+    getMoneyInputDigits(monthlyContribution),
   )
 
   const annualRate = Number(
@@ -163,11 +150,11 @@ function NisaCalculator() {
     : manualResult ?? emptyResult
 
   const initialAmount = Number(
-    getMoneyDigits(initialInvestment),
+    getMoneyInputDigits(initialInvestment),
   )
 
   const monthlyAmount = Number(
-    getMoneyDigits(monthlyContribution),
+    getMoneyInputDigits(monthlyContribution),
   )
 
   const annualRate = Number(
@@ -346,37 +333,9 @@ function NisaCalculator() {
             <span>初期投資額（任意）</span>
 
             <div className="input-with-unit">
-              <input
-                type="text"
-                inputMode="numeric"
+              <MoneyInput
                 value={initialInvestment}
-                onChange={(event) => {
-                  const value = event.target.value
-
-                  if (event.nativeEvent instanceof InputEvent &&
-                      event.nativeEvent.isComposing) {
-                    handleInitialInvestmentChange(value)
-                    return
-                  }
-
-                  handleInitialInvestmentChange(
-                    formatMoneyInput(value),
-                  )
-                }}
-                onCompositionEnd={(event) => {
-                  handleInitialInvestmentChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                onBlur={(event) => {
-                  handleInitialInvestmentChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
+                onValueChange={handleInitialInvestmentChange}
                 placeholder="例：1,000,000"
               />
 
@@ -388,37 +347,9 @@ function NisaCalculator() {
             <span>毎月積立額</span>
 
             <div className="input-with-unit">
-              <input
-                type="text"
-                inputMode="numeric"
+              <MoneyInput
                 value={monthlyContribution}
-                onChange={(event) => {
-                  const value = event.target.value
-
-                  if (event.nativeEvent instanceof InputEvent &&
-                      event.nativeEvent.isComposing) {
-                    handleMonthlyContributionChange(value)
-                    return
-                  }
-
-                  handleMonthlyContributionChange(
-                    formatMoneyInput(value),
-                  )
-                }}
-                onCompositionEnd={(event) => {
-                  handleMonthlyContributionChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                onBlur={(event) => {
-                  handleMonthlyContributionChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
+                onValueChange={handleMonthlyContributionChange}
                 placeholder="例：30,000"
               />
 

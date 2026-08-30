@@ -1,4 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
+import MoneyInput from './components/form/MoneyInput'
+import {
+  getMoneyInputDigits,
+  normalizeMoneyInputCharacters,
+} from './utils/moneyInput'
 
 type IdecoResult = {
   annualContribution: number | null
@@ -59,26 +64,8 @@ const incomeTaxRates = [
   },
 ]
 
-const convertToHalfWidth = (value: string) => {
-  return value.normalize('NFKC')
-}
-
-const getMoneyDigits = (value: string) => {
-  return convertToHalfWidth(value).replace(/[^\d]/g, '')
-}
-
-const formatMoneyInput = (value: string) => {
-  const digits = getMoneyDigits(value)
-
-  if (digits === '') {
-    return ''
-  }
-
-  return Number(digits).toLocaleString('ja-JP')
-}
-
 const normalizeDecimalInput = (value: string) => {
-  const converted = convertToHalfWidth(value)
+  const converted = normalizeMoneyInputCharacters(value)
     .replace(/,/g, '')
     .replace(/[^\d.]/g, '')
 
@@ -106,7 +93,7 @@ const calculateIdeco = (
   contributionYears: string,
 ): IdecoResult => {
   const monthlyAmount = Number(
-    getMoneyDigits(monthlyContribution),
+    getMoneyInputDigits(monthlyContribution),
   )
 
   const incomeRate = Number(
@@ -220,7 +207,7 @@ function IdecoCalculator({
     : manualResult ?? emptyResult
 
   const monthlyAmount = Number(
-    getMoneyDigits(monthlyContribution),
+    getMoneyInputDigits(monthlyContribution),
   )
 
   const incomeRate = Number(
@@ -409,41 +396,9 @@ function IdecoCalculator({
             <span>毎月の掛金</span>
 
             <div className="input-with-unit">
-              <input
-                type="text"
-                inputMode="numeric"
+              <MoneyInput
                 value={monthlyContribution}
-                onChange={(event) => {
-                  const value = event.target.value
-
-                  if (
-                    event.nativeEvent instanceof InputEvent &&
-                    event.nativeEvent.isComposing
-                  ) {
-                    handleMonthlyContributionChange(
-                      value,
-                    )
-                    return
-                  }
-
-                  handleMonthlyContributionChange(
-                    formatMoneyInput(value),
-                  )
-                }}
-                onCompositionEnd={(event) => {
-                  handleMonthlyContributionChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
-                onBlur={(event) => {
-                  handleMonthlyContributionChange(
-                    formatMoneyInput(
-                      event.currentTarget.value,
-                    ),
-                  )
-                }}
+                onValueChange={handleMonthlyContributionChange}
                 placeholder="例：23,000"
               />
 

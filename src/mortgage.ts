@@ -1,3 +1,8 @@
+import {
+    formatMoneyInputValue,
+    normalizeMoneyInputCharacters,
+} from './utils/moneyInput'
+
 export const MORTGAGE_MODEL_VERSION = 'fixed-monthly-v1' as const
 
 export const MORTGAGE_LIMITS = {
@@ -140,7 +145,6 @@ export type MortgageTrajectoryResult =
         error: MortgageCalculationError
     }
 
-const FULL_WIDTH_NORMALIZATION_FORM = 'NFKC'
 const UNSIGNED_INTEGER_PATTERN = /^\d+$/
 const ANNUAL_RATE_PATTERN = /^\d+(?:\.\d{1,3})?$/
 const DECIMAL_PRECISION_EPSILON = 1e-9
@@ -178,7 +182,7 @@ const createFieldError = (
 
 export const convertMortgageTextToHalfWidth = (
     value: string,
-) => value.normalize(FULL_WIDTH_NORMALIZATION_FORM)
+) => normalizeMoneyInputCharacters(value)
 
 const removePermittedSeparators = (value: string) =>
     value.replace(/,/g, '').replace(/\s/g, '')
@@ -206,21 +210,9 @@ export const normalizeRepaymentYearsText = (
 
 export const formatLoanAmountForDisplay = (
     value: string,
-) => {
-    const normalized = normalizeLoanAmountText(value)
-
-    if (!UNSIGNED_INTEGER_PATTERN.test(normalized)) {
-        return convertMortgageTextToHalfWidth(value)
-    }
-
-    const canonicalDigits =
-        normalized.replace(/^0+(?=\d)/, '') || '0'
-
-    return canonicalDigits.replace(
-        /\B(?=(\d{3})+(?!\d))/g,
-        ',',
-    )
-}
+) => formatMoneyInputValue(value, {
+    invalidCharacterPolicy: 'preserve',
+})
 
 const hasAtMostThreeDecimalPlaces = (
     value: number,

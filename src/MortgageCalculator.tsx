@@ -8,6 +8,7 @@ import {
   type FormEvent,
 } from 'react'
 import './MortgageCalculator.css'
+import MoneyInput from './components/form/MoneyInput'
 import {
   calculateMortgageComparison,
   calculateMortgageTrajectory,
@@ -982,14 +983,13 @@ function MortgageCalculator() {
             </label>
 
             <div className="mortgage-input-with-unit">
-              <input
+              <MoneyInput
                 ref={loanAmountRef}
                 id="mortgage-loan-amount"
                 name="loanAmount"
-                type="text"
-                inputMode="numeric"
                 autoComplete="off"
                 value={values.loanAmount}
+                invalidCharacterPolicy="preserve"
                 placeholder="例：30,000,000"
                 aria-required="true"
                 aria-invalid={Boolean(
@@ -1000,10 +1000,10 @@ function MortgageCalculator() {
                     ? 'mortgage-loan-amount-help mortgage-loan-amount-error'
                     : 'mortgage-loan-amount-help'
                 }
-                onChange={(event) =>
-                  handleFieldChange(
+                onValueChange={(value) =>
+                  updateFieldValue(
                     'loanAmount',
-                    event,
+                    value,
                   )
                 }
                 onBlur={(event) =>
