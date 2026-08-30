@@ -99,7 +99,7 @@
       rgba(0, 117, 163, 0.62) 72%,
       rgba(0, 91, 130, 0.34) 100%
     ),
-    url('../assets/simulator-heroes/OMG-Mortgage-Hero-v1.png') center 54% / cover no-repeat;
+    url('../assets/simulator-heroes/OMG-Mortgage-Hero-v2.png') center 42% / cover no-repeat;
 }
 
 .simulator-page--mortgage .simulator-page__hero::after {
