@@ -92,8 +92,49 @@
 
 .simulator-page--mortgage .simulator-page__hero {
   background:
-    linear-gradient(105deg, rgba(6, 54, 137, 0.96), rgba(24, 126, 196, 0.7)),
-    url('../assets/top-hero/OMG-TOP-HERO-PHOTO-ISHIGAKI-APPROVED-v1.0-20260816.png') center 48% / cover no-repeat;
+    linear-gradient(
+      96deg,
+      rgba(3, 35, 92, 0.97) 0%,
+      rgba(5, 66, 137, 0.9) 42%,
+      rgba(0, 117, 163, 0.62) 72%,
+      rgba(0, 91, 130, 0.34) 100%
+    ),
+    url('../assets/simulator-heroes/OMG-Mortgage-Hero-v1.png') center 54% / cover no-repeat;
+}
+
+.simulator-page--mortgage .simulator-page__hero::after {
+  right: -2%;
+  bottom: -1px;
+  left: -2%;
+  width: auto;
+  height: 42px;
+  border: 0;
+  border-radius: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 31C180-12 346 56 570 31c236-26 380 26 570 3 126-15 211-5 300-25v55H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.simulator-page--mortgage .simulator-page__hero-inner {
+  padding-bottom: 48px;
+}
+
+.simulator-page--mortgage .simulator-page__benefits article {
+  border-color: rgba(207, 235, 255, 0.45);
+  background: rgba(9, 72, 133, 0.58);
+}
+
+.simulator-page--mortgage .simulator-page__benefits small {
+  color: rgba(239, 249, 255, 0.86);
+}
+
+.simulator-page--mortgage .simulator-page__main {
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+.simulator-page--mortgage .simulator-page__calculator {
+  border-top: 1px solid #dce8ef;
 }
 
 .simulator-page--nisa {
