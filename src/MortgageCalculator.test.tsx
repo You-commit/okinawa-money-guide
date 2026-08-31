@@ -258,6 +258,20 @@ describe('MortgageCalculator', () => {
             '最終回返済額',
             '約71,488円',
         )
+        const comparison = screen.getByRole('note')
+        expectDefinitionValue(
+            comparison,
+            '初回返済額の差',
+            '約11,743円',
+        )
+        expectDefinitionValue(
+            comparison,
+            '支払利息の差',
+            '約305,498円',
+        )
+        expect(
+            screen.queryByText('総返済額の差'),
+        ).toBeNull()
         expect(screen.getByText('元金均等返済は、元利均等返済より初回返済額が約11,743円高い一方、支払利息総額は約305,498円少ない試算です。')).toBeTruthy()
         expect(screen.getByText('強調して表示する返済方式')).toBeTruthy()
         expect(within(equalPayment).getByText('選択中')).toBeTruthy()
@@ -290,6 +304,48 @@ describe('MortgageCalculator', () => {
                 .closest('section')
                 ?.getAttribute('data-empty'),
         ).toBe('false')
+    })
+
+    it('shows zero comparison differences without unnatural directional copy at zero interest', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '30000000',
+        )
+        await user.type(
+            screen.getByLabelText('年利'),
+            '0',
+        )
+        await user.type(
+            screen.getByLabelText('返済期間'),
+            '35',
+        )
+        await user.click(
+            screen.getByRole('button', {
+                name: 'シミュレートする',
+            }),
+        )
+
+        const comparison = screen.getByRole('note')
+        expectDefinitionValue(
+            comparison,
+            '初回返済額の差',
+            '0円',
+        )
+        expectDefinitionValue(
+            comparison,
+            '支払利息の差',
+            '0円',
+        )
+        expect(within(comparison).getByText(
+            'この条件では、元利均等返済と元金均等返済の初回返済額と支払利息総額に差はありません。',
+        )).toBeTruthy()
+        expect(comparison.textContent).not.toMatch(
+            /0円(?:高い|低い|多い|少ない)/,
+        )
     })
 
     it('calculates when the focused simulate button is activated with Enter', async () => {

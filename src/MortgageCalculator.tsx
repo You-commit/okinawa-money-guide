@@ -68,6 +68,14 @@ type MortgageTrajectoryChartProps = {
 const formatMortgageChartYen = (value: number) =>
   `${Math.round(value / 10_000).toLocaleString('ja-JP')}万円`
 
+const formatMortgageDifferenceYen = (value: number) => {
+  const absoluteDifference = Math.abs(value)
+
+  return Math.round(absoluteDifference) === 0
+    ? '0円'
+    : formatApproxMortgageYen(absoluteDifference)
+}
+
 function MortgageTrajectoryChart({
   title,
   tone,
@@ -181,7 +189,7 @@ function MortgageEmptyResults() {
             <h4>2方式の差額</h4>
           </header>
           <dl>
-            <div><dt>総返済額の差</dt><dd>―</dd></div>
+            <div><dt>初回返済額の差</dt><dd>―</dd></div>
             <div><dt>支払利息の差</dt><dd>―</dd></div>
           </dl>
           <p>条件を入力すると、2つの返済方式の差額を表示します。</p>
@@ -1383,12 +1391,12 @@ function MortgageCalculator() {
                   </header>
                   <dl>
                     <div>
-                      <dt>総返済額の差</dt>
-                      <dd>{formatApproxMortgageYen(Math.abs(activeCalculation.comparison.differences.totalPayment))}</dd>
+                      <dt>初回返済額の差</dt>
+                      <dd>{formatMortgageDifferenceYen(activeCalculation.comparison.differences.firstPayment)}</dd>
                     </div>
                     <div>
                       <dt>支払利息の差</dt>
-                      <dd>{formatApproxMortgageYen(Math.abs(activeCalculation.comparison.differences.totalInterest))}</dd>
+                      <dd>{formatMortgageDifferenceYen(activeCalculation.comparison.differences.totalInterest)}</dd>
                     </div>
                   </dl>
                   <p>{createMortgageComparisonExplanation(activeCalculation.comparison)}</p>
