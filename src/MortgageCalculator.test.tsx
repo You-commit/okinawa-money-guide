@@ -50,6 +50,28 @@ const expectDefinitionValue = (
     expect(within(row!).getByText(value)).toBeTruthy()
 }
 
+const expectManualResultCleared = () => {
+    expect(
+        screen
+            .getByText('シミュレーション結果')
+            .closest('section')
+            ?.getAttribute('data-empty'),
+    ).toBe('true')
+    expect(screen.queryByText('約84,686円')).toBeNull()
+    expect(document.querySelectorAll(
+        '.mortgage-trajectory--empty',
+    )).toHaveLength(2)
+    expect(screen.getByText(
+        '条件を変更しました。シミュレートすると結果を更新します。',
+    )).toBeTruthy()
+    expect(screen.queryByText(
+        /前回の結果を表示しています/,
+    )).toBeNull()
+    expect(screen.queryByText(
+        /条件変更前の結果です/,
+    )).toBeNull()
+}
+
 describe('MortgageCalculator', () => {
     afterEach(() => {
         cleanup()
@@ -374,7 +396,7 @@ describe('MortgageCalculator', () => {
         )
     })
 
-    it('marks a previous manual result as stale after conditions change', async () => {
+    it('clears the previous manual result after an annual-rate change and recalculates only on simulate', async () => {
         render(<MortgageCalculator />)
 
         const user = await fillValidConditions()
@@ -391,21 +413,29 @@ describe('MortgageCalculator', () => {
         await user.clear(annualRate)
         await user.type(annualRate, '1.5')
 
-        expect(
-            screen.getByText(
-                '条件が変更されました。再計算してください。前回の結果を表示しています。',
-            ),
-        ).toBeTruthy()
-        expect(
-            screen.getByText('前回の概算結果'),
-        ).toBeTruthy()
-        expectDefinitionValue(
-            screen.getByRole('article', {
-                name: '元利均等返済',
-            }),
-            '毎月返済額',
-            '約84,686円',
+        expectManualResultCleared()
+        expect(screen.queryByRole('alert')).toBeNull()
+
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const recalculatedResult = screen.getByRole(
+            'article',
+            { name: '元利均等返済' },
         )
+        expect(within(recalculatedResult).queryByText(
+            '約84,686円',
+        )).toBeNull()
+        expect(screen.getByText(
+            '概算結果を更新しました。',
+        )).toBeTruthy()
+        expect(screen.queryByText(
+            '条件を変更しました。シミュレートすると結果を更新します。',
+        )).toBeNull()
+        expect(screen.queryByText(
+            /前回の結果を表示しています/,
+        )).toBeNull()
     })
 
     it('keeps an invalid loan amount edit validation-free in manual mode until simulate is requested again', async () => {
@@ -422,9 +452,7 @@ describe('MortgageCalculator', () => {
 
         await user.clear(loanAmount)
 
-        expect(screen.getByText(
-            '条件が変更されました。再計算してください。前回の結果を表示しています。',
-        )).toBeTruthy()
+        expectManualResultCleared()
         expect(screen.queryByRole('alert')).toBeNull()
         expect(screen.queryByText(
             '借入金額を入力してください。',
@@ -490,6 +518,37 @@ describe('MortgageCalculator', () => {
         expect(
             repaymentYears.getAttribute('aria-invalid'),
         ).toBe('false')
+    })
+
+    it('clears manual results for both repayment-period input and slider changes', async () => {
+        render(<MortgageCalculator />)
+
+        const user = await fillValidConditions()
+        const simulateButton = screen.getByRole('button', {
+            name: 'シミュレートする',
+        })
+        await user.click(simulateButton)
+
+        const repaymentYears = screen.getByLabelText(
+            '返済期間',
+        )
+        await user.clear(repaymentYears)
+        await user.type(repaymentYears, '20')
+
+        expectManualResultCleared()
+
+        await user.click(simulateButton)
+        expect(screen.getByRole('article', {
+            name: '元利均等返済',
+        })).toBeTruthy()
+
+        fireEvent.change(
+            screen.getByLabelText('返済期間スライダー'),
+            { target: { value: '25' } },
+        )
+
+        expectManualResultCleared()
+        expect(screen.queryByRole('alert')).toBeNull()
     })
 
     it('clears submitted manual errors when editing resumes and does not revalidate during input', async () => {
@@ -566,6 +625,12 @@ describe('MortgageCalculator', () => {
         expect(screen.getByText(
             '概算結果を更新しました。',
         )).toBeTruthy()
+        expect(screen.queryByText(
+            '条件を変更しました。シミュレートすると結果を更新します。',
+        )).toBeNull()
+        expect(screen.queryByText(
+            /前回の結果を表示しています/,
+        )).toBeNull()
     })
 
     it('does not show required errors for untouched fields in auto mode', async () => {

@@ -46,6 +46,7 @@ type ResetSnapshot = {
   isAutoCalculation: boolean
   hasSubmitted: boolean
   manualCalculation: StoredCalculation | null
+  isManualCalculationInvalidated: boolean
   manualCalculationError: MortgageCalculationError | null
 }
 
@@ -55,7 +56,6 @@ type CalculatorViewState =
   | 'invalid'
   | 'ready'
   | 'calculated'
-  | 'stale'
   | 'calculation-error'
 
 type MortgageTrajectoryChartProps = {
@@ -352,14 +352,7 @@ const createStoredCalculation = (
   comparison,
 })
 
-const getResultHeading = (
-  isStale: boolean,
-  hasResult: boolean,
-) => {
-  if (isStale) {
-    return '前回の概算結果'
-  }
-
+const getResultHeading = (hasResult: boolean) => {
   if (hasResult) {
     return '概算結果'
   }
@@ -369,7 +362,6 @@ const getResultHeading = (
 
 const getStatusMessage = (
   viewState: CalculatorViewState,
-  hasVisibleErrors: boolean,
 ) => {
   switch (viewState) {
     case 'idle':
@@ -382,10 +374,6 @@ const getStatusMessage = (
       return '入力内容を確認し、シミュレートしてください。'
     case 'calculated':
       return '概算結果を更新しました。'
-    case 'stale':
-      return hasVisibleErrors
-        ? '条件が変更され、入力内容にも確認が必要です。前回の結果を表示しています。'
-        : '条件が変更されました。再計算してください。前回の結果を表示しています。'
     case 'calculation-error':
       return CALCULATION_ERROR_MESSAGE
   }
@@ -398,8 +386,6 @@ const getStatusTone = (
     case 'invalid':
     case 'calculation-error':
       return 'error'
-    case 'stale':
-      return 'warning'
     case 'calculated':
       return 'success'
     case 'ready':
@@ -426,6 +412,10 @@ function MortgageCalculator() {
     useState(false)
   const [manualCalculation, setManualCalculation] =
     useState<StoredCalculation | null>(null)
+  const [
+    isManualCalculationInvalidated,
+    setIsManualCalculationInvalidated,
+  ] = useState(false)
   const [
     manualCalculationError,
     setManualCalculationError,
@@ -556,17 +546,14 @@ function MortgageCalculator() {
     pendingErrorSummaryFocusRef.current = false
   }, [shouldShowErrorSummary])
 
-  const isManualResultStale =
-    !isAutoCalculation &&
-    manualCalculation !== null &&
-    currentInputKey !== manualCalculation.inputKey
-
   const activeCalculation =
     isAutoCalculation
       ? autoCalculationOutcome?.ok
         ? autoCalculationOutcome.stored
         : null
-      : manualCalculation
+      : isManualCalculationInvalidated
+        ? null
+        : manualCalculation
 
   const mortgageTrajectories = useMemo(() => {
     if (activeCalculation === null) {
@@ -609,10 +596,6 @@ function MortgageCalculator() {
       return 'calculation-error'
     }
 
-    if (isManualResultStale) {
-      return 'stale'
-    }
-
     if (hasVisibleErrors) {
       return 'invalid'
     }
@@ -644,10 +627,7 @@ function MortgageCalculator() {
 
   const statusMessage =
     statusMessageOverride ??
-    getStatusMessage(
-      viewState,
-      hasVisibleErrors,
-    )
+    getStatusMessage(viewState)
 
   const updateFieldValue = (
     fieldName: MortgageFieldName,
@@ -660,6 +640,10 @@ function MortgageCalculator() {
       pendingErrorSummaryFocusRef.current = false
       setHasSubmitted(false)
       setTouchedFields(EMPTY_TOUCHED_FIELDS)
+      setIsManualCalculationInvalidated(
+        (currentInvalidated) =>
+          currentInvalidated || manualCalculation !== null,
+      )
     }
 
     setValues((currentValues) => ({
@@ -770,6 +754,7 @@ function MortgageCalculator() {
         calculation.comparison,
       ),
     )
+    setIsManualCalculationInvalidated(false)
   }
 
   const handleFormKeyDown = (
@@ -804,6 +789,7 @@ function MortgageCalculator() {
       setManualCalculation(
         autoCalculationOutcome.stored,
       )
+      setIsManualCalculationInvalidated(false)
     }
 
     pendingErrorSummaryFocusRef.current = false
@@ -823,6 +809,7 @@ function MortgageCalculator() {
         isAutoCalculation,
         hasSubmitted,
         manualCalculation,
+        isManualCalculationInvalidated,
         manualCalculationError,
       })
       setStatusMessageOverride(
@@ -840,6 +827,7 @@ function MortgageCalculator() {
     setIsAutoCalculation(false)
     setHasSubmitted(false)
     setManualCalculation(null)
+    setIsManualCalculationInvalidated(false)
     setManualCalculationError(null)
 
     if (!shouldOfferUndo) {
@@ -859,6 +847,9 @@ function MortgageCalculator() {
     setIsAutoCalculation(resetSnapshot.isAutoCalculation)
     setHasSubmitted(resetSnapshot.hasSubmitted)
     setManualCalculation(resetSnapshot.manualCalculation)
+    setIsManualCalculationInvalidated(
+      resetSnapshot.isManualCalculationInvalidated,
+    )
     setManualCalculationError(
       resetSnapshot.manualCalculationError,
     )
@@ -873,7 +864,6 @@ function MortgageCalculator() {
   }
 
   const resultHeading = getResultHeading(
-    isManualResultStale,
     Boolean(activeCalculation),
   )
   const repaymentYearsSlider =
@@ -1318,7 +1308,6 @@ function MortgageCalculator() {
         <section
           className="mortgage-results"
           aria-labelledby="mortgage-result-title"
-          data-stale={isManualResultStale}
           data-empty={
             activeCalculation === null &&
             calculationError === null
@@ -1337,15 +1326,13 @@ function MortgageCalculator() {
 
           </div>
 
-          {isManualResultStale && (
-            <div
-              className="mortgage-stale-note"
-              role="note"
-            >
-              条件変更前の結果です。現在の条件を反映するには、
-              もう一度シミュレートしてください。
-            </div>
-          )}
+          {!isAutoCalculation &&
+            isManualCalculationInvalidated &&
+            !hasVisibleErrors && (
+              <p className="mortgage-results-helper">
+                条件を変更しました。シミュレートすると結果を更新します。
+              </p>
+            )}
 
           {getCalculationErrorLabel(
             calculationError,
