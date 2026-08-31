@@ -173,7 +173,7 @@ function MortgageEmptyResults() {
               </div>
             </header>
             <dl className="mortgage-comparison-card__values">
-              {['毎月返済額', '最終回返済額', '総返済額', '支払利息総額'].map((label) => (
+              {['毎月返済額', '初年度年間返済額（概算）', '最終回返済額', '総返済額', '支払利息総額'].map((label) => (
                 <div key={label}>
                   <dt>{label}</dt>
                   <dd>―</dd>
@@ -1365,6 +1365,7 @@ function MortgageCalculator() {
                   </header>
                   <dl className="mortgage-comparison-card__values">
                     <div><dt>毎月返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.firstPayment)}</dd><small>毎月の返済額が原則一定</small></div>
+                    <div><dt>初年度年間返済額（概算）</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.firstYearPaymentTotal)}</dd></div>
                     <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.lastPayment)}</dd></div>
                     <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.totalPayment)}</dd></div>
                     <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.totalInterest)}</dd></div>
@@ -1378,6 +1379,7 @@ function MortgageCalculator() {
                   </header>
                   <dl className="mortgage-comparison-card__values">
                     <div><dt>初回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.firstPayment)}</dd><small>返済額は徐々に減少</small></div>
+                    <div><dt>初年度年間返済額（概算）</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.firstYearPaymentTotal)}</dd></div>
                     <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.lastPayment)}</dd></div>
                     <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.totalPayment)}</dd></div>
                     <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.totalInterest)}</dd></div>

@@ -253,6 +253,13 @@ describe('fixed monthly mortgage model', () => {
             84_685.70968101347,
             6,
         )
+        expect(result.firstYearPaymentTotal).toBeCloseTo(
+            result.firstPayment * 12,
+            6,
+        )
+        expect(roundMortgageYen(result.firstYearPaymentTotal)).toBe(
+            1_016_229,
+        )
         expect(roundMortgageYen(result.firstPayment)).toBe(84_686)
         expect(roundMortgageYen(result.totalPayment)).toBe(
             35_567_998,
@@ -272,6 +279,9 @@ describe('fixed monthly mortgage model', () => {
         )
 
         expect(roundMortgageYen(result.firstPayment)).toBe(96_429)
+        expect(roundMortgageYen(result.firstYearPaymentTotal)).toBe(
+            1_153_214,
+        )
         expect(roundMortgageYen(result.lastPayment)).toBe(71_488)
         expect(roundMortgageYen(result.totalPayment)).toBe(
             35_262_500,
@@ -304,8 +314,83 @@ describe('fixed monthly mortgage model', () => {
             expect(result.lastPayment).toBe(
                 input.principal / paymentCount,
             )
+            expect(result.firstYearPaymentTotal).toBe(
+                input.principal / paymentCount * 12,
+            )
         },
     )
+
+    it('sums the first 12 unrounded equal-principal payments instead of multiplying the first payment', () => {
+        const result = expectSuccessfulCalculation(
+            standardInput,
+            'equal-principal',
+        )
+        const principalPayment =
+            standardInput.principal /
+            standardInput.paymentCount
+        const monthlyRate =
+            standardInput.annualRate / 100 / 12
+        const expectedFirstYearPaymentTotal = Array.from(
+            { length: 12 },
+            (_, index) =>
+                principalPayment +
+                (
+                    standardInput.principal -
+                    index * principalPayment
+                ) * monthlyRate,
+        ).reduce((total, payment) => total + payment, 0)
+
+        expect(result.firstYearPaymentTotal).toBeCloseTo(
+            expectedFirstYearPaymentTotal,
+            6,
+        )
+        expect(result.firstYearPaymentTotal).not.toBeCloseTo(
+            result.firstPayment * 12,
+            6,
+        )
+    })
+
+    it('calculates first-year totals for the 20 million yen reference case', () => {
+        const input: MortgageInput = {
+            principal: 20_000_000,
+            annualRate: 1,
+            paymentCount: 420,
+        }
+        const equalPayment = expectSuccessfulCalculation(
+            input,
+            'equal-payment',
+        )
+        const equalPrincipal = expectSuccessfulCalculation(
+            input,
+            'equal-principal',
+        )
+
+        expect(roundMortgageYen(
+            equalPayment.firstYearPaymentTotal,
+        )).toBe(677_486)
+        expect(roundMortgageYen(
+            equalPrincipal.firstYearPaymentTotal,
+        )).toBe(768_810)
+    })
+
+    it.each([
+        'equal-payment' as const,
+        'equal-principal' as const,
+    ])('matches the total payment during a one-year %s term', (method) => {
+        const result = expectSuccessfulCalculation(
+            {
+                principal: 30_000_000,
+                annualRate: 1,
+                paymentCount: 12,
+            },
+            method,
+        )
+
+        expect(result.firstYearPaymentTotal).toBeCloseTo(
+            result.totalPayment,
+            6,
+        )
+    })
 
     it('keeps the lower boundary finite and above zero when displayed', () => {
         const result = expectSuccessfulCalculation(
@@ -337,6 +422,7 @@ describe('fixed monthly mortgage model', () => {
 
             for (const value of [
                 result.firstPayment,
+                result.firstYearPaymentTotal,
                 result.lastPayment,
                 result.totalPayment,
                 result.totalInterest,
@@ -493,6 +579,7 @@ describe('mortgage repayment comparison', () => {
             equalPayment: {
                 method: 'equal-payment',
                 firstPayment: 100,
+                firstYearPaymentTotal: 1_200,
                 lastPayment: 100,
                 totalPayment: 1_100,
                 totalInterest: 1_000,
@@ -502,6 +589,7 @@ describe('mortgage repayment comparison', () => {
             equalPrincipal: {
                 method: 'equal-principal',
                 firstPayment: 90,
+                firstYearPaymentTotal: 1_020,
                 lastPayment: 80,
                 totalPayment: 1_300,
                 totalInterest: 1_200,
@@ -532,6 +620,7 @@ describe('mortgage repayment comparison', () => {
             equalPayment: {
                 method: 'equal-payment',
                 firstPayment: 100,
+                firstYearPaymentTotal: 1_200,
                 lastPayment: 100,
                 totalPayment: 1_100,
                 totalInterest: 1_000,
@@ -541,6 +630,7 @@ describe('mortgage repayment comparison', () => {
             equalPrincipal: {
                 method: 'equal-principal',
                 firstPayment: 100,
+                firstYearPaymentTotal: 1_100,
                 lastPayment: 80,
                 totalPayment: 1_000,
                 totalInterest: 900,

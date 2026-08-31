@@ -249,9 +249,19 @@ describe('MortgageCalculator', () => {
             '約84,686円',
         )
         expectDefinitionValue(
+            equalPayment,
+            '初年度年間返済額（概算）',
+            '約1,016,229円',
+        )
+        expectDefinitionValue(
             equalPrincipal,
             '初回返済額',
             '約96,429円',
+        )
+        expectDefinitionValue(
+            equalPrincipal,
+            '初年度年間返済額（概算）',
+            '約1,153,214円',
         )
         expectDefinitionValue(
             equalPrincipal,

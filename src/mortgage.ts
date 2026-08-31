@@ -87,6 +87,7 @@ export type MortgageCalculationError =
 export type RepaymentSummary = {
     method: RepaymentMethod
     firstPayment: number
+    firstYearPaymentTotal: number
     lastPayment: number
     totalPayment: number
     totalInterest: number
@@ -476,10 +477,12 @@ export const calculateMortgage = (
             monthlyRate === 0
                 ? 0
                 : totalPayment - principal
+        const firstYearPaymentTotal = payment * 12
 
         if (
             !allValuesAreFiniteAndNonNegative([
                 payment,
+                firstYearPaymentTotal,
                 totalPayment,
                 totalInterest,
             ])
@@ -495,6 +498,7 @@ export const calculateMortgage = (
             result: {
                 method,
                 firstPayment: payment,
+                firstYearPaymentTotal,
                 lastPayment: payment,
                 totalPayment,
                 totalInterest,
@@ -507,6 +511,12 @@ export const calculateMortgage = (
     const principalPayment = principal / paymentCount
     const firstPayment =
         principalPayment + principal * monthlyRate
+    const firstYearPaymentTotal = Array.from(
+        { length: 12 },
+        (_, index) =>
+            principalPayment +
+            (principal - index * principalPayment) * monthlyRate,
+    ).reduce((total, payment) => total + payment, 0)
     const lastPayment =
         principalPayment + principalPayment * monthlyRate
     const totalInterest =
@@ -519,6 +529,7 @@ export const calculateMortgage = (
         !allValuesAreFiniteAndNonNegative([
             principalPayment,
             firstPayment,
+            firstYearPaymentTotal,
             lastPayment,
             totalPayment,
             totalInterest,
@@ -535,6 +546,7 @@ export const calculateMortgage = (
         result: {
             method,
             firstPayment,
+            firstYearPaymentTotal,
             lastPayment,
             totalPayment,
             totalInterest,
