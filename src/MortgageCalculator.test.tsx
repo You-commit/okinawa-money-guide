@@ -408,6 +408,166 @@ describe('MortgageCalculator', () => {
         )
     })
 
+    it('keeps an invalid loan amount edit validation-free in manual mode until simulate is requested again', async () => {
+        render(<MortgageCalculator />)
+
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const loanAmount = screen.getByLabelText(
+            '借入金額',
+        )
+
+        await user.clear(loanAmount)
+
+        expect(screen.getByText(
+            '条件が変更されました。再計算してください。前回の結果を表示しています。',
+        )).toBeTruthy()
+        expect(screen.queryByRole('alert')).toBeNull()
+        expect(screen.queryByText(
+            '借入金額を入力してください。',
+        )).toBeNull()
+        expect(loanAmount.getAttribute('aria-invalid')).toBe(
+            'false',
+        )
+
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        expect(await screen.findByRole('alert')).toBeTruthy()
+        expect(document.getElementById(
+            'mortgage-loan-amount-error',
+        )?.textContent).toBe(
+            '借入金額を入力してください。',
+        )
+        expect(loanAmount.getAttribute('aria-invalid')).toBe(
+            'true',
+        )
+    })
+
+    it('does not show validation while the annual rate is cleared in manual mode', async () => {
+        render(<MortgageCalculator />)
+
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const annualRate = screen.getByLabelText('年利')
+        await user.clear(annualRate)
+        await user.tab()
+
+        expect(screen.queryByRole('alert')).toBeNull()
+        expect(screen.queryByText(
+            '年利を入力してください。',
+        )).toBeNull()
+        expect(annualRate.getAttribute('aria-invalid')).toBe(
+            'false',
+        )
+    })
+
+    it('does not show validation while the repayment period is deleted in manual mode', async () => {
+        render(<MortgageCalculator />)
+
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const repaymentYears = screen.getByLabelText(
+            '返済期間',
+        )
+        await user.clear(repaymentYears)
+        await user.type(repaymentYears, '{Enter}')
+
+        expect(screen.queryByRole('alert')).toBeNull()
+        expect(screen.queryByText(
+            '返済期間を入力してください。',
+        )).toBeNull()
+        expect(
+            repaymentYears.getAttribute('aria-invalid'),
+        ).toBe('false')
+    })
+
+    it('clears submitted manual errors when editing resumes and does not revalidate during input', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        expect(await screen.findByRole('alert')).toBeTruthy()
+        expect(screen.getByLabelText(
+            '借入金額',
+        ).getAttribute('aria-invalid')).toBe('true')
+
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '30000000',
+        )
+
+        expect(screen.queryByRole('alert')).toBeNull()
+        expect(screen.queryByText(
+            '年利を入力してください。',
+        )).toBeNull()
+        expect(screen.queryByText(
+            '返済期間を入力してください。',
+        )).toBeNull()
+        expect(screen.getByLabelText(
+            '借入金額',
+        ).getAttribute('aria-invalid')).toBe('false')
+    })
+
+    it('shows real-time validation in auto mode and clears it after a valid correction', async () => {
+        const user = userEvent.setup()
+
+        render(<MortgageCalculator />)
+
+        await user.click(screen.getByRole('checkbox', {
+            name: '入力と同時に計算結果を更新する',
+        }))
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '30000000',
+        )
+        await user.type(
+            screen.getByLabelText('年利'),
+            '1',
+        )
+        await user.type(
+            screen.getByLabelText('返済期間'),
+            '35',
+        )
+
+        const annualRate = screen.getByLabelText('年利')
+        await user.clear(annualRate)
+
+        expect(screen.getByText(
+            '年利を入力してください。',
+        )).toBeTruthy()
+        expect(annualRate.getAttribute('aria-invalid')).toBe(
+            'true',
+        )
+        expect(document.body.textContent).not.toContain('NaN')
+
+        await user.type(annualRate, '1.5')
+
+        expect(screen.queryByText(
+            '年利を入力してください。',
+        )).toBeNull()
+        expect(annualRate.getAttribute('aria-invalid')).toBe(
+            'false',
+        )
+        expect(screen.getByText(
+            '概算結果を更新しました。',
+        )).toBeTruthy()
+    })
+
     it('does not show required errors for untouched fields in auto mode', async () => {
         const user = userEvent.setup()
 

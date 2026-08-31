@@ -500,15 +500,17 @@ function MortgageCalculator() {
     }
 
     const errors: MortgageFieldErrors = {}
-    const showAllErrors =
-      !isAutoCalculation && hasSubmitted
+
+    if (!isAutoCalculation && !hasSubmitted) {
+      return errors
+    }
 
     for (const fieldName of FIELD_NAMES) {
       const error = validation.errors[fieldName]
 
       if (
         error &&
-        (showAllErrors || touchedFields[fieldName])
+        (!isAutoCalculation || touchedFields[fieldName])
       ) {
         errors[fieldName] = error
       }
@@ -650,8 +652,16 @@ function MortgageCalculator() {
   const updateFieldValue = (
     fieldName: MortgageFieldName,
     value: string,
+    clearManualValidation = true,
   ) => {
     dismissResetUndo()
+
+    if (!isAutoCalculation && clearManualValidation) {
+      pendingErrorSummaryFocusRef.current = false
+      setHasSubmitted(false)
+      setTouchedFields(EMPTY_TOUCHED_FIELDS)
+    }
+
     setValues((currentValues) => ({
       ...currentValues,
       [fieldName]: value,
@@ -681,6 +691,7 @@ function MortgageCalculator() {
         fieldName,
         event.currentTarget.value,
       ),
+      false,
     )
   }
 

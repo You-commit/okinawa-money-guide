@@ -106,7 +106,7 @@ describe('simulator money fields', () => {
     expect(inputValue(loanAmount)).toBe('10,000,000')
   })
 
-  it('formats the mortgage loan amount while retaining its existing validation', () => {
+  it('formats the mortgage loan amount and validates it only after an explicit manual simulation', () => {
     render(<MortgageCalculator />)
 
     const loanAmount = screen.getByLabelText('借入金額')
@@ -121,8 +121,18 @@ describe('simulator money fields', () => {
     fireEvent.blur(loanAmount)
     expect(inputValue(loanAmount)).toBe('100円')
     expect(
-      screen.getByText('借入金額は数字だけで入力してください。'),
-    ).toBeTruthy()
+      screen.queryByText('借入金額は数字だけで入力してください。'),
+    ).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', {
+      name: 'シミュレートする',
+    }))
+
+    expect(document.getElementById(
+      'mortgage-loan-amount-error',
+    )?.textContent).toBe(
+      '借入金額は数字だけで入力してください。',
+    )
   })
 
   it('formats and resets both NISA money fields', () => {
