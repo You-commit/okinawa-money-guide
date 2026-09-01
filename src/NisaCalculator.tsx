@@ -4,6 +4,11 @@ import {
   getMoneyInputDigits,
   normalizeMoneyInputCharacters,
 } from './utils/moneyInput'
+import {
+  NISA_INPUT_LIMITS,
+  calculateCurrentFutureValueWithInitialInvestment,
+  roundHalfUp,
+} from './nisaCalculation'
 
 type NisaResult = {
   totalPrincipal: number | null
@@ -20,15 +25,19 @@ const emptyResult: NisaResult = {
 const normalizeDecimalInput = (value: string) => {
   const converted = normalizeMoneyInputCharacters(value)
     .replace(/,/g, '')
+    .replace(/\s/g, '')
+  const sign = converted.startsWith('-') ? '-' : ''
+  const unsignedValue = converted
+    .replace(/-/g, '')
     .replace(/[^\d.]/g, '')
 
-  const [integerPart, ...decimalParts] = converted.split('.')
+  const [integerPart, ...decimalParts] = unsignedValue.split('.')
 
   if (decimalParts.length === 0) {
-    return integerPart
+    return `${sign}${integerPart}`
   }
 
-  return `${integerPart}.${decimalParts.join('')}`
+  return `${sign}${integerPart}.${decimalParts.join('')}`
 }
 
 const formatYen = (value: number) =>
@@ -36,7 +45,47 @@ const formatYen = (value: number) =>
     style: 'currency',
     currency: 'JPY',
     maximumFractionDigits: 0,
-  }).format(Math.round(value))
+  }).format(roundHalfUp(value))
+
+const getInvestmentMonths = (investmentYears: string) => {
+  const years = Number(normalizeDecimalInput(investmentYears))
+  const months = years * 12
+
+  if (
+    !Number.isFinite(months) ||
+    !Number.isInteger(months) ||
+    months < NISA_INPUT_LIMITS.months.min ||
+    months > NISA_INPUT_LIMITS.months.max
+  ) {
+    return null
+  }
+
+  return months
+}
+
+const calculateCurrentNisa = (
+  initialAmount: number,
+  monthlyAmount: number,
+  annualRate: number,
+  months: number,
+): NisaResult => {
+  try {
+    const result = calculateCurrentFutureValueWithInitialInvestment({
+      initialInvestment: initialAmount,
+      monthlyContribution: monthlyAmount,
+      annualRatePercent: annualRate,
+      months,
+    })
+
+    return {
+      totalPrincipal: result.principal,
+      investmentGain: result.gain,
+      futureValue: result.futureValue,
+    }
+  } catch {
+    return emptyResult
+  }
+}
 
 const calculateNisa = (
   initialInvestment: string,
@@ -56,58 +105,29 @@ const calculateNisa = (
     normalizeDecimalInput(annualReturnRate),
   )
 
-  const years = Number(
-    normalizeDecimalInput(investmentYears),
-  )
+  const months = getInvestmentMonths(investmentYears)
 
   if (
+    !Number.isFinite(initialAmount) ||
+    !Number.isFinite(monthlyAmount) ||
+    !Number.isFinite(annualRate) ||
     initialAmount < 0 ||
     monthlyAmount < 0 ||
-    annualRate < 0 ||
-    years <= 0 ||
+    monthlyAmount > NISA_INPUT_LIMITS.monthlyContribution.max ||
+    annualRate < NISA_INPUT_LIMITS.annualRatePercent.min ||
+    annualRate > NISA_INPUT_LIMITS.annualRatePercent.max ||
+    months === null ||
     (initialAmount === 0 && monthlyAmount === 0)
   ) {
     return emptyResult
   }
 
-  const numberOfMonths = Math.round(years * 12)
-  const monthlyRate = annualRate / 100 / 12
-
-  let initialFutureValue: number
-  let contributionFutureValue: number
-
-  if (monthlyRate === 0) {
-    initialFutureValue = initialAmount
-    contributionFutureValue =
-      monthlyAmount * numberOfMonths
-  } else {
-    initialFutureValue =
-      initialAmount *
-      Math.pow(1 + monthlyRate, numberOfMonths)
-
-    contributionFutureValue =
-      monthlyAmount *
-      (
-        Math.pow(1 + monthlyRate, numberOfMonths) - 1
-      ) /
-      monthlyRate
-  }
-
-  const futureValue =
-    initialFutureValue + contributionFutureValue
-
-  const totalPrincipal =
-    initialAmount +
-    monthlyAmount * numberOfMonths
-
-  const investmentGain =
-    futureValue - totalPrincipal
-
-  return {
-    totalPrincipal,
-    investmentGain,
-    futureValue,
-  }
+  return calculateCurrentNisa(
+    initialAmount,
+    monthlyAmount,
+    annualRate,
+    months,
+  )
 }
 
 function NisaCalculator() {
@@ -164,27 +184,31 @@ function NisaCalculator() {
   const years = Number(
     normalizeDecimalInput(investmentYears),
   )
+  const investmentMonths = getInvestmentMonths(investmentYears)
 
   const finalAssetValue = displayedResult.futureValue
 
   const assetTrajectory = useMemo(() => {
-    if (finalAssetValue === null || years <= 0) {
+    if (finalAssetValue === null || investmentMonths === null) {
       return []
     }
 
     return Array.from({ length: 7 }, (_, index) => index / 6).map((ratio) => {
-      const pointYears = years * ratio
+      const pointMonths = ratio === 1
+        ? investmentMonths
+        : Math.max(1, Math.floor(investmentMonths * ratio))
+      const pointYears = pointMonths / 12
       const pointResult = ratio === 0
         ? {
             totalPrincipal: initialAmount,
             investmentGain: 0,
             futureValue: initialAmount,
           }
-        : calculateNisa(
-            initialInvestment,
-            monthlyContribution,
-            annualReturnRate,
-            String(pointYears),
+        : calculateCurrentNisa(
+            initialAmount,
+            monthlyAmount,
+            annualRate,
+            pointMonths,
           )
 
       return {
@@ -200,12 +224,11 @@ function NisaCalculator() {
       }
     })
   }, [
-    annualReturnRate,
     finalAssetValue,
-    initialInvestment,
-    monthlyContribution,
-    years,
+    investmentMonths,
     initialAmount,
+    monthlyAmount,
+    annualRate,
   ])
 
   const assetAreaGraph = useMemo(() => {
@@ -235,9 +258,11 @@ function NisaCalculator() {
 
   const canSimulate =
     (initialAmount > 0 || monthlyAmount > 0) &&
+    monthlyAmount <= NISA_INPUT_LIMITS.monthlyContribution.max &&
     annualReturnRate !== '' &&
-    annualRate >= 0 &&
-    years > 0
+    annualRate >= NISA_INPUT_LIMITS.annualRatePercent.min &&
+    annualRate <= NISA_INPUT_LIMITS.annualRatePercent.max &&
+    investmentMonths !== null
 
   const clearManualResult = () => {
     if (!isAutoCalculation) {

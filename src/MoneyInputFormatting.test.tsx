@@ -157,6 +157,26 @@ describe('simulator money fields', () => {
     expect(inputValue(monthly)).toBe('')
   })
 
+  it('uses the formal effective monthly rate in the current NISA result', () => {
+    render(<NisaCalculator />)
+
+    fireEvent.change(screen.getByLabelText(/毎月積立額/), {
+      target: { value: '10000' },
+    })
+    fireEvent.change(screen.getByLabelText(/想定年利/), {
+      target: { value: '5' },
+    })
+    fireEvent.change(screen.getByLabelText(/積立期間/), {
+      target: { value: '20' },
+    })
+    fireEvent.click(screen.getByRole('button', {
+      name: 'シミュレートする',
+    }))
+
+    expect(screen.getAllByText('￥4,058,045')).toHaveLength(2)
+    expect(screen.queryByText('￥4,110,337')).toBeNull()
+  })
+
   it('formats and resets the iDeCo contribution field', () => {
     render(
       <IdecoCalculator onOpenTaxableIncome={() => undefined} />,
