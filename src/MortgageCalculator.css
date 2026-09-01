@@ -847,23 +847,119 @@
     line-height: 1.55;
 }
 
+.mortgage-consultation-summary__status[data-tone="error"] {
+    border: 1px solid #e3b6b6;
+    background: #fff5f5;
+    color: #8a3d3d;
+}
+
 .mortgage-consultation-summary__empty {
     background: #f5f7f8;
     color: #6b7c88;
 }
 
 .mortgage-consultation-summary__content {
+    display: grid;
+    gap: 14px;
     margin: 0;
     padding: 18px;
     border: 1px solid #e1e9ed;
     border-radius: 11px;
     background: #f9fbfc;
     color: #314d61;
-    font-family: inherit;
     font-size: 0.78rem;
     line-height: 1.7;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
+}
+
+.mortgage-consultation-summary__document-heading {
+    padding-bottom: 13px;
+    border-bottom: 2px solid #bfd7d4;
+}
+
+.mortgage-consultation-summary__document-heading p,
+.mortgage-consultation-summary__document-heading h4,
+.mortgage-consultation-summary__document-heading span,
+.mortgage-consultation-summary__section h5,
+.mortgage-consultation-summary__section dl,
+.mortgage-consultation-summary__section ul,
+.mortgage-consultation-summary__notice {
+    margin: 0;
+}
+
+.mortgage-consultation-summary__document-heading p {
+    color: var(--mortgage-green);
+    font-size: 0.68rem;
+    font-weight: 800;
+}
+
+.mortgage-consultation-summary__document-heading h4 {
+    margin-top: 3px;
+    color: var(--mortgage-navy);
+    font-size: 1.1rem;
+}
+
+.mortgage-consultation-summary__document-heading span {
+    display: block;
+    margin-top: 5px;
+    color: var(--mortgage-muted);
+}
+
+.mortgage-consultation-summary__section {
+    padding: 13px 14px;
+    border: 1px solid #e0e9ed;
+    border-radius: 9px;
+    background: #ffffff;
+}
+
+.mortgage-consultation-summary__section h5 {
+    color: var(--mortgage-navy);
+    font-size: 0.87rem;
+}
+
+.mortgage-consultation-summary__section dl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px 18px;
+    margin-top: 8px;
+}
+
+.mortgage-consultation-summary__section dl > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    min-width: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #edf1f3;
+}
+
+.mortgage-consultation-summary__section dt {
+    color: #667d8e;
+}
+
+.mortgage-consultation-summary__section dd {
+    margin: 0;
+    color: #203f55;
+    font-weight: 750;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.mortgage-consultation-summary__section ul {
+    columns: 2;
+    gap: 28px;
+    margin-top: 8px;
+    padding-left: 1.2rem;
+}
+
+.mortgage-consultation-summary__section li {
+    break-inside: avoid;
+}
+
+.mortgage-consultation-summary__notice {
+    padding-top: 2px;
+    color: #536b7b;
+    font-size: 0.73rem;
+    font-weight: 650;
 }
 
 @media (max-width: 760px) {
@@ -879,11 +975,20 @@
     .mortgage-consultation-summary__actions button {
         flex: 1 1 12rem;
     }
+
+    .mortgage-consultation-summary__section dl {
+        grid-template-columns: 1fr;
+    }
+
+    .mortgage-consultation-summary__section ul {
+        columns: 1;
+    }
 }
 
 @media print {
     @page {
-        margin: 12mm;
+        size: A4 portrait;
+        margin: 14mm 15mm;
     }
 
     .simulator-page--mortgage .skip-link,
@@ -919,6 +1024,7 @@
     }
 
     .simulator-page--mortgage .mortgage-consultation-summary__content {
+        display: block;
         padding: 0;
         border: 0;
         border-radius: 0;
@@ -926,6 +1032,72 @@
         color: #111111;
         font-size: 10pt;
         line-height: 1.5;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__document-heading {
+        margin-bottom: 8mm;
+        padding-bottom: 4mm;
+        border-bottom: 1px solid #555555;
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__document-heading p,
+    .simulator-page--mortgage .mortgage-consultation-summary__document-heading h4,
+    .simulator-page--mortgage .mortgage-consultation-summary__document-heading span,
+    .simulator-page--mortgage .mortgage-consultation-summary__section h5,
+    .simulator-page--mortgage .mortgage-consultation-summary__section dt,
+    .simulator-page--mortgage .mortgage-consultation-summary__section dd,
+    .simulator-page--mortgage .mortgage-consultation-summary__section li,
+    .simulator-page--mortgage .mortgage-consultation-summary__notice {
+        color: #111111;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__document-heading h4 {
+        font-size: 16pt;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__section {
+        margin-top: 4mm;
+        padding: 3.5mm 4mm;
+        border: 1px solid #b8b8b8;
+        border-radius: 0;
+        background: #ffffff;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__section h5 {
+        font-size: 11pt;
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__section dl {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5mm 7mm;
+        margin-top: 2mm;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__section dl > div {
+        gap: 3mm;
+        padding-bottom: 1mm;
+        border-bottom-color: #d8d8d8;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__section ul {
+        columns: 2;
+        gap: 8mm;
+        margin-top: 2mm;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__notice {
+        margin-top: 5mm;
+        padding: 3mm 4mm;
+        border: 1px solid #b8b8b8;
+        font-size: 9.5pt;
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
 }
 

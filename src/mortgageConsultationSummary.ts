@@ -7,6 +7,9 @@ import {
 export const MORTGAGE_SPEC_VERSION =
     'OMG-DS-MORTGAGE-v1.1' as const
 
+export const MORTGAGE_MODEL_DISPLAY_NAME =
+    '固定金利・毎月返済モデル v1' as const
+
 export const MORTGAGE_EXCLUDED_ITEMS = [
     '金融機関ごとの各回返済額の端数処理',
     '初回返済時の日割り計算',
@@ -118,7 +121,7 @@ export const createMortgageConsultationSummary = ({
         '',
         '【計算情報】',
         `計算日時: ${formatMortgageCalculationDateTime(calculatedAt)}`,
-        `計算モデル版: ${comparison.modelVersion}`,
+        `計算モデル: ${MORTGAGE_MODEL_DISPLAY_NAME}`,
         `仕様版: ${MORTGAGE_SPEC_VERSION}`,
         '',
         '本サマリーは概算結果です。実際の返済条件は金融機関へご確認ください。',

@@ -175,12 +175,19 @@ describe('MortgageCalculator', () => {
             '借入金額: 30,000,000円',
         )
         expect(firstSummary).toContain(
-            '計算モデル版: fixed-monthly-v1',
+            '計算モデル: 固定金利・毎月返済モデル v1',
         )
+        expect(firstSummary).not.toContain('fixed-monthly-v1')
         expect(firstSummary).toContain(
             '仕様版: OMG-DS-MORTGAGE-v1.1',
         )
         expect(firstSummary).toMatch(/計算日時: /)
+        expect(screen.getByText(
+            '固定金利・毎月返済モデル v1',
+        )).toBeTruthy()
+        expect(screen.queryByText(
+            'fixed-monthly-v1',
+        )).toBeNull()
         expect(screen.getByText(
             '相談用サマリーをコピーしました。',
         )).toBeTruthy()
@@ -238,6 +245,158 @@ describe('MortgageCalculator', () => {
         await user.click(printButton)
 
         expect(print).toHaveBeenCalledTimes(1)
+    })
+
+    it('announces copy success for three seconds and resets the timer when copied again', async () => {
+        render(<MortgageCalculator />)
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const writeText = vi.fn().mockResolvedValue(undefined)
+        const clipboardNavigator = Object.create(
+            window.navigator,
+        )
+        Object.defineProperty(
+            clipboardNavigator,
+            'clipboard',
+            {
+                configurable: true,
+                value: { writeText },
+            },
+        )
+        vi.stubGlobal('navigator', clipboardNavigator)
+
+        vi.useFakeTimers()
+        const copyButton = screen.getByRole('button', {
+            name: '相談用サマリーをコピー',
+        })
+        const summarySection = screen.getByRole('region', {
+            name: '相談用サマリー',
+        })
+
+        await act(async () => {
+            fireEvent.click(copyButton)
+            await Promise.resolve()
+        })
+
+        const successStatus = within(summarySection)
+            .getByRole('status')
+        expect(successStatus.textContent).toBe(
+            '相談用サマリーをコピーしました。',
+        )
+        expect(successStatus.getAttribute('aria-live')).toBe(
+            'polite',
+        )
+        expect(successStatus.getAttribute('data-tone')).toBe(
+            'success',
+        )
+
+        act(() => {
+            vi.advanceTimersByTime(2_000)
+        })
+
+        await act(async () => {
+            fireEvent.click(copyButton)
+            await Promise.resolve()
+        })
+
+        act(() => {
+            vi.advanceTimersByTime(2_999)
+        })
+        expect(within(summarySection)
+            .getByRole('status')).toBeTruthy()
+
+        act(() => {
+            vi.advanceTimersByTime(1)
+        })
+        expect(within(summarySection)
+            .queryByRole('status')).toBeNull()
+        expect(writeText).toHaveBeenCalledTimes(2)
+    })
+
+    it('shows an accessible error status without a success message when copying fails', async () => {
+        render(<MortgageCalculator />)
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const writeText = vi.fn().mockRejectedValue(
+            new Error('clipboard unavailable'),
+        )
+        const clipboardNavigator = Object.create(
+            window.navigator,
+        )
+        Object.defineProperty(
+            clipboardNavigator,
+            'clipboard',
+            {
+                configurable: true,
+                value: { writeText },
+            },
+        )
+        vi.stubGlobal('navigator', clipboardNavigator)
+
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', {
+                name: '相談用サマリーをコピー',
+            }))
+            await Promise.resolve()
+        })
+
+        const summarySection = screen.getByRole('region', {
+            name: '相談用サマリー',
+        })
+        const failureStatus = within(summarySection)
+            .getByRole('status')
+        expect(failureStatus.textContent).toBe(
+            'コピーできませんでした。もう一度お試しください。',
+        )
+        expect(failureStatus.getAttribute('aria-live')).toBe(
+            'polite',
+        )
+        expect(failureStatus.getAttribute('data-tone')).toBe(
+            'error',
+        )
+        expect(screen.queryByText(
+            '相談用サマリーをコピーしました。',
+        )).toBeNull()
+    })
+
+    it('clears the copy status timer when unmounted', async () => {
+        const { unmount } = render(<MortgageCalculator />)
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const writeText = vi.fn().mockResolvedValue(undefined)
+        const clipboardNavigator = Object.create(
+            window.navigator,
+        )
+        Object.defineProperty(
+            clipboardNavigator,
+            'clipboard',
+            {
+                configurable: true,
+                value: { writeText },
+            },
+        )
+        vi.stubGlobal('navigator', clipboardNavigator)
+        vi.useFakeTimers()
+
+        await act(async () => {
+            fireEvent.click(screen.getByRole('button', {
+                name: '相談用サマリーをコピー',
+            }))
+            await Promise.resolve()
+        })
+
+        expect(vi.getTimerCount()).toBe(1)
+        unmount()
+        expect(vi.getTimerCount()).toBe(0)
     })
 
     it('does not submit or validate the whole form when Enter is pressed in an incomplete field', async () => {

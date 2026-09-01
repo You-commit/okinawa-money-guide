@@ -12,6 +12,11 @@ import './MortgageCalculator.css'
 import MoneyInput from './components/form/MoneyInput'
 import {
   createMortgageConsultationSummary,
+  formatMortgageCalculationDateTime,
+  MORTGAGE_EXCLUDED_ITEMS,
+  MORTGAGE_LENDER_CONFIRMATION_ITEMS,
+  MORTGAGE_MODEL_DISPLAY_NAME,
+  MORTGAGE_SPEC_VERSION,
 } from './mortgageConsultationSummary'
 import {
   calculateMortgageComparison,
@@ -248,6 +253,108 @@ function MortgageEmptyResults() {
   )
 }
 
+type MortgageConsultationSummaryContentProps = {
+  calculation: StoredCalculation
+  repaymentMethod: RepaymentMethod
+}
+
+function MortgageConsultationSummaryContent({
+  calculation,
+  repaymentMethod,
+}: MortgageConsultationSummaryContentProps) {
+  const { comparison, input, calculatedAt } = calculation
+  const repaymentMethodLabel = repaymentMethod === 'equal-payment'
+    ? '元利均等返済'
+    : '元金均等返済'
+
+  return (
+    <div
+      className="mortgage-consultation-summary__content"
+      aria-label="相談用サマリー本文"
+    >
+      <header className="mortgage-consultation-summary__document-heading">
+        <p>沖縄マネーガイド</p>
+        <h4>住宅ローンシミュレーター 相談用サマリー</h4>
+        <span>
+          金融機関への相談時に、入力条件と概算結果を確認するための資料です。
+        </span>
+      </header>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>入力条件</h5>
+        <dl>
+          <div><dt>借入金額</dt><dd>{input.principal.toLocaleString('ja-JP')}円</dd></div>
+          <div><dt>年利</dt><dd>{input.annualRate.toLocaleString('ja-JP', { maximumFractionDigits: 3 })}%</dd></div>
+          <div><dt>返済期間</dt><dd>{input.paymentCount / 12}年</dd></div>
+          <div><dt>返済回数</dt><dd>{input.paymentCount.toLocaleString('ja-JP')}回</dd></div>
+          <div><dt>強調表示中の返済方式</dt><dd>{repaymentMethodLabel}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>元利均等返済</h5>
+        <dl>
+          <div><dt>毎月返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.firstPayment)}</dd></div>
+          <div><dt>初年度年間返済額（概算）</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.firstYearPaymentTotal)}</dd></div>
+          <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.lastPayment)}</dd></div>
+          <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.totalPayment)}</dd></div>
+          <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.totalInterest)}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>元金均等返済</h5>
+        <dl>
+          <div><dt>初回返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.firstPayment)}</dd></div>
+          <div><dt>初年度年間返済額（概算）</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.firstYearPaymentTotal)}</dd></div>
+          <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.lastPayment)}</dd></div>
+          <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.totalPayment)}</dd></div>
+          <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.totalInterest)}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>2方式の差額</h5>
+        <dl>
+          <div><dt>初回返済額の差</dt><dd>{formatMortgageDifferenceYen(comparison.differences.firstPayment)}</dd></div>
+          <div><dt>支払利息の差</dt><dd>{formatMortgageDifferenceYen(comparison.differences.totalInterest)}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>計算上含まれない費用・条件</h5>
+        <ul>
+          {MORTGAGE_EXCLUDED_ITEMS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>金融機関へ確認する項目</h5>
+        <ul>
+          {MORTGAGE_LENDER_CONFIRMATION_ITEMS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>計算情報</h5>
+        <dl>
+          <div><dt>計算日時</dt><dd>{formatMortgageCalculationDateTime(calculatedAt)}</dd></div>
+          <div><dt>計算モデル</dt><dd>{MORTGAGE_MODEL_DISPLAY_NAME}</dd></div>
+          <div><dt>仕様版</dt><dd>{MORTGAGE_SPEC_VERSION}</dd></div>
+        </dl>
+      </section>
+
+      <p className="mortgage-consultation-summary__notice">
+        本サマリーは概算結果です。実際の返済条件は金融機関へご確認ください。
+      </p>
+    </div>
+  )
+}
+
 const FIELD_NAMES: MortgageFieldName[] = [
   'loanAmount',
   'annualInterestRate',
@@ -444,6 +551,10 @@ function MortgageCalculator() {
     useRef<HTMLDivElement>(null)
   const pendingErrorSummaryFocusRef =
     useRef(false)
+  const summaryStatusTimerRef =
+    useRef<number | null>(null)
+  const copyRequestIdRef =
+    useRef(0)
   const loanAmountRef =
     useRef<HTMLInputElement>(null)
   const annualInterestRateRef =
@@ -606,8 +717,22 @@ function MortgageCalculator() {
   )
 
   useEffect(() => {
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+      summaryStatusTimerRef.current = null
+    }
+
+    copyRequestIdRef.current += 1
     setSummaryActionStatus(null)
   }, [activeCalculation, repaymentMethod])
+
+  useEffect(() => () => {
+    copyRequestIdRef.current += 1
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+    }
+  }, [])
 
   const calculationError =
     isAutoCalculation
@@ -833,12 +958,38 @@ function MortgageCalculator() {
       return
     }
 
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+      summaryStatusTimerRef.current = null
+    }
+
+    const requestId = copyRequestIdRef.current + 1
+    copyRequestIdRef.current = requestId
+
     try {
       await navigator.clipboard.writeText(
         consultationSummary,
       )
+
+      if (requestId !== copyRequestIdRef.current) {
+        return
+      }
+
       setSummaryActionStatus('copied')
+      summaryStatusTimerRef.current = window.setTimeout(
+        () => {
+          if (requestId === copyRequestIdRef.current) {
+            setSummaryActionStatus(null)
+            summaryStatusTimerRef.current = null
+          }
+        },
+        3000,
+      )
     } catch {
+      if (requestId !== copyRequestIdRef.current) {
+        return
+      }
+
       setSummaryActionStatus('copy-error')
     }
   }
@@ -1575,19 +1726,23 @@ function MortgageCalculator() {
         {summaryActionStatus && (
           <p
             className="mortgage-consultation-summary__status"
+            data-tone={summaryActionStatus === 'copied'
+              ? 'success'
+              : 'error'}
             role="status"
             aria-live="polite"
           >
             {summaryActionStatus === 'copied'
               ? '相談用サマリーをコピーしました。'
-              : 'コピーできませんでした。ブラウザの設定をご確認ください。'}
+              : 'コピーできませんでした。もう一度お試しください。'}
           </p>
         )}
 
-        {consultationSummary ? (
-          <pre className="mortgage-consultation-summary__content">
-            {consultationSummary}
-          </pre>
+        {activeCalculation ? (
+          <MortgageConsultationSummaryContent
+            calculation={activeCalculation}
+            repaymentMethod={repaymentMethod}
+          />
         ) : (
           <p className="mortgage-consultation-summary__empty">
             シミュレーション後にコピー・印刷できます。

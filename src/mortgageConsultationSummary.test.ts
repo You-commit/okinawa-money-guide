@@ -5,6 +5,7 @@ import {
 } from './mortgage'
 import {
     createMortgageConsultationSummary,
+    MORTGAGE_MODEL_DISPLAY_NAME,
     MORTGAGE_SPEC_VERSION,
 } from './mortgageConsultationSummary'
 
@@ -69,13 +70,14 @@ describe('mortgage consultation summary', () => {
             '計算日時: 2026/09/01 12:34:56',
         )
         expect(summary).toContain(
-            '計算モデル版: fixed-monthly-v1',
+            `計算モデル: ${MORTGAGE_MODEL_DISPLAY_NAME}`,
         )
         expect(summary).toContain(
             `仕様版: ${MORTGAGE_SPEC_VERSION}`,
         )
         expect(summary).not.toContain('<')
         expect(summary).not.toContain('http')
+        expect(summary).not.toContain('fixed-monthly-v1')
     })
 
     it('shows zero differences naturally for a zero-interest calculation', () => {
