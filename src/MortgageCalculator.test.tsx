@@ -174,20 +174,35 @@ describe('MortgageCalculator', () => {
         expect(firstSummary).toContain(
             '借入金額: 30,000,000円',
         )
-        expect(firstSummary).toContain(
-            '計算モデル: 固定金利・毎月返済モデル v1',
-        )
+        expect(firstSummary).not.toContain('計算情報')
+        expect(firstSummary).not.toContain('計算日時:')
+        expect(firstSummary).not.toContain('計算モデル:')
+        expect(firstSummary).not.toContain('仕様版:')
         expect(firstSummary).not.toContain('fixed-monthly-v1')
-        expect(firstSummary).toContain(
-            '仕様版: OMG-DS-MORTGAGE-v1.1',
-        )
-        expect(firstSummary).toMatch(/計算日時: /)
-        expect(screen.getByText(
+        expect(firstSummary).not.toContain(
             '固定金利・毎月返済モデル v1',
-        )).toBeTruthy()
-        expect(screen.queryByText(
-            'fixed-monthly-v1',
+        )
+        expect(firstSummary).not.toContain(
+            'OMG-DS-MORTGAGE-v1.1',
+        )
+        const summarySection = screen.getByRole('region', {
+            name: '相談用サマリー',
+        })
+        expect(within(summarySection).queryByText(
+            '計算情報',
         )).toBeNull()
+        expect(summarySection.textContent).not.toContain('計算日時')
+        expect(summarySection.textContent).not.toContain('計算モデル')
+        expect(summarySection.textContent).not.toContain('仕様版')
+        expect(summarySection.textContent).not.toContain(
+            'fixed-monthly-v1',
+        )
+        expect(summarySection.textContent).not.toContain(
+            '固定金利・毎月返済モデル v1',
+        )
+        expect(summarySection.textContent).not.toContain(
+            'OMG-DS-MORTGAGE-v1.1',
+        )
         expect(screen.getByText(
             '相談用サマリーをコピーしました。',
         )).toBeTruthy()
@@ -242,6 +257,28 @@ describe('MortgageCalculator', () => {
         await user.click(screen.getByRole('button', {
             name: 'シミュレートする',
         }))
+
+        const printableSummary = screen.getByRole('region', {
+            name: '相談用サマリー',
+        })
+        expect(within(printableSummary).queryByText(
+            '計算情報',
+        )).toBeNull()
+        expect(printableSummary.textContent).not.toContain(
+            '計算日時',
+        )
+        expect(printableSummary.textContent).not.toContain(
+            '計算モデル',
+        )
+        expect(printableSummary.textContent).not.toContain(
+            '仕様版',
+        )
+        expect(printableSummary.textContent).not.toContain(
+            'fixed-monthly-v1',
+        )
+        expect(printableSummary.textContent).not.toContain(
+            'OMG-DS-MORTGAGE-v1.1',
+        )
         await user.click(printButton)
 
         expect(print).toHaveBeenCalledTimes(1)

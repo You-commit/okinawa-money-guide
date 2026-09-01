@@ -72,7 +72,6 @@ type MortgageConsultationSummaryInput = {
 export const createMortgageConsultationSummary = ({
     comparison,
     repaymentMethod,
-    calculatedAt,
 }: MortgageConsultationSummaryInput) => {
     const {
         input,
@@ -118,11 +117,6 @@ export const createMortgageConsultationSummary = ({
         '',
         '【金融機関へ確認する項目】',
         bulletLines(MORTGAGE_LENDER_CONFIRMATION_ITEMS),
-        '',
-        '【計算情報】',
-        `計算日時: ${formatMortgageCalculationDateTime(calculatedAt)}`,
-        `計算モデル: ${MORTGAGE_MODEL_DISPLAY_NAME}`,
-        `仕様版: ${MORTGAGE_SPEC_VERSION}`,
         '',
         '本サマリーは概算結果です。実際の返済条件は金融機関へご確認ください。',
     ].join('\n')

@@ -5,8 +5,6 @@ import {
 } from './mortgage'
 import {
     createMortgageConsultationSummary,
-    MORTGAGE_MODEL_DISPLAY_NAME,
-    MORTGAGE_SPEC_VERSION,
 } from './mortgageConsultationSummary'
 
 const calculateComparison = (input: MortgageInput) => {
@@ -66,14 +64,15 @@ describe('mortgage consultation summary', () => {
         expect(summary).toContain('- 事務手数料')
         expect(summary).toContain('- 団信')
         expect(summary).toContain('- 繰上返済条件')
-        expect(summary).toContain(
-            '計算日時: 2026/09/01 12:34:56',
+        expect(summary).not.toContain('【計算情報】')
+        expect(summary).not.toContain('計算日時:')
+        expect(summary).not.toContain('計算モデル:')
+        expect(summary).not.toContain('仕様版:')
+        expect(summary).not.toContain(
+            '固定金利・毎月返済モデル v1',
         )
-        expect(summary).toContain(
-            `計算モデル: ${MORTGAGE_MODEL_DISPLAY_NAME}`,
-        )
-        expect(summary).toContain(
-            `仕様版: ${MORTGAGE_SPEC_VERSION}`,
+        expect(summary).not.toContain(
+            'OMG-DS-MORTGAGE-v1.1',
         )
         expect(summary).not.toContain('<')
         expect(summary).not.toContain('http')

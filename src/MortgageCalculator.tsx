@@ -12,11 +12,8 @@ import './MortgageCalculator.css'
 import MoneyInput from './components/form/MoneyInput'
 import {
   createMortgageConsultationSummary,
-  formatMortgageCalculationDateTime,
   MORTGAGE_EXCLUDED_ITEMS,
   MORTGAGE_LENDER_CONFIRMATION_ITEMS,
-  MORTGAGE_MODEL_DISPLAY_NAME,
-  MORTGAGE_SPEC_VERSION,
 } from './mortgageConsultationSummary'
 import {
   calculateMortgageComparison,
@@ -262,7 +259,7 @@ function MortgageConsultationSummaryContent({
   calculation,
   repaymentMethod,
 }: MortgageConsultationSummaryContentProps) {
-  const { comparison, input, calculatedAt } = calculation
+  const { comparison, input } = calculation
   const repaymentMethodLabel = repaymentMethod === 'equal-payment'
     ? '元利均等返済'
     : '元金均等返済'
@@ -337,15 +334,6 @@ function MortgageConsultationSummaryContent({
             <li key={item}>{item}</li>
           ))}
         </ul>
-      </section>
-
-      <section className="mortgage-consultation-summary__section">
-        <h5>計算情報</h5>
-        <dl>
-          <div><dt>計算日時</dt><dd>{formatMortgageCalculationDateTime(calculatedAt)}</dd></div>
-          <div><dt>計算モデル</dt><dd>{MORTGAGE_MODEL_DISPLAY_NAME}</dd></div>
-          <div><dt>仕様版</dt><dd>{MORTGAGE_SPEC_VERSION}</dd></div>
-        </dl>
       </section>
 
       <p className="mortgage-consultation-summary__notice">
