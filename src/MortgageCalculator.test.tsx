@@ -116,6 +116,128 @@ describe('MortgageCalculator', () => {
                 .getByLabelText('返済期間スライダー')
                 .getAttribute('aria-valuetext'),
         ).toBe('未入力')
+        expect(
+            (screen.getByRole('button', {
+                name: '相談用サマリーをコピー',
+            }) as HTMLButtonElement).disabled,
+        ).toBe(true)
+        expect(
+            (screen.getByRole('button', {
+                name: '印刷する',
+            }) as HTMLButtonElement).disabled,
+        ).toBe(true)
+    })
+
+    it('copies only the latest calculated consultation summary and disables output after reset', async () => {
+        const user = userEvent.setup()
+        const writeText = vi.fn().mockResolvedValue(undefined)
+        const clipboardNavigator = Object.create(
+            window.navigator,
+        )
+        Object.defineProperty(
+            clipboardNavigator,
+            'clipboard',
+            {
+                configurable: true,
+                value: { writeText },
+            },
+        )
+        vi.stubGlobal('navigator', clipboardNavigator)
+
+        render(<MortgageCalculator />)
+        await user.type(
+            screen.getByLabelText('借入金額'),
+            '30000000',
+        )
+        await user.type(screen.getByLabelText('年利'), '1')
+        await user.type(
+            screen.getByLabelText('返済期間'),
+            '35',
+        )
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const copyButton = screen.getByRole('button', {
+            name: '相談用サマリーをコピー',
+        }) as HTMLButtonElement
+        const printButton = screen.getByRole('button', {
+            name: '印刷する',
+        }) as HTMLButtonElement
+
+        expect(copyButton.disabled).toBe(false)
+        expect(printButton.disabled).toBe(false)
+        await user.click(copyButton)
+
+        expect(writeText).toHaveBeenCalledTimes(1)
+        const firstSummary = writeText.mock.calls[0][0]
+        expect(firstSummary).toContain(
+            '借入金額: 30,000,000円',
+        )
+        expect(firstSummary).toContain(
+            '計算モデル版: fixed-monthly-v1',
+        )
+        expect(firstSummary).toContain(
+            '仕様版: OMG-DS-MORTGAGE-v1.1',
+        )
+        expect(firstSummary).toMatch(/計算日時: /)
+        expect(screen.getByText(
+            '相談用サマリーをコピーしました。',
+        )).toBeTruthy()
+
+        const loanAmount = screen.getByLabelText('借入金額')
+        await user.clear(loanAmount)
+        await user.type(loanAmount, '20000000')
+
+        expect(copyButton.disabled).toBe(true)
+        expect(printButton.disabled).toBe(true)
+
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+        await user.click(copyButton)
+
+        expect(writeText).toHaveBeenCalledTimes(2)
+        const latestSummary = writeText.mock.calls[1][0]
+        expect(latestSummary).toContain(
+            '借入金額: 20,000,000円',
+        )
+        expect(latestSummary).not.toContain(
+            '借入金額: 30,000,000円',
+        )
+
+        await user.click(screen.getByRole('button', {
+            name: '入力内容をリセット',
+        }))
+
+        expect(copyButton.disabled).toBe(true)
+        expect(printButton.disabled).toBe(true)
+        expect(screen.queryByText(
+            '住宅ローンシミュレーター 相談用サマリー',
+        )).toBeNull()
+    })
+
+    it('uses browser print only after a result has been calculated', async () => {
+        const print = vi.spyOn(window, 'print')
+            .mockImplementation(() => undefined)
+
+        render(<MortgageCalculator />)
+        const printButton = screen.getByRole('button', {
+            name: '印刷する',
+        }) as HTMLButtonElement
+
+        expect(printButton.disabled).toBe(true)
+        const initialUser = userEvent.setup()
+        await initialUser.click(printButton)
+        expect(print).not.toHaveBeenCalled()
+
+        const user = await fillValidConditions()
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+        await user.click(printButton)
+
+        expect(print).toHaveBeenCalledTimes(1)
     })
 
     it('does not submit or validate the whole form when Enter is pressed in an incomplete field', async () => {

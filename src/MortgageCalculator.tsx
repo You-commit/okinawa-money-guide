@@ -11,6 +11,9 @@ import {
 import './MortgageCalculator.css'
 import MoneyInput from './components/form/MoneyInput'
 import {
+  createMortgageConsultationSummary,
+} from './mortgageConsultationSummary'
+import {
   calculateMortgageComparison,
   calculateMortgageTrajectory,
   createMortgageComparisonExplanation,
@@ -37,6 +40,7 @@ type StoredCalculation = {
   input: MortgageInput
   inputKey: string
   comparison: MortgageComparison
+  calculatedAt: string
 }
 
 type ResetSnapshot = {
@@ -358,6 +362,7 @@ const createStoredCalculation = (
   input,
   inputKey: createMortgageComparisonInputKey(input),
   comparison,
+  calculatedAt: new Date().toISOString(),
 })
 
 const getResultHeading = (hasResult: boolean) => {
@@ -432,6 +437,8 @@ function MortgageCalculator() {
     useState<ResetSnapshot | null>(null)
   const [statusMessageOverride, setStatusMessageOverride] =
     useState<string | null>(null)
+  const [summaryActionStatus, setSummaryActionStatus] =
+    useState<'copied' | 'copy-error' | null>(null)
 
   const errorSummaryRef =
     useRef<HTMLDivElement>(null)
@@ -586,6 +593,21 @@ function MortgageCalculator() {
       equalPrincipal: equalPrincipal.points,
     }
   }, [activeCalculation])
+
+  const consultationSummary = useMemo(
+    () => activeCalculation
+      ? createMortgageConsultationSummary({
+          comparison: activeCalculation.comparison,
+          repaymentMethod,
+          calculatedAt: activeCalculation.calculatedAt,
+        })
+      : null,
+    [activeCalculation, repaymentMethod],
+  )
+
+  useEffect(() => {
+    setSummaryActionStatus(null)
+  }, [activeCalculation, repaymentMethod])
 
   const calculationError =
     isAutoCalculation
@@ -804,6 +826,29 @@ function MortgageCalculator() {
     setIsAutoCalculation(nextIsAutoCalculation)
     setHasSubmitted(false)
     setManualCalculationError(null)
+  }
+
+  const copyConsultationSummary = async () => {
+    if (!consultationSummary) {
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(
+        consultationSummary,
+      )
+      setSummaryActionStatus('copied')
+    } catch {
+      setSummaryActionStatus('copy-error')
+    }
+  }
+
+  const printConsultationSummary = () => {
+    if (!consultationSummary) {
+      return
+    }
+
+    window.print()
   }
 
   const resetCalculator = () => {
@@ -1491,6 +1536,64 @@ function MortgageCalculator() {
           実際の返済予定表とは差が生じる場合があります。
         </p>
       </aside>
+
+      <section
+        className="mortgage-consultation-summary"
+        data-empty={consultationSummary === null}
+        aria-labelledby="mortgage-consultation-summary-title"
+      >
+        <header className="mortgage-consultation-summary__heading">
+          <div>
+            <p>CONSULTATION SUMMARY</p>
+            <h3 id="mortgage-consultation-summary-title">
+              相談用サマリー
+            </h3>
+            <span>
+              計算結果を金融機関への相談用に整理します。
+              入力内容は保存・外部送信しません。
+            </span>
+          </div>
+
+          <div className="mortgage-consultation-summary__actions">
+            <button
+              type="button"
+              disabled={!consultationSummary}
+              onClick={copyConsultationSummary}
+            >
+              相談用サマリーをコピー
+            </button>
+            <button
+              type="button"
+              disabled={!consultationSummary}
+              onClick={printConsultationSummary}
+            >
+              印刷する
+            </button>
+          </div>
+        </header>
+
+        {summaryActionStatus && (
+          <p
+            className="mortgage-consultation-summary__status"
+            role="status"
+            aria-live="polite"
+          >
+            {summaryActionStatus === 'copied'
+              ? '相談用サマリーをコピーしました。'
+              : 'コピーできませんでした。ブラウザの設定をご確認ください。'}
+          </p>
+        )}
+
+        {consultationSummary ? (
+          <pre className="mortgage-consultation-summary__content">
+            {consultationSummary}
+          </pre>
+        ) : (
+          <p className="mortgage-consultation-summary__empty">
+            シミュレーション後にコピー・印刷できます。
+          </p>
+        )}
+      </section>
     </section>
   )
 }

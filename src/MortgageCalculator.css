@@ -757,6 +757,178 @@
     margin-top: 8px;
 }
 
+.mortgage-consultation-summary {
+    display: grid;
+    gap: 16px;
+    padding: 22px;
+    border: 1px solid #d8e5ea;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(28, 59, 83, 0.06);
+}
+
+.mortgage-consultation-summary__heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.mortgage-consultation-summary__heading p {
+    margin: 0 0 5px;
+    color: var(--mortgage-green);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.13em;
+}
+
+.mortgage-consultation-summary__heading h3 {
+    margin: 0;
+    color: var(--mortgage-navy);
+    font-size: 1.2rem;
+}
+
+.mortgage-consultation-summary__heading span {
+    display: block;
+    margin-top: 7px;
+    color: var(--mortgage-muted);
+    font-size: 0.76rem;
+    line-height: 1.6;
+}
+
+.mortgage-consultation-summary__actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.mortgage-consultation-summary__actions button {
+    min-height: 42px;
+    padding: 8px 13px;
+    border: 1px solid var(--mortgage-green);
+    border-radius: 9px;
+    background: #ffffff;
+    color: var(--mortgage-green-dark);
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.mortgage-consultation-summary__actions button:first-child {
+    background: var(--mortgage-green);
+    color: #ffffff;
+}
+
+.mortgage-consultation-summary__actions button:focus-visible {
+    outline: 3px solid rgba(15, 118, 110, 0.22);
+    outline-offset: 3px;
+}
+
+.mortgage-consultation-summary__actions button:disabled {
+    border-color: #cbd7dc;
+    background: #eef2f4;
+    color: #82929d;
+    cursor: not-allowed;
+    opacity: 0.72;
+}
+
+.mortgage-consultation-summary__status,
+.mortgage-consultation-summary__empty {
+    margin: 0;
+    padding: 9px 11px;
+    border-radius: 9px;
+    background: #f3f8f7;
+    color: #456d69;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.mortgage-consultation-summary__empty {
+    background: #f5f7f8;
+    color: #6b7c88;
+}
+
+.mortgage-consultation-summary__content {
+    margin: 0;
+    padding: 18px;
+    border: 1px solid #e1e9ed;
+    border-radius: 11px;
+    background: #f9fbfc;
+    color: #314d61;
+    font-family: inherit;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+    .mortgage-consultation-summary__heading {
+        flex-direction: column;
+    }
+
+    .mortgage-consultation-summary__actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .mortgage-consultation-summary__actions button {
+        flex: 1 1 12rem;
+    }
+}
+
+@media print {
+    @page {
+        margin: 12mm;
+    }
+
+    .simulator-page--mortgage .skip-link,
+    .simulator-page--mortgage .top-option02__header,
+    .simulator-page--mortgage .simulator-page__hero,
+    .simulator-page--mortgage .simulator-page__notes,
+    .simulator-page--mortgage .site-footer,
+    .simulator-page--mortgage .mortgage-calculator > :not(.mortgage-consultation-summary),
+    .simulator-page--mortgage .mortgage-consultation-summary__heading,
+    .simulator-page--mortgage .mortgage-consultation-summary__status,
+    .simulator-page--mortgage .mortgage-consultation-summary__empty {
+        display: none !important;
+    }
+
+    .simulator-page--mortgage,
+    .simulator-page--mortgage main,
+    .simulator-page--mortgage .simulator-page__main,
+    .simulator-page--mortgage .simulator-page__calculator,
+    .simulator-page--mortgage .mortgage-calculator {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary {
+        display: block;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .simulator-page--mortgage .mortgage-consultation-summary__content {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: #ffffff;
+        color: #111111;
+        font-size: 10pt;
+        line-height: 1.5;
+    }
+}
+
 @media (max-width: 940px) {
     .mortgage-calculator__layout {
         grid-template-columns: 1fr;
