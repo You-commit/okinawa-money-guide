@@ -652,3 +652,226 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     expect(within(summary).queryByText('￥10,000')).toBeNull()
   })
 })
+
+describe('NISA low, base, and high scenario comparison', () => {
+  afterEach(() => {
+    cleanup()
+    vi.restoreAllMocks()
+  })
+
+  const enableScenarioComparison = () => {
+    fireEvent.click(screen.getByRole('checkbox', { name: 'シナリオ比較' }))
+  }
+
+  const fillScenarioRates = (low: string, high: string) => {
+    change('低位シナリオ', low)
+    change('高位シナリオ', high)
+  }
+
+  it('starts OFF, shows empty inputs only when enabled, and stays out of reverse modes', () => {
+    render(<NisaCalculator />)
+
+    const toggle = screen.getByRole('checkbox', { name: 'シナリオ比較' })
+    expect((toggle as HTMLInputElement).checked).toBe(false)
+    expect(screen.queryByLabelText('低位シナリオ')).toBeNull()
+    expect(screen.queryByLabelText('高位シナリオ')).toBeNull()
+
+    enableScenarioComparison()
+    expect((screen.getByLabelText('低位シナリオ') as HTMLInputElement).value)
+      .toBe('')
+    expect((screen.getByLabelText('高位シナリオ') as HTMLInputElement).value)
+      .toBe('')
+
+    selectMode('必要な毎月積立額を調べる')
+    expect(screen.queryByRole('checkbox', { name: 'シナリオ比較' })).toBeNull()
+    expect(screen.queryByText('SCENARIO COMPARISON')).toBeNull()
+  })
+
+  it('accepts equal and ordered rates but rejects reversed relationships', () => {
+    render(<NisaCalculator />)
+    fillFuture()
+    enableScenarioComparison()
+    fillScenarioRates('7', '7')
+    calculate()
+    expect(screen.getAllByText(/低位シナリオは基準シナリオ以下/).length)
+      .toBeGreaterThan(0)
+
+    fillScenarioRates('5', '3')
+    calculate()
+    expect(screen.getAllByText(/高位シナリオは基準シナリオ以上/).length)
+      .toBeGreaterThan(0)
+
+    fillScenarioRates('5', '5')
+    calculate()
+    expect(screen.getByRole('table', {
+      name: '低位・基準・高位シナリオの最終結果（概算）',
+    })).toBeTruthy()
+
+    fillScenarioRates('3', '7')
+    calculate()
+    expect(screen.queryByText(/基準シナリオ以下の利回りを入力/)).toBeNull()
+    expect(screen.queryByText(/基準シナリオ以上の利回りを入力/)).toBeNull()
+  })
+
+  it('validates required and boundary rates only on manual calculation', () => {
+    render(<NisaCalculator />)
+    fillFuture()
+    enableScenarioComparison()
+
+    expect(screen.queryByText(/低位シナリオの利回りを入力/)).toBeNull()
+    calculate()
+    expect(screen.getAllByText(/低位シナリオの利回りを入力/).length)
+      .toBeGreaterThan(0)
+    expect(screen.getAllByText(/高位シナリオの利回りを入力/).length)
+      .toBeGreaterThan(0)
+
+    fillScenarioRates('-20', '20')
+    calculate()
+    const comparisonTable = screen.getByRole('table', {
+      name: '低位・基準・高位シナリオの最終結果（概算）',
+    })
+    expect(within(comparisonTable).getByText('-20%')).toBeTruthy()
+    expect(within(comparisonTable).getByText('20%')).toBeTruthy()
+    expect(comparisonTable.textContent).toMatch(/-￥|−￥/)
+  })
+
+  it('renders equal-height result cards, a three-line legend, and accessible data', () => {
+    const { container } = render(<NisaCalculator />)
+    fillFuture({ inflation: '2' })
+    enableScenarioComparison()
+    fillScenarioRates('3', '7')
+    calculate()
+
+    const comparison = container.querySelector('.nisa-scenario-comparison')!
+    const cards = comparison.querySelectorAll('.nisa-scenario-result-card')
+    expect(cards).toHaveLength(3)
+    expect(within(comparison as HTMLElement).getAllByText('インフレ調整後価値'))
+      .toHaveLength(4)
+    expect(comparison.querySelectorAll('.nisa-scenario-chart__line'))
+      .toHaveLength(3)
+    expect(comparison.querySelector('.nisa-scenario-chart__legend')?.textContent)
+      .toBe('低位基準高位')
+
+    const table = within(comparison as HTMLElement).getByRole('table', {
+      name: '低位・基準・高位シナリオの最終結果（概算）',
+    })
+    expect(within(table).getAllByRole('rowheader')).toHaveLength(3)
+    expect(within(table).getAllByRole('columnheader')).toHaveLength(5)
+    expect(screen.getAllByText(/将来の運用成果を予測・保証するものではありません/).length)
+      .toBeGreaterThan(0)
+
+    expect(container.querySelectorAll('.nisa-allowance-panel')).toHaveLength(1)
+  })
+
+  it('keeps the normal result available in AUTO mode while scenario inputs are incomplete or invalid', async () => {
+    render(<NisaCalculator />)
+    fireEvent.click(screen.getByLabelText('入力と同時に計算結果を更新する'))
+    fillFuture()
+    enableScenarioComparison()
+
+    expect(screen.getAllByText('￥4,058,045').length).toBeGreaterThanOrEqual(2)
+    expect(screen.queryByRole('table', {
+      name: '低位・基準・高位シナリオの最終結果（概算）',
+    })).toBeNull()
+    expect(screen.queryByText(/低位シナリオの利回りを入力/)).toBeNull()
+
+    change('低位シナリオ', '7')
+    expect(screen.getByLabelText('低位シナリオ').getAttribute('aria-invalid'))
+      .toBe('true')
+    expect(screen.getAllByText('￥4,058,045').length).toBeGreaterThanOrEqual(2)
+
+    fillScenarioRates('3', '7')
+    await waitFor(() => {
+      expect(screen.getByRole('table', {
+        name: '低位・基準・高位シナリオの最終結果（概算）',
+      })).toBeTruthy()
+    })
+  })
+
+  it('resets and restores scenario settings through the one-generation Undo snapshot', () => {
+    render(<NisaCalculator />)
+    fillFuture()
+    enableScenarioComparison()
+    fillScenarioRates('3', '7')
+
+    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    expect((screen.getByRole('checkbox', { name: 'シナリオ比較' }) as HTMLInputElement).checked)
+      .toBe(false)
+    expect(screen.queryByLabelText('低位シナリオ')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
+    expect((screen.getByRole('checkbox', { name: 'シナリオ比較' }) as HTMLInputElement).checked)
+      .toBe(true)
+    expect((screen.getByLabelText('低位シナリオ') as HTMLInputElement).value)
+      .toBe('3')
+    expect((screen.getByLabelText('高位シナリオ') as HTMLInputElement).value)
+      .toBe('7')
+    expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
+  })
+
+  it('adds valid scenarios to the summary, snapshot, clipboard, and print output', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    const print = vi.spyOn(window, 'print').mockImplementation(() => undefined)
+    render(<NisaCalculator />)
+    fillFuture({ inflation: '2' })
+    enableScenarioComparison()
+    fillScenarioRates('3', '7')
+    calculate()
+
+    const summary = screen.getByRole('region', { name: '相談用サマリー' })
+    const scenarioSection = within(summary).getByRole('heading', {
+      name: 'シナリオ比較',
+      level: 5,
+    })
+      .closest('section')!
+    expect(within(scenarioSection).getByText('低位')).toBeTruthy()
+    expect(within(scenarioSection).getByText('基準')).toBeTruthy()
+    expect(within(scenarioSection).getByText('高位')).toBeTruthy()
+
+    fireEvent.click(within(summary).getByText('計算条件・参照情報'))
+    expect(within(summary).getByText(/シナリオ比較=ON/)).toBeTruthy()
+    expect(within(summary).getByText(/低位シナリオ利回り=3%/)).toBeTruthy()
+    expect(within(summary).getByText(/基準シナリオ利回り=5%/)).toBeTruthy()
+    expect(within(summary).getByText(/高位シナリオ利回り=7%/)).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '相談用サマリーをコピー' }))
+      await Promise.resolve()
+    })
+    const copiedText = writeText.mock.calls[0][0] as string
+    expect(copiedText).toContain('【シナリオ比較】')
+    expect(copiedText).toContain('低位:')
+    expect(copiedText).toContain('基準:')
+    expect(copiedText).toContain('高位:')
+    expect(copiedText).toContain('インフレ調整後価値:')
+
+    fireEvent.click(screen.getByRole('button', { name: '印刷する' }))
+    expect(print).toHaveBeenCalledTimes(1)
+    expect(within(summary).getByRole('heading', {
+      name: 'シナリオ比較',
+      level: 5,
+    })).toBeTruthy()
+  })
+
+  it('does not add scenario output when comparison is OFF', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    render(<NisaCalculator />)
+    fillFuture()
+    calculate()
+
+    expect(screen.queryByText('SCENARIO COMPARISON')).toBeNull()
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '相談用サマリーをコピー' }))
+      await Promise.resolve()
+    })
+    expect(writeText.mock.calls[0][0]).not.toContain('【シナリオ比較】')
+  })
+})

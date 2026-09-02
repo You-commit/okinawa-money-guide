@@ -24,6 +24,11 @@ import {
   type NisaAllowanceAssessment,
 } from './nisaAllowance'
 import {
+  calculateNisaScenarioComparison,
+  getNisaScenarioResults,
+  type NisaScenarioComparison,
+} from './nisaScenarioComparison'
+import {
   NISA_CALCULATION_SPEC_VERSION,
   NISA_CONFIRMATION_ITEMS,
   NISA_DESIGN_SPEC_VERSION,
@@ -49,6 +54,8 @@ type NisaField =
   | 'annualReturnRate'
   | 'investmentPeriod'
   | 'inflationRate'
+  | 'lowScenarioRate'
+  | 'highScenarioRate'
 
 type NisaErrors = Partial<Record<NisaField, string>>
 
@@ -60,6 +67,8 @@ type NisaFormValues = {
   investmentYears: string
   investmentMonths: string
   inflationRate: string
+  lowScenarioRate: string
+  highScenarioRate: string
 }
 
 type ParsedNisaValues = {
@@ -69,6 +78,8 @@ type ParsedNisaValues = {
   annualReturnRate?: number
   investmentMonths?: number
   inflationRate?: number
+  lowScenarioRate?: number
+  highScenarioRate?: number
 }
 
 type CalculatedNisaResult = {
@@ -82,6 +93,7 @@ type CalculatedNisaResult = {
   targetAmount: number | null
   inflationAdjustedValue: number | null
   allowance: NisaAllowanceAssessment
+  scenarioComparison: NisaScenarioComparison | null
 }
 
 type UnreachableNisaResult = {
@@ -102,6 +114,7 @@ type NisaResetSnapshot = {
   mode: NisaCalculationMode
   values: NisaFormValues
   isAutoCalculation: boolean
+  isScenarioComparisonEnabled: boolean
 }
 
 type NisaSummaryActionStatus = 'copied' | 'copy-error' | null
@@ -134,6 +147,8 @@ const FIELD_INPUT_IDS: Record<NisaField, string> = {
   annualReturnRate: 'nisa-annual-return-rate',
   investmentPeriod: 'nisa-investment-years',
   inflationRate: 'nisa-inflation-rate',
+  lowScenarioRate: 'nisa-low-scenario-rate',
+  highScenarioRate: 'nisa-high-scenario-rate',
 }
 
 const INITIAL_VALUES: NisaFormValues = {
@@ -144,6 +159,8 @@ const INITIAL_VALUES: NisaFormValues = {
   investmentYears: '',
   investmentMonths: '',
   inflationRate: '',
+  lowScenarioRate: '',
+  highScenarioRate: '',
 }
 
 const normalizeDecimalInput = (value: string) => {
@@ -226,12 +243,15 @@ const parseValues = (values: NisaFormValues): ParsedNisaValues => ({
     values.investmentMonths,
   ),
   inflationRate: parseDecimalValue(values.inflationRate),
+  lowScenarioRate: parseDecimalValue(values.lowScenarioRate),
+  highScenarioRate: parseDecimalValue(values.highScenarioRate),
 })
 
 const validateValues = (
   mode: NisaCalculationMode,
   values: NisaFormValues,
   showRequired: boolean,
+  isScenarioComparisonEnabled: boolean,
 ) => {
   const errors: NisaErrors = {}
   const parsed = parseValues(values)
@@ -299,6 +319,48 @@ const validateValues = (
       '想定インフレ率は0.00%～10.00%、小数第2位までで入力してください。'
   }
 
+  if (mode === 'future-value' && isScenarioComparisonEnabled) {
+    if (values.lowScenarioRate === '') {
+      if (showRequired) {
+        errors.lowScenarioRate = '低位シナリオの利回りを入力してください。'
+      }
+    } else if (
+      parsed.lowScenarioRate === undefined ||
+      parsed.lowScenarioRate < NISA_INPUT_LIMITS.annualRatePercent.min ||
+      parsed.lowScenarioRate > NISA_INPUT_LIMITS.annualRatePercent.max ||
+      !hasAtMostTwoDecimalPlaces(values.lowScenarioRate)
+    ) {
+      errors.lowScenarioRate =
+        '低位シナリオは-20.00%～20.00%、小数第2位までで入力してください。'
+    } else if (
+      parsed.annualReturnRate !== undefined &&
+      parsed.lowScenarioRate > parsed.annualReturnRate
+    ) {
+      errors.lowScenarioRate =
+        '低位シナリオは基準シナリオ以下の利回りを入力してください。'
+    }
+
+    if (values.highScenarioRate === '') {
+      if (showRequired) {
+        errors.highScenarioRate = '高位シナリオの利回りを入力してください。'
+      }
+    } else if (
+      parsed.highScenarioRate === undefined ||
+      parsed.highScenarioRate < NISA_INPUT_LIMITS.annualRatePercent.min ||
+      parsed.highScenarioRate > NISA_INPUT_LIMITS.annualRatePercent.max ||
+      !hasAtMostTwoDecimalPlaces(values.highScenarioRate)
+    ) {
+      errors.highScenarioRate =
+        '高位シナリオは-20.00%～20.00%、小数第2位までで入力してください。'
+    } else if (
+      parsed.annualReturnRate !== undefined &&
+      parsed.highScenarioRate < parsed.annualReturnRate
+    ) {
+      errors.highScenarioRate =
+        '高位シナリオは基準シナリオ以上の利回りを入力してください。'
+    }
+  }
+
   return { errors, parsed }
 }
 
@@ -346,6 +408,7 @@ const calculateForMode = (
         months: parsed.investmentMonths,
         targetAmount: null,
         inflationAdjustedValue: result.inflationAdjustedValue,
+        scenarioComparison: null,
         allowance: assessNisaAllowance({
           monthlyContribution: parsed.monthlyContribution,
           months: parsed.investmentMonths,
@@ -375,6 +438,7 @@ const calculateForMode = (
         months: parsed.investmentMonths,
         targetAmount: parsed.targetAmount,
         inflationAdjustedValue: result.inflationAdjustedValue,
+        scenarioComparison: null,
         allowance: assessNisaAllowance({
           monthlyContribution: result.requiredMonthlyContribution,
           months: parsed.investmentMonths,
@@ -412,6 +476,7 @@ const calculateForMode = (
         months: result.requiredMonths,
         targetAmount: parsed.targetAmount,
         inflationAdjustedValue: result.inflationAdjustedValue,
+        scenarioComparison: null,
         allowance: assessNisaAllowance({
           monthlyContribution: parsed.monthlyContribution,
           months: result.requiredMonths,
@@ -429,12 +494,47 @@ const createCalculationRecord = (
   mode: NisaCalculationMode,
   values: NisaFormValues,
   parsed: ParsedNisaValues,
+  isScenarioComparisonEnabled: boolean,
 ): NisaCalculationRecord | null => {
-  const result = calculateForMode(mode, parsed)
+  const baseResult = calculateForMode(mode, parsed)
 
-  if (result === null || parsed.annualReturnRate === undefined) {
+  if (baseResult === null || parsed.annualReturnRate === undefined) {
     return null
   }
+
+  let scenarioComparison: NisaScenarioComparison | null = null
+
+  if (
+    baseResult.status === 'calculated' &&
+    mode === 'future-value' &&
+    isScenarioComparisonEnabled &&
+    parsed.monthlyContribution !== undefined &&
+    parsed.investmentMonths !== undefined &&
+    parsed.lowScenarioRate !== undefined &&
+    parsed.highScenarioRate !== undefined &&
+    parsed.lowScenarioRate >= NISA_INPUT_LIMITS.annualRatePercent.min &&
+    parsed.lowScenarioRate <= NISA_INPUT_LIMITS.annualRatePercent.max &&
+    parsed.highScenarioRate >= NISA_INPUT_LIMITS.annualRatePercent.min &&
+    parsed.highScenarioRate <= NISA_INPUT_LIMITS.annualRatePercent.max &&
+    parsed.lowScenarioRate <= parsed.annualReturnRate &&
+    parsed.annualReturnRate <= parsed.highScenarioRate &&
+    hasAtMostTwoDecimalPlaces(values.lowScenarioRate) &&
+    hasAtMostTwoDecimalPlaces(values.highScenarioRate)
+  ) {
+    scenarioComparison = calculateNisaScenarioComparison({
+      initialInvestment: parsed.initialInvestment,
+      monthlyContribution: parsed.monthlyContribution,
+      months: parsed.investmentMonths,
+      lowAnnualRatePercent: parsed.lowScenarioRate,
+      baseAnnualRatePercent: parsed.annualReturnRate,
+      highAnnualRatePercent: parsed.highScenarioRate,
+      inflationRatePercent: parsed.inflationRate,
+    })
+  }
+
+  const result = baseResult.status === 'calculated'
+    ? { ...baseResult, scenarioComparison }
+    : baseResult
 
   return {
     result,
@@ -459,6 +559,16 @@ const createCalculationRecord = (
           ? null
           : parsed.investmentMonths ?? null,
       inflationRatePercent: parsed.inflationRate ?? null,
+      scenarioComparisonEnabled:
+        mode === 'future-value' && isScenarioComparisonEnabled,
+      lowScenarioAnnualRatePercent:
+        mode === 'future-value' && isScenarioComparisonEnabled
+          ? parsed.lowScenarioRate ?? null
+          : null,
+      highScenarioAnnualRatePercent:
+        mode === 'future-value' && isScenarioComparisonEnabled
+          ? parsed.highScenarioRate ?? null
+          : null,
     },
   }
 }
@@ -501,6 +611,48 @@ const formatTrajectoryPointLabel = (
   if (months === 0) return '開始'
   if (months === finalMonths) return `最終（${formatMonths(months)}）`
   return formatMonths(months)
+}
+
+const createScenarioGraphData = (
+  comparison: NisaScenarioComparison,
+) => {
+  const width = 600
+  const bottom = 180
+  const plotHeight = 150
+  const scenarios = getNisaScenarioResults(comparison)
+  const maximumValue = Math.max(
+    1,
+    ...scenarios.flatMap((scenario) =>
+      scenario.trajectory.map((point) => point.futureValue),
+    ),
+  )
+  const toY = (value: number) =>
+    bottom - value / maximumValue * plotHeight
+
+  return {
+    lines: scenarios.map((scenario) => {
+      const pointStep = scenario.trajectory.length > 1
+        ? width / (scenario.trajectory.length - 1)
+        : 0
+
+      return {
+        id: scenario.id,
+        points: scenario.trajectory.map((point, index) =>
+          `${index * pointStep},${toY(point.futureValue)}`,
+        ).join(' '),
+      }
+    }),
+    xAxisLabels: comparison.base.trajectory.map((point) => ({
+      months: point.months,
+      label: formatTrajectoryPointLabel(
+        point.months,
+        comparison.base.trajectory.at(-1)?.months ?? point.months,
+      ),
+    })),
+    yAxisValues: [1, 0.75, 0.5, 0.25, 0].map((ratio) =>
+      maximumValue * ratio,
+    ),
+  }
 }
 
 const NisaMoneyField = ({
@@ -571,6 +723,8 @@ function NisaCalculator() {
   const [mode, setMode] = useState<NisaCalculationMode>('future-value')
   const [values, setValues] = useState<NisaFormValues>(INITIAL_VALUES)
   const [isAutoCalculation, setIsAutoCalculation] = useState(false)
+  const [isScenarioComparisonEnabled, setIsScenarioComparisonEnabled] =
+    useState(false)
   const [manualRecord, setManualRecord] =
     useState<NisaCalculationRecord | null>(null)
   const [manualErrors, setManualErrors] = useState<NisaErrors>({})
@@ -592,17 +746,30 @@ function NisaCalculator() {
       }
     }
 
-    const { errors, parsed } = validateValues(mode, values, false)
+    const { errors, parsed } = validateValues(
+      mode,
+      values,
+      false,
+      isScenarioComparisonEnabled,
+    )
+    const hasCoreErrors = Object.keys(errors).some(
+      (field) => field !== 'lowScenarioRate' && field !== 'highScenarioRate',
+    )
 
-    if (Object.keys(errors).length > 0 || !hasRequiredValues(mode, values)) {
+    if (hasCoreErrors || !hasRequiredValues(mode, values)) {
       return { errors, record: null }
     }
 
     return {
       errors,
-      record: createCalculationRecord(mode, values, parsed),
+      record: createCalculationRecord(
+        mode,
+        values,
+        parsed,
+        isScenarioComparisonEnabled,
+      ),
     }
-  }, [isAutoCalculation, mode, values])
+  }, [isAutoCalculation, isScenarioComparisonEnabled, mode, values])
 
   const visibleErrors = isAutoCalculation ? autoState.errors : manualErrors
   const displayedRecord = isAutoCalculation ? autoState.record : manualRecord
@@ -661,6 +828,13 @@ function NisaCalculator() {
     setManualErrors({})
   }
 
+  const changeScenarioComparison = (enabled: boolean) => {
+    dismissResetUndo()
+    setIsScenarioComparisonEnabled(enabled)
+    setManualRecord(null)
+    setManualErrors({})
+  }
+
   const changeMode = (nextMode: NisaCalculationMode) => {
     if (nextMode === mode) return
 
@@ -694,7 +868,12 @@ function NisaCalculator() {
   }
 
   const simulate = () => {
-    const { errors, parsed } = validateValues(mode, values, true)
+    const { errors, parsed } = validateValues(
+      mode,
+      values,
+      true,
+      isScenarioComparisonEnabled,
+    )
 
     if (Object.keys(errors).length > 0) {
       setManualErrors(errors)
@@ -704,13 +883,19 @@ function NisaCalculator() {
     }
 
     setManualErrors({})
-    setManualRecord(createCalculationRecord(mode, values, parsed))
+    setManualRecord(createCalculationRecord(
+      mode,
+      values,
+      parsed,
+      isScenarioComparisonEnabled,
+    ))
   }
 
   const resetCalculator = () => {
     const shouldOfferUndo =
       mode !== 'future-value' ||
       isAutoCalculation ||
+      isScenarioComparisonEnabled ||
       Object.values(values).some((value) => value !== '')
 
     setResetSnapshot(shouldOfferUndo
@@ -718,11 +903,13 @@ function NisaCalculator() {
           mode,
           values: { ...values },
           isAutoCalculation,
+          isScenarioComparisonEnabled,
         }
       : null)
     setMode('future-value')
     setValues(INITIAL_VALUES)
     setIsAutoCalculation(false)
+    setIsScenarioComparisonEnabled(false)
     setManualRecord(null)
     setManualErrors({})
   }
@@ -733,6 +920,9 @@ function NisaCalculator() {
     setMode(resetSnapshot.mode)
     setValues(resetSnapshot.values)
     setIsAutoCalculation(resetSnapshot.isAutoCalculation)
+    setIsScenarioComparisonEnabled(
+      resetSnapshot.isScenarioComparisonEnabled,
+    )
     setManualRecord(null)
     setManualErrors({})
     setResetSnapshot(null)
@@ -832,8 +1022,23 @@ function NisaCalculator() {
     }
   }, [assetTrajectory])
 
+  const displayedScenarioComparison =
+    displayedResult?.status === 'calculated'
+      ? displayedResult.scenarioComparison
+      : null
+  const scenarioGraphData = useMemo(
+    () => displayedScenarioComparison
+      ? createScenarioGraphData(displayedScenarioComparison)
+      : null,
+    [displayedScenarioComparison],
+  )
+
   const setDecimal = (
-    field: 'annualReturnRate' | 'inflationRate',
+    field:
+      | 'annualReturnRate'
+      | 'inflationRate'
+      | 'lowScenarioRate'
+      | 'highScenarioRate',
     value: string,
   ) => updateValue(field, normalizeDecimalInput(value))
 
@@ -994,6 +1199,121 @@ function NisaCalculator() {
               </small>
             )}
           </div>
+
+          {mode === 'future-value' && (
+            <section
+              className="nisa-scenario-input"
+              aria-labelledby="nisa-scenario-input-title"
+            >
+              <div className="nisa-scenario-input__heading">
+                <div>
+                  <h4 id="nisa-scenario-input-title">シナリオ比較</h4>
+                  <p>利回りだけを変えた3つの仮定を比較します。</p>
+                </div>
+                <label className="nisa-scenario-toggle">
+                  <input
+                    type="checkbox"
+                    aria-label="シナリオ比較"
+                    checked={isScenarioComparisonEnabled}
+                    aria-controls="nisa-scenario-rate-fields"
+                    onChange={(event) =>
+                      changeScenarioComparison(event.target.checked)
+                    }
+                  />
+                  <span>{isScenarioComparisonEnabled ? 'ON' : 'OFF'}</span>
+                </label>
+              </div>
+
+              {isScenarioComparisonEnabled && (
+                <div
+                  id="nisa-scenario-rate-fields"
+                  className="nisa-scenario-rate-fields"
+                >
+                  <div className="nisa-field nisa-scenario-rate-field">
+                    <label htmlFor="nisa-low-scenario-rate">
+                      低位シナリオ
+                    </label>
+                    <div className="input-with-unit">
+                      <input
+                        id="nisa-low-scenario-rate"
+                        type="text"
+                        inputMode="decimal"
+                        value={values.lowScenarioRate}
+                        placeholder="-20.00～20.00"
+                        aria-required="true"
+                        aria-invalid={Boolean(visibleErrors.lowScenarioRate)}
+                        aria-describedby={`nisa-low-scenario-rate-help${visibleErrors.lowScenarioRate ? ' nisa-low-scenario-rate-error' : ''}`}
+                        onChange={(event) =>
+                          setDecimal('lowScenarioRate', event.target.value)
+                        }
+                      />
+                      <span>%</span>
+                    </div>
+                    <small
+                      id="nisa-low-scenario-rate-help"
+                      className="nisa-field__help"
+                    >
+                      基準シナリオ以下の利回り
+                    </small>
+                    {visibleErrors.lowScenarioRate && (
+                      <small
+                        id="nisa-low-scenario-rate-error"
+                        className="nisa-field__error"
+                      >
+                        {visibleErrors.lowScenarioRate}
+                      </small>
+                    )}
+                  </div>
+
+                  <div className="nisa-scenario-base-rate">
+                    <span>基準シナリオ</span>
+                    <strong>
+                      {values.annualReturnRate === ''
+                        ? '想定利回りを入力'
+                        : `${values.annualReturnRate}%`}
+                    </strong>
+                    <small>現在入力中の想定利回り</small>
+                  </div>
+
+                  <div className="nisa-field nisa-scenario-rate-field">
+                    <label htmlFor="nisa-high-scenario-rate">
+                      高位シナリオ
+                    </label>
+                    <div className="input-with-unit">
+                      <input
+                        id="nisa-high-scenario-rate"
+                        type="text"
+                        inputMode="decimal"
+                        value={values.highScenarioRate}
+                        placeholder="-20.00～20.00"
+                        aria-required="true"
+                        aria-invalid={Boolean(visibleErrors.highScenarioRate)}
+                        aria-describedby={`nisa-high-scenario-rate-help${visibleErrors.highScenarioRate ? ' nisa-high-scenario-rate-error' : ''}`}
+                        onChange={(event) =>
+                          setDecimal('highScenarioRate', event.target.value)
+                        }
+                      />
+                      <span>%</span>
+                    </div>
+                    <small
+                      id="nisa-high-scenario-rate-help"
+                      className="nisa-field__help"
+                    >
+                      基準シナリオ以上の利回り
+                    </small>
+                    {visibleErrors.highScenarioRate && (
+                      <small
+                        id="nisa-high-scenario-rate-error"
+                        className="nisa-field__error"
+                      >
+                        {visibleErrors.highScenarioRate}
+                      </small>
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
 
           {mode !== 'required-months' && (
             <fieldset className="nisa-field nisa-period-field">
@@ -1291,6 +1611,13 @@ function NisaCalculator() {
               )}
             </div>
           )}
+
+          {mode === 'future-value' && isScenarioComparisonEnabled && (
+            <NisaScenarioComparisonPanel
+              comparison={displayedScenarioComparison}
+              graphData={scenarioGraphData}
+            />
+          )}
         </div>
       </div>
 
@@ -1386,6 +1713,12 @@ const NisaConsultationSummaryContent = ({
           {input.mode === 'future-value' && input.initialInvestment !== null && (
             <div><dt>初期投資額</dt><dd>{formatYen(input.initialInvestment)}</dd></div>
           )}
+          {input.mode === 'future-value' && (
+            <div>
+              <dt>シナリオ比較</dt>
+              <dd>{input.scenarioComparisonEnabled ? 'ON' : 'OFF'}</dd>
+            </div>
+          )}
         </dl>
       </section>
 
@@ -1421,6 +1754,30 @@ const NisaConsultationSummaryContent = ({
           )}
         </dl>
       </section>
+
+      {result.scenarioComparison && (
+        <section className="nisa-consultation-summary__section nisa-consultation-summary__section--scenarios">
+          <h5>シナリオ比較</h5>
+          <div className="nisa-consultation-scenario-grid">
+            {getNisaScenarioResults(result.scenarioComparison).map((scenario) => (
+              <article key={scenario.id} data-scenario={scenario.id}>
+                <h6>{scenario.label}</h6>
+                <dl>
+                  <div><dt>想定利回り</dt><dd>{scenario.annualRatePercent}%</dd></div>
+                  <div><dt>将来資産額</dt><dd>{formatYen(scenario.futureValue)}</dd></div>
+                  <div><dt>運用収益</dt><dd>{formatYen(scenario.gain)}</dd></div>
+                  {scenario.inflationAdjustedValue !== null && (
+                    <div>
+                      <dt>インフレ調整後価値</dt>
+                      <dd>{formatYen(scenario.inflationAdjustedValue)}</dd>
+                    </div>
+                  )}
+                </dl>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="nisa-consultation-summary__section">
         <h5>NISA枠との関係</h5>
@@ -1501,6 +1858,158 @@ const ResultCard = ({
   <div className={`result-card ${className}`.trim()}>
     <span>{label}</span><strong>{value}</strong><small>{help}</small>
   </div>
+)
+
+const NisaScenarioComparisonPanel = ({
+  comparison,
+  graphData,
+}: {
+  comparison: NisaScenarioComparison | null
+  graphData: ReturnType<typeof createScenarioGraphData> | null
+}) => (
+  <section
+    className="nisa-scenario-comparison"
+    aria-labelledby="nisa-scenario-comparison-title"
+  >
+    <div className="simulator-subheading">
+      <div>
+        <p>SCENARIO COMPARISON</p>
+        <h3 id="nisa-scenario-comparison-title">シナリオ比較</h3>
+      </div>
+      <span>利回りだけを変更</span>
+    </div>
+
+    {comparison && graphData ? (
+      <>
+        <div className="nisa-scenario-result-grid">
+          {getNisaScenarioResults(comparison).map((scenario) => (
+            <article
+              key={scenario.id}
+              className="nisa-scenario-result-card"
+              data-scenario={scenario.id}
+            >
+              <div className="nisa-scenario-result-card__heading">
+                <strong>{scenario.label}</strong>
+                {scenario.id === 'base' && <span>基準</span>}
+              </div>
+              <dl>
+                <div>
+                  <dt>想定利回り</dt>
+                  <dd>{scenario.annualRatePercent}%</dd>
+                </div>
+                <div>
+                  <dt>将来資産額</dt>
+                  <dd>{formatYen(scenario.futureValue)}</dd>
+                </div>
+                <div>
+                  <dt>運用収益</dt>
+                  <dd>{formatYen(scenario.gain)}</dd>
+                </div>
+                {scenario.inflationAdjustedValue !== null && (
+                  <div>
+                    <dt>インフレ調整後価値</dt>
+                    <dd>{formatYen(scenario.inflationAdjustedValue)}</dd>
+                  </div>
+                )}
+              </dl>
+            </article>
+          ))}
+        </div>
+
+        <div className="nisa-scenario-chart" aria-label="低位・基準・高位シナリオの資産推移比較グラフ">
+          <div className="nisa-scenario-chart__legend">
+            {getNisaScenarioResults(comparison).map((scenario) => (
+              <span key={scenario.id} data-scenario={scenario.id}>
+                <i aria-hidden="true" />{scenario.label}
+              </span>
+            ))}
+          </div>
+          <div className="nisa-scenario-chart__canvas">
+            <div className="nisa-scenario-chart__y-axis" aria-hidden="true">
+              {graphData.yAxisValues.map((value, index) => (
+                <span key={`${index}-${value}`}>{formatGraphAxisYen(value)}</span>
+              ))}
+            </div>
+            <div className="nisa-scenario-chart__plot">
+              <svg viewBox="0 0 600 200" aria-hidden="true" preserveAspectRatio="none">
+                <g className="nisa-scenario-chart__grid">
+                  <line x1="0" y1="30" x2="600" y2="30" />
+                  <line x1="0" y1="67.5" x2="600" y2="67.5" />
+                  <line x1="0" y1="105" x2="600" y2="105" />
+                  <line x1="0" y1="142.5" x2="600" y2="142.5" />
+                  <line x1="0" y1="180" x2="600" y2="180" />
+                </g>
+                {graphData.lines.map((line) => (
+                  <polyline
+                    key={line.id}
+                    className="nisa-scenario-chart__line"
+                    data-scenario={line.id}
+                    points={line.points}
+                  />
+                ))}
+              </svg>
+              <div
+                className="nisa-scenario-chart__labels"
+                aria-hidden="true"
+                style={{
+                  gridTemplateColumns:
+                    `repeat(${graphData.xAxisLabels.length}, minmax(0, 1fr))`,
+                }}
+              >
+                {graphData.xAxisLabels.map((point) => (
+                  <span key={point.months}>{point.label}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="nisa-scenario-table-wrap"
+          role="region"
+          aria-label="シナリオ比較結果表"
+          tabIndex={0}
+        >
+          <table className="nisa-scenario-table">
+            <caption>低位・基準・高位シナリオの最終結果（概算）</caption>
+            <thead>
+              <tr>
+                <th scope="col">シナリオ</th>
+                <th scope="col">想定利回り</th>
+                <th scope="col">将来資産額</th>
+                <th scope="col">運用収益</th>
+                <th scope="col">インフレ調整後価値</th>
+              </tr>
+            </thead>
+            <tbody>
+              {getNisaScenarioResults(comparison).map((scenario) => (
+                <tr key={scenario.id}>
+                  <th scope="row">{scenario.label}</th>
+                  <td>{scenario.annualRatePercent}%</td>
+                  <td>{formatYen(scenario.futureValue)}</td>
+                  <td>{formatYen(scenario.gain)}</td>
+                  <td>
+                    {scenario.inflationAdjustedValue === null
+                      ? '―'
+                      : formatYen(scenario.inflationAdjustedValue)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
+    ) : (
+      <div className="nisa-scenario-comparison__empty">
+        低位・基準・高位の利回りと共通条件を入力して計算すると、比較結果を表示します。
+      </div>
+    )}
+
+    <p className="nisa-scenario-comparison__notice">
+      各シナリオは、入力した利回りが積立期間中継続すると仮定した概算です。
+      将来の運用成果を予測・保証するものではありません。
+    </p>
+  </section>
 )
 
 const NisaAllowancePanel = ({

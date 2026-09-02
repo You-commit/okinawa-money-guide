@@ -261,6 +261,112 @@
   outline: 3px solid rgba(11, 143, 91, 0.16);
 }
 
+.nisa-scenario-input {
+  display: grid;
+  gap: 11px;
+  padding: 13px;
+  border: 1px solid #d3e5dc;
+  border-radius: 12px;
+  background: #f8fcfa;
+}
+
+.nisa-scenario-input__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nisa-scenario-input__heading h4,
+.nisa-scenario-input__heading p {
+  margin: 0;
+}
+
+.nisa-scenario-input__heading h4 {
+  color: var(--nisa-navy);
+  font-size: 0.82rem;
+}
+
+.nisa-scenario-input__heading p {
+  margin-top: 3px;
+  color: #6d8191;
+  font-size: 0.62rem;
+  line-height: 1.5;
+}
+
+.nisa-scenario-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 1px solid #b8d6c7;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #496a5b;
+  font-size: 0.65rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.nisa-scenario-toggle input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--nisa-green);
+}
+
+.nisa-scenario-toggle:focus-within {
+  outline: 3px solid rgba(11, 143, 91, 0.18);
+  outline-offset: 2px;
+}
+
+.nisa-scenario-rate-fields {
+  display: grid;
+  gap: 8px;
+}
+
+.nisa-scenario-rate-field,
+.nisa-scenario-base-rate {
+  padding: 10px;
+  border: 1px solid #d8e6df;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.nisa-scenario-rate-field {
+  gap: 6px;
+}
+
+.nisa-scenario-base-rate {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3px 10px;
+  border-color: #9bcbb4;
+  background: #f0f9f4;
+}
+
+.nisa-scenario-base-rate > span,
+.nisa-scenario-rate-field > label {
+  color: #315846;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+.nisa-scenario-base-rate > strong {
+  color: var(--nisa-green-dark);
+  font-size: 0.82rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-scenario-base-rate > small {
+  grid-column: 1 / -1;
+  color: #6a7f73;
+  font-size: 0.61rem;
+}
+
 .nisa-error-summary {
   padding: 13px 15px;
   border: 1px solid #d9a3a7;
@@ -628,6 +734,278 @@
   text-align: left;
 }
 
+.nisa-scenario-comparison {
+  display: grid;
+  gap: 13px;
+  padding: 17px;
+  border: 1px solid #d3e4dc;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 7px 20px rgba(22, 77, 56, 0.045);
+}
+
+.nisa-scenario-result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 9px;
+}
+
+.nisa-scenario-result-card {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+  min-height: 180px;
+  padding: 13px;
+  border: 1px solid #d9e4df;
+  border-top: 3px solid #7d8f9e;
+  border-radius: 11px;
+  background: #fbfcfc;
+}
+
+.nisa-scenario-result-card[data-scenario="base"] {
+  border-color: #91c9ad;
+  border-top-color: var(--nisa-green);
+  background: #f3faf6;
+  box-shadow: 0 6px 16px rgba(11, 143, 91, 0.07);
+}
+
+.nisa-scenario-result-card[data-scenario="high"] {
+  border-top-color: #4d7893;
+}
+
+.nisa-scenario-result-card__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nisa-scenario-result-card__heading > strong {
+  color: var(--nisa-navy);
+  font-size: 0.9rem;
+}
+
+.nisa-scenario-result-card__heading > span {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #def3e8;
+  color: var(--nisa-green-dark);
+  font-size: 0.56rem;
+  font-weight: 850;
+}
+
+.nisa-scenario-result-card dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.nisa-scenario-result-card dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e7eeea;
+}
+
+.nisa-scenario-result-card dt {
+  color: #667d71;
+  font-size: 0.61rem;
+}
+
+.nisa-scenario-result-card dd {
+  min-width: 0;
+  margin: 0;
+  color: #254538;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-scenario-chart {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #dbe6e1;
+  border-radius: 11px;
+  background: #fbfdfc;
+}
+
+.nisa-scenario-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 16px;
+  color: #526a5f;
+  font-size: 0.64rem;
+  font-weight: 750;
+}
+
+.nisa-scenario-chart__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nisa-scenario-chart__legend i {
+  width: 22px;
+  height: 0;
+  border-top: 2px dashed #718596;
+}
+
+.nisa-scenario-chart__legend span[data-scenario="base"] i {
+  border-top: 3px solid var(--nisa-green);
+}
+
+.nisa-scenario-chart__legend span[data-scenario="high"] i {
+  border-top: 2px dotted #477994;
+}
+
+.nisa-scenario-chart__canvas {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+}
+
+.nisa-scenario-chart__y-axis {
+  display: flex;
+  height: 200px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 0 13px;
+  color: #718597;
+  font-size: 0.58rem;
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.nisa-scenario-chart__plot {
+  min-width: 0;
+}
+
+.nisa-scenario-chart__plot svg {
+  display: block;
+  width: 100%;
+  height: 200px;
+  overflow: visible;
+}
+
+.nisa-scenario-chart__grid line {
+  stroke: #dfe9e4;
+  stroke-width: 1;
+}
+
+.nisa-scenario-chart__line {
+  fill: none;
+  stroke: #718596;
+  stroke-width: 2.1;
+  stroke-dasharray: 8 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.nisa-scenario-chart__line[data-scenario="base"] {
+  stroke: var(--nisa-green);
+  stroke-width: 3;
+  stroke-dasharray: none;
+}
+
+.nisa-scenario-chart__line[data-scenario="high"] {
+  stroke: #477994;
+  stroke-dasharray: 2 5;
+  stroke-linecap: round;
+}
+
+.nisa-scenario-chart__labels {
+  display: grid;
+  margin-top: 4px;
+  color: #718597;
+  font-size: 0.58rem;
+  text-align: center;
+}
+
+.nisa-scenario-chart__labels span:first-child {
+  text-align: left;
+}
+
+.nisa-scenario-chart__labels span:last-child {
+  text-align: right;
+}
+
+.nisa-scenario-table-wrap {
+  min-width: 0;
+  overflow-x: auto;
+  border: 1px solid #d6e4dd;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.nisa-scenario-table-wrap:focus-visible {
+  outline: 3px solid rgba(11, 143, 91, 0.18);
+  outline-offset: 2px;
+}
+
+.nisa-scenario-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  color: #38546a;
+  font-size: 0.64rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-scenario-table caption {
+  padding: 9px 10px 7px;
+  color: var(--nisa-navy);
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-align: left;
+}
+
+.nisa-scenario-table th,
+.nisa-scenario-table td {
+  padding: 8px 9px;
+  border-top: 1px solid #e6eeea;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.nisa-scenario-table thead th {
+  background: #f1f8f4;
+  color: #315a49;
+  font-weight: 850;
+}
+
+.nisa-scenario-table tr > :first-child {
+  text-align: left;
+}
+
+.nisa-scenario-comparison__empty,
+.nisa-scenario-comparison__notice {
+  margin: 0;
+  color: #5d7468;
+  font-size: 0.68rem;
+  line-height: 1.7;
+}
+
+.nisa-scenario-comparison__empty {
+  padding: 18px;
+  border: 1px dashed #bfd7ca;
+  border-radius: 9px;
+  background: #fafcfb;
+  text-align: center;
+}
+
+.nisa-scenario-comparison__notice {
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #f4f7f6;
+}
+
 .nisa-consultation-summary {
   display: grid;
   gap: 16px;
@@ -824,6 +1202,47 @@
   font-size: 0.7rem;
 }
 
+.nisa-consultation-scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.nisa-consultation-scenario-grid article {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #dce8e2;
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.nisa-consultation-scenario-grid article[data-scenario="base"] {
+  border-color: #a7d0bc;
+  background: #f3faf6;
+}
+
+.nisa-consultation-scenario-grid h6 {
+  margin: 0;
+  color: var(--nisa-navy);
+  font-size: 0.76rem;
+}
+
+.nisa-consultation-summary__section .nisa-consultation-scenario-grid dl {
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin-top: 7px;
+}
+
+.nisa-consultation-summary__section .nisa-consultation-scenario-grid dl > div {
+  grid-template-columns: 1fr;
+  gap: 1px;
+}
+
+.nisa-consultation-summary__section .nisa-consultation-scenario-grid dd {
+  text-align: left;
+}
+
 .nisa-consultation-summary__section--reproduction {
   background: #f8faf9;
   color: #60756a;
@@ -914,6 +1333,11 @@
   .nisa-consultation-summary__section ul {
     columns: 1;
   }
+
+  .nisa-scenario-result-grid,
+  .nisa-consultation-scenario-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 520px) {
@@ -939,6 +1363,16 @@
   .nisa-reset-undo {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .nisa-scenario-chart__canvas {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .nisa-scenario-chart__y-axis,
+  .nisa-scenario-chart__plot svg {
+    height: 170px;
   }
 }
 

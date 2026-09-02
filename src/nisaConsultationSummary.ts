@@ -3,6 +3,10 @@ import {
   roundHalfUp,
   type NisaCalculationMode,
 } from './nisaCalculation'
+import {
+  getNisaScenarioResults,
+  type NisaScenarioComparison,
+} from './nisaScenarioComparison'
 
 export const NISA_DESIGN_SPEC_VERSION =
   'OMG-DS-NISA-v1.0-20260730' as const
@@ -54,6 +58,9 @@ export type NisaConsultationInputSnapshot = {
   annualRatePercent: number
   inputMonths: number | null
   inflationRatePercent: number | null
+  scenarioComparisonEnabled: boolean
+  lowScenarioAnnualRatePercent: number | null
+  highScenarioAnnualRatePercent: number | null
 }
 
 export type NisaConsultationResult = {
@@ -65,6 +72,7 @@ export type NisaConsultationResult = {
   targetAmount: number | null
   inflationAdjustedValue: number | null
   allowance: NisaAllowanceAssessment
+  scenarioComparison: NisaScenarioComparison | null
 }
 
 export type NisaConsultationRecord = {
@@ -156,6 +164,18 @@ export const createNisaInputSnapshotText = (
     input.mode === 'future-value' && input.initialInvestment !== null
       ? `初期投資額=${formatNisaYen(input.initialInvestment)}`
       : null,
+    input.mode === 'future-value'
+      ? `シナリオ比較=${input.scenarioComparisonEnabled ? 'ON' : 'OFF'}`
+      : null,
+    input.mode === 'future-value' && input.scenarioComparisonEnabled
+      ? `低位シナリオ利回り=${input.lowScenarioAnnualRatePercent === null ? '未入力' : `${input.lowScenarioAnnualRatePercent}%`}`
+      : null,
+    input.mode === 'future-value' && input.scenarioComparisonEnabled
+      ? `基準シナリオ利回り=${input.annualRatePercent}%`
+      : null,
+    input.mode === 'future-value' && input.scenarioComparisonEnabled
+      ? `高位シナリオ利回り=${input.highScenarioAnnualRatePercent === null ? '未入力' : `${input.highScenarioAnnualRatePercent}%`}`
+      : null,
   ].filter((value): value is string => value !== null)
 
   return values.join('／')
@@ -193,7 +213,31 @@ const createInputLines = (record: NisaConsultationRecord) => {
     lines.push(`初期投資額: ${formatNisaYen(input.initialInvestment)}`)
   }
 
+  if (input.mode === 'future-value') {
+    lines.push(`シナリオ比較: ${input.scenarioComparisonEnabled ? 'ON' : 'OFF'}`)
+  }
+
   return lines
+}
+
+const createScenarioComparisonLines = (
+  comparison: NisaScenarioComparison | null,
+) => {
+  if (comparison === null) return []
+
+  return [
+    '',
+    '【シナリオ比較】',
+    ...getNisaScenarioResults(comparison).flatMap((scenario) => [
+      `${scenario.label}:`,
+      `  想定利回り: ${scenario.annualRatePercent}%`,
+      `  将来資産額: ${formatNisaYen(scenario.futureValue)}`,
+      `  運用収益: ${formatNisaYen(scenario.gain)}`,
+      scenario.inflationAdjustedValue === null
+        ? null
+        : `  インフレ調整後価値: ${formatNisaYen(scenario.inflationAdjustedValue)}`,
+    ]).filter((value): value is string => value !== null),
+  ]
 }
 
 const createResultLines = (record: NisaConsultationRecord) => {
@@ -245,6 +289,7 @@ export const createNisaConsultationSummaryText = (
     '',
     '【概算結果】',
     ...createResultLines(record),
+    ...createScenarioComparisonLines(record.result.scenarioComparison),
     '',
     '【NISA枠との関係】',
     `年間換算額: ${formatNisaYen(record.result.allowance.annualContribution)}`,
