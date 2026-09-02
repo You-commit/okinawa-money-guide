@@ -11,6 +11,7 @@ type SimulatorPageShellProps = {
   title: string
   description: ReactNode
   benefits: Array<{ title: string; description: string }>
+  heroVisual?: ReactNode
   children: ReactNode
   notes?: ReactNode
 }
@@ -21,6 +22,7 @@ function SimulatorPageShell({
   title,
   description,
   benefits,
+  heroVisual,
   children,
   notes,
 }: SimulatorPageShellProps) {
@@ -39,17 +41,14 @@ function SimulatorPageShell({
               <h1>{title}</h1>
               <p>{description}</p>
             </div>
-            <div className="simulator-page__benefits" aria-label={`${title}の特長`}>
-              {benefits.map((benefit, index) => (
-                <article key={benefit.title}>
-                  <b aria-hidden="true">0{index + 1}</b>
-                  <span>
-                    <strong>{benefit.title}</strong>
-                    <small>{benefit.description}</small>
-                  </span>
-                </article>
-              ))}
-            </div>
+            {heroVisual ? (
+              <div className="simulator-page__hero-stage">
+                {heroVisual}
+                <Benefits title={title} benefits={benefits} />
+              </div>
+            ) : (
+              <Benefits title={title} benefits={benefits} />
+            )}
           </div>
         </section>
 
@@ -61,5 +60,25 @@ function SimulatorPageShell({
     </SiteLayout>
   )
 }
+
+const Benefits = ({
+  title,
+  benefits,
+}: {
+  title: string
+  benefits: Array<{ title: string; description: string }>
+}) => (
+  <div className="simulator-page__benefits" aria-label={`${title}の特長`}>
+    {benefits.map((benefit, index) => (
+      <article key={benefit.title}>
+        <b aria-hidden="true">0{index + 1}</b>
+        <span>
+          <strong>{benefit.title}</strong>
+          <small>{benefit.description}</small>
+        </span>
+      </article>
+    ))}
+  </div>
+)
 
 export default SimulatorPageShell
