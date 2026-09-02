@@ -320,6 +320,16 @@ export const calculateGain = (
   principal: number,
 ) => ensureFiniteResult('gain', futureValue - principal)
 
+const calculateInflationAdjustedValueUnchecked = (
+  futureValue: number,
+  months: number,
+  inflationRatePercent: number,
+) => ensureFiniteResult(
+  'inflationAdjustedValue',
+  futureValue /
+    Math.pow(1 + inflationRatePercent / 100, months / 12),
+)
+
 export const calculateInflationAdjustedValue = (
   futureValue: number,
   months: number,
@@ -333,10 +343,10 @@ export const calculateInflationAdjustedValue = (
     inflationRatePercent,
   })
 
-  return ensureFiniteResult(
-    'inflationAdjustedValue',
-    futureValue /
-      Math.pow(1 + inflationRatePercent / 100, months / 12),
+  return calculateInflationAdjustedValueUnchecked(
+    futureValue,
+    months,
+    inflationRatePercent,
   )
 }
 
@@ -367,7 +377,7 @@ export const calculateFutureValue = (
     inflationAdjustedValue:
       input.inflationRatePercent === undefined
         ? null
-        : calculateInflationAdjustedValue(
+        : calculateInflationAdjustedValueUnchecked(
             futureValue,
             input.months,
             input.inflationRatePercent,
@@ -438,7 +448,7 @@ export const calculateRequiredMonthlyContribution = (
     inflationAdjustedValue:
       input.inflationRatePercent === undefined
         ? null
-        : calculateInflationAdjustedValue(
+        : calculateInflationAdjustedValueUnchecked(
             futureValue,
             input.months,
             input.inflationRatePercent,
@@ -555,7 +565,7 @@ export const calculateRequiredInvestmentMonths = (
     inflationAdjustedValue:
       input.inflationRatePercent === undefined
         ? null
-        : calculateInflationAdjustedValue(
+        : calculateInflationAdjustedValueUnchecked(
             futureValue,
             requiredMonths,
             input.inflationRatePercent,
@@ -611,7 +621,7 @@ export const calculateCurrentFutureValueWithInitialInvestment = (
     inflationAdjustedValue:
       input.inflationRatePercent === undefined
         ? null
-        : calculateInflationAdjustedValue(
+        : calculateInflationAdjustedValueUnchecked(
             futureValue,
             input.months,
             input.inflationRatePercent,

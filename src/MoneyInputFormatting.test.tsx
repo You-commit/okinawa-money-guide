@@ -163,14 +163,14 @@ describe('simulator money fields', () => {
     fireEvent.change(screen.getByLabelText(/毎月積立額/), {
       target: { value: '10000' },
     })
-    fireEvent.change(screen.getByLabelText(/想定年利/), {
+    fireEvent.change(screen.getByLabelText('想定利回り'), {
       target: { value: '5' },
     })
-    fireEvent.change(screen.getByLabelText(/積立期間/), {
+    fireEvent.change(screen.getByLabelText('積立期間（年）'), {
       target: { value: '20' },
     })
     fireEvent.click(screen.getByRole('button', {
-      name: 'シミュレートする',
+      name: '計算する',
     }))
 
     expect(screen.getAllByText('￥4,058,045')).toHaveLength(2)
