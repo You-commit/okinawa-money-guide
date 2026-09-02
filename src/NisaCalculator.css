@@ -16,9 +16,11 @@
 }
 
 .nisa-mode-selector button {
+  position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 3px 10px;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
   min-width: 0;
   min-height: 82px;
   padding: 13px 15px;
@@ -30,12 +32,18 @@
   text-align: left;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(22, 77, 56, 0.045);
-  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .nisa-mode-selector button:hover {
   border-color: #80c7a5;
+  background: #f4fbf7;
+  box-shadow: 0 9px 20px rgba(22, 77, 56, 0.08);
   transform: translateY(-1px);
+}
+
+.nisa-mode-selector button:active {
+  transform: translateY(1px);
 }
 
 .nisa-mode-selector button:focus-visible {
@@ -44,17 +52,34 @@
 }
 
 .nisa-mode-selector button[data-selected="true"] {
-  border-color: var(--nisa-green);
+  border: 2px solid var(--nisa-green);
   background: var(--nisa-green-soft);
-  box-shadow: inset 0 0 0 1px var(--nisa-green);
+  box-shadow: 0 8px 20px rgba(11, 143, 91, 0.1);
 }
 
-.nisa-mode-selector button > span {
-  grid-row: 1 / 3;
-  color: var(--nisa-green);
+.nisa-mode-selector__number {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #edf7f2;
+  color: #438066;
   font-size: 0.7rem;
   font-weight: 900;
   letter-spacing: 0.08em;
+}
+
+.nisa-mode-selector button[data-selected="true"] .nisa-mode-selector__number {
+  background: var(--nisa-green);
+  color: #ffffff;
+}
+
+.nisa-mode-selector__content {
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
 }
 
 .nisa-mode-selector button strong {
@@ -63,10 +88,26 @@
   line-height: 1.45;
 }
 
+.nisa-mode-selector button[data-selected="true"] strong {
+  color: var(--nisa-green-dark);
+  font-weight: 900;
+}
+
 .nisa-mode-selector button small {
   color: #708596;
   font-size: 0.62rem;
   font-weight: 650;
+}
+
+.nisa-mode-selector__state {
+  align-self: start;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--nisa-green-dark);
+  font-size: 0.56rem;
+  font-weight: 850;
+  white-space: nowrap;
 }
 
 .nisa-field {
@@ -84,6 +125,76 @@
   color: #24455c;
   font-size: 0.82rem;
   font-weight: 800;
+}
+
+.nisa-field__label-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.nisa-field__label-row > label {
+  color: #24455c;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.nisa-info-tooltip {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.nisa-info-tooltip__trigger {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid #91bdaa;
+  border-radius: 50%;
+  background: #f4fbf7;
+  color: var(--nisa-green-dark);
+  font: inherit;
+  font-family: Georgia, serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: help;
+}
+
+.nisa-info-tooltip__trigger:focus-visible {
+  outline: 3px solid rgba(11, 143, 91, 0.2);
+  outline-offset: 2px;
+}
+
+.nisa-info-tooltip__content {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 20;
+  width: min(280px, calc(100vw - 40px));
+  padding: 9px 11px;
+  border: 1px solid #c6ddd2;
+  border-radius: 9px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(18, 67, 49, 0.14);
+  color: #38594a;
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1.65;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-3px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  visibility: hidden;
+}
+
+.nisa-info-tooltip:hover .nisa-info-tooltip__content,
+.nisa-info-tooltip:focus-within .nisa-info-tooltip__content {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  visibility: visible;
 }
 
 .nisa-field__help,
@@ -198,6 +309,29 @@
 .nisa-inflation-card {
   border-color: #c9d6e8;
   background: #f7f9fd;
+}
+
+.nisa-calculation-assumption {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  color: #718699;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.nisa-calculation-assumption .nisa-info-tooltip__content {
+  right: 0;
+  left: auto;
+  transform: translateY(-3px);
+}
+
+.nisa-calculation-assumption .nisa-info-tooltip:hover .nisa-info-tooltip__content,
+.nisa-calculation-assumption .nisa-info-tooltip:focus-within .nisa-info-tooltip__content {
+  transform: translateY(0);
 }
 
 .nisa-result-empty,
@@ -316,6 +450,13 @@
   line-height: 1.6;
 }
 
+.nisa-allowance-panel__initial-note {
+  margin: -3px 0 0;
+  color: #657a8c;
+  font-size: 0.63rem;
+  line-height: 1.55;
+}
+
 .nisa-allowance-panel__message,
 .nisa-lifetime-notice {
   padding: 11px 12px;
@@ -344,6 +485,51 @@
 .nisa-allowance-panel__message p,
 .nisa-lifetime-notice p {
   margin: 5px 0 0;
+  color: #5f7385;
+  font-size: 0.67rem;
+  line-height: 1.65;
+}
+
+.nisa-tax-free-information {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px 14px;
+  padding: 14px 16px;
+  border: 1px solid #d7e6de;
+  border-radius: 12px;
+  background: #f8fbf9;
+}
+
+.nisa-tax-free-information > div > p,
+.nisa-tax-free-information h3,
+.nisa-tax-free-information > p {
+  margin: 0;
+}
+
+.nisa-tax-free-information > div > p {
+  color: var(--nisa-green);
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.nisa-tax-free-information h3 {
+  margin-top: 2px;
+  color: var(--nisa-navy);
+  font-size: 0.84rem;
+}
+
+.nisa-tax-free-information > strong {
+  align-self: start;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #edf5f0;
+  color: #4f6f5e;
+  font-size: 0.62rem;
+}
+
+.nisa-tax-free-information > p {
+  grid-column: 1 / -1;
   color: #5f7385;
   font-size: 0.67rem;
   line-height: 1.65;
@@ -643,6 +829,35 @@
   color: #60756a;
 }
 
+.nisa-consultation-summary__section--reproduction > summary {
+  color: #526a5e;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nisa-consultation-summary__section--reproduction > summary:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid rgba(11, 143, 91, 0.18);
+  outline-offset: 3px;
+}
+
+.nisa-consultation-summary__section--reproduction[open] > summary {
+  margin-bottom: 10px;
+}
+
+.nisa-primary-source-list a {
+  color: var(--nisa-green-dark);
+  font-weight: 750;
+  text-underline-offset: 3px;
+}
+
+.nisa-primary-source-list a:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid rgba(11, 143, 91, 0.18);
+  outline-offset: 3px;
+}
+
 .nisa-consultation-summary__notice {
   padding: 10px 12px;
   border: 1px solid #d6e2dc;
@@ -670,6 +885,11 @@
 
   .nisa-mode-selector button {
     min-height: 68px;
+  }
+
+  .nisa-calculation-assumption {
+    justify-content: flex-start;
+    text-align: left;
   }
 }
 
@@ -706,6 +926,14 @@
   .nisa-allowance-panel__heading {
     flex-direction: column;
     gap: 7px;
+  }
+
+  .nisa-tax-free-information {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-tax-free-information > strong {
+    justify-self: start;
   }
 
   .nisa-reset-undo {
@@ -795,6 +1023,14 @@
     background: #ffffff;
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__section--reproduction > summary {
+    display: none;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__section--reproduction > dl {
+    display: grid !important;
   }
 
   .simulator-page--nisa .nisa-consultation-summary__section h5 {

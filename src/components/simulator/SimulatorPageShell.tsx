@@ -51,6 +51,7 @@ function SimulatorPageShell({
               ))}
             </div>
           </div>
+          <span className="simulator-page__hero-wave" aria-hidden="true" />
         </section>
 
         <div className="simulator-page__main">

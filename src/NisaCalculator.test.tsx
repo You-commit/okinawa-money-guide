@@ -57,7 +57,24 @@ describe('NISA planning modes', () => {
     expect(tabs).toHaveLength(3)
     expect(screen.getByRole('tab', { name: /将来額を調べる/ })
       .getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('tab', { name: /将来額を調べる/ }).textContent)
+      .toContain('選択中')
     expect(screen.getByLabelText(/初期投資額/)).toBeTruthy()
+  })
+
+  it('supports roving focus and mode selection with arrow keys', () => {
+    render(<NisaCalculator />)
+    const futureTab = screen.getByRole('tab', { name: /将来額を調べる/ })
+    const contributionTab = screen.getByRole('tab', {
+      name: /必要な毎月積立額を調べる/,
+    })
+
+    futureTab.focus()
+    fireEvent.keyDown(futureTab, { key: 'ArrowRight' })
+
+    expect(contributionTab.getAttribute('aria-selected')).toBe('true')
+    expect(contributionTab.getAttribute('tabindex')).toBe('0')
+    expect(document.activeElement).toBe(contributionTab)
   })
 
   it('changes modes, preserves shared values, and clears the old result', () => {
@@ -246,8 +263,10 @@ describe('NISA 2026 allowance UI', () => {
 
     expect(screen.queryByText('非課税保有限度額について確認が必要です'))
       .toBeNull()
-    expect(screen.getByText('枠判定対象の積立元本').parentElement
+    expect(screen.getAllByText('NISA枠判定対象の積立元本')[0].parentElement
       ?.textContent).toContain('￥1,200,000')
+    expect(screen.getAllByText('初期投資額はNISA枠判定に含めていません。').length)
+      .toBeGreaterThan(0)
   })
 
   it('does not expose initial investment in either reverse mode', () => {
@@ -425,6 +444,56 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     expect(lossTable.textContent).toMatch(/-￥|−￥/)
   })
 
+  it('clarifies principal labels and separates the tax-free note from KPI cards', () => {
+    const { container } = render(<NisaCalculator />)
+    change('初期投資額（任意）', '500000')
+    fillFuture()
+    calculate()
+
+    const kpiGrid = container.querySelector('.nisa-result-grid')
+    expect(kpiGrid?.textContent).toContain('投資元本（初期投資額を含む）')
+    expect(kpiGrid?.textContent).not.toContain('非課税メリット')
+    expect(screen.getByText('NISAの非課税効果について')).toBeTruthy()
+    expect(screen.getByText('別途確認')).toBeTruthy()
+    expect(screen.getAllByText('NISA枠判定対象の積立元本').length)
+      .toBeGreaterThan(0)
+  })
+
+  it('renders five dynamic yen labels on the asset graph Y axis', () => {
+    const { container } = render(<NisaCalculator />)
+    fillFuture()
+    calculate()
+
+    const labels = Array.from(
+      container.querySelectorAll('.nisa-area-graph__y-axis span'),
+    ).map((label) => label.textContent)
+    expect(labels).toHaveLength(5)
+    expect(labels.at(-1)).toBe('0')
+    expect(labels.slice(0, -1).every((label) => /円$/.test(label ?? '')))
+      .toBe(true)
+  })
+
+  it('associates calculation and inflation explanations with focusable tooltips', () => {
+    render(<NisaCalculator />)
+
+    const inflationTrigger = screen.getByRole('button', {
+      name: '想定インフレ率の説明',
+    })
+    const inflationTooltipId = inflationTrigger.getAttribute('aria-describedby')
+    expect(inflationTooltipId).toBeTruthy()
+    expect(document.getElementById(inflationTooltipId!)?.getAttribute('role'))
+      .toBe('tooltip')
+    inflationTrigger.focus()
+    expect(document.activeElement).toBe(inflationTrigger)
+
+    const calculationTrigger = screen.getByRole('button', {
+      name: '計算方法の説明',
+    })
+    expect(calculationTrigger.getAttribute('aria-describedby'))
+      .toBe('nisa-effective-monthly-rate-tooltip')
+    expect(screen.getByText('毎月末に積み立てる前提で試算')).toBeTruthy()
+  })
+
   it('renders the future-value consultation summary with allowance, lists, and reproduction information', () => {
     render(<NisaCalculator />)
     change('初期投資額（任意）', '500000')
@@ -437,11 +506,23 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     expect(within(summary).getByText('NISA枠との関係')).toBeTruthy()
     expect(within(summary).getByText('商品固有の信託報酬等')).toBeTruthy()
     expect(within(summary).getByText('現在の利用可能枠')).toBeTruthy()
-    expect(within(summary).getByText('結果再現情報')).toBeTruthy()
+    const disclosure = within(summary).getByText('計算条件・参照情報')
+      .closest('details') as HTMLDetailsElement
+    expect(disclosure.open).toBe(false)
+    fireEvent.click(within(disclosure).getByText('計算条件・参照情報'))
+    expect(disclosure.open).toBe(true)
     expect(within(summary).getAllByText('OMG-DS-NISA-v1.0-20260730'))
       .toHaveLength(2)
-    expect(within(summary).getByText('未設定（正式版番号未定義）'))
+    expect(within(summary).getByText('NISA積立シミュレーションモデル'))
       .toBeTruthy()
+    expect(within(summary).getByText('2026年現行NISA制度')).toBeTruthy()
+    expect(within(summary).getByText('2026年9月2日')).toBeTruthy()
+    expect(within(summary).queryByText(/未設定|未記録/)).toBeNull()
+    const primarySource = within(summary).getByRole('link', {
+      name: '金融庁 NISA特設サイトを新しいタブで開く',
+    })
+    expect(primarySource.getAttribute('target')).toBe('_blank')
+    expect(primarySource.getAttribute('rel')).toBe('noopener noreferrer')
     expect(within(summary).getByText(/計算モード=将来額を調べる/))
       .toBeTruthy()
   })
@@ -512,8 +593,11 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     expect(copiedText).toContain('【入力条件】')
     expect(copiedText).toContain('【概算結果】')
     expect(copiedText).toContain('【NISA枠との関係】')
-    expect(copiedText).toContain('【結果再現情報】')
+    expect(copiedText).toContain('【計算条件・参照情報】')
     expect(copiedText).toContain('入力スナップショット:')
+    expect(copiedText).toContain('制度基準: 2026年現行NISA制度')
+    expect(copiedText).toContain('一次資料確認日: 2026年9月2日')
+    expect(copiedText).toContain('https://www.fsa.go.jp/policy/nisa2/')
     expect(screen.getByRole('status').textContent)
       .toBe('相談用サマリーをコピーしました。')
 

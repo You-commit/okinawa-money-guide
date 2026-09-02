@@ -8,10 +8,12 @@ export const NISA_DESIGN_SPEC_VERSION =
   'OMG-DS-NISA-v1.0-20260730' as const
 
 export const NISA_CALCULATION_MODEL_VERSION: string | null = null
+export const NISA_CALCULATION_MODEL_NAME =
+  'NISA積立シミュレーションモデル' as const
 export const NISA_CALCULATION_SPEC_VERSION = NISA_DESIGN_SPEC_VERSION
-export const NISA_POLICY_STANDARD = '2026年現行制度' as const
-export const NISA_POLICY_REFERENCE_DATE: string | null = null
-export const NISA_PRIMARY_SOURCE_REVIEW_DATE: string | null = null
+export const NISA_POLICY_STANDARD = '2026年現行NISA制度' as const
+export const NISA_POLICY_REFERENCE_DATE = NISA_POLICY_STANDARD
+export const NISA_PRIMARY_SOURCE_REVIEW_DATE = '2026年9月2日' as const
 
 export const NISA_UNCONSIDERED_ITEMS = [
   '商品固有の信託報酬等',
@@ -34,7 +36,14 @@ export const NISA_CONFIRMATION_ITEMS = [
 ] as const
 
 export const NISA_PRIMARY_SOURCES = [
-  '金融庁（NISA制度の一次資料。正式参照先は未設定）',
+  {
+    label: '金融庁 NISA特設サイト',
+    url: 'https://www.fsa.go.jp/policy/nisa2/',
+  },
+  {
+    label: '金融庁 NISA制度概要',
+    url: 'https://www.fsa.go.jp/policy/nisa2/know/index.html',
+  },
 ] as const
 
 export type NisaConsultationInputSnapshot = {
@@ -95,13 +104,19 @@ export const formatNisaCalculationDateTime = (calculatedAt: string) =>
   }).format(new Date(calculatedAt))
 
 export const getNisaModelVersionDisplay = () =>
-  NISA_CALCULATION_MODEL_VERSION ?? '未設定（正式版番号未定義）'
+  NISA_CALCULATION_MODEL_VERSION ?? NISA_CALCULATION_MODEL_NAME
 
 export const getNisaPolicyReferenceDateDisplay = () =>
-  NISA_POLICY_REFERENCE_DATE ?? `未設定（${NISA_POLICY_STANDARD}を基準）`
+  NISA_POLICY_REFERENCE_DATE
 
 export const getNisaPrimarySourceReviewDateDisplay = () =>
-  NISA_PRIMARY_SOURCE_REVIEW_DATE ?? '未記録（正式確認日の設定なし）'
+  NISA_PRIMARY_SOURCE_REVIEW_DATE
+
+export const getNisaPrincipalLabel = (
+  input: NisaConsultationInputSnapshot,
+) => input.mode === 'future-value' && (input.initialInvestment ?? 0) > 0
+  ? '投資元本（初期投資額を含む）'
+  : '投資元本'
 
 export const getNisaAllowanceRelation = (
   assessment: NisaAllowanceAssessment,
@@ -183,11 +198,12 @@ const createInputLines = (record: NisaConsultationRecord) => {
 
 const createResultLines = (record: NisaConsultationRecord) => {
   const { input, result } = record
+  const principalLabel = getNisaPrincipalLabel(input)
 
   if (input.mode === 'future-value') {
     return [
       `将来資産額: ${formatNisaYen(result.futureValue)}`,
-      `元本: ${formatNisaYen(result.principal)}`,
+      `${principalLabel}: ${formatNisaYen(result.principal)}`,
       `運用収益: ${formatNisaYen(result.gain)}`,
       result.inflationAdjustedValue === null
         ? null
@@ -199,7 +215,7 @@ const createResultLines = (record: NisaConsultationRecord) => {
     return [
       `必要な毎月積立額: ${formatNisaYen(result.monthlyContribution)}`,
       `年間換算額: ${formatNisaYen(result.allowance.annualContribution)}`,
-      `元本: ${formatNisaYen(result.principal)}`,
+      `${principalLabel}: ${formatNisaYen(result.principal)}`,
       `目標額: ${formatNisaYen(result.targetAmount ?? 0)}`,
     ]
   }
@@ -208,7 +224,7 @@ const createResultLines = (record: NisaConsultationRecord) => {
     `必要期間: ${formatNisaMonths(result.months)}`,
     `必要月数: ${result.months.toLocaleString('ja-JP')}か月`,
     `毎月積立額: ${formatNisaYen(result.monthlyContribution)}`,
-    `元本: ${formatNisaYen(result.principal)}`,
+    `${principalLabel}: ${formatNisaYen(result.principal)}`,
     `目標額: ${formatNisaYen(result.targetAmount ?? 0)}`,
   ]
 }
@@ -232,9 +248,11 @@ export const createNisaConsultationSummaryText = (
     '',
     '【NISA枠との関係】',
     `年間換算額: ${formatNisaYen(record.result.allowance.annualContribution)}`,
+    `NISA枠判定対象の積立元本: ${formatNisaYen(record.result.allowance.formalPrincipal)}`,
     `120万円との関係: ${allowanceRelation.annualTsumitate}`,
     `360万円との関係: ${allowanceRelation.annualCombined}`,
     `1,800万円との関係: ${allowanceRelation.lifetime}`,
+    '初期投資額はNISA枠判定に含めていません。',
     '成長投資枠へ自動配分していません。実際の利用可能枠は金融機関等でご確認ください。',
     '',
     '【未考慮事項】',
@@ -243,17 +261,17 @@ export const createNisaConsultationSummaryText = (
     '【金融機関・FPへ確認する項目】',
     bulletLines(NISA_CONFIRMATION_ITEMS),
     '',
-    '【結果再現情報】',
+    '【計算条件・参照情報】',
     `入力スナップショット: ${createNisaInputSnapshotText(record.input)}`,
     `計算日時: ${formatNisaCalculationDateTime(record.calculatedAt)}`,
-    `計算モデル版: ${getNisaModelVersionDisplay()}`,
+    `計算モデル: ${getNisaModelVersionDisplay()}`,
     `仕様版: ${NISA_DESIGN_SPEC_VERSION}`,
     `計算仕様版: ${NISA_CALCULATION_SPEC_VERSION}`,
-    `制度基準日: ${getNisaPolicyReferenceDateDisplay()}`,
+    `制度基準: ${getNisaPolicyReferenceDateDisplay()}`,
     `一次資料確認日: ${getNisaPrimarySourceReviewDateDisplay()}`,
     '',
     '【一次資料】',
-    bulletLines(NISA_PRIMARY_SOURCES),
+    bulletLines(NISA_PRIMARY_SOURCES.map((source) => `${source.label}: ${source.url}`)),
     '',
     '本サマリーは一定の利回りを仮定した概算です。実際の運用成果や利用可能なNISA枠を保証するものではありません。',
   ].join('\n')

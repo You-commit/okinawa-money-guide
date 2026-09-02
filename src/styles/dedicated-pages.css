@@ -73,16 +73,15 @@
   color: #ffffff;
 }
 
-.simulator-page__hero::after {
-  content: "";
+.simulator-page__hero-wave {
   position: absolute;
-  right: -5%;
-  bottom: -135px;
-  width: 70%;
-  height: 190px;
-  border: 1px solid rgba(255, 255, 255, 0.26);
-  border-radius: 50%;
-  box-shadow: 0 -30px 0 -28px rgba(255, 255, 255, 0.11);
+  right: -2%;
+  bottom: -1px;
+  left: -2%;
+  z-index: 2;
+  height: 42px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 31C180-12 346 56 570 31c236-26 380 26 570 3 126-15 211-5 300-25v55H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
+  pointer-events: none;
 }
 
 .simulator-page--mortgage {
@@ -100,19 +99,6 @@
       rgba(0, 91, 130, 0.34) 100%
     ),
     url('../assets/simulator-heroes/OMG-Mortgage-Hero-v2.png') center 42% / cover no-repeat;
-}
-
-.simulator-page--mortgage .simulator-page__hero::after {
-  right: -2%;
-  bottom: -1px;
-  left: -2%;
-  width: auto;
-  height: 42px;
-  border: 0;
-  border-radius: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 31C180-12 346 56 570 31c236-26 380 26 570 3 126-15 211-5 300-25v55H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
-  box-shadow: none;
-  pointer-events: none;
 }
 
 .simulator-page--mortgage .simulator-page__hero-inner {
@@ -159,20 +145,6 @@
     rgba(0, 72, 50, 0.1) 39%,
     rgba(0, 84, 60, 0) 67%
   );
-  pointer-events: none;
-}
-
-.simulator-page--nisa .simulator-page__hero::after {
-  right: -2%;
-  bottom: -1px;
-  left: -2%;
-  z-index: 2;
-  width: auto;
-  height: 40px;
-  border: 0;
-  border-radius: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 56' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 26C210 4 373 39 590 27c233-13 398 17 604 2 99-7 176-8 246-4v31H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
-  box-shadow: none;
   pointer-events: none;
 }
 
@@ -349,8 +321,8 @@
 
 .simulator-page__main {
   width: min(100% - 64px, 1360px);
-  margin: -18px auto 0;
-  padding: 0 0 76px;
+  margin: 0 auto;
+  padding: 10px 0 76px;
 }
 
 .simulator-page__calculator {
@@ -358,7 +330,7 @@
   z-index: 2;
   padding: 34px;
   border: 1px solid #dce8ef;
-  border-top: 4px solid var(--page-accent);
+  border-top: 1px solid #dce8ef;
   border-radius: 18px;
   background: #ffffff;
   box-shadow: 0 20px 52px rgba(8, 43, 80, 0.13);
@@ -886,7 +858,7 @@
   }
 
   .simulator-page__main {
-    margin-top: -16px;
+    margin-top: 0;
     padding-bottom: 64px;
   }
 
@@ -2009,16 +1981,6 @@
     min-height: 118px;
   }
 
-  .simulator-page--nisa .result-card--tax-free-note {
-    border-color: #efcf9a;
-    background: #fff9ef;
-  }
-
-  .simulator-page--nisa .result-card--tax-free-note strong {
-    color: #d17a16;
-    font-size: clamp(0.9rem, 6cqi, 1.22rem);
-  }
-
   .simulator-page--nisa .simulator-chart-panel--nisa {
     min-height: 328px;
   }
@@ -2102,6 +2064,35 @@
   padding: 5px 4px 0;
 }
 
+.nisa-area-graph__canvas {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.nisa-area-graph__y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  height: 225px;
+  padding: 30px 0 22px;
+  color: #62798c;
+  font-size: 0.56rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-area-graph__plot {
+  position: relative;
+  min-width: 0;
+}
+
 .nisa-area-graph svg,
 .ideco-area-graph svg {
   display: block;
@@ -2147,7 +2138,7 @@
   text-align: center;
 }
 
-.nisa-area-graph > strong {
+.nisa-area-graph__plot > strong {
   position: absolute;
   top: 12px;
   right: 10px;
@@ -2245,6 +2236,12 @@
   .nisa-area-graph svg,
   .ideco-area-graph svg {
     height: 190px;
+  }
+
+  .nisa-area-graph__y-axis {
+    height: 190px;
+    padding-top: 25px;
+    font-size: 0.5rem;
   }
 
   .nisa-area-graph__labels,
@@ -2356,19 +2353,6 @@
       rgba(0, 72, 78, 0.28) 100%
     ),
     url('../assets/simulator-heroes/OMG-Military-Land-Hero-v1.png') center 54% / cover no-repeat;
-}
-
-.simulator-page--military .simulator-page__hero::after {
-  right: -2%;
-  bottom: -1px;
-  left: -2%;
-  width: auto;
-  height: 42px;
-  border: 0;
-  border-radius: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 31C180-12 346 56 570 31c236-26 380 26 570 3 126-15 211-5 300-25v55H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
-  box-shadow: none;
-  pointer-events: none;
 }
 
 .simulator-page--military .simulator-page__hero-inner {

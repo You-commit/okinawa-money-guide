@@ -3,6 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type KeyboardEvent,
 } from 'react'
 import MoneyInput from './components/form/MoneyInput'
 import {
@@ -35,6 +36,7 @@ import {
   getNisaModeLabel,
   getNisaModelVersionDisplay,
   getNisaPolicyReferenceDateDisplay,
+  getNisaPrincipalLabel,
   getNisaPrimarySourceReviewDateDisplay,
   type NisaConsultationRecord as NisaConsultationSummaryRecord,
   type NisaConsultationInputSnapshot,
@@ -477,6 +479,21 @@ const formatMonths = (months: number) => {
   return `${years}年${remainingMonths}か月`
 }
 
+const formatGraphAxisYen = (value: number) => {
+  if (value === 0) return '0'
+
+  if (Math.abs(value) >= 100_000_000) {
+    const oku = roundHalfUp(value / 10_000_000) / 10
+    return `${oku.toLocaleString('ja-JP', { maximumFractionDigits: 1 })}億円`
+  }
+
+  if (Math.abs(value) >= 10_000) {
+    return `${roundHalfUp(value / 10_000).toLocaleString('ja-JP')}万円`
+  }
+
+  return `${roundHalfUp(value).toLocaleString('ja-JP')}円`
+}
+
 const formatTrajectoryPointLabel = (
   months: number,
   finalMonths: number,
@@ -526,6 +543,30 @@ const NisaMoneyField = ({
   </div>
 )
 
+const InfoTooltip = ({
+  id,
+  label,
+  children,
+}: {
+  id: string
+  label: string
+  children: string
+}) => (
+  <span className="nisa-info-tooltip">
+    <button
+      type="button"
+      className="nisa-info-tooltip__trigger"
+      aria-label={label}
+      aria-describedby={id}
+    >
+      i
+    </button>
+    <span id={id} className="nisa-info-tooltip__content" role="tooltip">
+      {children}
+    </span>
+  </span>
+)
+
 function NisaCalculator() {
   const [mode, setMode] = useState<NisaCalculationMode>('future-value')
   const [values, setValues] = useState<NisaFormValues>(INITIAL_VALUES)
@@ -541,6 +582,7 @@ function NisaCalculator() {
   const errorSummaryRef = useRef<HTMLDivElement>(null)
   const summaryStatusTimerRef = useRef<number | null>(null)
   const copyRequestIdRef = useRef(0)
+  const modeButtonRefs = useRef<Array<HTMLButtonElement | null>>([])
 
   const autoState = useMemo(() => {
     if (!isAutoCalculation) {
@@ -626,6 +668,29 @@ function NisaCalculator() {
     setMode(nextMode)
     setManualRecord(null)
     setManualErrors({})
+  }
+
+  const handleModeKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    currentIndex: number,
+  ) => {
+    let nextIndex: number | null = null
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % MODE_OPTIONS.length
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + MODE_OPTIONS.length) % MODE_OPTIONS.length
+    } else if (event.key === 'Home') {
+      nextIndex = 0
+    } else if (event.key === 'End') {
+      nextIndex = MODE_OPTIONS.length - 1
+    }
+
+    if (nextIndex === null) return
+
+    event.preventDefault()
+    changeMode(MODE_OPTIONS[nextIndex].mode)
+    modeButtonRefs.current[nextIndex]?.focus()
   }
 
   const simulate = () => {
@@ -761,6 +826,9 @@ function NisaCalculator() {
       principalArea: `0,${bottom} ${principalPoints.join(' ')} ${width},${bottom}`,
       gainArea: `${totalPoints.join(' ')} ${[...principalPoints].reverse().join(' ')}`,
       totalLine: totalPoints.join(' '),
+      yAxisValues: [1, 0.75, 0.5, 0.25, 0].map((ratio) =>
+        maximumValue * ratio,
+      ),
     }
   }, [assetTrajectory])
 
@@ -786,17 +854,29 @@ function NisaCalculator() {
         {MODE_OPTIONS.map((option, index) => (
           <button
             key={option.mode}
+            ref={(element) => {
+              modeButtonRefs.current[index] = element
+            }}
             id={`nisa-mode-${option.mode}`}
             type="button"
             role="tab"
             aria-selected={mode === option.mode}
             aria-controls="nisa-calculation-panel"
+            tabIndex={mode === option.mode ? 0 : -1}
             data-selected={mode === option.mode}
             onClick={() => changeMode(option.mode)}
+            onKeyDown={(event) => handleModeKeyDown(event, index)}
           >
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            <strong>{option.label}</strong>
-            <small>{option.shortLabel}を試算</small>
+            <span className="nisa-mode-selector__number">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <span className="nisa-mode-selector__content">
+              <strong>{option.label}</strong>
+              <small>{option.shortLabel}を試算</small>
+            </span>
+            {mode === option.mode && (
+              <span className="nisa-mode-selector__state">選択中</span>
+            )}
           </button>
         ))}
       </div>
@@ -960,7 +1040,15 @@ function NisaCalculator() {
           )}
 
           <div className="nisa-field">
-            <label htmlFor="nisa-inflation-rate">想定インフレ率（任意）</label>
+            <div className="nisa-field__label-row">
+              <label htmlFor="nisa-inflation-rate">想定インフレ率（任意）</label>
+              <InfoTooltip
+                id="nisa-inflation-rate-tooltip"
+                label="想定インフレ率の説明"
+              >
+                将来のお金の実質的な価値を確認するための任意項目です。入力しなくても通常の資産形成試算はできます。
+              </InfoTooltip>
+            </div>
             <div className="input-with-unit">
               <input
                 id="nisa-inflation-rate"
@@ -1028,7 +1116,15 @@ function NisaCalculator() {
         <div className="calculator-results" aria-live="polite">
           <div className="simulator-results-heading">
             <div><p>RESULT</p><h3>概算結果</h3></div>
-            <span>毎月末積立・実効月利</span>
+            <div className="nisa-calculation-assumption">
+              <span>毎月末に積み立てる前提で試算</span>
+              <InfoTooltip
+                id="nisa-effective-monthly-rate-tooltip"
+                label="計算方法の説明"
+              >
+                入力した年利を実効月次利率へ換算して計算しています。
+              </InfoTooltip>
+            </div>
           </div>
 
           {displayedResult?.status === 'unreachable' ? (
@@ -1045,7 +1141,7 @@ function NisaCalculator() {
                 {displayedResult.mode === 'future-value' && (
                   <>
                     <ResultCard className="emphasis-result result-card--future" label="将来資産額" value={formatYen(displayedResult.futureValue)} help="毎月末積立・月次複利による概算" />
-                    <ResultCard label="元本" value={formatYen(displayedResult.principal)} help="初期投資額と毎月積立額の合計" />
+                    <ResultCard label={getNisaPrincipalLabel(displayedRecord!.input)} value={formatYen(displayedResult.principal)} help="初期投資額と毎月積立額の合計" />
                     <ResultCard className="result-card--gain" label="運用収益" value={formatYen(displayedResult.gain)} help="将来資産額－元本" />
                   </>
                 )}
@@ -1055,7 +1151,7 @@ function NisaCalculator() {
                     <ResultCard className="emphasis-result result-card--future" label="必要な毎月積立額" value={formatYen(displayedResult.monthlyContribution)} help="目標額を下回らないよう1円単位で切り上げ" />
                     <ResultCard label="年間換算額" value={formatYen(displayedResult.allowance.annualContribution)} help="必要な毎月積立額×12か月" />
                     <ResultCard label="目標額" value={formatYen(displayedResult.targetAmount!)} help="入力した目標額" />
-                    <ResultCard label="元本" value={formatYen(displayedResult.principal)} help="切り上げ後の毎月積立額×積立月数" />
+                    <ResultCard label="投資元本" value={formatYen(displayedResult.principal)} help="切り上げ後の毎月積立額×積立月数" />
                   </>
                 )}
 
@@ -1064,7 +1160,7 @@ function NisaCalculator() {
                     <ResultCard className="emphasis-result result-card--future" label="必要積立期間" value={formatMonths(displayedResult.months)} help={`${displayedResult.months.toLocaleString('ja-JP')}か月（1か月単位で切り上げ）`} />
                     <ResultCard label="目標額" value={formatYen(displayedResult.targetAmount!)} help="入力した目標額" />
                     <ResultCard label="毎月積立額" value={formatYen(displayedResult.monthlyContribution)} help="入力した毎月積立額" />
-                    <ResultCard label="元本" value={formatYen(displayedResult.principal)} help="毎月積立額×必要月数" />
+                    <ResultCard label="投資元本" value={formatYen(displayedResult.principal)} help="毎月積立額×必要月数" />
                   </>
                 )}
 
@@ -1072,10 +1168,10 @@ function NisaCalculator() {
                   <ResultCard className="nisa-inflation-card" label="インフレ調整後価値" value={formatYen(displayedResult.inflationAdjustedValue)} help="入力した想定インフレ率による現在価値の目安" />
                 )}
 
-                <ResultCard className="result-card--tax-free-note" label="非課税メリット" value="別途確認" help="個別税額は自動算定していません" />
               </div>
 
               <NisaAllowancePanel assessment={displayedResult.allowance} />
+              <NisaTaxFreeInformation />
             </>
           ) : (
             <div className="nisa-result-empty">
@@ -1105,28 +1201,40 @@ function NisaCalculator() {
                     <span><i />積立元本</span><span><i />運用収益</span><span><i />将来資産額</span>
                   </div>
                   <div className="nisa-area-graph" aria-label="元本と運用益を含む資産推移の概算グラフ">
-                    <svg viewBox="0 0 600 200" role="img" aria-hidden="true" preserveAspectRatio="none">
-                      <g className="nisa-area-graph__grid">
-                        <line x1="0" y1="30" x2="600" y2="30" /><line x1="0" y1="80" x2="600" y2="80" />
-                        <line x1="0" y1="130" x2="600" y2="130" /><line x1="0" y1="180" x2="600" y2="180" />
-                      </g>
-                      <polygon className="nisa-area-graph__principal" points={assetAreaGraph.principalArea} />
-                      <polygon className="nisa-area-graph__gain" points={assetAreaGraph.gainArea} />
-                      <polyline className="nisa-area-graph__total" points={assetAreaGraph.totalLine} />
-                    </svg>
-                    <div
-                      className="nisa-area-graph__labels"
-                      aria-hidden="true"
-                      style={{
-                        gridTemplateColumns:
-                          `repeat(${assetTrajectory.length}, minmax(0, 1fr))`,
-                      }}
-                    >
-                      {assetTrajectory.map((point) => (
-                        <span key={point.months}>{point.label}</span>
-                      ))}
+                    <div className="nisa-area-graph__canvas">
+                      <div className="nisa-area-graph__y-axis" aria-hidden="true">
+                        {assetAreaGraph.yAxisValues.map((value, index) => (
+                          <span key={`${index}-${value}`}>{formatGraphAxisYen(value)}</span>
+                        ))}
+                      </div>
+                      <div className="nisa-area-graph__plot">
+                        <svg viewBox="0 0 600 200" role="img" aria-hidden="true" preserveAspectRatio="none">
+                          <g className="nisa-area-graph__grid">
+                            <line x1="0" y1="30" x2="600" y2="30" />
+                            <line x1="0" y1="67.5" x2="600" y2="67.5" />
+                            <line x1="0" y1="105" x2="600" y2="105" />
+                            <line x1="0" y1="142.5" x2="600" y2="142.5" />
+                            <line x1="0" y1="180" x2="600" y2="180" />
+                          </g>
+                          <polygon className="nisa-area-graph__principal" points={assetAreaGraph.principalArea} />
+                          <polygon className="nisa-area-graph__gain" points={assetAreaGraph.gainArea} />
+                          <polyline className="nisa-area-graph__total" points={assetAreaGraph.totalLine} />
+                        </svg>
+                        <div
+                          className="nisa-area-graph__labels"
+                          aria-hidden="true"
+                          style={{
+                            gridTemplateColumns:
+                              `repeat(${assetTrajectory.length}, minmax(0, 1fr))`,
+                          }}
+                        >
+                          {assetTrajectory.map((point) => (
+                            <span key={point.months}>{point.label}</span>
+                          ))}
+                        </div>
+                        <strong>{formatYen(displayedResult.futureValue)}</strong>
+                      </div>
                     </div>
-                    <strong>{formatYen(displayedResult.futureValue)}</strong>
                   </div>
                   <p className="nisa-trajectory-summary">
                     最終時点は{formatMonths(displayedResult.months)}です。
@@ -1287,7 +1395,7 @@ const NisaConsultationSummaryContent = ({
           {input.mode === 'future-value' && (
             <>
               <div><dt>将来資産額</dt><dd>{formatYen(result.futureValue)}</dd></div>
-              <div><dt>元本</dt><dd>{formatYen(result.principal)}</dd></div>
+              <div><dt>{getNisaPrincipalLabel(input)}</dt><dd>{formatYen(result.principal)}</dd></div>
               <div><dt>運用収益</dt><dd>{formatYen(result.gain)}</dd></div>
               {result.inflationAdjustedValue !== null && (
                 <div><dt>インフレ調整後価値</dt><dd>{formatYen(result.inflationAdjustedValue)}</dd></div>
@@ -1298,7 +1406,7 @@ const NisaConsultationSummaryContent = ({
             <>
               <div><dt>必要な毎月積立額</dt><dd>{formatYen(result.monthlyContribution)}</dd></div>
               <div><dt>年間換算額</dt><dd>{formatYen(result.allowance.annualContribution)}</dd></div>
-              <div><dt>元本</dt><dd>{formatYen(result.principal)}</dd></div>
+              <div><dt>投資元本</dt><dd>{formatYen(result.principal)}</dd></div>
               <div><dt>目標額</dt><dd>{formatYen(result.targetAmount ?? 0)}</dd></div>
             </>
           )}
@@ -1307,7 +1415,7 @@ const NisaConsultationSummaryContent = ({
               <div><dt>必要期間</dt><dd>{formatMonths(result.months)}</dd></div>
               <div><dt>必要月数</dt><dd>{result.months.toLocaleString('ja-JP')}か月</dd></div>
               <div><dt>毎月積立額</dt><dd>{formatYen(result.monthlyContribution)}</dd></div>
-              <div><dt>元本</dt><dd>{formatYen(result.principal)}</dd></div>
+              <div><dt>投資元本</dt><dd>{formatYen(result.principal)}</dd></div>
               <div><dt>目標額</dt><dd>{formatYen(result.targetAmount ?? 0)}</dd></div>
             </>
           )}
@@ -1318,11 +1426,13 @@ const NisaConsultationSummaryContent = ({
         <h5>NISA枠との関係</h5>
         <dl>
           <div><dt>年間換算額</dt><dd>{formatYen(result.allowance.annualContribution)}</dd></div>
+          <div><dt>NISA枠判定対象の積立元本</dt><dd>{formatYen(result.allowance.formalPrincipal)}</dd></div>
           <div><dt>120万円との関係</dt><dd>{allowanceRelation.annualTsumitate}</dd></div>
           <div><dt>360万円との関係</dt><dd>{allowanceRelation.annualCombined}</dd></div>
           <div><dt>1,800万円との関係</dt><dd>{allowanceRelation.lifetime}</dd></div>
         </dl>
         <p className="nisa-consultation-summary__supplement">
+          初期投資額はNISA枠判定に含めていません。
           成長投資枠へ自動配分していません。実際の利用可能枠は金融機関等でご確認ください。
         </p>
       </section>
@@ -1341,23 +1451,34 @@ const NisaConsultationSummaryContent = ({
         </ul>
       </section>
 
-      <section className="nisa-consultation-summary__section nisa-consultation-summary__section--reproduction">
-        <h5>結果再現情報</h5>
+      <details className="nisa-consultation-summary__section nisa-consultation-summary__section--reproduction">
+        <summary>計算条件・参照情報</summary>
         <dl>
           <div><dt>入力スナップショット</dt><dd>{createNisaInputSnapshotText(input)}</dd></div>
           <div><dt>計算日時</dt><dd>{formatNisaCalculationDateTime(record.calculatedAt)}</dd></div>
-          <div><dt>計算モデル版</dt><dd>{getNisaModelVersionDisplay()}</dd></div>
+          <div><dt>計算モデル</dt><dd>{getNisaModelVersionDisplay()}</dd></div>
           <div><dt>仕様版</dt><dd>{NISA_DESIGN_SPEC_VERSION}</dd></div>
           <div><dt>計算仕様版</dt><dd>{NISA_CALCULATION_SPEC_VERSION}</dd></div>
-          <div><dt>制度基準日</dt><dd>{getNisaPolicyReferenceDateDisplay()}</dd></div>
+          <div><dt>制度基準</dt><dd>{getNisaPolicyReferenceDateDisplay()}</dd></div>
           <div><dt>一次資料確認日</dt><dd>{getNisaPrimarySourceReviewDateDisplay()}</dd></div>
         </dl>
-      </section>
+      </details>
 
       <section className="nisa-consultation-summary__section">
         <h5>一次資料</h5>
-        <ul>
-          {NISA_PRIMARY_SOURCES.map((source) => <li key={source}>{source}</li>)}
+        <ul className="nisa-primary-source-list">
+          {NISA_PRIMARY_SOURCES.map((source) => (
+            <li key={source.url}>
+              <a
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${source.label}を新しいタブで開く`}
+              >
+                {source.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </section>
 
@@ -1398,8 +1519,11 @@ const NisaAllowancePanel = ({
     </div>
     <div className="nisa-allowance-panel__summary">
       <div><span>年間積立額</span><strong>{formatYen(assessment.annualContribution)}</strong></div>
-      <div><span>枠判定対象の積立元本</span><strong>{formatYen(assessment.formalPrincipal)}</strong></div>
+      <div><span>NISA枠判定対象の積立元本</span><strong>{formatYen(assessment.formalPrincipal)}</strong></div>
     </div>
+    <p className="nisa-allowance-panel__initial-note">
+      初期投資額はNISA枠判定に含めていません。
+    </p>
     <p className="nisa-allowance-panel__limits">
       年間上限：つみたて投資枠120万円／成長投資枠240万円／合計360万円
     </p>
@@ -1417,6 +1541,20 @@ const NisaAllowancePanel = ({
       </div>
     )}
   </section>
+)
+
+const NisaTaxFreeInformation = () => (
+  <aside className="nisa-tax-free-information" aria-labelledby="nisa-tax-free-information-title">
+    <div>
+      <p>NISA TAX INFORMATION</p>
+      <h3 id="nisa-tax-free-information-title">NISAの非課税効果について</h3>
+    </div>
+    <strong>別途確認</strong>
+    <p>
+      運用益に対する実際の非課税効果は、売却時期や課税関係などによって異なるため、
+      本シミュレーターでは個別金額を算定していません。
+    </p>
+  </aside>
 )
 
 export default NisaCalculator

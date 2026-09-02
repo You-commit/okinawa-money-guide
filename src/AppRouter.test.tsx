@@ -59,6 +59,19 @@ describe('dedicated page routing', () => {
     expect(screen.getByText('NISA枠も確認')).toBeTruthy()
   })
 
+  it.each([
+    '/simulators/military-land',
+    '/simulators/mortgage',
+    '/simulators/nisa',
+    '/simulators/ideco',
+    '/simulators/taxable-income',
+  ])('renders the shared hero wave on %s', (path) => {
+    const { container } = renderAt(path)
+
+    expect(container.querySelectorAll('.simulator-page__hero-wave'))
+      .toHaveLength(1)
+  })
+
   it('connects top simulator cards to their dedicated pages and keeps insurance disabled', async () => {
     const user = userEvent.setup()
     renderAt('/')
