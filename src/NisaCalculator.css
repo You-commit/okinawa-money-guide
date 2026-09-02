@@ -1243,28 +1243,6 @@
   text-align: left;
 }
 
-.nisa-consultation-summary__section--reproduction {
-  background: #f8faf9;
-  color: #60756a;
-}
-
-.nisa-consultation-summary__section--reproduction > summary {
-  color: #526a5e;
-  font-size: 0.78rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.nisa-consultation-summary__section--reproduction > summary:focus-visible {
-  border-radius: 4px;
-  outline: 3px solid rgba(11, 143, 91, 0.18);
-  outline-offset: 3px;
-}
-
-.nisa-consultation-summary__section--reproduction[open] > summary {
-  margin-bottom: 10px;
-}
-
 .nisa-primary-source-list a {
   color: var(--nisa-green-dark);
   font-weight: 750;
@@ -1457,14 +1435,6 @@
     background: #ffffff;
     break-inside: avoid;
     page-break-inside: avoid;
-  }
-
-  .simulator-page--nisa .nisa-consultation-summary__section--reproduction > summary {
-    display: none;
-  }
-
-  .simulator-page--nisa .nisa-consultation-summary__section--reproduction > dl {
-    display: grid !important;
   }
 
   .simulator-page--nisa .nisa-consultation-summary__section h5 {

@@ -12,6 +12,11 @@ import {
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import NisaCalculator from './NisaCalculator'
+import {
+  NISA_CALCULATION_SPEC_VERSION,
+  NISA_DESIGN_SPEC_VERSION,
+  createNisaInputSnapshotText,
+} from './nisaConsultationSummary'
 
 const change = (label: string, value: string) => {
   fireEvent.change(screen.getByLabelText(label), {
@@ -494,7 +499,7 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     expect(screen.getByText('毎月末に積み立てる前提で試算')).toBeTruthy()
   })
 
-  it('renders the future-value consultation summary with allowance, lists, and reproduction information', () => {
+  it('renders the future-value consultation summary without internal reproduction metadata', () => {
     render(<NisaCalculator />)
     change('初期投資額（任意）', '500000')
     fillFuture({ inflation: '2' })
@@ -506,25 +511,32 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     expect(within(summary).getByText('NISA枠との関係')).toBeTruthy()
     expect(within(summary).getByText('商品固有の信託報酬等')).toBeTruthy()
     expect(within(summary).getByText('現在の利用可能枠')).toBeTruthy()
-    const disclosure = within(summary).getByText('計算条件・参照情報')
-      .closest('details') as HTMLDetailsElement
-    expect(disclosure.open).toBe(false)
-    fireEvent.click(within(disclosure).getByText('計算条件・参照情報'))
-    expect(disclosure.open).toBe(true)
-    expect(within(summary).getAllByText('OMG-DS-NISA-v1.0-20260730'))
-      .toHaveLength(2)
-    expect(within(summary).getByText('NISA積立シミュレーションモデル'))
-      .toBeTruthy()
-    expect(within(summary).getByText('2026年現行NISA制度')).toBeTruthy()
-    expect(within(summary).getByText('2026年9月2日')).toBeTruthy()
-    expect(within(summary).queryByText(/未設定|未記録/)).toBeNull()
+    expect(within(summary).queryByText('計算条件・参照情報')).toBeNull()
+    expect(within(summary).queryByText('入力スナップショット')).toBeNull()
+    expect(within(summary).queryByText('計算日時')).toBeNull()
+    expect(within(summary).queryByText('計算モデル')).toBeNull()
+    expect(within(summary).queryByText('仕様版')).toBeNull()
+    expect(within(summary).queryByText('計算仕様版')).toBeNull()
     const primarySource = within(summary).getByRole('link', {
       name: '金融庁 NISA特設サイトを新しいタブで開く',
     })
     expect(primarySource.getAttribute('target')).toBe('_blank')
     expect(primarySource.getAttribute('rel')).toBe('noopener noreferrer')
-    expect(within(summary).getByText(/計算モード=将来額を調べる/))
-      .toBeTruthy()
+    const internalSnapshot = createNisaInputSnapshotText({
+      mode: 'future-value',
+      initialInvestment: 500000,
+      monthlyContribution: 10000,
+      targetAmount: null,
+      annualRatePercent: 5,
+      inputMonths: 240,
+      inflationRatePercent: 2,
+      scenarioComparisonEnabled: false,
+      lowScenarioAnnualRatePercent: null,
+      highScenarioAnnualRatePercent: null,
+    })
+    expect(internalSnapshot).toContain('計算モード=将来額を調べる')
+    expect(NISA_DESIGN_SPEC_VERSION).toBe('OMG-DS-NISA-v1.0-20260730')
+    expect(NISA_CALCULATION_SPEC_VERSION).toBe(NISA_DESIGN_SPEC_VERSION)
   })
 
   it('renders mode-specific summaries for required contribution and required months', () => {
@@ -593,10 +605,12 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     expect(copiedText).toContain('【入力条件】')
     expect(copiedText).toContain('【概算結果】')
     expect(copiedText).toContain('【NISA枠との関係】')
-    expect(copiedText).toContain('【計算条件・参照情報】')
-    expect(copiedText).toContain('入力スナップショット:')
-    expect(copiedText).toContain('制度基準: 2026年現行NISA制度')
-    expect(copiedText).toContain('一次資料確認日: 2026年9月2日')
+    expect(copiedText).not.toContain('【計算条件・参照情報】')
+    expect(copiedText).not.toContain('入力スナップショット:')
+    expect(copiedText).not.toContain('計算日時:')
+    expect(copiedText).not.toContain('計算モデル:')
+    expect(copiedText).not.toContain('仕様版:')
+    expect(copiedText).not.toContain('計算仕様版:')
     expect(copiedText).toContain('https://www.fsa.go.jp/policy/nisa2/')
     expect(screen.getByRole('status').textContent)
       .toBe('相談用サマリーをコピーしました。')
@@ -809,7 +823,7 @@ describe('NISA low, base, and high scenario comparison', () => {
     expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
   })
 
-  it('adds valid scenarios to the summary, snapshot, clipboard, and print output', async () => {
+  it('adds valid scenarios to the summary, clipboard, and print output without metadata', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
@@ -832,11 +846,7 @@ describe('NISA low, base, and high scenario comparison', () => {
     expect(within(scenarioSection).getByText('基準')).toBeTruthy()
     expect(within(scenarioSection).getByText('高位')).toBeTruthy()
 
-    fireEvent.click(within(summary).getByText('計算条件・参照情報'))
-    expect(within(summary).getByText(/シナリオ比較=ON/)).toBeTruthy()
-    expect(within(summary).getByText(/低位シナリオ利回り=3%/)).toBeTruthy()
-    expect(within(summary).getByText(/基準シナリオ利回り=5%/)).toBeTruthy()
-    expect(within(summary).getByText(/高位シナリオ利回り=7%/)).toBeTruthy()
+    expect(within(summary).queryByText('計算条件・参照情報')).toBeNull()
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: '相談用サマリーをコピー' }))
@@ -848,6 +858,9 @@ describe('NISA low, base, and high scenario comparison', () => {
     expect(copiedText).toContain('基準:')
     expect(copiedText).toContain('高位:')
     expect(copiedText).toContain('インフレ調整後価値:')
+    expect(copiedText).not.toContain('入力スナップショット:')
+    expect(copiedText).not.toContain('計算日時:')
+    expect(copiedText).not.toContain('仕様版:')
 
     fireEvent.click(screen.getByRole('button', { name: '印刷する' }))
     expect(print).toHaveBeenCalledTimes(1)
@@ -855,6 +868,7 @@ describe('NISA low, base, and high scenario comparison', () => {
       name: 'シナリオ比較',
       level: 5,
     })).toBeTruthy()
+    expect(within(summary).queryByText('計算条件・参照情報')).toBeNull()
   })
 
   it('does not add scenario output when comparison is OFF', async () => {

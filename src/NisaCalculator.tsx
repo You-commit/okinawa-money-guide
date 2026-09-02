@@ -29,20 +29,13 @@ import {
   type NisaScenarioComparison,
 } from './nisaScenarioComparison'
 import {
-  NISA_CALCULATION_SPEC_VERSION,
   NISA_CONFIRMATION_ITEMS,
-  NISA_DESIGN_SPEC_VERSION,
   NISA_PRIMARY_SOURCES,
   NISA_UNCONSIDERED_ITEMS,
   createNisaConsultationSummaryText,
-  createNisaInputSnapshotText,
-  formatNisaCalculationDateTime,
   getNisaAllowanceRelation,
   getNisaModeLabel,
-  getNisaModelVersionDisplay,
-  getNisaPolicyReferenceDateDisplay,
   getNisaPrincipalLabel,
-  getNisaPrimarySourceReviewDateDisplay,
   type NisaConsultationRecord as NisaConsultationSummaryRecord,
   type NisaConsultationInputSnapshot,
 } from './nisaConsultationSummary'
@@ -1807,19 +1800,6 @@ const NisaConsultationSummaryContent = ({
           {NISA_CONFIRMATION_ITEMS.map((item) => <li key={item}>{item}</li>)}
         </ul>
       </section>
-
-      <details className="nisa-consultation-summary__section nisa-consultation-summary__section--reproduction">
-        <summary>計算条件・参照情報</summary>
-        <dl>
-          <div><dt>入力スナップショット</dt><dd>{createNisaInputSnapshotText(input)}</dd></div>
-          <div><dt>計算日時</dt><dd>{formatNisaCalculationDateTime(record.calculatedAt)}</dd></div>
-          <div><dt>計算モデル</dt><dd>{getNisaModelVersionDisplay()}</dd></div>
-          <div><dt>仕様版</dt><dd>{NISA_DESIGN_SPEC_VERSION}</dd></div>
-          <div><dt>計算仕様版</dt><dd>{NISA_CALCULATION_SPEC_VERSION}</dd></div>
-          <div><dt>制度基準</dt><dd>{getNisaPolicyReferenceDateDisplay()}</dd></div>
-          <div><dt>一次資料確認日</dt><dd>{getNisaPrimarySourceReviewDateDisplay()}</dd></div>
-        </dl>
-      </details>
 
       <section className="nisa-consultation-summary__section">
         <h5>一次資料</h5>

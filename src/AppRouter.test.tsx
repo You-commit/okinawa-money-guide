@@ -1,6 +1,13 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
@@ -57,6 +64,67 @@ describe('dedicated page routing', () => {
     expect(screen.getByText('毎月の積立を試算')).toBeTruthy()
     expect(screen.getByText('将来資産を可視化')).toBeTruthy()
     expect(screen.getByText('NISA枠も確認')).toBeTruthy()
+  })
+
+  it('provides an accessible overlay simulator menu and closes it predictably', async () => {
+    const user = userEvent.setup()
+    renderAt('/simulators/mortgage')
+
+    const trigger = screen.getByRole('button', { name: 'シミュレーター' })
+    const panelId = trigger.getAttribute('aria-controls')
+    const panel = document.getElementById(panelId!)!
+
+    expect(trigger.getAttribute('aria-haspopup')).toBe('true')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+
+    await user.click(trigger)
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    expect(within(panel).getAllByRole('link')).toHaveLength(5)
+    expect(within(panel).getByText('SIMULATORS')).toBeTruthy()
+    expect(within(panel).getByText('目的に合わせてシミュレーターを選択'))
+      .toBeTruthy()
+
+    const currentLink = within(panel).getByRole('link', {
+      name: /住宅ローン.*表示中/,
+    })
+    expect(currentLink.getAttribute('aria-current')).toBe('page')
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(trigger)
+
+    await user.click(trigger)
+    fireEvent.pointerDown(screen.getByRole('heading', {
+      level: 1,
+      name: '住宅ローンシミュレーター',
+    }))
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+
+    await user.click(trigger)
+    await user.click(within(panel).getByRole('link', { name: /^NISA/ }))
+    expect(window.location.pathname).toBe('/simulators/nisa')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  it('keeps the existing mobile navigation trigger and nested simulator links', async () => {
+    const user = userEvent.setup()
+    renderAt('/simulators/nisa')
+
+    const navigationTrigger = screen.getByRole('button', {
+      name: 'メニューを開閉する',
+    })
+    expect(navigationTrigger.getAttribute('aria-expanded')).toBe('false')
+    await user.click(navigationTrigger)
+    expect(navigationTrigger.getAttribute('aria-expanded')).toBe('true')
+
+    const simulatorTrigger = screen.getByRole('button', {
+      name: 'シミュレーター',
+    })
+    await user.click(simulatorTrigger)
+    expect(simulatorTrigger.getAttribute('aria-expanded')).toBe('true')
+    expect(document.querySelectorAll(
+      '#top-option02-simulator-menu .top-option02__simulator-menu-card',
+    )).toHaveLength(5)
   })
 
   it.each([

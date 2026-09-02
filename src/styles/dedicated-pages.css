@@ -44,6 +44,8 @@
   --page-navy: #082b68;
   --page-accent: #0f766e;
   --page-accent-soft: #eaf7f5;
+  --simulator-hero-height-desktop: 255px;
+  --simulator-hero-wave-height: 42px;
   overflow-x: clip;
   background: #f6f9fb;
   color: #17314f;
@@ -79,7 +81,7 @@
   bottom: -1px;
   left: -2%;
   z-index: 2;
-  height: 42px;
+  height: var(--simulator-hero-wave-height);
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 31C180-12 346 56 570 31c236-26 380 26 570 3 126-15 211-5 300-25v55H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
   pointer-events: none;
 }
@@ -798,13 +800,13 @@
 
 @media (min-width: 901px) {
   .simulator-page__hero {
-    min-height: 225px;
+    min-height: var(--simulator-hero-height-desktop);
   }
 
   .simulator-page__hero-inner {
     grid-template-columns: minmax(0, 0.8fr) minmax(560px, 1.2fr);
     gap: 30px;
-    min-height: 225px;
+    min-height: var(--simulator-hero-height-desktop);
     padding: 20px 0 28px;
   }
 
