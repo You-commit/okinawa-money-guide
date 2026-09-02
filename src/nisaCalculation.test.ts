@@ -6,12 +6,67 @@ import {
   calculateCurrentFutureValueWithInitialInvestment,
   calculateFutureValue,
   calculateInflationAdjustedValue,
+  calculateNisaTrajectory,
   calculateRequiredInvestmentMonths,
   calculateRequiredMonthlyContribution,
   roundHalfUp,
   splitInvestmentMonths,
   validateNisaCalculationInput,
 } from './nisaCalculation'
+
+describe('NISA accessible trajectory data', () => {
+  it('uses the pure calculation model for major points and an exact partial final month', () => {
+    const points = calculateNisaTrajectory({
+      initialInvestment: 0,
+      monthlyContribution: 30_000,
+      annualRatePercent: 5,
+      months: 211,
+    })
+
+    expect(points.map((point) => point.months)).toEqual([
+      0,
+      60,
+      120,
+      180,
+      211,
+    ])
+
+    const finalPoint = points.at(-1)!
+    const formalResult = calculateCurrentFutureValueWithInitialInvestment({
+      initialInvestment: 0,
+      monthlyContribution: 30_000,
+      annualRatePercent: 5,
+      months: 211,
+    })
+
+    expect(finalPoint).toEqual({
+      months: 211,
+      principal: formalResult.principal,
+      gain: formalResult.gain,
+      futureValue: formalResult.futureValue,
+    })
+  })
+
+  it('preserves zero-return and negative-return gains without hiding losses', () => {
+    const zeroReturn = calculateNisaTrajectory({
+      initialInvestment: 0,
+      monthlyContribution: 10_000,
+      annualRatePercent: 0,
+      months: 120,
+    })
+    const negativeReturn = calculateNisaTrajectory({
+      initialInvestment: 0,
+      monthlyContribution: 10_000,
+      annualRatePercent: -20,
+      months: 120,
+    })
+
+    expect(zeroReturn.at(-1)?.gain).toBe(0)
+    expect(negativeReturn.at(-1)?.gain).toBeLessThan(0)
+    expect(negativeReturn.at(-1)?.futureValue)
+      .toBeLessThan(negativeReturn.at(-1)?.principal ?? 0)
+  })
+})
 
 describe('NISA formal calculation model', () => {
   it('converts an annual return into an effective monthly rate', () => {

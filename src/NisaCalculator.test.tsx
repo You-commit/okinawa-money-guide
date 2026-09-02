@@ -1,13 +1,16 @@
 // @vitest-environment jsdom
 
 import {
+  act,
   cleanup,
   fireEvent,
   render,
   screen,
+  waitFor,
+  within,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import NisaCalculator from './NisaCalculator'
 
 const change = (label: string, value: string) => {
@@ -61,7 +64,7 @@ describe('NISA planning modes', () => {
     render(<NisaCalculator />)
     fillFuture()
     calculate()
-    expect(screen.getAllByText('￥4,058,045')).toHaveLength(2)
+    expect(screen.getAllByText('￥4,058,045').length).toBeGreaterThanOrEqual(2)
 
     selectMode('必要な毎月積立額を調べる')
     expect(screen.queryByText('￥4,058,045')).toBeNull()
@@ -138,7 +141,7 @@ describe('NISA planning modes', () => {
     render(<NisaCalculator />)
     fillFuture({ inflation: '0' })
     calculate()
-    expect(screen.getByText('インフレ調整後価値')).toBeTruthy()
+    expect(screen.getAllByText('インフレ調整後価値').length).toBeGreaterThan(0)
 
     change('想定インフレ率（任意）', '')
     calculate()
@@ -146,7 +149,7 @@ describe('NISA planning modes', () => {
 
     change('想定インフレ率（任意）', '10')
     calculate()
-    expect(screen.getByText('インフレ調整後価値')).toBeTruthy()
+    expect(screen.getAllByText('インフレ調整後価値').length).toBeGreaterThan(0)
   })
 
   it('calculates the formal required monthly contribution of 24,643 yen', () => {
@@ -157,8 +160,8 @@ describe('NISA planning modes', () => {
     change('積立期間（年）', '20')
     calculate()
 
-    expect(screen.getByText('必要な毎月積立額')).toBeTruthy()
-    expect(screen.getByText('￥24,643')).toBeTruthy()
+    expect(screen.getAllByText('必要な毎月積立額').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('￥24,643').length).toBeGreaterThan(0)
   })
 
   it('calculates 211 months as 17 years 7 months', () => {
@@ -169,7 +172,7 @@ describe('NISA planning modes', () => {
     change('想定利回り', '5')
     calculate()
 
-    expect(screen.getByText('17年7か月')).toBeTruthy()
+    expect(screen.getAllByText('17年7か月').length).toBeGreaterThan(0)
     expect(screen.getByText('211か月（1か月単位で切り上げ）')).toBeTruthy()
   })
 
@@ -288,7 +291,7 @@ describe('NISA validation timing', () => {
     expect(screen.queryByText(/毎月積立額を入力してください/)).toBeNull()
 
     fillFuture()
-    expect(screen.getAllByText('￥4,058,045')).toHaveLength(2)
+    expect(screen.getAllByText('￥4,058,045').length).toBeGreaterThanOrEqual(2)
     expect(screen.queryByRole('button', { name: '計算する' })).toBeNull()
   })
 
@@ -302,6 +305,266 @@ describe('NISA validation timing', () => {
 
     expect(screen.queryByText('￥4,058,045')).toBeNull()
     calculate()
-    expect(screen.getAllByText('￥4,058,045')).toHaveLength(2)
+    expect(screen.getAllByText('￥4,058,045').length).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('NISA recovery, accessible graph, and consultation tools', () => {
+  afterEach(() => {
+    cleanup()
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
+
+  it('offers one undo generation without a time limit and does not restore stale results', () => {
+    vi.useFakeTimers()
+    render(<NisaCalculator />)
+    fillFuture()
+    calculate()
+    expect(screen.getByRole('region', { name: '相談用サマリー' }))
+      .toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    expect(screen.getByText('入力内容をリセットしました。')).toBeTruthy()
+    expect(screen.queryByRole('region', { name: '相談用サマリー' })).toBeNull()
+
+    act(() => vi.advanceTimersByTime(10 * 60 * 1000))
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
+
+    expect((screen.getByLabelText('毎月積立額') as HTMLInputElement).value)
+      .toBe('10,000')
+    expect((screen.getByLabelText('想定利回り') as HTMLInputElement).value)
+      .toBe('5')
+    expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
+    expect(screen.queryByRole('region', { name: '相談用サマリー' })).toBeNull()
+  })
+
+  it('restores the mode, every shared input, initial investment, and AUTO setting', () => {
+    render(<NisaCalculator />)
+    change('初期投資額（任意）', '500000')
+    fillFuture({ monthly: '30000', rate: '4.5', years: '20', months: '6', inflation: '2' })
+    selectMode('必要な積立期間を調べる')
+    change('目標額', '10000000')
+    fireEvent.click(screen.getByLabelText('入力と同時に計算結果を更新する'))
+
+    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
+
+    expect(screen.getByRole('tab', { name: /必要な積立期間を調べる/ })
+      .getAttribute('aria-selected')).toBe('true')
+    expect((screen.getByLabelText('毎月積立額') as HTMLInputElement).value)
+      .toBe('30,000')
+    expect((screen.getByLabelText('目標額') as HTMLInputElement).value)
+      .toBe('10,000,000')
+    expect((screen.getByLabelText('入力と同時に計算結果を更新する') as HTMLInputElement).checked)
+      .toBe(true)
+
+    selectMode('将来額を調べる')
+    expect((screen.getByLabelText(/初期投資額/) as HTMLInputElement).value)
+      .toBe('500,000')
+    expect((screen.getByLabelText('積立期間（年）') as HTMLInputElement).value)
+      .toBe('20')
+    expect((screen.getByLabelText('積立期間（か月）') as HTMLInputElement).value)
+      .toBe('6')
+    expect((screen.getByLabelText('想定インフレ率（任意）') as HTMLInputElement).value)
+      .toBe('2')
+  })
+
+  it('invalidates undo on new input or a mode change and keeps only the latest reset snapshot', () => {
+    render(<NisaCalculator />)
+    change('毎月積立額', '10000')
+    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    change('毎月積立額', '20000')
+    expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
+    expect((screen.getByLabelText('毎月積立額') as HTMLInputElement).value)
+      .toBe('20,000')
+
+    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    selectMode('必要な毎月積立額を調べる')
+    expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
+  })
+
+  it('provides a semantic major-point table with an exact partial final month', () => {
+    render(<NisaCalculator />)
+    fillFuture({ monthly: '30000', rate: '5', years: '17', months: '7' })
+    calculate()
+
+    const table = screen.getByRole('table', {
+      name: '資産推移の主要時点（概算）',
+    })
+    expect(within(table).getAllByRole('columnheader')).toHaveLength(4)
+    expect(within(table).getByRole('columnheader', { name: '時点' })
+      .getAttribute('scope')).toBe('col')
+    expect(within(table).getByRole('rowheader', { name: '最終（17年7か月）' })
+      .getAttribute('scope')).toBe('row')
+    expect(within(table).getByText('運用収益')).toBeTruthy()
+    expect(within(table).getByText('将来資産額')).toBeTruthy()
+  })
+
+  it('shows zero-return data and explicitly describes a negative-return loss', () => {
+    const { unmount } = render(<NisaCalculator />)
+    fillFuture({ monthly: '10000', rate: '0', years: '10' })
+    calculate()
+    const zeroTable = screen.getByRole('table', {
+      name: '資産推移の主要時点（概算）',
+    })
+    expect(within(zeroTable).getAllByText('￥0').length).toBeGreaterThan(0)
+    unmount()
+
+    render(<NisaCalculator />)
+    fillFuture({ monthly: '10000', rate: '-20', years: '10' })
+    calculate()
+    expect(screen.getByText(/運用収益はマイナスで、元本を下回る試算です/))
+      .toBeTruthy()
+    const lossTable = screen.getByRole('table', {
+      name: '資産推移の主要時点（概算）',
+    })
+    expect(lossTable.textContent).toMatch(/-￥|−￥/)
+  })
+
+  it('renders the future-value consultation summary with allowance, lists, and reproduction information', () => {
+    render(<NisaCalculator />)
+    change('初期投資額（任意）', '500000')
+    fillFuture({ inflation: '2' })
+    calculate()
+
+    const summary = screen.getByRole('region', { name: '相談用サマリー' })
+    expect(within(summary).getByText('入力条件')).toBeTruthy()
+    expect(within(summary).getByText('概算結果')).toBeTruthy()
+    expect(within(summary).getByText('NISA枠との関係')).toBeTruthy()
+    expect(within(summary).getByText('商品固有の信託報酬等')).toBeTruthy()
+    expect(within(summary).getByText('現在の利用可能枠')).toBeTruthy()
+    expect(within(summary).getByText('結果再現情報')).toBeTruthy()
+    expect(within(summary).getAllByText('OMG-DS-NISA-v1.0-20260730'))
+      .toHaveLength(2)
+    expect(within(summary).getByText('未設定（正式版番号未定義）'))
+      .toBeTruthy()
+    expect(within(summary).getByText(/計算モード=将来額を調べる/))
+      .toBeTruthy()
+  })
+
+  it('renders mode-specific summaries for required contribution and required months', () => {
+    const { unmount } = render(<NisaCalculator />)
+    selectMode('必要な毎月積立額を調べる')
+    change('目標額', '10000000')
+    change('想定利回り', '5')
+    change('積立期間（年）', '20')
+    calculate()
+    let summary = screen.getByRole('region', { name: '相談用サマリー' })
+    expect(within(summary).getAllByText('必要な毎月積立額').length)
+      .toBeGreaterThan(0)
+    expect(within(summary).getByText('￥24,643')).toBeTruthy()
+    unmount()
+
+    render(<NisaCalculator />)
+    selectMode('必要な積立期間を調べる')
+    change('目標額', '10000000')
+    change('毎月積立額', '30000')
+    change('想定利回り', '5')
+    calculate()
+    summary = screen.getByRole('region', { name: '相談用サマリー' })
+    expect(within(summary).getAllByText('必要期間').length).toBeGreaterThan(0)
+    expect(within(summary).getByText('17年7か月')).toBeTruthy()
+    expect(within(summary).getByText('211か月')).toBeTruthy()
+  })
+
+  it('removes copy and print access for stale manual input and unreachable results', () => {
+    render(<NisaCalculator />)
+    fillFuture()
+    calculate()
+    expect(screen.getByRole('button', { name: '相談用サマリーをコピー' }))
+      .toBeTruthy()
+
+    change('毎月積立額', '20000')
+    expect(screen.queryByRole('region', { name: '相談用サマリー' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '印刷する' })).toBeNull()
+
+    selectMode('必要な積立期間を調べる')
+    change('目標額', '2000000')
+    change('毎月積立額', '30000')
+    change('想定利回り', '-20')
+    calculate()
+    expect(screen.getByText('この条件では目標額に到達しません。'))
+      .toBeTruthy()
+    expect(screen.queryByRole('region', { name: '相談用サマリー' })).toBeNull()
+  })
+
+  it('copies explicit plain text, resets the timer on recopy, and clears after three seconds', async () => {
+    vi.useFakeTimers()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    render(<NisaCalculator />)
+    fillFuture()
+    calculate()
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '相談用サマリーをコピー' }))
+      await Promise.resolve()
+    })
+    expect(writeText).toHaveBeenCalledTimes(1)
+    const copiedText = writeText.mock.calls[0][0] as string
+    expect(copiedText).toContain('【入力条件】')
+    expect(copiedText).toContain('【概算結果】')
+    expect(copiedText).toContain('【NISA枠との関係】')
+    expect(copiedText).toContain('【結果再現情報】')
+    expect(copiedText).toContain('入力スナップショット:')
+    expect(screen.getByRole('status').textContent)
+      .toBe('相談用サマリーをコピーしました。')
+
+    act(() => vi.advanceTimersByTime(2000))
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '相談用サマリーをコピー' }))
+      await Promise.resolve()
+    })
+    act(() => vi.advanceTimersByTime(1500))
+    expect(screen.getByRole('status')).toBeTruthy()
+    act(() => vi.advanceTimersByTime(1500))
+    expect(screen.queryByRole('status')).toBeNull()
+  })
+
+  it('reports clipboard failure and invokes browser print only for a current result', async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error('denied'))
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    const print = vi.spyOn(window, 'print').mockImplementation(() => undefined)
+    render(<NisaCalculator />)
+    expect(screen.queryByRole('button', { name: '印刷する' })).toBeNull()
+    fillFuture()
+    calculate()
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: '相談用サマリーをコピー' }))
+      await Promise.resolve()
+    })
+    expect(screen.getByRole('status').textContent)
+      .toContain('コピーできませんでした')
+
+    fireEvent.click(screen.getByRole('button', { name: '印刷する' }))
+    expect(print).toHaveBeenCalledTimes(1)
+    expect(screen.getByLabelText('相談用サマリー本文').textContent)
+      .toContain('一次資料')
+  })
+
+  it('keeps AUTO calculation summaries synchronized with the latest valid input', async () => {
+    render(<NisaCalculator />)
+    fireEvent.click(screen.getByLabelText('入力と同時に計算結果を更新する'))
+    fillFuture()
+    await waitFor(() => {
+      expect(screen.getByRole('region', { name: '相談用サマリー' }))
+        .toBeTruthy()
+    })
+
+    change('毎月積立額', '20000')
+    const summary = screen.getByRole('region', { name: '相談用サマリー' })
+    expect(within(summary).getAllByText('￥20,000').length).toBeGreaterThan(0)
+    expect(within(summary).queryByText('￥10,000')).toBeNull()
   })
 })

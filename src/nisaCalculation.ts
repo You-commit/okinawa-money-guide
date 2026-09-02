@@ -103,6 +103,13 @@ export type NisaCurrentFutureValueInput =
     initialInvestment: number
   }
 
+export type NisaTrajectoryPoint = {
+  months: number
+  principal: number
+  gain: number
+  futureValue: number
+}
+
 const hasAtMostTwoDecimalPlaces = (value: number) => {
   const scaled = value * 100
   const tolerance = Number.EPSILON * Math.max(1, Math.abs(scaled)) * 8
@@ -627,6 +634,55 @@ export const calculateCurrentFutureValueWithInitialInvestment = (
             input.inflationRatePercent,
           ),
   }
+}
+
+const getTrajectoryIntervalMonths = (months: number) => {
+  if (months <= 360) return 60
+  if (months <= 720) return 120
+  return 180
+}
+
+export const calculateNisaTrajectory = (
+  input: NisaCurrentFutureValueInput,
+): NisaTrajectoryPoint[] => {
+  const finalResult = calculateCurrentFutureValueWithInitialInvestment(input)
+  const intervalMonths = getTrajectoryIntervalMonths(input.months)
+  const pointMonths = [0]
+
+  for (
+    let months = intervalMonths;
+    months < input.months;
+    months += intervalMonths
+  ) {
+    pointMonths.push(months)
+  }
+
+  pointMonths.push(input.months)
+
+  return pointMonths.map((months) => {
+    if (months === 0) {
+      return {
+        months,
+        principal: input.initialInvestment,
+        gain: 0,
+        futureValue: input.initialInvestment,
+      }
+    }
+
+    const result = months === input.months
+      ? finalResult
+      : calculateCurrentFutureValueWithInitialInvestment({
+          ...input,
+          months,
+        })
+
+    return {
+      months,
+      principal: result.principal,
+      gain: result.gain,
+      futureValue: result.futureValue,
+    }
+  })
 }
 
 export const roundHalfUp = (value: number) => {

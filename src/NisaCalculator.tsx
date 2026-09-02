@@ -11,6 +11,7 @@ import {
 } from './utils/moneyInput'
 import {
   NISA_INPUT_LIMITS,
+  calculateNisaTrajectory,
   calculateCurrentFutureValueWithInitialInvestment,
   calculateRequiredInvestmentMonths,
   calculateRequiredMonthlyContribution,
@@ -21,6 +22,23 @@ import {
   assessNisaAllowance,
   type NisaAllowanceAssessment,
 } from './nisaAllowance'
+import {
+  NISA_CALCULATION_SPEC_VERSION,
+  NISA_CONFIRMATION_ITEMS,
+  NISA_DESIGN_SPEC_VERSION,
+  NISA_PRIMARY_SOURCES,
+  NISA_UNCONSIDERED_ITEMS,
+  createNisaConsultationSummaryText,
+  createNisaInputSnapshotText,
+  formatNisaCalculationDateTime,
+  getNisaAllowanceRelation,
+  getNisaModeLabel,
+  getNisaModelVersionDisplay,
+  getNisaPolicyReferenceDateDisplay,
+  getNisaPrimarySourceReviewDateDisplay,
+  type NisaConsultationRecord as NisaConsultationSummaryRecord,
+  type NisaConsultationInputSnapshot,
+} from './nisaConsultationSummary'
 import './NisaCalculator.css'
 
 type NisaField =
@@ -71,6 +89,20 @@ type UnreachableNisaResult = {
 }
 
 type NisaUiResult = CalculatedNisaResult | UnreachableNisaResult
+
+type NisaCalculationRecord = {
+  result: NisaUiResult
+  input: NisaConsultationInputSnapshot
+  calculatedAt: string
+}
+
+type NisaResetSnapshot = {
+  mode: NisaCalculationMode
+  values: NisaFormValues
+  isAutoCalculation: boolean
+}
+
+type NisaSummaryActionStatus = 'copied' | 'copy-error' | null
 
 const MODE_OPTIONS: Array<{
   mode: NisaCalculationMode
@@ -391,6 +423,44 @@ const calculateForMode = (
   return null
 }
 
+const createCalculationRecord = (
+  mode: NisaCalculationMode,
+  values: NisaFormValues,
+  parsed: ParsedNisaValues,
+): NisaCalculationRecord | null => {
+  const result = calculateForMode(mode, parsed)
+
+  if (result === null || parsed.annualReturnRate === undefined) {
+    return null
+  }
+
+  return {
+    result,
+    calculatedAt: new Date().toISOString(),
+    input: {
+      mode,
+      initialInvestment:
+        mode === 'future-value' && values.initialInvestment !== ''
+          ? parsed.initialInvestment
+          : null,
+      monthlyContribution:
+        mode === 'future-value' || mode === 'required-months'
+          ? parsed.monthlyContribution ?? null
+          : null,
+      targetAmount:
+        mode === 'future-value'
+          ? null
+          : parsed.targetAmount ?? null,
+      annualRatePercent: parsed.annualReturnRate,
+      inputMonths:
+        mode === 'required-months'
+          ? null
+          : parsed.investmentMonths ?? null,
+      inflationRatePercent: parsed.inflationRate ?? null,
+    },
+  }
+}
+
 const formatYen = (value: number) =>
   new Intl.NumberFormat('ja-JP', {
     style: 'currency',
@@ -405,6 +475,15 @@ const formatMonths = (months: number) => {
   if (years === 0) return `${remainingMonths}か月`
   if (remainingMonths === 0) return `${years}年`
   return `${years}年${remainingMonths}か月`
+}
+
+const formatTrajectoryPointLabel = (
+  months: number,
+  finalMonths: number,
+) => {
+  if (months === 0) return '開始'
+  if (months === finalMonths) return `最終（${formatMonths(months)}）`
+  return formatMonths(months)
 }
 
 const NisaMoneyField = ({
@@ -451,28 +530,58 @@ function NisaCalculator() {
   const [mode, setMode] = useState<NisaCalculationMode>('future-value')
   const [values, setValues] = useState<NisaFormValues>(INITIAL_VALUES)
   const [isAutoCalculation, setIsAutoCalculation] = useState(false)
-  const [manualResult, setManualResult] = useState<NisaUiResult | null>(null)
+  const [manualRecord, setManualRecord] =
+    useState<NisaCalculationRecord | null>(null)
   const [manualErrors, setManualErrors] = useState<NisaErrors>({})
   const [focusErrorSummary, setFocusErrorSummary] = useState(false)
+  const [resetSnapshot, setResetSnapshot] =
+    useState<NisaResetSnapshot | null>(null)
+  const [summaryActionStatus, setSummaryActionStatus] =
+    useState<NisaSummaryActionStatus>(null)
   const errorSummaryRef = useRef<HTMLDivElement>(null)
+  const summaryStatusTimerRef = useRef<number | null>(null)
+  const copyRequestIdRef = useRef(0)
 
   const autoState = useMemo(() => {
     if (!isAutoCalculation) {
-      return { errors: {} as NisaErrors, result: null as NisaUiResult | null }
+      return {
+        errors: {} as NisaErrors,
+        record: null as NisaCalculationRecord | null,
+      }
     }
 
     const { errors, parsed } = validateValues(mode, values, false)
 
     if (Object.keys(errors).length > 0 || !hasRequiredValues(mode, values)) {
-      return { errors, result: null }
+      return { errors, record: null }
     }
 
-    return { errors, result: calculateForMode(mode, parsed) }
+    return {
+      errors,
+      record: createCalculationRecord(mode, values, parsed),
+    }
   }, [isAutoCalculation, mode, values])
 
   const visibleErrors = isAutoCalculation ? autoState.errors : manualErrors
-  const displayedResult = isAutoCalculation ? autoState.result : manualResult
+  const displayedRecord = isAutoCalculation ? autoState.record : manualRecord
+  const displayedResult = displayedRecord?.result ?? null
   const errorEntries = Object.entries(visibleErrors) as Array<[NisaField, string]>
+  const consultationRecord = useMemo(
+    () => displayedRecord?.result.status === 'calculated'
+      ? {
+          input: displayedRecord.input,
+          result: displayedRecord.result,
+          calculatedAt: displayedRecord.calculatedAt,
+        }
+      : null,
+    [displayedRecord],
+  )
+  const consultationSummary = useMemo(
+    () => consultationRecord
+      ? createNisaConsultationSummaryText(consultationRecord)
+      : null,
+    [consultationRecord],
+  )
 
   useEffect(() => {
     if (focusErrorSummary && errorEntries.length > 0) {
@@ -481,15 +590,41 @@ function NisaCalculator() {
     }
   }, [errorEntries.length, focusErrorSummary])
 
+  useEffect(() => {
+    copyRequestIdRef.current += 1
+    setSummaryActionStatus(null)
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+      summaryStatusTimerRef.current = null
+    }
+  }, [displayedRecord])
+
+  useEffect(() => () => {
+    copyRequestIdRef.current += 1
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+    }
+  }, [])
+
+  const dismissResetUndo = () => {
+    setResetSnapshot(null)
+  }
+
   const updateValue = (field: keyof NisaFormValues, value: string) => {
+    dismissResetUndo()
     setValues((current) => ({ ...current, [field]: value }))
-    setManualResult(null)
+    setManualRecord(null)
     setManualErrors({})
   }
 
   const changeMode = (nextMode: NisaCalculationMode) => {
+    if (nextMode === mode) return
+
+    dismissResetUndo()
     setMode(nextMode)
-    setManualResult(null)
+    setManualRecord(null)
     setManualErrors({})
   }
 
@@ -498,62 +633,110 @@ function NisaCalculator() {
 
     if (Object.keys(errors).length > 0) {
       setManualErrors(errors)
-      setManualResult(null)
+      setManualRecord(null)
       setFocusErrorSummary(true)
       return
     }
 
     setManualErrors({})
-    setManualResult(calculateForMode(mode, parsed))
+    setManualRecord(createCalculationRecord(mode, values, parsed))
   }
 
   const resetCalculator = () => {
+    const shouldOfferUndo =
+      mode !== 'future-value' ||
+      isAutoCalculation ||
+      Object.values(values).some((value) => value !== '')
+
+    setResetSnapshot(shouldOfferUndo
+      ? {
+          mode,
+          values: { ...values },
+          isAutoCalculation,
+        }
+      : null)
+    setMode('future-value')
     setValues(INITIAL_VALUES)
-    setManualResult(null)
+    setIsAutoCalculation(false)
+    setManualRecord(null)
     setManualErrors({})
+  }
+
+  const restoreReset = () => {
+    if (resetSnapshot === null) return
+
+    setMode(resetSnapshot.mode)
+    setValues(resetSnapshot.values)
+    setIsAutoCalculation(resetSnapshot.isAutoCalculation)
+    setManualRecord(null)
+    setManualErrors({})
+    setResetSnapshot(null)
+  }
+
+  const handleAutoCalculationChange = (checked: boolean) => {
+    dismissResetUndo()
+    setIsAutoCalculation(checked)
+    setManualRecord(null)
+    setManualErrors({})
+  }
+
+  const copyConsultationSummary = async () => {
+    if (consultationSummary === null) return
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+      summaryStatusTimerRef.current = null
+    }
+
+    const requestId = copyRequestIdRef.current + 1
+    copyRequestIdRef.current = requestId
+
+    try {
+      await navigator.clipboard.writeText(consultationSummary)
+
+      if (requestId !== copyRequestIdRef.current) return
+
+      setSummaryActionStatus('copied')
+      summaryStatusTimerRef.current = window.setTimeout(() => {
+        if (requestId === copyRequestIdRef.current) {
+          setSummaryActionStatus(null)
+          summaryStatusTimerRef.current = null
+        }
+      }, 3000)
+    } catch {
+      if (requestId !== copyRequestIdRef.current) return
+      setSummaryActionStatus('copy-error')
+    }
+  }
+
+  const printConsultationSummary = () => {
+    if (consultationSummary === null) return
+    window.print()
   }
 
   const assetTrajectory = useMemo(() => {
     if (
-      displayedResult?.status !== 'calculated' ||
-      displayedResult.mode !== 'future-value'
+      displayedRecord?.result.status !== 'calculated' ||
+      displayedRecord.result.mode !== 'future-value'
     ) return []
 
-    const initialAmount = parseMoneyValue(values.initialInvestment) ?? 0
-    const annualRate = parseDecimalValue(values.annualReturnRate)
-    if (annualRate === undefined) return []
-
-    return Array.from({ length: 7 }, (_, index) => index / 6).map((ratio) => {
-      if (ratio === 0) {
-        return {
-          label: '開始', principal: initialAmount, gain: 0,
-          futureValue: initialAmount, ratio,
-        }
-      }
-
-      const pointMonths = ratio === 1
-        ? displayedResult.months
-        : Math.max(1, Math.floor(displayedResult.months * ratio))
-      const point = calculateCurrentFutureValueWithInitialInvestment({
-        initialInvestment: initialAmount,
-        monthlyContribution: displayedResult.monthlyContribution,
-        annualRatePercent: annualRate,
-        months: pointMonths,
-      })
-
-      return {
-        label: ratio === 1
-          ? '終了'
-          : `${(pointMonths / 12).toLocaleString('ja-JP', {
-              maximumFractionDigits: 1,
-            })}年後`,
-        principal: point.principal,
-        gain: point.gain,
-        futureValue: point.futureValue,
-        ratio,
-      }
+    const points = calculateNisaTrajectory({
+      initialInvestment: displayedRecord.input.initialInvestment ?? 0,
+      monthlyContribution: displayedRecord.result.monthlyContribution,
+      annualRatePercent: displayedRecord.input.annualRatePercent,
+      months: displayedRecord.result.months,
     })
-  }, [displayedResult, values.annualReturnRate, values.initialInvestment])
+
+    return points.map((point) => ({
+      ...point,
+      label: formatTrajectoryPointLabel(
+        point.months,
+        displayedRecord.result.status === 'calculated'
+          ? displayedRecord.result.months
+          : point.months,
+      ),
+    }))
+  }, [displayedRecord])
 
   const assetAreaGraph = useMemo(() => {
     if (assetTrajectory.length === 0) return null
@@ -806,11 +989,9 @@ function NisaCalculator() {
               <input
                 type="checkbox"
                 checked={isAutoCalculation}
-                onChange={(event) => {
-                  setIsAutoCalculation(event.target.checked)
-                  setManualResult(null)
-                  setManualErrors({})
-                }}
+                onChange={(event) =>
+                  handleAutoCalculationChange(event.target.checked)
+                }
               />
               <span>入力と同時に計算結果を更新する</span>
             </label>
@@ -823,7 +1004,7 @@ function NisaCalculator() {
 
           <div className="simulator-form-actions" data-single={isAutoCalculation}>
             <button className="reset-button" type="button" onClick={resetCalculator}>
-              入力内容をリセット
+              入力をリセット
             </button>
             {!isAutoCalculation && (
               <button className="simulate-button" type="button" onClick={simulate}>
@@ -831,6 +1012,17 @@ function NisaCalculator() {
               </button>
             )}
           </div>
+
+          {resetSnapshot && (
+            <div
+              className="nisa-reset-undo"
+              role="group"
+              aria-label="リセットの取り消し"
+            >
+              <strong>入力内容をリセットしました。</strong>
+              <button type="button" onClick={restoreReset}>元に戻す</button>
+            </div>
+          )}
         </div>
 
         <div className="calculator-results" aria-live="polite">
@@ -910,7 +1102,7 @@ function NisaCalculator() {
               {assetAreaGraph && displayedResult?.status === 'calculated' ? (
                 <div className="nisa-trajectory-wrap">
                   <div className="nisa-trajectory-legend" aria-hidden="true">
-                    <span><i />積立元本</span><span><i />運用益</span><span><i />将来資産額</span>
+                    <span><i />積立元本</span><span><i />運用収益</span><span><i />将来資産額</span>
                   </div>
                   <div className="nisa-area-graph" aria-label="元本と運用益を含む資産推移の概算グラフ">
                     <svg viewBox="0 0 600 200" role="img" aria-hidden="true" preserveAspectRatio="none">
@@ -922,10 +1114,56 @@ function NisaCalculator() {
                       <polygon className="nisa-area-graph__gain" points={assetAreaGraph.gainArea} />
                       <polyline className="nisa-area-graph__total" points={assetAreaGraph.totalLine} />
                     </svg>
-                    <div className="nisa-area-graph__labels" aria-hidden="true">
-                      {assetTrajectory.map((point) => <span key={point.ratio}>{point.label}</span>)}
+                    <div
+                      className="nisa-area-graph__labels"
+                      aria-hidden="true"
+                      style={{
+                        gridTemplateColumns:
+                          `repeat(${assetTrajectory.length}, minmax(0, 1fr))`,
+                      }}
+                    >
+                      {assetTrajectory.map((point) => (
+                        <span key={point.months}>{point.label}</span>
+                      ))}
                     </div>
                     <strong>{formatYen(displayedResult.futureValue)}</strong>
+                  </div>
+                  <p className="nisa-trajectory-summary">
+                    最終時点は{formatMonths(displayedResult.months)}です。
+                    積立元本{formatYen(displayedResult.principal)}に対し、
+                    運用収益は{formatYen(displayedResult.gain)}、
+                    将来資産額は{formatYen(displayedResult.futureValue)}の概算です。
+                    {displayedResult.gain < 0 && (
+                      <strong> 運用収益はマイナスで、元本を下回る試算です。</strong>
+                    )}
+                  </p>
+                  <div
+                    className="nisa-trajectory-table-wrap"
+                    tabIndex={0}
+                    role="region"
+                    aria-label="資産推移の主要時点表"
+                  >
+                    <table className="nisa-trajectory-table">
+                      <caption>資産推移の主要時点（概算）</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">時点</th>
+                          <th scope="col">積立元本</th>
+                          <th scope="col">運用収益</th>
+                          <th scope="col">将来資産額</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {assetTrajectory.map((point) => (
+                          <tr key={point.months}>
+                            <th scope="row">{point.label}</th>
+                            <td>{formatYen(point.principal)}</td>
+                            <td>{formatYen(point.gain)}</td>
+                            <td>{formatYen(point.futureValue)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               ) : (
@@ -948,11 +1186,186 @@ function NisaCalculator() {
         </div>
       </div>
 
+      {consultationRecord && (
+        <section
+          className="nisa-consultation-summary"
+          aria-labelledby="nisa-consultation-summary-title"
+        >
+          <header className="nisa-consultation-summary__heading">
+            <div>
+              <p>CONSULTATION SUMMARY</p>
+              <h3 id="nisa-consultation-summary-title">相談用サマリー</h3>
+              <span>
+                金融機関やFPへの相談時に、入力条件と概算結果を確認するための資料です。
+              </span>
+            </div>
+            <div className="nisa-consultation-summary__actions">
+              <button type="button" onClick={copyConsultationSummary}>
+                相談用サマリーをコピー
+              </button>
+              <button type="button" onClick={printConsultationSummary}>
+                印刷する
+              </button>
+            </div>
+          </header>
+
+          {summaryActionStatus && (
+            <p
+              className="nisa-consultation-summary__status"
+              data-tone={summaryActionStatus === 'copied' ? 'success' : 'error'}
+              role="status"
+              aria-live="polite"
+            >
+              {summaryActionStatus === 'copied'
+                ? '相談用サマリーをコピーしました。'
+                : 'コピーできませんでした。もう一度お試しください。'}
+            </p>
+          )}
+
+          <NisaConsultationSummaryContent record={consultationRecord} />
+        </section>
+      )}
+
       <p className="calculator-note">
         本シミュレーターは、一定の利回りで毎月末に積み立てる想定の概算です。
         実際の運用成果、手数料、価格変動、利用可能なNISA枠を保証するものではありません。
       </p>
     </section>
+  )
+}
+
+const NisaConsultationSummaryContent = ({
+  record,
+}: {
+  record: NisaConsultationSummaryRecord
+}) => {
+  const { input, result } = record
+  const allowanceRelation = getNisaAllowanceRelation(result.allowance)
+
+  return (
+    <div
+      className="nisa-consultation-summary__content"
+      aria-label="相談用サマリー本文"
+    >
+      <header className="nisa-consultation-summary__document-heading">
+        <p>沖縄マネーガイド</p>
+        <h4>NISAシミュレーター 相談用サマリー</h4>
+        <span>
+          入力条件と概算結果を整理した、金融機関・FPへの相談用資料です。
+        </span>
+      </header>
+
+      <section className="nisa-consultation-summary__section">
+        <h5>入力条件</h5>
+        <dl>
+          <div><dt>計算モード</dt><dd>{getNisaModeLabel(input.mode)}</dd></div>
+          {input.monthlyContribution !== null && (
+            <div><dt>毎月積立額</dt><dd>{formatYen(input.monthlyContribution)}</dd></div>
+          )}
+          {input.targetAmount !== null && (
+            <div><dt>目標額</dt><dd>{formatYen(input.targetAmount)}</dd></div>
+          )}
+          <div><dt>想定利回り</dt><dd>{input.annualRatePercent}%</dd></div>
+          {input.inputMonths !== null && (
+            <div>
+              <dt>積立期間</dt>
+              <dd>{formatMonths(input.inputMonths)}（{input.inputMonths.toLocaleString('ja-JP')}か月）</dd>
+            </div>
+          )}
+          {input.inflationRatePercent !== null && (
+            <div><dt>想定インフレ率</dt><dd>{input.inflationRatePercent}%</dd></div>
+          )}
+          {input.mode === 'future-value' && input.initialInvestment !== null && (
+            <div><dt>初期投資額</dt><dd>{formatYen(input.initialInvestment)}</dd></div>
+          )}
+        </dl>
+      </section>
+
+      <section className="nisa-consultation-summary__section">
+        <h5>概算結果</h5>
+        <dl>
+          {input.mode === 'future-value' && (
+            <>
+              <div><dt>将来資産額</dt><dd>{formatYen(result.futureValue)}</dd></div>
+              <div><dt>元本</dt><dd>{formatYen(result.principal)}</dd></div>
+              <div><dt>運用収益</dt><dd>{formatYen(result.gain)}</dd></div>
+              {result.inflationAdjustedValue !== null && (
+                <div><dt>インフレ調整後価値</dt><dd>{formatYen(result.inflationAdjustedValue)}</dd></div>
+              )}
+            </>
+          )}
+          {input.mode === 'required-contribution' && (
+            <>
+              <div><dt>必要な毎月積立額</dt><dd>{formatYen(result.monthlyContribution)}</dd></div>
+              <div><dt>年間換算額</dt><dd>{formatYen(result.allowance.annualContribution)}</dd></div>
+              <div><dt>元本</dt><dd>{formatYen(result.principal)}</dd></div>
+              <div><dt>目標額</dt><dd>{formatYen(result.targetAmount ?? 0)}</dd></div>
+            </>
+          )}
+          {input.mode === 'required-months' && (
+            <>
+              <div><dt>必要期間</dt><dd>{formatMonths(result.months)}</dd></div>
+              <div><dt>必要月数</dt><dd>{result.months.toLocaleString('ja-JP')}か月</dd></div>
+              <div><dt>毎月積立額</dt><dd>{formatYen(result.monthlyContribution)}</dd></div>
+              <div><dt>元本</dt><dd>{formatYen(result.principal)}</dd></div>
+              <div><dt>目標額</dt><dd>{formatYen(result.targetAmount ?? 0)}</dd></div>
+            </>
+          )}
+        </dl>
+      </section>
+
+      <section className="nisa-consultation-summary__section">
+        <h5>NISA枠との関係</h5>
+        <dl>
+          <div><dt>年間換算額</dt><dd>{formatYen(result.allowance.annualContribution)}</dd></div>
+          <div><dt>120万円との関係</dt><dd>{allowanceRelation.annualTsumitate}</dd></div>
+          <div><dt>360万円との関係</dt><dd>{allowanceRelation.annualCombined}</dd></div>
+          <div><dt>1,800万円との関係</dt><dd>{allowanceRelation.lifetime}</dd></div>
+        </dl>
+        <p className="nisa-consultation-summary__supplement">
+          成長投資枠へ自動配分していません。実際の利用可能枠は金融機関等でご確認ください。
+        </p>
+      </section>
+
+      <section className="nisa-consultation-summary__section">
+        <h5>未考慮事項</h5>
+        <ul>
+          {NISA_UNCONSIDERED_ITEMS.map((item) => <li key={item}>{item}</li>)}
+        </ul>
+      </section>
+
+      <section className="nisa-consultation-summary__section">
+        <h5>金融機関・FPへ確認する項目</h5>
+        <ul>
+          {NISA_CONFIRMATION_ITEMS.map((item) => <li key={item}>{item}</li>)}
+        </ul>
+      </section>
+
+      <section className="nisa-consultation-summary__section nisa-consultation-summary__section--reproduction">
+        <h5>結果再現情報</h5>
+        <dl>
+          <div><dt>入力スナップショット</dt><dd>{createNisaInputSnapshotText(input)}</dd></div>
+          <div><dt>計算日時</dt><dd>{formatNisaCalculationDateTime(record.calculatedAt)}</dd></div>
+          <div><dt>計算モデル版</dt><dd>{getNisaModelVersionDisplay()}</dd></div>
+          <div><dt>仕様版</dt><dd>{NISA_DESIGN_SPEC_VERSION}</dd></div>
+          <div><dt>計算仕様版</dt><dd>{NISA_CALCULATION_SPEC_VERSION}</dd></div>
+          <div><dt>制度基準日</dt><dd>{getNisaPolicyReferenceDateDisplay()}</dd></div>
+          <div><dt>一次資料確認日</dt><dd>{getNisaPrimarySourceReviewDateDisplay()}</dd></div>
+        </dl>
+      </section>
+
+      <section className="nisa-consultation-summary__section">
+        <h5>一次資料</h5>
+        <ul>
+          {NISA_PRIMARY_SOURCES.map((source) => <li key={source}>{source}</li>)}
+        </ul>
+      </section>
+
+      <p className="nisa-consultation-summary__notice">
+        本サマリーは一定の利回りを仮定した概算です。
+        実際の運用成果や利用可能なNISA枠を保証するものではありません。
+      </p>
+    </div>
   )
 }
 

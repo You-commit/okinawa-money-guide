@@ -349,6 +349,310 @@
   line-height: 1.65;
 }
 
+.nisa-reset-undo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #b8dac8;
+  border-radius: 10px;
+  background: #f2faf6;
+  color: #315e4d;
+  font-size: 0.72rem;
+}
+
+.nisa-reset-undo button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 6px 12px;
+  border: 1px solid var(--nisa-green);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--nisa-green-dark);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nisa-reset-undo button:focus-visible {
+  outline: 3px solid rgba(11, 143, 91, 0.2);
+  outline-offset: 2px;
+}
+
+.nisa-trajectory-summary {
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #f4f8f6;
+  color: #536f62;
+  font-size: 0.68rem;
+  line-height: 1.7;
+}
+
+.nisa-trajectory-summary strong {
+  color: #8b4545;
+}
+
+.nisa-trajectory-table-wrap {
+  min-width: 0;
+  overflow-x: auto;
+  border: 1px solid #d6e4dd;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.nisa-trajectory-table-wrap:focus-visible {
+  outline: 3px solid rgba(11, 143, 91, 0.18);
+  outline-offset: 2px;
+}
+
+.nisa-trajectory-table {
+  width: 100%;
+  min-width: 540px;
+  border-collapse: collapse;
+  color: #38546a;
+  font-size: 0.67rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-trajectory-table caption {
+  padding: 10px 12px 8px;
+  color: var(--nisa-navy);
+  font-size: 0.75rem;
+  font-weight: 850;
+  text-align: left;
+}
+
+.nisa-trajectory-table th,
+.nisa-trajectory-table td {
+  padding: 8px 10px;
+  border-top: 1px solid #e6eeea;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.nisa-trajectory-table thead th {
+  background: #f1f8f4;
+  color: #315a49;
+  font-weight: 850;
+}
+
+.nisa-trajectory-table tr > :first-child {
+  text-align: left;
+}
+
+.nisa-consultation-summary {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #d4e4dc;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(22, 77, 56, 0.06);
+}
+
+.nisa-consultation-summary__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.nisa-consultation-summary__heading p {
+  margin: 0 0 5px;
+  color: var(--nisa-green);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+}
+
+.nisa-consultation-summary__heading h3 {
+  margin: 0;
+  color: var(--nisa-navy);
+  font-size: 1.2rem;
+}
+
+.nisa-consultation-summary__heading span {
+  display: block;
+  margin-top: 7px;
+  color: var(--nisa-text);
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.nisa-consultation-summary__actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.nisa-consultation-summary__actions button {
+  min-height: 42px;
+  padding: 8px 13px;
+  border: 1px solid var(--nisa-green);
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--nisa-green-dark);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nisa-consultation-summary__actions button:first-child {
+  background: var(--nisa-green);
+  color: #ffffff;
+}
+
+.nisa-consultation-summary__actions button:focus-visible {
+  outline: 3px solid rgba(11, 143, 91, 0.2);
+  outline-offset: 3px;
+}
+
+.nisa-consultation-summary__status {
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: #f2faf6;
+  color: #356b54;
+  font-size: 0.76rem;
+  font-weight: 750;
+  line-height: 1.55;
+}
+
+.nisa-consultation-summary__status[data-tone="error"] {
+  border: 1px solid #e3b6b6;
+  background: #fff5f5;
+  color: #8a3d3d;
+}
+
+.nisa-consultation-summary__content {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #e0ebe5;
+  border-radius: 11px;
+  background: #f9fcfa;
+  color: #314f42;
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+.nisa-consultation-summary__document-heading {
+  padding-bottom: 13px;
+  border-bottom: 2px solid #bcdccb;
+}
+
+.nisa-consultation-summary__document-heading p,
+.nisa-consultation-summary__document-heading h4,
+.nisa-consultation-summary__document-heading span,
+.nisa-consultation-summary__section h5,
+.nisa-consultation-summary__section dl,
+.nisa-consultation-summary__section ul,
+.nisa-consultation-summary__supplement,
+.nisa-consultation-summary__notice {
+  margin: 0;
+}
+
+.nisa-consultation-summary__document-heading p {
+  color: var(--nisa-green);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.nisa-consultation-summary__document-heading h4 {
+  margin-top: 3px;
+  color: var(--nisa-navy);
+  font-size: 1.1rem;
+}
+
+.nisa-consultation-summary__document-heading span {
+  display: block;
+  margin-top: 5px;
+  color: var(--nisa-text);
+}
+
+.nisa-consultation-summary__section {
+  padding: 13px 14px;
+  border: 1px solid #e0e9e4;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.nisa-consultation-summary__section h5 {
+  color: var(--nisa-navy);
+  font-size: 0.87rem;
+}
+
+.nisa-consultation-summary__section dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 18px;
+  margin-top: 8px;
+}
+
+.nisa-consultation-summary__section dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  min-width: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #edf2ef;
+}
+
+.nisa-consultation-summary__section dt {
+  color: #667e72;
+}
+
+.nisa-consultation-summary__section dd {
+  max-width: 27rem;
+  margin: 0;
+  color: #203f31;
+  font-weight: 750;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-consultation-summary__section ul {
+  columns: 2;
+  gap: 28px;
+  margin-top: 8px;
+  padding-left: 1.2rem;
+}
+
+.nisa-consultation-summary__section li {
+  break-inside: avoid;
+}
+
+.nisa-consultation-summary__supplement {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--nisa-green-soft);
+  color: #526e60;
+  font-size: 0.7rem;
+}
+
+.nisa-consultation-summary__section--reproduction {
+  background: #f8faf9;
+  color: #60756a;
+}
+
+.nisa-consultation-summary__notice {
+  padding: 10px 12px;
+  border: 1px solid #d6e2dc;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #536c60;
+  font-size: 0.73rem;
+  font-weight: 650;
+}
+
 @media (min-width: 901px) {
   .simulator-page--nisa .nisa-calculator .calculator-layout {
     grid-template-columns: minmax(340px, 0.72fr) minmax(0, 1.28fr);
@@ -369,6 +673,29 @@
   }
 }
 
+@media (max-width: 760px) {
+  .nisa-consultation-summary__heading {
+    flex-direction: column;
+  }
+
+  .nisa-consultation-summary__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .nisa-consultation-summary__actions button {
+    flex: 1 1 12rem;
+  }
+
+  .nisa-consultation-summary__section dl {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-consultation-summary__section ul {
+    columns: 1;
+  }
+}
+
 @media (max-width: 520px) {
   .nisa-period-inputs,
   .nisa-result-grid,
@@ -379,5 +706,128 @@
   .nisa-allowance-panel__heading {
     flex-direction: column;
     gap: 7px;
+  }
+
+  .nisa-reset-undo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm 15mm;
+  }
+
+  .simulator-page--nisa .skip-link,
+  .simulator-page--nisa .top-option02__header,
+  .simulator-page--nisa .simulator-page__hero,
+  .simulator-page--nisa .simulator-page__notes,
+  .simulator-page--nisa .site-footer,
+  .simulator-page--nisa .nisa-calculator > :not(.nisa-consultation-summary),
+  .simulator-page--nisa .nisa-consultation-summary__heading,
+  .simulator-page--nisa .nisa-consultation-summary__status {
+    display: none !important;
+  }
+
+  .simulator-page--nisa,
+  .simulator-page--nisa main,
+  .simulator-page--nisa .simulator-page__main,
+  .simulator-page--nisa .simulator-page__calculator,
+  .simulator-page--nisa .nisa-calculator {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__content {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: #ffffff;
+    color: #111111;
+    font-size: 10pt;
+    line-height: 1.5;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__document-heading {
+    margin-bottom: 8mm;
+    padding-bottom: 4mm;
+    border-bottom: 1px solid #555555;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__document-heading p,
+  .simulator-page--nisa .nisa-consultation-summary__document-heading h4,
+  .simulator-page--nisa .nisa-consultation-summary__document-heading span,
+  .simulator-page--nisa .nisa-consultation-summary__section h5,
+  .simulator-page--nisa .nisa-consultation-summary__section dt,
+  .simulator-page--nisa .nisa-consultation-summary__section dd,
+  .simulator-page--nisa .nisa-consultation-summary__section li,
+  .simulator-page--nisa .nisa-consultation-summary__supplement,
+  .simulator-page--nisa .nisa-consultation-summary__notice {
+    color: #111111;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__document-heading h4 {
+    font-size: 16pt;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__section {
+    margin-top: 4mm;
+    padding: 3.5mm 4mm;
+    border: 1px solid #b8b8b8;
+    border-radius: 0;
+    background: #ffffff;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__section h5 {
+    font-size: 11pt;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__section dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5mm 7mm;
+    margin-top: 2mm;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__section dl > div {
+    gap: 3mm;
+    padding-bottom: 1mm;
+    border-bottom-color: #d8d8d8;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__section ul {
+    columns: 2;
+    gap: 8mm;
+    margin-top: 2mm;
+  }
+
+  .simulator-page--nisa .nisa-consultation-summary__supplement,
+  .simulator-page--nisa .nisa-consultation-summary__notice {
+    margin-top: 3mm;
+    padding: 3mm 4mm;
+    border: 1px solid #b8b8b8;
+    background: #ffffff;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
