@@ -1,5 +1,4 @@
 import NisaCalculator from '../NisaCalculator'
-import NisaHeroMotion from '../components/simulator/NisaHeroMotion'
 import SimulatorNotes from '../components/simulator/SimulatorNotes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
 
@@ -15,7 +14,6 @@ function NisaPage() {
         { title: '将来資産を可視化', description: '元本と運用による変化を分かりやすく確認' },
         { title: 'NISA枠も確認', description: '年間投資枠や非課税保有限度額との関係を確認' },
       ]}
-      heroVisual={<NisaHeroMotion />}
       notes={<SimulatorNotes knowledgeTitle="NISAの基礎知識を学ぶ" knowledgeItems={['NISA制度の基本', '長期・分散・積立', '元本割れリスク']} accent="nisa" />}
     >
       <NisaCalculator />

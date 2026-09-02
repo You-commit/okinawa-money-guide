@@ -50,14 +50,10 @@ describe('dedicated page routing', () => {
     expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex, follow')
   })
 
-  it('renders the NISA asset-building hero motion as decorative content', () => {
+  it('renders the approved NISA hero content without the retired motion layer', () => {
     const { container } = renderAt('/simulators/nisa')
-    const motion = container.querySelector('.nisa-hero-motion')
 
-    expect(motion?.getAttribute('aria-hidden')).toBe('true')
-    expect(motion?.querySelectorAll('.nisa-hero-motion__bar')).toHaveLength(14)
-    expect(motion?.querySelectorAll('.nisa-hero-motion__particles span'))
-      .toHaveLength(6)
+    expect(container.querySelector('.nisa-hero-motion')).toBeNull()
     expect(screen.getByText('毎月の積立を試算')).toBeTruthy()
     expect(screen.getByText('将来資産を可視化')).toBeTruthy()
     expect(screen.getByText('NISA枠も確認')).toBeTruthy()

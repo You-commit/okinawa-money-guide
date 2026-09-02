@@ -143,9 +143,92 @@
 }
 
 .simulator-page--nisa .simulator-page__hero {
-  background:
-    linear-gradient(105deg, rgba(0, 112, 72, 0.96), rgba(0, 158, 123, 0.68)),
-    url('../assets/top-hero/OMG-TOP-HERO-PHOTO-ISHIGAKI-APPROVED-v1.0-20260816.png') center 52% / cover no-repeat;
+  min-height: 255px;
+  background: url('../assets/simulator-heroes/OMG-NISA-Hero-v1.png') center 66% / cover no-repeat;
+  color: #ffffff;
+}
+
+.simulator-page--nisa .simulator-page__hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 63, 42, 0.24) 0%,
+    rgba(0, 72, 50, 0.1) 39%,
+    rgba(0, 84, 60, 0) 67%
+  );
+  pointer-events: none;
+}
+
+.simulator-page--nisa .simulator-page__hero::after {
+  right: -2%;
+  bottom: -1px;
+  left: -2%;
+  z-index: 2;
+  width: auto;
+  height: 40px;
+  border: 0;
+  border-radius: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 56' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 26C210 4 373 39 590 27c233-13 398 17 604 2 99-7 176-8 246-4v31H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.simulator-page--nisa .simulator-page__hero-inner {
+  min-height: 255px;
+  padding-bottom: 48px;
+}
+
+.simulator-page--nisa .breadcrumb {
+  color: rgba(245, 255, 251, 0.86);
+}
+
+.simulator-page--nisa .simulator-page__eyebrow {
+  color: #c9ffeb;
+}
+
+.simulator-page--nisa .simulator-page__hero-copy h1 {
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 55, 38, 0.18);
+}
+
+.simulator-page--nisa .simulator-page__hero-copy > p:last-child {
+  color: rgba(244, 255, 251, 0.92);
+  text-shadow: 0 1px 10px rgba(0, 50, 36, 0.18);
+}
+
+.simulator-page--nisa .simulator-page__benefits {
+  align-self: end;
+  margin-bottom: 2px;
+  gap: 10px;
+}
+
+.simulator-page--nisa .simulator-page__benefits article {
+  border-color: rgba(222, 255, 243, 0.34);
+  background: rgba(0, 104, 76, 0.43);
+  box-shadow: 0 9px 22px rgba(0, 63, 47, 0.09);
+  color: #ffffff;
+  backdrop-filter: blur(7px);
+}
+
+.simulator-page--nisa .simulator-page__benefits b {
+  background: rgba(240, 255, 249, 0.16);
+  color: #ffffff;
+}
+
+.simulator-page--nisa .simulator-page__benefits small {
+  color: rgba(239, 255, 249, 0.85);
+}
+
+.simulator-page--nisa .simulator-page__main {
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+.simulator-page--nisa .simulator-page__calculator {
+  border-top: 1px solid #dce8ef;
 }
 
 .simulator-page--ideco {
@@ -3021,366 +3104,4 @@
     flex-direction: column;
   }
 
-}
-
-/* NISA page: light asset-building motion hero */
-.simulator-page--nisa .simulator-page__hero {
-  min-height: 255px;
-  background:
-    radial-gradient(circle at 79% 21%, rgba(101, 232, 188, 0.34), transparent 28%),
-    radial-gradient(circle at 96% 74%, rgba(102, 211, 223, 0.3), transparent 34%),
-    linear-gradient(105deg, #fffdfa 0%, #f7fdf9 36%, #e7faf2 69%, #dcf7f5 100%);
-  color: #123b32;
-}
-
-.simulator-page--nisa .simulator-page__hero::after {
-  right: -2%;
-  bottom: -1px;
-  left: -2%;
-  z-index: 0;
-  width: auto;
-  height: 40px;
-  border: 0;
-  border-radius: 0;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 56' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 26C210 4 373 39 590 27c233-13 398 17 604 2 99-7 176-8 246-4v31H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
-  box-shadow: none;
-  pointer-events: none;
-}
-
-.simulator-page--nisa .simulator-page__hero-inner {
-  grid-template-columns: minmax(360px, 0.78fr) minmax(610px, 1.22fr);
-  min-height: 255px;
-  padding: 17px 0 43px;
-}
-
-.simulator-page--nisa .breadcrumb {
-  color: #54766d;
-}
-
-.simulator-page--nisa .simulator-page__eyebrow {
-  color: #07885d;
-}
-
-.simulator-page--nisa .simulator-page__hero-copy h1 {
-  color: #123b32;
-}
-
-.simulator-page--nisa .simulator-page__hero-copy > p:last-child {
-  max-width: 520px;
-  color: #466b61;
-}
-
-.simulator-page--nisa .simulator-page__hero-stage {
-  position: relative;
-  min-width: 0;
-  min-height: 195px;
-}
-
-.simulator-page--nisa .nisa-hero-motion {
-  position: absolute;
-  inset: 0 4px 72px;
-  overflow: hidden;
-  border-radius: 56% 24% 38% 30% / 44% 30% 42% 40%;
-  background: linear-gradient(128deg, rgba(255, 255, 255, 0.22), rgba(190, 247, 225, 0.2));
-  isolation: isolate;
-  pointer-events: none;
-}
-
-.simulator-page--nisa .nisa-hero-motion__flow {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.62;
-  will-change: transform, opacity;
-}
-
-.simulator-page--nisa .nisa-hero-motion__flow--one {
-  top: -58%;
-  right: -7%;
-  width: 82%;
-  height: 138%;
-  background: linear-gradient(142deg, rgba(63, 220, 156, 0.52), rgba(71, 211, 208, 0.15));
-  transform: rotate(-8deg);
-  animation: nisa-flow-one 14s ease-in-out infinite alternate;
-}
-
-.simulator-page--nisa .nisa-hero-motion__flow--two {
-  right: 22%;
-  bottom: -92%;
-  width: 72%;
-  height: 155%;
-  background: linear-gradient(128deg, rgba(152, 239, 189, 0.22), rgba(32, 190, 148, 0.44));
-  transform: rotate(7deg);
-  animation: nisa-flow-two 17s ease-in-out infinite alternate;
-}
-
-.simulator-page--nisa .nisa-hero-motion__flow--three {
-  top: -25%;
-  left: 22%;
-  width: 42%;
-  height: 95%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.68), rgba(175, 239, 224, 0.08) 70%);
-  animation: nisa-flow-three 12s ease-in-out infinite alternate;
-}
-
-.simulator-page--nisa .nisa-hero-motion__bars {
-  position: absolute;
-  inset: 10px 6% 9px 5%;
-  z-index: 2;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: clamp(5px, 0.85vw, 10px);
-}
-
-.simulator-page--nisa .nisa-hero-motion__bar {
-  flex: 1 1 0;
-  max-width: 24px;
-  height: var(--bar-height);
-  border: 1px solid rgba(8, 137, 93, 0.16);
-  border-radius: 8px 8px 3px 3px;
-  background: linear-gradient(
-    to top,
-    rgba(16, 168, 111, 0.78) 0 var(--bar-principal),
-    rgba(114, 222, 185, 0.72) var(--bar-principal) 100%
-  );
-  box-shadow: 0 7px 16px rgba(12, 116, 83, 0.08);
-  transform: scaleY(0);
-  transform-origin: center bottom;
-  will-change: transform, opacity;
-  animation:
-    nisa-bar-rise 820ms cubic-bezier(0.22, 0.72, 0.24, 1) var(--bar-delay) forwards,
-    nisa-bar-breathe 6.4s ease-in-out calc(var(--bar-delay) + 900ms) infinite alternate;
-}
-
-.simulator-page--nisa .nisa-hero-motion__curve {
-  position: absolute;
-  inset: 3px 3.5% 6px 3%;
-  z-index: 3;
-  width: 93.5%;
-  height: calc(100% - 9px);
-  overflow: visible;
-}
-
-.simulator-page--nisa .nisa-hero-motion__curve path {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-}
-
-.simulator-page--nisa .nisa-hero-motion__curve-guide {
-  stroke: rgba(255, 255, 255, 0.72);
-  stroke-width: 5;
-}
-
-.simulator-page--nisa .nisa-hero-motion__curve-line {
-  stroke: #047e62;
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-dasharray: 760;
-  stroke-dashoffset: 760;
-  animation: nisa-curve-draw 3.4s cubic-bezier(0.3, 0.7, 0.28, 1) 420ms forwards;
-}
-
-.simulator-page--nisa .nisa-hero-motion__curve-highlight {
-  stroke: rgba(220, 255, 243, 0.95);
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-dasharray: 22 738;
-  stroke-dashoffset: 0;
-  opacity: 0;
-  animation: nisa-curve-highlight 8s linear 3.6s infinite;
-}
-
-.simulator-page--nisa .nisa-hero-motion__particles span {
-  position: absolute;
-  top: var(--particle-y);
-  left: var(--particle-x);
-  z-index: 4;
-  width: 5px;
-  height: 5px;
-  border: 1px solid rgba(5, 133, 93, 0.24);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.84);
-  opacity: 0.42;
-  will-change: transform, opacity;
-  animation: nisa-particle-flow 12s ease-in-out var(--particle-delay) infinite;
-}
-
-.simulator-page--nisa .simulator-page__benefits {
-  position: absolute;
-  right: 0;
-  bottom: 1px;
-  left: 0;
-  z-index: 5;
-  gap: 8px;
-}
-
-.simulator-page--nisa .simulator-page__benefits article {
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 8px;
-  min-height: 68px;
-  padding: 9px 10px;
-  border-color: rgba(80, 177, 142, 0.28);
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 10px 24px rgba(19, 95, 71, 0.08);
-  color: #174b3d;
-  backdrop-filter: blur(7px);
-}
-
-.simulator-page--nisa .simulator-page__benefits b {
-  width: 28px;
-  height: 28px;
-  background: rgba(232, 250, 241, 0.94);
-  color: #07885d;
-}
-
-.simulator-page--nisa .simulator-page__benefits strong {
-  font-size: 0.69rem;
-}
-
-.simulator-page--nisa .simulator-page__benefits small {
-  color: #58786e;
-  font-size: 0.58rem;
-  line-height: 1.4;
-}
-
-.simulator-page--nisa .simulator-page__main {
-  margin-top: 0;
-  padding-top: 10px;
-}
-
-.simulator-page--nisa .simulator-page__calculator {
-  border-top: 1px solid #dce8ef;
-}
-
-@keyframes nisa-bar-rise {
-  from { opacity: 0; transform: scaleY(0); }
-  to { opacity: 1; transform: scaleY(1); }
-}
-
-@keyframes nisa-bar-breathe {
-  from { opacity: 0.9; transform: scaleY(0.985); }
-  to { opacity: 1; transform: scaleY(1.015); }
-}
-
-@keyframes nisa-curve-draw {
-  to { stroke-dashoffset: 0; }
-}
-
-@keyframes nisa-curve-highlight {
-  0% { opacity: 0; stroke-dashoffset: 0; }
-  14%, 82% { opacity: 0.72; }
-  100% { opacity: 0; stroke-dashoffset: -760; }
-}
-
-@keyframes nisa-flow-one {
-  from { opacity: 0.5; transform: translate3d(-8px, 4px, 0) rotate(-8deg) scale(1); }
-  to { opacity: 0.7; transform: translate3d(30px, 18px, 0) rotate(-5deg) scale(1.035); }
-}
-
-@keyframes nisa-flow-two {
-  from { opacity: 0.5; transform: translate3d(14px, -5px, 0) rotate(7deg) scale(1.01); }
-  to { opacity: 0.66; transform: translate3d(-24px, -19px, 0) rotate(4deg) scale(1.04); }
-}
-
-@keyframes nisa-flow-three {
-  from { opacity: 0.42; transform: translate3d(-10px, 2px, 0) scale(1); }
-  to { opacity: 0.66; transform: translate3d(25px, 13px, 0) scale(1.035); }
-}
-
-@keyframes nisa-particle-flow {
-  0%, 100% { opacity: 0.18; transform: translate3d(0, 8px, 0) scale(0.86); }
-  45% { opacity: 0.55; transform: translate3d(var(--particle-shift), -12px, 0) scale(1); }
-  72% { opacity: 0.34; transform: translate3d(calc(var(--particle-shift) + 10px), -21px, 0) scale(0.92); }
-}
-
-@media (max-width: 1200px) and (min-width: 901px) {
-  .simulator-page--nisa .simulator-page__hero-inner {
-    grid-template-columns: minmax(355px, 0.8fr) minmax(0, 1.2fr);
-    gap: 24px;
-  }
-
-  .simulator-page--nisa .simulator-page__benefits article {
-    padding-inline: 8px;
-  }
-
-  .simulator-page--nisa .simulator-page__benefits small {
-    font-size: 0.55rem;
-  }
-}
-
-@media (max-width: 900px) {
-  .simulator-page--nisa .simulator-page__hero-inner {
-    grid-template-columns: 1fr;
-    padding-bottom: 54px;
-  }
-
-  .simulator-page--nisa .simulator-page__hero-stage {
-    min-height: 260px;
-  }
-}
-
-@media (max-width: 760px) {
-  .simulator-page--nisa .simulator-page__hero-stage {
-    min-height: 430px;
-  }
-
-  .simulator-page--nisa .nisa-hero-motion {
-    inset: 0 0 250px;
-  }
-
-  .simulator-page--nisa .simulator-page__benefits {
-    position: absolute;
-    top: 190px;
-    bottom: auto;
-    grid-template-columns: 1fr;
-  }
-
-  .simulator-page--nisa .simulator-page__benefits article {
-    min-height: 68px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .simulator-page--nisa .nisa-hero-motion__flow,
-  .simulator-page--nisa .nisa-hero-motion__bar,
-  .simulator-page--nisa .nisa-hero-motion__curve-line,
-  .simulator-page--nisa .nisa-hero-motion__curve-highlight,
-  .simulator-page--nisa .nisa-hero-motion__particles span {
-    animation: none;
-  }
-
-  .simulator-page--nisa .nisa-hero-motion__flow--one {
-    opacity: 0.62;
-    transform: rotate(-8deg);
-  }
-
-  .simulator-page--nisa .nisa-hero-motion__flow--two {
-    opacity: 0.58;
-    transform: rotate(7deg);
-  }
-
-  .simulator-page--nisa .nisa-hero-motion__flow--three {
-    opacity: 0.5;
-    transform: none;
-  }
-
-  .simulator-page--nisa .nisa-hero-motion__bar {
-    opacity: 1;
-    transform: scaleY(1);
-  }
-
-  .simulator-page--nisa .nisa-hero-motion__curve-line {
-    stroke-dashoffset: 0;
-  }
-
-  .simulator-page--nisa .nisa-hero-motion__curve-highlight {
-    opacity: 0.45;
-    stroke-dashoffset: -320;
-  }
-
-  .simulator-page--nisa .nisa-hero-motion__particles span {
-    opacity: 0.32;
-    transform: none;
-  }
 }
