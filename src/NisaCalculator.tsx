@@ -1203,18 +1203,26 @@ function NisaCalculator() {
                   <h4 id="nisa-scenario-input-title">シナリオ比較</h4>
                   <p>利回りだけを変えた3つの仮定を比較します。</p>
                 </div>
-                <label className="nisa-scenario-toggle">
-                  <input
-                    type="checkbox"
-                    aria-label="シナリオ比較"
-                    checked={isScenarioComparisonEnabled}
-                    aria-controls="nisa-scenario-rate-fields"
-                    onChange={(event) =>
-                      changeScenarioComparison(event.target.checked)
-                    }
-                  />
-                  <span>{isScenarioComparisonEnabled ? 'ON' : 'OFF'}</span>
-                </label>
+                <div
+                  className="nisa-scenario-segmented-control"
+                  role="group"
+                  aria-label="シナリオ比較"
+                >
+                  <button
+                    type="button"
+                    aria-pressed={!isScenarioComparisonEnabled}
+                    onClick={() => changeScenarioComparison(false)}
+                  >
+                    比較しない
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={isScenarioComparisonEnabled}
+                    onClick={() => changeScenarioComparison(true)}
+                  >
+                    比較する
+                  </button>
+                </div>
               </div>
 
               {isScenarioComparisonEnabled && (
@@ -1405,7 +1413,7 @@ function NisaCalculator() {
 
           <div className="simulator-form-actions" data-single={isAutoCalculation}>
             <button className="reset-button" type="button" onClick={resetCalculator}>
-              入力をリセット
+              入力内容をリセット
             </button>
             {!isAutoCalculation && (
               <button className="simulate-button" type="button" onClick={simulate}>
@@ -1655,8 +1663,7 @@ function NisaCalculator() {
       )}
 
       <p className="calculator-note">
-        本シミュレーターは、一定の利回りで毎月末に積み立てる想定の概算です。
-        実際の運用成果、手数料、価格変動、利用可能なNISA枠を保証するものではありません。
+        一定の利回りで毎月末に積み立てる想定の概算であり、将来の運用成果を保証するものではありません。
       </p>
     </section>
   )

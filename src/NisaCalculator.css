@@ -272,6 +272,7 @@
 
 .nisa-scenario-input__heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
@@ -294,31 +295,49 @@
   line-height: 1.5;
 }
 
-.nisa-scenario-toggle {
-  display: inline-flex;
+.nisa-scenario-segmented-control {
+  display: grid;
   flex: 0 0 auto;
-  align-items: center;
-  gap: 6px;
-  min-height: 32px;
-  padding: 4px 8px;
-  border: 1px solid #b8d6c7;
-  border-radius: 999px;
-  background: #ffffff;
-  color: #496a5b;
-  font-size: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 202px;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 2px;
+  border: 1px solid #c9ded4;
+  border-radius: 12px;
+  background: #f1f8f4;
+}
+
+.nisa-scenario-segmented-control button {
+  min-height: 34px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #365b4b;
+  font: inherit;
+  font-size: 0.64rem;
   font-weight: 850;
+  line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
 }
 
-.nisa-scenario-toggle input {
-  width: 15px;
-  height: 15px;
-  accent-color: var(--nisa-green);
+.nisa-scenario-segmented-control button:first-child[aria-pressed="true"] {
+  border-color: #c1d9cc;
+  background: #ffffff;
+  color: #24493b;
 }
 
-.nisa-scenario-toggle:focus-within {
+.nisa-scenario-segmented-control button:last-child[aria-pressed="true"] {
+  border-color: var(--nisa-green);
+  background: var(--nisa-green);
+  color: #ffffff;
+}
+
+.nisa-scenario-segmented-control button:focus-visible {
   outline: 3px solid rgba(11, 143, 91, 0.18);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
 
 .nisa-scenario-rate-fields {

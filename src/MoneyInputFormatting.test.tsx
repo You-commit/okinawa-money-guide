@@ -151,7 +151,7 @@ describe('simulator money fields', () => {
     expect(inputValue(monthly)).toBe('30,000')
 
     fireEvent.click(screen.getByRole('button', {
-      name: '入力をリセット',
+      name: '入力内容をリセット',
     }))
     expect(inputValue(initial)).toBe('')
     expect(inputValue(monthly)).toBe('')

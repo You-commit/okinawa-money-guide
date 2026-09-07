@@ -5,18 +5,26 @@ type SimulatorNotesProps = {
   knowledgeTitle: string
   knowledgeItems: string[]
   accent?: string
+  warningItems?: string[]
 }
 
-function SimulatorNotes({ knowledgeTitle, knowledgeItems, accent = 'blue' }: SimulatorNotesProps) {
+const defaultWarningItems = [
+  '本シミュレーションは概算であり、結果を保証するものではありません。',
+  '制度・金利・税制などの変更により、実際の結果と異なる場合があります。',
+  '重要な判断は一次資料や専門窓口でも確認してください。',
+]
+
+function SimulatorNotes({
+  knowledgeTitle,
+  knowledgeItems,
+  accent = 'blue',
+  warningItems = defaultWarningItems,
+}: SimulatorNotesProps) {
   return (
     <>
       <article className="simulator-note-card simulator-note-card--warning">
         <h2>ご注意</h2>
-        <ul>
-          <li>本シミュレーションは概算であり、結果を保証するものではありません。</li>
-          <li>制度・金利・税制などの変更により、実際の結果と異なる場合があります。</li>
-          <li>重要な判断は一次資料や専門窓口でも確認してください。</li>
-        </ul>
+        <ul>{warningItems.map((item) => <li key={item}>{item}</li>)}</ul>
       </article>
       <article className={`simulator-note-card simulator-note-card--${accent}`}>
         <h2>{knowledgeTitle}</h2>

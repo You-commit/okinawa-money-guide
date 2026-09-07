@@ -348,7 +348,7 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     expect(screen.getByRole('region', { name: '相談用サマリー' }))
       .toBeTruthy()
 
-    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
     expect(screen.getByText('入力内容をリセットしました。')).toBeTruthy()
     expect(screen.queryByRole('region', { name: '相談用サマリー' })).toBeNull()
 
@@ -371,7 +371,7 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
     change('目標額', '10000000')
     fireEvent.click(screen.getByLabelText('入力と同時に計算結果を更新する'))
 
-    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
     fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
 
     expect(screen.getByRole('tab', { name: /必要な積立期間を調べる/ })
@@ -397,16 +397,16 @@ describe('NISA recovery, accessible graph, and consultation tools', () => {
   it('invalidates undo on new input or a mode change and keeps only the latest reset snapshot', () => {
     render(<NisaCalculator />)
     change('毎月積立額', '10000')
-    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
     change('毎月積立額', '20000')
     expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
 
-    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
     fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
     expect((screen.getByLabelText('毎月積立額') as HTMLInputElement).value)
       .toBe('20,000')
 
-    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
     selectMode('必要な毎月積立額を調べる')
     expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
   })
@@ -674,7 +674,7 @@ describe('NISA low, base, and high scenario comparison', () => {
   })
 
   const enableScenarioComparison = () => {
-    fireEvent.click(screen.getByRole('checkbox', { name: 'シナリオ比較' }))
+    fireEvent.click(screen.getByRole('button', { name: '比較する' }))
   }
 
   const fillScenarioRates = (low: string, high: string) => {
@@ -682,23 +682,47 @@ describe('NISA low, base, and high scenario comparison', () => {
     change('高位シナリオ', high)
   }
 
-  it('starts OFF, shows empty inputs only when enabled, and stays out of reverse modes', () => {
+  it('starts with comparison disabled, exposes pressed states, and stays out of reverse modes', () => {
     render(<NisaCalculator />)
 
-    const toggle = screen.getByRole('checkbox', { name: 'シナリオ比較' })
-    expect((toggle as HTMLInputElement).checked).toBe(false)
+    const disabledButton = screen.getByRole('button', { name: '比較しない' })
+    const enabledButton = screen.getByRole('button', { name: '比較する' })
+    expect(disabledButton.getAttribute('aria-pressed')).toBe('true')
+    expect(enabledButton.getAttribute('aria-pressed')).toBe('false')
+    expect(screen.queryByRole('checkbox', { name: 'シナリオ比較' })).toBeNull()
     expect(screen.queryByLabelText('低位シナリオ')).toBeNull()
     expect(screen.queryByLabelText('高位シナリオ')).toBeNull()
 
     enableScenarioComparison()
+    expect(disabledButton.getAttribute('aria-pressed')).toBe('false')
+    expect(enabledButton.getAttribute('aria-pressed')).toBe('true')
     expect((screen.getByLabelText('低位シナリオ') as HTMLInputElement).value)
       .toBe('')
     expect((screen.getByLabelText('高位シナリオ') as HTMLInputElement).value)
       .toBe('')
 
     selectMode('必要な毎月積立額を調べる')
-    expect(screen.queryByRole('checkbox', { name: 'シナリオ比較' })).toBeNull()
+    expect(screen.queryByRole('group', { name: 'シナリオ比較' })).toBeNull()
     expect(screen.queryByText('SCENARIO COMPARISON')).toBeNull()
+  })
+
+  it('supports Enter, Space, and focus-visible button semantics', async () => {
+    const user = userEvent.setup()
+    render(<NisaCalculator />)
+
+    const enabledButton = screen.getByRole('button', { name: '比較する' })
+    const disabledButton = screen.getByRole('button', { name: '比較しない' })
+
+    enabledButton.focus()
+    expect(document.activeElement).toBe(enabledButton)
+    await user.keyboard('{Enter}')
+    expect(enabledButton.getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByLabelText('低位シナリオ')).toBeTruthy()
+
+    disabledButton.focus()
+    await user.keyboard(' ')
+    expect(disabledButton.getAttribute('aria-pressed')).toBe('true')
+    expect(screen.queryByLabelText('低位シナリオ')).toBeNull()
   })
 
   it('accepts equal and ordered rates but rejects reversed relationships', () => {
@@ -808,14 +832,14 @@ describe('NISA low, base, and high scenario comparison', () => {
     enableScenarioComparison()
     fillScenarioRates('3', '7')
 
-    fireEvent.click(screen.getByRole('button', { name: '入力をリセット' }))
-    expect((screen.getByRole('checkbox', { name: 'シナリオ比較' }) as HTMLInputElement).checked)
-      .toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
+    expect(screen.getByRole('button', { name: '比較しない' })
+      .getAttribute('aria-pressed')).toBe('true')
     expect(screen.queryByLabelText('低位シナリオ')).toBeNull()
 
     fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
-    expect((screen.getByRole('checkbox', { name: 'シナリオ比較' }) as HTMLInputElement).checked)
-      .toBe(true)
+    expect(screen.getByRole('button', { name: '比較する' })
+      .getAttribute('aria-pressed')).toBe('true')
     expect((screen.getByLabelText('低位シナリオ') as HTMLInputElement).value)
       .toBe('3')
     expect((screen.getByLabelText('高位シナリオ') as HTMLInputElement).value)

@@ -87,7 +87,7 @@ const fillScenarioPeriod = async (
 ) => {
   await user.type(
     screen.getByRole('textbox', {
-      name: '長期シナリオ期間',
+      name: '収支シミュレーション期間',
     }),
     years,
   )
@@ -509,7 +509,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     render(<MilitaryLandCalculator />)
 
     const scenarioPeriod = screen.getByRole('textbox', {
-      name: '長期シナリオ期間',
+      name: '収支シミュレーション期間',
     }) as HTMLInputElement
 
     expect(scenarioPeriod.value).toBe('')
@@ -575,7 +575,7 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     render(<MilitaryLandCalculator />)
 
     const trigger = screen.getByRole('button', {
-      name: '長期シナリオ期間の説明',
+      name: '収支シミュレーション期間の説明',
     }) as HTMLButtonElement
     const tooltip = screen.getByRole('tooltip')
 
@@ -592,6 +592,17 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     render(<MilitaryLandCalculator />)
 
     expect(screen.queryByLabelText(/売却時の諸費用/)).toBeNull()
+  })
+
+  it('uses user-facing labels without exposing calculation metadata', () => {
+    render(<MilitaryLandCalculator />)
+
+    expect(screen.getByRole('textbox', {
+      name: '収支シミュレーション期間',
+    })).toBeTruthy()
+    expect(screen.getByText('回収期間（概算）')).toBeTruthy()
+    expect(screen.getByText('購入価格 ÷ 年間収支')).toBeTruthy()
+    expect(screen.queryByText(/計算モデル/)).toBeNull()
   })
 
   it('shows level-payment results and a repayment-adjusted long-term comparison', async () => {
@@ -667,13 +678,13 @@ describe('MilitaryLandCalculator long-term scenario and state behavior', () => {
     await user.type(screen.getByLabelText(/借入額/), '10000000')
     await user.type(screen.getByLabelText(/借入期間/), '20')
     await user.type(screen.getByLabelText(/金利（年率）/), '1.5')
-    await user.type(screen.getByRole('textbox', { name: '長期シナリオ期間' }), '50')
-    await user.click(screen.getByRole('button', { name: 'リセット' }))
+    await user.type(screen.getByRole('textbox', { name: '収支シミュレーション期間' }), '50')
+    await user.click(screen.getByRole('button', { name: '入力内容をリセット' }))
 
     expect(automaticCalculation.checked).toBe(true)
     expect((screen.getByLabelText(/年間借地料/) as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText(/購入価格/) as HTMLInputElement).value).toBe('')
-    expect((screen.getByRole('textbox', { name: '長期シナリオ期間' }) as HTMLInputElement).value).toBe('')
+    expect((screen.getByRole('textbox', { name: '収支シミュレーション期間' }) as HTMLInputElement).value).toBe('')
     expect((screen.getByRole('radio', { name: 'なし' }) as HTMLInputElement).checked).toBe(true)
     await user.click(screen.getByRole('radio', { name: 'あり' }))
     expect((screen.getByLabelText(/借入額/) as HTMLInputElement).value).toBe('')

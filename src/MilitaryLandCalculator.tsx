@@ -38,8 +38,6 @@ type NumberFieldProps = {
 }
 
 const MOBILE_VIEWPORT_QUERY = '(max-width: 760px)'
-const CALCULATION_MODEL = '軍用地シミュレーター v1.1'
-
 const scrollToMobileTarget = (target: HTMLElement | null) => {
   if (
     target === null ||
@@ -193,11 +191,11 @@ function ScenarioPeriodField({
   return (
     <div className="military-input-row military-scenario-period-field">
       <div className="military-scenario-period-label">
-        <label htmlFor={inputId}>長期シナリオ期間</label>
+        <label htmlFor={inputId}>収支シミュレーション期間</label>
         <button
           className="military-scenario-tooltip-trigger"
           type="button"
-          aria-label="長期シナリオ期間の説明"
+          aria-label="収支シミュレーション期間の説明"
           aria-describedby={tooltipId}
         >
           i
@@ -571,7 +569,7 @@ function MilitaryLandCalculator() {
               type="button"
               onClick={resetCalculator}
             >
-              リセット
+              入力内容をリセット
             </button>
             {!isAutoCalculation ? (
               <button
@@ -608,7 +606,6 @@ function MilitaryLandCalculator() {
               <p>RESULT</p>
               <h3>シミュレーション結果</h3>
             </div>
-            <span>計算モデル：{CALCULATION_MODEL}</span>
           </div>
 
           {hasDisplayedResult ? (
@@ -654,7 +651,7 @@ function MilitaryLandCalculator() {
               <small>年間借地料から入力した年間費用を控除</small>
             </div>
             <div className="result-card military-result-card--payback">
-              <span>購入価格ベースの回収期間（概算）</span>
+              <span>回収期間（概算）</span>
               <strong>
                 {displayedResult.paybackYears === null
                   ? '―'

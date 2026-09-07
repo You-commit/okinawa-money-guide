@@ -140,6 +140,56 @@ describe('dedicated page routing', () => {
       .toHaveLength(1)
   })
 
+  it.each([
+    '/simulators/military-land',
+    '/simulators/mortgage',
+    '/simulators/nisa',
+    '/simulators/ideco',
+    '/simulators/taxable-income',
+  ])('keeps developer metadata out of the visible UI on %s', (path) => {
+    renderAt(path)
+
+    const visibleText = document.body.textContent ?? ''
+    for (const internalLabel of [
+      '計算モデル',
+      'モデル版',
+      '仕様版',
+      '計算日時',
+      '入力スナップショット',
+      'OMG-DS-',
+      'fixed-monthly-v1',
+    ]) {
+      expect(visibleText).not.toContain(internalLabel)
+    }
+  })
+
+  it.each([
+    '/simulators/military-land',
+    '/simulators/mortgage',
+    '/simulators/nisa',
+    '/simulators/ideco',
+    '/simulators/taxable-income',
+  ])('uses the shared reset label on %s', (path) => {
+    renderAt(path)
+
+    expect(screen.getByRole('button', { name: '入力内容をリセット' }))
+      .toBeTruthy()
+  })
+
+  it('keeps the NISA caution messages concise and role-specific', () => {
+    renderAt('/simulators/nisa')
+
+    expect(screen.getByText(
+      '一定の利回りで毎月末に積み立てる想定の概算であり、将来の運用成果を保証するものではありません。',
+    )).toBeTruthy()
+    expect(screen.getByText(
+      '手数料、価格変動、商品ごとの条件を完全に反映した試算ではありません。',
+    )).toBeTruthy()
+    expect(screen.getByText(
+      '制度変更などにより、実際の結果や利用可能なNISA枠と異なる場合があります。',
+    )).toBeTruthy()
+  })
+
   it('connects top simulator cards to their dedicated pages and keeps insurance disabled', async () => {
     const user = userEvent.setup()
     renderAt('/')
