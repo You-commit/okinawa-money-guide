@@ -221,6 +221,10 @@
     url('../assets/simulator-heroes/OMG-iDeCo-Hero-v1.png') center 46% / cover no-repeat;
 }
 
+.simulator-page--ideco .simulator-page__hero-inner {
+  padding-bottom: 48px;
+}
+
 .simulator-page--taxable {
   --page-accent: #5f43c7;
   --page-accent-soft: #f3efff;
@@ -232,14 +236,29 @@
     url('../assets/top-hero/OMG-TOP-HERO-PHOTO-ISHIGAKI-APPROVED-v1.0-20260816.png') center 52% / cover no-repeat;
 }
 
-.simulator-page--ideco .simulator-page__benefits article,
+.simulator-page--ideco .simulator-page__benefits article {
+  border-color: rgba(238, 232, 255, 0.38);
+  background: rgba(48, 31, 133, 0.48);
+  box-shadow: 0 8px 20px rgba(29, 19, 83, 0.08);
+  color: #ffffff;
+  backdrop-filter: blur(7px);
+}
+
+.simulator-page--ideco .simulator-page__benefits b {
+  background: rgba(248, 245, 255, 0.18);
+  color: #ffffff;
+}
+
+.simulator-page--ideco .simulator-page__benefits small {
+  color: rgba(247, 243, 255, 0.86);
+}
+
 .simulator-page--taxable .simulator-page__benefits article {
   border-color: rgba(255, 255, 255, 0.62);
   background: rgba(255, 255, 255, 0.88);
   color: var(--page-navy);
 }
 
-.simulator-page--ideco .simulator-page__benefits small,
 .simulator-page--taxable .simulator-page__benefits small {
   color: #536c86;
 }
