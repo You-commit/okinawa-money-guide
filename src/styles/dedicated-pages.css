@@ -212,8 +212,13 @@
 
 .simulator-page--ideco .simulator-page__hero {
   background:
-    linear-gradient(105deg, rgba(79, 55, 192, 0.96), rgba(50, 127, 218, 0.62)),
-    url('../assets/top-hero/OMG-TOP-HERO-PHOTO-ISHIGAKI-APPROVED-v1.0-20260816.png') center 52% / cover no-repeat;
+    linear-gradient(
+      90deg,
+      rgba(45, 29, 123, 0.68) 0%,
+      rgba(55, 41, 150, 0.42) 38%,
+      rgba(69, 50, 170, 0.08) 68%
+    ),
+    url('../assets/simulator-heroes/OMG-iDeCo-Hero-v1.png') center 46% / cover no-repeat;
 }
 
 .simulator-page--taxable {
