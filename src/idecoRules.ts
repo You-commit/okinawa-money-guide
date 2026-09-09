@@ -1,4 +1,24 @@
-export const IDECO_REFORM_START_DATE = '2026-12-01'
+// Formal addendum: OMG-DS-IDECO-v1.0-20260730-A01-20260909
+// Extend this catalog only after a supported period is formally approved.
+export const IDECO_RULE_PERIODS = [
+  {
+    effectiveFrom: '2026-01-01',
+    effectiveTo: '2026-11-30',
+    regime: 'current',
+  },
+  {
+    effectiveFrom: '2026-12-01',
+    effectiveTo: '2027-12-31',
+    regime: 'reformed',
+  },
+] as const
+
+export const IDECO_SUPPORTED_EFFECTIVE_DATE_FROM =
+  IDECO_RULE_PERIODS[0].effectiveFrom
+export const IDECO_SUPPORTED_EFFECTIVE_DATE_TO =
+  IDECO_RULE_PERIODS[IDECO_RULE_PERIODS.length - 1].effectiveTo
+export const IDECO_REFORM_START_DATE =
+  IDECO_RULE_PERIODS[1].effectiveFrom
 export const IDECO_MINIMUM_MONTHLY_CONTRIBUTION = 5_000
 export const IDECO_CONTRIBUTION_STEP = 1_000
 
@@ -96,16 +116,34 @@ export const isValidIsoDate = (value: string) => {
   )
 }
 
+export const isIdecoSupportedEffectiveDate = (value: string) =>
+  isValidIsoDate(value) &&
+  value >= IDECO_SUPPORTED_EFFECTIVE_DATE_FROM &&
+  value <= IDECO_SUPPORTED_EFFECTIVE_DATE_TO
+
+const formatIsoDateInJapanese = (value: string) => {
+  const [year, month, day] = value.split('-').map(Number)
+  return `${year}年${month}月${day}日`
+}
+
+export const IDECO_SUPPORTED_EFFECTIVE_DATE_LABEL =
+  `${formatIsoDateInJapanese(IDECO_SUPPORTED_EFFECTIVE_DATE_FROM)}〜` +
+  `${formatIsoDateInJapanese(IDECO_SUPPORTED_EFFECTIVE_DATE_TO)}`
+
+export const IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR =
+  `${IDECO_SUPPORTED_EFFECTIVE_DATE_LABEL}の範囲で選択してください。`
+
 export const getIdecoRegime = (
   effectiveDate: string,
 ): IdecoRegime | null => {
-  if (!isValidIsoDate(effectiveDate)) {
+  if (!isIdecoSupportedEffectiveDate(effectiveDate)) {
     return null
   }
 
-  return effectiveDate < IDECO_REFORM_START_DATE
-    ? 'current'
-    : 'reformed'
+  return IDECO_RULE_PERIODS.find(
+    ({ effectiveFrom, effectiveTo }) =>
+      effectiveDate >= effectiveFrom && effectiveDate <= effectiveTo,
+  )?.regime ?? null
 }
 
 export const getIdecoRegimeLabel = (
@@ -252,8 +290,10 @@ export const validateIdecoRuleInput = (
 
   if (input.effectiveDate === '') {
     errors.effectiveDate = '計算基準日を入力してください。'
-  } else if (!regime) {
+  } else if (!isValidIsoDate(input.effectiveDate)) {
     errors.effectiveDate = '計算基準日を正しく入力してください。'
+  } else if (!regime) {
+    errors.effectiveDate = IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR
   }
 
   if (input.currentAge === null) {

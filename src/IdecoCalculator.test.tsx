@@ -9,6 +9,11 @@ import {
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import IdecoCalculator from './IdecoCalculator'
+import {
+  IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR,
+  IDECO_SUPPORTED_EFFECTIVE_DATE_FROM,
+  IDECO_SUPPORTED_EFFECTIVE_DATE_TO,
+} from './idecoRules'
 
 afterEach(() => {
   cleanup()
@@ -77,8 +82,12 @@ describe('IdecoCalculator formal eligibility UX', () => {
 
     const calculationDate = screen.getByLabelText('計算基準日')
     expect(calculationDate).toBeTruthy()
-    expect(calculationDate.getAttribute('min')).toBeNull()
-    expect(calculationDate.getAttribute('max')).toBeNull()
+    expect(calculationDate.getAttribute('min')).toBe(
+      IDECO_SUPPORTED_EFFECTIVE_DATE_FROM,
+    )
+    expect(calculationDate.getAttribute('max')).toBe(
+      IDECO_SUPPORTED_EFFECTIVE_DATE_TO,
+    )
     expect(screen.getByLabelText('現在の年齢')).toBeTruthy()
     expect(screen.getByLabelText('加入区分')).toBeTruthy()
     expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('')
@@ -205,6 +214,38 @@ describe('IdecoCalculator formal eligibility UX', () => {
       target: { value: '23000' },
     })
     expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('blocks out-of-range calculation dates in manual and auto modes', () => {
+    renderCalculator()
+    fillValidInputs()
+    const calculationDate = screen.getByLabelText('計算基準日')
+
+    fireEvent.change(calculationDate, {
+      target: { value: '2028-01-01' },
+    })
+    expect(screen.queryByText(IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR))
+      .toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+    expect(screen.getAllByText(IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR).length)
+      .toBeGreaterThanOrEqual(1)
+    expect(screen.queryByText('￥55,780')).toBeNull()
+
+    fireEvent.change(calculationDate, {
+      target: { value: '2026-11-30' },
+    })
+    fireEvent.click(screen.getByRole('checkbox', {
+      name: '入力と同時に計算結果を更新する',
+    }))
+    expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
+
+    fireEvent.change(calculationDate, {
+      target: { value: '2025-12-31' },
+    })
+    expect(screen.getAllByText(IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR).length)
+      .toBeGreaterThanOrEqual(1)
+    expect(screen.queryByText('￥55,780')).toBeNull()
   })
 
   it('resets all formal inputs and the auto-calculation setting', () => {
@@ -449,8 +490,10 @@ describe('IdecoCalculator formal eligibility UX', () => {
     renderCalculator()
 
     expect(screen.getByText(
-      'この日付時点のiDeCo制度で計算します。掛金の開始日ではありません。',
+      /この日付時点のiDeCo制度で計算します。掛金の開始日ではありません。/,
     )).toBeTruthy()
+    expect(screen.getByText(/対応期間は2026年1月1日〜2027年12月31日/))
+      .toBeTruthy()
     expect(screen.getByText('加入可能年齢の確認に使用します。'))
       .toBeTruthy()
     expect(screen.getByText(
@@ -560,6 +603,17 @@ describe('IdecoCalculator formal eligibility UX', () => {
     expect(ageField?.classList.contains(
       'ideco-field--alignment-peer',
     )).toBe(true)
+
+    const dateLabelRow = screen.getByText('計算基準日').parentElement
+    const monthsLabelRow = screen.getByText(
+      '今年の掛金拠出月数',
+    ).parentElement
+    expect(dateLabelRow?.classList.contains(
+      'ideco-field-label-row',
+    )).toBe(true)
+    expect(monthsLabelRow?.classList.contains(
+      'ideco-field-label-row',
+    )).toBe(true)
   })
 
   it('recalculates after the standard resident-tax action only when AUTO is on and all other values are valid', () => {
@@ -609,6 +663,19 @@ describe('IdecoCalculator formal eligibility UX', () => {
     expect((screen.getByLabelText('現在の年齢') as HTMLInputElement).value).toBe('40')
     expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
     expect(screen.queryByText('￥55,780')).toBeNull()
+  })
+
+  it('does not restore an unsupported calculation date through reset undo', () => {
+    renderCalculator()
+    fireEvent.change(screen.getByLabelText('計算基準日'), {
+      target: { value: '2028-01-01' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
+
+    expect(
+      (screen.getByLabelText('計算基準日') as HTMLInputElement).value,
+    ).toBe('')
   })
 
   it('restores a resident rate entered with the standard helper', () => {

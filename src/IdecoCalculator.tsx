@@ -26,7 +26,11 @@ import {
   getIdecoContributionLimit,
   getIdecoRegimeLabel,
   getIdecoRelatedContributionLabel,
+  IDECO_SUPPORTED_EFFECTIVE_DATE_FROM,
+  IDECO_SUPPORTED_EFFECTIVE_DATE_LABEL,
+  IDECO_SUPPORTED_EFFECTIVE_DATE_TO,
   IDECO_PARTICIPANT_OPTIONS,
+  isIdecoSupportedEffectiveDate,
   requiresIdecoRelatedContribution,
   type IdecoCalculationMode,
   type IdecoParticipantCategory,
@@ -561,7 +565,9 @@ function IdecoCalculator({
     setResetSnapshot(shouldOfferUndo
       ? {
           calculationMode,
-          effectiveDate,
+          effectiveDate: isIdecoSupportedEffectiveDate(effectiveDate)
+            ? effectiveDate
+            : '',
           currentAge,
           participantCategory,
           relatedMonthlyContribution,
@@ -813,7 +819,7 @@ function IdecoCalculator({
             </h4>
 
           <div className="ideco-field ideco-field--alignment-peer">
-            <div className="field-label-row">
+            <div className="ideco-field-label-row">
               <label htmlFor="ideco-effective-date">
                 計算基準日
               </label>
@@ -832,6 +838,8 @@ function IdecoCalculator({
               }}
               id="ideco-effective-date"
               type="date"
+              min={IDECO_SUPPORTED_EFFECTIVE_DATE_FROM}
+              max={IDECO_SUPPORTED_EFFECTIVE_DATE_TO}
               value={effectiveDate}
               aria-invalid={Boolean(visibleErrors.effectiveDate)}
               aria-describedby={`ideco-effective-date-help${visibleErrors.effectiveDate ? ' ideco-effectiveDate-error' : ''}`}
@@ -842,6 +850,7 @@ function IdecoCalculator({
             />
             <p id="ideco-effective-date-help" className="ideco-field__help">
               この日付時点のiDeCo制度で計算します。掛金の開始日ではありません。
+              対応期間は{IDECO_SUPPORTED_EFFECTIVE_DATE_LABEL}です。
             </p>
             {visibleErrors.effectiveDate && (
               <p
@@ -1026,7 +1035,7 @@ function IdecoCalculator({
           </div>
 
           <div className="ideco-field">
-            <div className="field-label-row">
+            <div className="ideco-field-label-row">
               <label htmlFor="ideco-actual-months">
                 今年の掛金拠出月数
               </label>

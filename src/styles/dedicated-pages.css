@@ -1180,18 +1180,42 @@
 }
 
 .simulator-page--ideco .ideco-field--alignment-peer > :is(
-  .field-label-row,
+  .ideco-field-label-row,
   label
 ) {
   min-height: 22px;
   align-items: center;
 }
 
-.simulator-page--ideco .ideco-field > label {
+.simulator-page--ideco :is(
+  .ideco-field > label,
+  .ideco-field-label-row
+) {
+  min-height: 22px;
+}
+
+.simulator-page--ideco .ideco-field > label,
+.simulator-page--ideco .ideco-field-label-row {
+  display: flex;
+  align-items: center;
+}
+
+.simulator-page--ideco .ideco-field-label-row {
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.simulator-page--ideco :is(
+  .ideco-field > label,
+  .ideco-field-label-row > label
+) {
+  margin: 0;
+  padding: 0;
   color: #3f3965;
   font-size: 0.86rem;
   font-weight: 800;
   line-height: 1.45;
+  text-align: left;
 }
 
 .ideco-field-helper-button {
@@ -1732,7 +1756,10 @@
     gap: 4px;
   }
 
-  .simulator-page--ideco .ideco-field > label {
+  .simulator-page--ideco :is(
+    .ideco-field > label,
+    .ideco-field-label-row > label
+  ) {
     font-size: 0.7rem;
   }
 

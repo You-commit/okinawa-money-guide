@@ -12,6 +12,11 @@ import {
 import {
   getIdecoContributionLimit,
   getIdecoRegime,
+  IDECO_RULE_PERIODS,
+  IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR,
+  IDECO_SUPPORTED_EFFECTIVE_DATE_FROM,
+  IDECO_SUPPORTED_EFFECTIVE_DATE_TO,
+  isIdecoSupportedEffectiveDate,
   type IdecoParticipantCategory,
   type IdecoRuleInput,
   validateIdecoRuleInput,
@@ -244,6 +249,51 @@ describe('iDeCo formal contribution rules', () => {
         validInput({ residentTaxRate: Number.NaN }),
       ).residentTaxRate,
     ).toBeTruthy()
+  })
+})
+
+describe('iDeCo supported calculation date range', () => {
+  it('derives the supported range from the formal rule periods', () => {
+    expect(IDECO_SUPPORTED_EFFECTIVE_DATE_FROM).toBe(
+      IDECO_RULE_PERIODS[0].effectiveFrom,
+    )
+    expect(IDECO_SUPPORTED_EFFECTIVE_DATE_TO).toBe(
+      IDECO_RULE_PERIODS[IDECO_RULE_PERIODS.length - 1].effectiveTo,
+    )
+    expect(IDECO_SUPPORTED_EFFECTIVE_DATE_FROM).toBe('2026-01-01')
+    expect(IDECO_SUPPORTED_EFFECTIVE_DATE_TO).toBe('2027-12-31')
+  })
+
+  it.each([
+    ['2025-12-31', false],
+    ['2026-01-01', true],
+    ['2026-11-30', true],
+    ['2026-12-01', true],
+    ['2027-12-31', true],
+    ['2028-01-01', false],
+    ['2026-02-30', false],
+    ['invalid', false],
+  ])('validates supported calculation date %s', (date, expected) => {
+    expect(isIdecoSupportedEffectiveDate(date)).toBe(expected)
+  })
+
+  it('keeps the formal regime boundary inside the supported range', () => {
+    expect(getIdecoRegime('2025-12-31')).toBeNull()
+    expect(getIdecoRegime('2026-01-01')).toBe('current')
+    expect(getIdecoRegime('2026-11-30')).toBe('current')
+    expect(getIdecoRegime('2026-12-01')).toBe('reformed')
+    expect(getIdecoRegime('2027-12-31')).toBe('reformed')
+    expect(getIdecoRegime('2028-01-01')).toBeNull()
+  })
+
+  it('returns the shared range error and blocks calculations outside it', () => {
+    for (const effectiveDate of ['2025-12-31', '2028-01-01']) {
+      const input = validInput({ effectiveDate })
+      expect(validateIdecoRuleInput(input).effectiveDate).toBe(
+        IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR,
+      )
+      expect(calculateIdeco(input).ok).toBe(false)
+    }
   })
 })
 
