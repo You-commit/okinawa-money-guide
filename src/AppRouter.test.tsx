@@ -269,7 +269,7 @@ describe('dedicated page routing', () => {
       '掛金控除前の課税所得',
     ) as HTMLInputElement).value).toBe('3,500,000')
 
-    fireEvent.change(screen.getByLabelText('制度適用日'), {
+    fireEvent.change(screen.getByLabelText('計算基準日'), {
       target: { value: '2026-11-30' },
     })
     fireEvent.change(screen.getByLabelText('現在の年齢'), {
@@ -281,13 +281,13 @@ describe('dedicated page routing', () => {
     fireEvent.change(screen.getByLabelText('毎月の掛金'), {
       target: { value: '23000' },
     })
-    fireEvent.change(screen.getByLabelText('実拠出月数'), {
+    fireEvent.change(screen.getByLabelText('今年の掛金拠出月数'), {
       target: { value: '12' },
     })
     fireEvent.change(screen.getByLabelText('住民税所得割率'), {
       target: { value: '10' },
     })
-    fireEvent.change(screen.getByLabelText('長期参考期間'), {
+    fireEvent.change(screen.getByLabelText('長期試算期間'), {
       target: { value: '20' },
     })
     await user.click(screen.getByRole('button', { name: 'シミュレートする' }))

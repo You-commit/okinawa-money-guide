@@ -1140,12 +1140,12 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   grid-column: 1 / -1;
-  gap: 10px 12px;
+  gap: 8px 12px;
   min-width: 0;
 }
 
 .ideco-input-group + .ideco-input-group {
-  padding-top: 11px;
+  padding-top: 9px;
   border-top: 1px solid #e1dced;
 }
 
@@ -1179,6 +1179,14 @@
   align-self: start;
 }
 
+.simulator-page--ideco .ideco-field--alignment-peer > :is(
+  .field-label-row,
+  label
+) {
+  min-height: 22px;
+  align-items: center;
+}
+
 .simulator-page--ideco .ideco-field > label {
   color: #3f3965;
   font-size: 0.86rem;
@@ -1186,7 +1194,7 @@
   line-height: 1.45;
 }
 
-.ideco-resident-tax-helper {
+.ideco-field-helper-button {
   justify-self: start;
   min-height: 34px;
   padding: 5px 11px;
@@ -1204,11 +1212,11 @@
     color 0.16s ease;
 }
 
-.ideco-resident-tax-helper:hover {
+.ideco-field-helper-button:hover {
   background: #f1edfc;
 }
 
-.ideco-resident-tax-helper:focus-visible {
+.ideco-field-helper-button:focus-visible {
   outline: 3px solid rgba(113, 84, 202, 0.2);
   outline-offset: 2px;
 }
@@ -1327,7 +1335,41 @@
 }
 
 .ideco-result-context {
+  display: grid;
+  align-items: start;
+  gap: 7px;
   background: #faf9ff;
+}
+
+.ideco-result-context__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+}
+
+.ideco-result-context__items span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 3px 7px;
+  border: 1px solid #e3ddf2;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #5f5875;
+  white-space: nowrap;
+}
+
+.ideco-result-context__items b {
+  color: #514177;
+  font-weight: 850;
+}
+
+.simulator-page--ideco .calculator-layout {
+  align-items: start;
+}
+
+.simulator-page--ideco .calculator-results {
+  align-self: start;
 }
 
 .ideco-detailed-tax-breakdown {

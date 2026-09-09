@@ -251,9 +251,9 @@ export const validateIdecoRuleInput = (
   const regime = getIdecoRegime(input.effectiveDate)
 
   if (input.effectiveDate === '') {
-    errors.effectiveDate = '制度適用日を入力してください。'
+    errors.effectiveDate = '計算基準日を入力してください。'
   } else if (!regime) {
-    errors.effectiveDate = '制度適用日を正しく入力してください。'
+    errors.effectiveDate = '計算基準日を正しく入力してください。'
   }
 
   if (input.currentAge === null) {
@@ -344,14 +344,14 @@ export const validateIdecoRuleInput = (
 
   if (input.actualContributionMonths === null) {
     errors.actualContributionMonths =
-      '実拠出月数を入力してください。'
+      '今年の掛金拠出月数を入力してください。'
   } else if (
     !Number.isInteger(input.actualContributionMonths) ||
     input.actualContributionMonths < 1 ||
     input.actualContributionMonths > 12
   ) {
     errors.actualContributionMonths =
-      '実拠出月数は1〜12の整数で入力してください。'
+      '今年の掛金拠出月数は1〜12の整数で入力してください。'
   }
 
   if (input.calculationMode !== 'detailed') {
@@ -387,14 +387,14 @@ export const validateIdecoRuleInput = (
   }
 
   if (input.referenceYears === null) {
-    errors.referenceYears = '長期参考期間を入力してください。'
+    errors.referenceYears = '長期試算期間を入力してください。'
   } else if (
     !Number.isInteger(input.referenceYears) ||
     input.referenceYears < 1 ||
     !Number.isFinite(input.referenceYears)
   ) {
     errors.referenceYears =
-      '長期参考期間は1年以上の整数で入力してください。'
+      '長期試算期間は1年以上の整数で入力してください。'
   }
 
   return errors

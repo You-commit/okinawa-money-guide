@@ -91,13 +91,13 @@ const createInputLines = (record: IdecoConsultationRecord) => {
   const { input, calculation } = record
   const lines = [
     `計算モード: ${getIdecoCalculationModeLabel(input.calculationMode)}`,
-    `制度適用日: ${input.effectiveDate}`,
+    `計算基準日: ${input.effectiveDate}`,
     `適用制度: ${calculation.regimeLabel}`,
     `現在の年齢: ${input.currentAge}歳`,
     `年齢確認: ${getIdecoEligibilitySummary(record)}`,
     `加入区分: ${calculation.participantLabel}`,
     `毎月の掛金: ${formatIdecoYen(input.monthlyContribution)}`,
-    `実拠出月数: ${input.actualContributionMonths}か月`,
+    `今年の掛金拠出月数: ${input.actualContributionMonths}か月`,
     `年間掛金: ${formatIdecoYen(calculation.result.rounded.annualContribution)}`,
   ]
 
@@ -117,7 +117,7 @@ const createInputLines = (record: IdecoConsultationRecord) => {
 
   lines.push(
     `住民税所得割率: ${input.residentTaxRate}%`,
-    `長期参考期間: ${input.referenceYears}年`,
+    `長期試算期間: ${input.referenceYears}年`,
   )
 
   return lines

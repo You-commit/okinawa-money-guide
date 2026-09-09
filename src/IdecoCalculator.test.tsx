@@ -28,7 +28,7 @@ const renderCalculator = (
 }
 
 const fillValidInputs = () => {
-  fireEvent.change(screen.getByLabelText('制度適用日'), {
+  fireEvent.change(screen.getByLabelText('計算基準日'), {
     target: { value: '2026-11-30' },
   })
   fireEvent.change(screen.getByLabelText('現在の年齢'), {
@@ -40,7 +40,7 @@ const fillValidInputs = () => {
   fireEvent.change(screen.getByLabelText('毎月の掛金'), {
     target: { value: '23000' },
   })
-  fireEvent.change(screen.getByLabelText('実拠出月数'), {
+  fireEvent.change(screen.getByLabelText('今年の掛金拠出月数'), {
     target: { value: '12' },
   })
   fireEvent.change(screen.getByLabelText('所得税率'), {
@@ -49,7 +49,7 @@ const fillValidInputs = () => {
   fireEvent.change(screen.getByLabelText('住民税所得割率'), {
     target: { value: '10' },
   })
-  fireEvent.change(screen.getByLabelText('長期参考期間'), {
+  fireEvent.change(screen.getByLabelText('長期試算期間'), {
     target: { value: '20' },
   })
 }
@@ -75,7 +75,10 @@ describe('IdecoCalculator formal eligibility UX', () => {
   it('starts with both tax rates empty and shows the formal fields', () => {
     renderCalculator()
 
-    expect(screen.getByLabelText('制度適用日')).toBeTruthy()
+    const calculationDate = screen.getByLabelText('計算基準日')
+    expect(calculationDate).toBeTruthy()
+    expect(calculationDate.getAttribute('min')).toBeNull()
+    expect(calculationDate.getAttribute('max')).toBeNull()
     expect(screen.getByLabelText('現在の年齢')).toBeTruthy()
     expect(screen.getByLabelText('加入区分')).toBeTruthy()
     expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('')
@@ -127,13 +130,13 @@ describe('IdecoCalculator formal eligibility UX', () => {
     fireEvent.change(screen.getByLabelText('毎月の掛金'), {
       target: { value: '24000' },
     })
-    fireEvent.change(screen.getByLabelText('実拠出月数'), {
+    fireEvent.change(screen.getByLabelText('今年の掛金拠出月数'), {
       target: { value: '13' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
 
     expect(screen.getAllByText(/月額上限は23,000円/).length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText(/実拠出月数は1〜12の整数/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/今年の掛金拠出月数は1〜12の整数/).length).toBeGreaterThanOrEqual(1)
 
     fireEvent.change(screen.getByLabelText('毎月の掛金'), {
       target: { value: '5500' },
@@ -163,7 +166,8 @@ describe('IdecoCalculator formal eligibility UX', () => {
 
     expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('￥276,000').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getByText('実拠出月数：12か月')).toBeTruthy()
+    expect(screen.getAllByText('今年の掛金拠出月数').length)
+      .toBeGreaterThanOrEqual(1)
   })
 
   it('clears a manual result and validation when editing resumes', () => {
@@ -213,7 +217,7 @@ describe('IdecoCalculator formal eligibility UX', () => {
     fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
 
     expect((auto as HTMLInputElement).checked).toBe(false)
-    expect((screen.getByLabelText('制度適用日') as HTMLInputElement).value).toBe('')
+    expect((screen.getByLabelText('計算基準日') as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText('現在の年齢') as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText('毎月の掛金') as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('')
@@ -289,7 +293,7 @@ describe('IdecoCalculator formal eligibility UX', () => {
       (screen.getByLabelText('毎月の掛金') as HTMLInputElement).value,
     ).toBe('23,000')
     expect(
-      (screen.getByLabelText('実拠出月数') as HTMLInputElement).value,
+      (screen.getByLabelText('今年の掛金拠出月数') as HTMLInputElement).value,
     ).toBe('12')
     expect(screen.getByLabelText('掛金控除前の課税所得')).toBeTruthy()
   })
@@ -329,7 +333,7 @@ describe('IdecoCalculator formal eligibility UX', () => {
   it('uses the formal special-income-tax names from 2027', () => {
     renderCalculator()
     fillValidDetailedInputs()
-    fireEvent.change(screen.getByLabelText('制度適用日'), {
+    fireEvent.change(screen.getByLabelText('計算基準日'), {
       target: { value: '2027-01-01' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
@@ -440,6 +444,84 @@ describe('IdecoCalculator formal eligibility UX', () => {
     ).toBe('10')
   })
 
+  it('explains the calculation date and contribution months accessibly', async () => {
+    const user = userEvent.setup()
+    renderCalculator()
+
+    expect(screen.getByText(
+      'この日付時点のiDeCo制度で計算します。掛金の開始日ではありません。',
+    )).toBeTruthy()
+    expect(screen.getByText('加入可能年齢の確認に使用します。'))
+      .toBeTruthy()
+    expect(screen.getByText(
+      '今年、実際に掛金を拠出する月数を入力してください。',
+    )).toBeTruthy()
+    expect(screen.getByText(
+      /現在の掛金・税率・制度が続くと仮定して/,
+    )).toBeTruthy()
+
+    const dateHelp = screen.getByRole('button', {
+      name: '計算基準日の説明',
+    })
+    const monthsHelp = screen.getByRole('button', {
+      name: '今年の掛金拠出月数の説明',
+    })
+    expect(dateHelp.textContent).toBe('?')
+    expect(monthsHelp.className).toBe(dateHelp.className)
+    dateHelp.focus()
+    expect(document.activeElement).toBe(dateHelp)
+    await user.keyboard('{Tab}')
+    expect(document.activeElement).not.toBe(dateHelp)
+  })
+
+  it('sets 12 contribution months only through the compact helper', async () => {
+    const user = userEvent.setup()
+    renderCalculator()
+
+    const months = screen.getByLabelText(
+      '今年の掛金拠出月数',
+    ) as HTMLInputElement
+    const helper = screen.getByRole('button', {
+      name: '12か月で計算',
+    })
+
+    expect(months.value).toBe('')
+    expect(helper.getAttribute('type')).toBe('button')
+    helper.focus()
+    await user.keyboard('{Enter}')
+    expect(months.value).toBe('12')
+    expect(screen.queryByText('￥55,780')).toBeNull()
+
+    fireEvent.change(months, { target: { value: '' } })
+    helper.focus()
+    await user.keyboard(' ')
+    expect(months.value).toBe('12')
+
+    fireEvent.click(screen.getByRole('button', {
+      name: '入力内容をリセット',
+    }))
+    expect(months.value).toBe('')
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
+    expect(months.value).toBe('12')
+  })
+
+  it('recalculates from the 12-month helper only when AUTO is on and inputs are valid', () => {
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.change(screen.getByLabelText('今年の掛金拠出月数'), {
+      target: { value: '' },
+    })
+    fireEvent.click(screen.getByRole('checkbox', {
+      name: '入力と同時に計算結果を更新する',
+    }))
+
+    expect(screen.queryByText('￥55,780')).toBeNull()
+    fireEvent.click(screen.getByRole('button', {
+      name: '12か月で計算',
+    }))
+    expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
+  })
+
   it('groups eligibility, contribution, and tax inputs by meaning', () => {
     renderCalculator()
 
@@ -451,12 +533,12 @@ describe('IdecoCalculator formal eligibility UX', () => {
     })
     const tax = screen.getByRole('region', { name: '税率' })
 
-    expect(eligibility.contains(screen.getByLabelText('制度適用日'))).toBe(true)
+    expect(eligibility.contains(screen.getByLabelText('計算基準日'))).toBe(true)
     expect(eligibility.contains(screen.getByLabelText('現在の年齢'))).toBe(true)
     expect(eligibility.contains(screen.getByLabelText('加入区分'))).toBe(true)
     expect(contribution.contains(screen.getByLabelText('毎月の掛金'))).toBe(true)
-    expect(contribution.contains(screen.getByLabelText('実拠出月数'))).toBe(true)
-    expect(contribution.contains(screen.getByLabelText('長期参考期間'))).toBe(true)
+    expect(contribution.contains(screen.getByLabelText('今年の掛金拠出月数'))).toBe(true)
+    expect(contribution.contains(screen.getByLabelText('長期試算期間'))).toBe(true)
     expect(tax.contains(screen.getByLabelText('所得税率'))).toBe(true)
     expect(tax.contains(screen.getByLabelText('住民税所得割率'))).toBe(true)
     expect(tax.contains(screen.getByRole('button', {
@@ -467,7 +549,7 @@ describe('IdecoCalculator formal eligibility UX', () => {
   it('keeps the effective-date and age fields in the same alignment row', () => {
     renderCalculator()
 
-    const dateField = screen.getByLabelText('制度適用日')
+    const dateField = screen.getByLabelText('計算基準日')
       .closest('.ideco-field')
     const ageField = screen.getByLabelText('現在の年齢')
       .closest('.ideco-field')
@@ -566,6 +648,9 @@ describe('IdecoCalculator formal eligibility UX', () => {
     fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
 
     const summary = screen.getByRole('region', { name: '相談用サマリー' })
+    expect(summary.textContent).toContain('計算基準日2026-11-30')
+    expect(summary.textContent).toContain('今年の掛金拠出月数12か月')
+    expect(summary.textContent).toContain('長期試算期間20年')
     expect(summary.textContent).toContain('現在の年齢40歳')
     expect(summary.textContent).toContain('住民税所得割率10%')
     expect(summary.textContent).toContain('適用月額上限23,000円')
@@ -603,6 +688,9 @@ describe('IdecoCalculator formal eligibility UX', () => {
     await vi.waitFor(() => expect(writeText).toHaveBeenCalledOnce())
     const copied = writeText.mock.calls[0][0] as string
     expect(copied).toContain('iDeCo節税シミュレーター 相談用サマリー')
+    expect(copied).toContain('計算基準日: 2026-11-30')
+    expect(copied).toContain('今年の掛金拠出月数: 12か月')
+    expect(copied).toContain('長期試算期間: 20年')
     expect(copied).toContain('年間節税効果: 55,780円')
     expect(copied).not.toMatch(/OMG-DS-IDECO|モデル版|計算日時|debug/i)
     expect(await screen.findByText('相談用サマリーをコピーしました。')).toBeTruthy()
@@ -644,5 +732,20 @@ describe('IdecoCalculator formal eligibility UX', () => {
     const privacy = screen.getByLabelText('入力データの取り扱い')
     expect(privacy.textContent).toContain('保存・外部送信・広告利用・AI学習には利用しません')
     expect(document.body.textContent).not.toMatch(/internal timestamp|debug snapshot|model version/i)
+  })
+
+  it('summarizes the current calculation conditions as compact user-facing items', () => {
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    const context = document.querySelector('.ideco-result-context')
+    expect(context?.textContent).toContain('今回の計算条件')
+    expect(context?.textContent).toContain('計算基準2026-11-30')
+    expect(context?.textContent).toContain('月額掛金￥23,000')
+    expect(context?.textContent).toContain('今年の掛金拠出月数12か月')
+    expect(context?.textContent).toContain('長期試算期間20年')
+    expect(context?.textContent).not.toContain('現在の年齢')
+    expect(context?.textContent).not.toMatch(/model|仕様ID|timestamp/i)
   })
 })

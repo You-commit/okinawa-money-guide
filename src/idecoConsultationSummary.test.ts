@@ -48,7 +48,10 @@ describe('iDeCo consultation summary', () => {
     const text = createIdecoConsultationSummaryText(createRecord())
 
     expect(text).toContain('計算モード: 簡易税率モード')
+    expect(text).toContain('計算基準日: 2026-11-30')
     expect(text).toContain('現在の年齢: 40歳')
+    expect(text).toContain('今年の掛金拠出月数: 12か月')
+    expect(text).toContain('長期試算期間: 20年')
     expect(text).toContain('所得税率: 10%')
     expect(text).toContain('住民税所得割率: 10%')
     expect(text).toContain('年間節税効果: 55,780円')

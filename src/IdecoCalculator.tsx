@@ -24,7 +24,6 @@ import {
 } from './idecoCalculation'
 import {
   getIdecoContributionLimit,
-  getIdecoParticipantLabel,
   getIdecoRegimeLabel,
   getIdecoRelatedContributionLabel,
   IDECO_PARTICIPANT_OPTIONS,
@@ -516,6 +515,13 @@ function IdecoCalculator({
     invalidateManualResult()
   }
 
+  const handleActualContributionMonthsChange = (
+    value: string,
+  ) => {
+    setActualContributionMonths(value)
+    invalidateManualResult()
+  }
+
   const handleResidentTaxRateChange = (
     value: string,
   ) => {
@@ -807,9 +813,19 @@ function IdecoCalculator({
             </h4>
 
           <div className="ideco-field ideco-field--alignment-peer">
-            <label htmlFor="ideco-effective-date">
-              制度適用日
-            </label>
+            <div className="field-label-row">
+              <label htmlFor="ideco-effective-date">
+                計算基準日
+              </label>
+              <FieldHelpTooltip
+                id="ideco-effective-date-tooltip"
+                label="計算基準日の説明"
+              >
+                この日付時点のiDeCo制度を適用します。
+                iDeCoや掛金の開始日ではありません。
+                2026年11月30日までと12月1日以後で制度判定が変わります。
+              </FieldHelpTooltip>
+            </div>
             <input
               ref={(node) => {
                 fieldRefs.current.effectiveDate = node ?? undefined
@@ -818,12 +834,15 @@ function IdecoCalculator({
               type="date"
               value={effectiveDate}
               aria-invalid={Boolean(visibleErrors.effectiveDate)}
-              aria-describedby={getErrorDescription('effectiveDate')}
+              aria-describedby={`ideco-effective-date-help${visibleErrors.effectiveDate ? ' ideco-effectiveDate-error' : ''}`}
               onChange={(event) => {
                 setEffectiveDate(event.target.value)
                 invalidateManualResult()
               }}
             />
+            <p id="ideco-effective-date-help" className="ideco-field__help">
+              この日付時点のiDeCo制度で計算します。掛金の開始日ではありません。
+            </p>
             {visibleErrors.effectiveDate && (
               <p
                 id="ideco-effectiveDate-error"
@@ -860,7 +879,7 @@ function IdecoCalculator({
               <span>歳</span>
             </div>
             <p id="ideco-current-age-help" className="ideco-field__help">
-              年齢だけで加入期間や受給開始年齢を推測せず、制度上の基本年齢範囲だけを確認します。
+              加入可能年齢の確認に使用します。
             </p>
             {visibleErrors.currentAge && (
               <p
@@ -952,14 +971,11 @@ function IdecoCalculator({
 
           {contributionLimit && selectedCategory && (
             <aside className="ideco-rule-summary">
-              <strong>{getIdecoRegimeLabel(contributionLimit.regime)}</strong>
-              <span>{getIdecoParticipantLabel(selectedCategory)}</span>
-              <span>計算モード：{calculationModeLabel}</span>
-              <p>
-                この条件での月額上限は
+              <strong>
+                この条件の月額上限：
                 <b>{contributionLimit.monthlyLimit.toLocaleString('ja-JP')}円</b>
-                です。
-              </p>
+              </strong>
+              <span>{getIdecoRegimeLabel(contributionLimit.regime)}</span>
             </aside>
           )}
 
@@ -1010,9 +1026,18 @@ function IdecoCalculator({
           </div>
 
           <div className="ideco-field">
-            <label htmlFor="ideco-actual-months">
-              実拠出月数
-            </label>
+            <div className="field-label-row">
+              <label htmlFor="ideco-actual-months">
+                今年の掛金拠出月数
+              </label>
+              <FieldHelpTooltip
+                id="ideco-actual-months-tooltip"
+                label="今年の掛金拠出月数の説明"
+              >
+                毎月の掛金にこの月数を掛けて年間掛金を計算し、
+                年間の所得税・住民税の軽減額を試算します。
+              </FieldHelpTooltip>
+            </div>
             <div className="input-with-unit">
               <input
                 ref={(node) => {
@@ -1026,22 +1051,26 @@ function IdecoCalculator({
                 aria-invalid={Boolean(
                   visibleErrors.actualContributionMonths,
                 )}
-                aria-describedby={getErrorDescription(
-                  'actualContributionMonths',
-                )}
+                aria-describedby={`ideco-actual-months-help${visibleErrors.actualContributionMonths ? ' ideco-actualContributionMonths-error' : ''}`}
                 onChange={(event) => {
-                  setActualContributionMonths(
+                  handleActualContributionMonthsChange(
                     normalizeDecimalInput(event.target.value),
                   )
-                  invalidateManualResult()
                 }}
                 placeholder="例：12"
               />
               <span>か月</span>
             </div>
-            <p className="ideco-field__help">
-              この年に実際に掛金を拠出する月数（1〜12か月）です。
+            <p id="ideco-actual-months-help" className="ideco-field__help">
+              今年、実際に掛金を拠出する月数を入力してください。
             </p>
+            <button
+              className="ideco-field-helper-button"
+              type="button"
+              onClick={() => handleActualContributionMonthsChange('12')}
+            >
+              12か月で計算
+            </button>
             {visibleErrors.actualContributionMonths && (
               <p
                 id="ideco-actualContributionMonths-error"
@@ -1054,7 +1083,7 @@ function IdecoCalculator({
 
           <div className="ideco-field ideco-field--wide">
             <label htmlFor="ideco-reference-years">
-              長期参考期間
+              長期試算期間
             </label>
 
             <div className="input-with-unit">
@@ -1105,7 +1134,7 @@ function IdecoCalculator({
               <span>年</span>
             </div>
             <p className="ideco-field__help">
-              税率・掛金・制度が毎年変わらないと仮定した参考期間です。
+              現在の掛金・税率・制度が続くと仮定して、掛金累計と期間中の節税額を試算する期間です。
             </p>
             {visibleErrors.referenceYears && (
               <p
@@ -1322,7 +1351,7 @@ function IdecoCalculator({
               ご自身の住民税所得割率を入力してください。標準値は自動設定しません。
             </p>
             <button
-              className="ideco-resident-tax-helper"
+              className="ideco-field-helper-button"
               type="button"
               onClick={useStandardResidentTaxRate}
             >
@@ -1408,7 +1437,7 @@ function IdecoCalculator({
           <aside className="simulator-input-point simulator-input-point--ideco">
             <strong>入力のポイント</strong>
             <p>
-              加入区分と制度適用日による上限を確認し、実際に拠出する月数で概算します。
+              加入区分と計算基準日による上限を確認し、今年の掛金拠出月数で概算します。
             </p>
           </aside>
         </div>
@@ -1430,22 +1459,15 @@ function IdecoCalculator({
 
           {displayedCalculation && (
             <aside className="ideco-result-context">
-              <strong>{displayedCalculation.regimeLabel}</strong>
-              <span>{displayedCalculation.participantLabel}</span>
-              <span>計算モード：{calculationModeLabel}</span>
-              <span>
-                現在の年齢：{input.currentAge}歳
-              </span>
-              <span>
-                制度適用日：{input.effectiveDate}
-              </span>
-              <span>
-                実拠出月数：{input.actualContributionMonths}か月
-              </span>
-              <span>
-                月額上限：
-                {displayedCalculation.contributionLimit.monthlyLimit.toLocaleString('ja-JP')}円
-              </span>
+              <strong>今回の計算条件</strong>
+              <div className="ideco-result-context__items">
+                <span><b>計算基準</b>{input.effectiveDate}</span>
+                <span><b>加入区分</b>{displayedCalculation.participantLabel}</span>
+                <span><b>計算方法</b>{calculationModeLabel}</span>
+                <span><b>月額掛金</b>{formatYen(input.monthlyContribution ?? 0)}</span>
+                <span><b>今年の掛金拠出月数</b>{input.actualContributionMonths}か月</span>
+                <span><b>長期試算期間</b>{input.referenceYears}年</span>
+              </div>
             </aside>
           )}
 
@@ -1522,7 +1544,7 @@ function IdecoCalculator({
               </strong>
 
               <small>
-                毎月の掛金 × 実拠出月数
+                毎月の掛金 × 今年の掛金拠出月数
               </small>
             </div>
 
@@ -1540,7 +1562,7 @@ function IdecoCalculator({
               </strong>
 
               <small>
-                年間掛金額 × 長期参考期間
+                年間掛金額 × 長期試算期間
               </small>
             </div>
 
@@ -1558,7 +1580,7 @@ function IdecoCalculator({
               </strong>
 
               <small>
-                年間節税額 × 長期参考期間
+                年間節税額 × 長期試算期間
               </small>
             </div>
           </div>
@@ -1784,12 +1806,12 @@ const IdecoConsultationSummaryContent = ({
             <dt>計算モード</dt>
             <dd>{getIdecoCalculationModeLabel(input.calculationMode)}</dd>
           </div>
-          <div><dt>制度適用日</dt><dd>{input.effectiveDate}</dd></div>
+          <div><dt>計算基準日</dt><dd>{input.effectiveDate}</dd></div>
           <div><dt>適用制度</dt><dd>{calculation.regimeLabel}</dd></div>
           <div><dt>現在の年齢</dt><dd>{input.currentAge}歳</dd></div>
           <div><dt>加入区分</dt><dd>{calculation.participantLabel}</dd></div>
           <div><dt>毎月の掛金</dt><dd>{formatIdecoYen(input.monthlyContribution)}</dd></div>
-          <div><dt>実拠出月数</dt><dd>{input.actualContributionMonths}か月</dd></div>
+          <div><dt>今年の掛金拠出月数</dt><dd>{input.actualContributionMonths}か月</dd></div>
           <div><dt>年間掛金</dt><dd>{formatIdecoYen(rounded.annualContribution)}</dd></div>
           {hasRelatedContribution && (
             <div>
@@ -1806,7 +1828,7 @@ const IdecoConsultationSummaryContent = ({
             </div>
           )}
           <div><dt>住民税所得割率</dt><dd>{input.residentTaxRate}%</dd></div>
-          <div><dt>長期参考期間</dt><dd>{input.referenceYears}年</dd></div>
+          <div><dt>長期試算期間</dt><dd>{input.referenceYears}年</dd></div>
         </dl>
         <p className="ideco-consultation-summary__supplement">
           {getIdecoEligibilitySummary(record)}
