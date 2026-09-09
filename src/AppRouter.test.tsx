@@ -236,13 +236,17 @@ describe('dedicated page routing', () => {
     expect(window.location.search).not.toContain('5000000')
   })
 
-  it('accepts allowed income tax rates and ignores invalid query values', () => {
+  it('starts iDeCo with a blank rate, accepts allowed rates, and ignores invalid query values', () => {
+    renderAt('/simulators/ideco')
+    expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('')
+
+    cleanup()
     renderAt('/simulators/ideco?incomeTaxRate=23')
     expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('23')
 
     cleanup()
     renderAt('/simulators/ideco?incomeTaxRate=17')
-    expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('10')
+    expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('')
   })
 
   it('offers basic and detailed taxable-income input modes', async () => {

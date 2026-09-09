@@ -1,11 +1,34 @@
-import { useEffect, useMemo, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from 'react'
 import MoneyInput from './components/form/MoneyInput'
+import {
+  calculateIdeco,
+  type IdecoCalculationSuccess,
+} from './idecoCalculation'
+import {
+  getIdecoContributionLimit,
+  getIdecoParticipantLabel,
+  getIdecoRegimeLabel,
+  getIdecoRelatedContributionLabel,
+  IDECO_PARTICIPANT_OPTIONS,
+  requiresIdecoRelatedContribution,
+  type IdecoParticipantCategory,
+  type IdecoRuleField,
+  type IdecoRuleInput,
+  type IdecoValidationErrors,
+  validateIdecoRuleInput,
+} from './idecoRules'
 import {
   getMoneyInputDigits,
   normalizeMoneyInputCharacters,
 } from './utils/moneyInput'
 
-type IdecoResult = {
+type DisplayedIdecoResult = {
   annualContribution: number | null
   totalContribution: number | null
   incomeTaxSaving: number | null
@@ -14,7 +37,7 @@ type IdecoResult = {
   totalTaxSaving: number | null
 }
 
-const emptyResult: IdecoResult = {
+const emptyResult: DisplayedIdecoResult = {
   annualContribution: null,
   totalContribution: null,
   incomeTaxSaving: null,
@@ -67,16 +90,23 @@ const incomeTaxRates = [
 const normalizeDecimalInput = (value: string) => {
   const converted = normalizeMoneyInputCharacters(value)
     .replace(/,/g, '')
-    .replace(/[^\d.]/g, '')
+    .replace(/[^\d.-]/g, '')
+
+  const isNegative = converted.startsWith('-')
+  const unsigned = converted.replace(/-/g, '')
 
   const [integerPart, ...decimalParts] =
-    converted.split('.')
+    unsigned.split('.')
 
-  if (decimalParts.length === 0) {
-    return integerPart
+  const normalized = decimalParts.length === 0
+    ? integerPart
+    : `${integerPart}.${decimalParts.join('')}`
+
+  if (isNegative && normalized !== '') {
+    return `-${normalized}`
   }
 
-  return `${integerPart}.${decimalParts.join('')}`
+  return normalized
 }
 
 const formatYen = (value: number) =>
@@ -84,73 +114,37 @@ const formatYen = (value: number) =>
     style: 'currency',
     currency: 'JPY',
     maximumFractionDigits: 0,
-  }).format(Math.round(value))
+  }).format(value)
 
-const calculateIdeco = (
-  monthlyContribution: string,
-  incomeTaxRate: string,
-  residentTaxRate: string,
-  contributionYears: string,
-): IdecoResult => {
-  const monthlyAmount = Number(
-    getMoneyInputDigits(monthlyContribution),
-  )
-
-  const incomeRate = Number(
-    normalizeDecimalInput(incomeTaxRate),
-  )
-
-  const residentRate = Number(
-    normalizeDecimalInput(residentTaxRate),
-  )
-
-  const years = Number(
-    normalizeDecimalInput(contributionYears),
-  )
-
-  if (
-    monthlyAmount <= 0 ||
-    incomeRate < 0 ||
-    residentRate < 0 ||
-    years <= 0
-  ) {
-    return emptyResult
-  }
-
-  const annualContribution =
-    monthlyAmount * 12
-
-  /*
-   * 所得税には、基準所得税額の2.1％にあたる
-   * 復興特別所得税を概算で含めています。
-   */
-  const incomeTaxSaving =
-    annualContribution *
-    (incomeRate / 100) *
-    1.021
-
-  const residentTaxSaving =
-    annualContribution *
-    (residentRate / 100)
-
-  const annualTaxSaving =
-    incomeTaxSaving + residentTaxSaving
-
-  const totalTaxSaving =
-    annualTaxSaving * years
-
-  const totalContribution =
-    annualContribution * years
-
-  return {
-    annualContribution,
-    totalContribution,
-    incomeTaxSaving,
-    residentTaxSaving,
-    annualTaxSaving,
-    totalTaxSaving,
-  }
+const parseMoneyValue = (value: string) => {
+  const digits = getMoneyInputDigits(value)
+  return digits === '' ? null : Number(digits)
 }
+
+const parseDecimalValue = (value: string) => {
+  const normalized = normalizeDecimalInput(value)
+  return normalized === '' || normalized === '-'
+    ? null
+    : Number(normalized)
+}
+
+const toDisplayedResult = (
+  calculation: IdecoCalculationSuccess | null,
+): DisplayedIdecoResult =>
+  calculation
+    ? calculation.result.rounded
+    : emptyResult
+
+const IDECO_FIELD_ORDER: IdecoRuleField[] = [
+  'effectiveDate',
+  'participantCategory',
+  'relatedMonthlyContribution',
+  'monthlyContribution',
+  'actualContributionMonths',
+  'incomeTaxRate',
+  'residentTaxRate',
+  'referenceYears',
+]
 
 type IdecoCalculatorProps = {
   initialIncomeTaxRate?: number
@@ -161,76 +155,133 @@ function IdecoCalculator({
   initialIncomeTaxRate,
   onOpenTaxableIncome,
 }: IdecoCalculatorProps) {
+  const [effectiveDate, setEffectiveDate] = useState('')
+  const [participantCategory, setParticipantCategory] =
+    useState<IdecoParticipantCategory | ''>('')
+  const [relatedMonthlyContribution, setRelatedMonthlyContribution] =
+    useState('')
   const [monthlyContribution, setMonthlyContribution] =
     useState('')
-
+  const [actualContributionMonths, setActualContributionMonths] =
+    useState('')
   const [incomeTaxRate, setIncomeTaxRate] =
-    useState(() => String(initialIncomeTaxRate ?? 10))
-
+    useState(() => String(initialIncomeTaxRate ?? ''))
   const [residentTaxRate, setResidentTaxRate] =
-    useState('10')
-
+    useState('')
   const [contributionYears, setContributionYears] =
     useState('')
-
   const [isAutoCalculation, setIsAutoCalculation] =
     useState(false)
-
   const [manualResult, setManualResult] =
-    useState<IdecoResult | null>(null)
+    useState<IdecoCalculationSuccess | null>(null)
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const errorSummaryRef = useRef<HTMLDivElement>(null)
+  const fieldRefs = useRef<
+    Partial<Record<IdecoRuleField, HTMLElement>>
+  >({})
 
   useEffect(() => {
     if (initialIncomeTaxRate !== undefined) {
       setIncomeTaxRate(String(initialIncomeTaxRate))
       setManualResult(null)
+      setHasSubmitted(false)
     }
   }, [initialIncomeTaxRate])
 
-  const autoResult = useMemo(
-    () =>
-      calculateIdeco(
-        monthlyContribution,
-        incomeTaxRate,
-        residentTaxRate,
-        contributionYears,
-      ),
+  const input = useMemo<IdecoRuleInput>(
+    () => ({
+      effectiveDate,
+      participantCategory,
+      relatedMonthlyContribution:
+        parseMoneyValue(relatedMonthlyContribution),
+      monthlyContribution:
+        parseMoneyValue(monthlyContribution),
+      actualContributionMonths:
+        parseDecimalValue(actualContributionMonths),
+      incomeTaxRate: parseDecimalValue(incomeTaxRate),
+      residentTaxRate: parseDecimalValue(residentTaxRate),
+      referenceYears: parseDecimalValue(contributionYears),
+    }),
     [
+      effectiveDate,
+      participantCategory,
+      relatedMonthlyContribution,
       monthlyContribution,
+      actualContributionMonths,
       incomeTaxRate,
       residentTaxRate,
       contributionYears,
     ],
   )
 
-  const displayedResult = isAutoCalculation
+  const validationErrors = useMemo(
+    () => validateIdecoRuleInput(input),
+    [input],
+  )
+  const autoOutcome = useMemo(
+    () => calculateIdeco(input),
+    [input],
+  )
+  const autoResult = autoOutcome.ok ? autoOutcome : null
+  const displayedCalculation = isAutoCalculation
     ? autoResult
-    : manualResult ?? emptyResult
-
-  const monthlyAmount = Number(
-    getMoneyInputDigits(monthlyContribution),
+    : manualResult
+  const displayedResult = toDisplayedResult(displayedCalculation)
+  const rawDisplayedResult = displayedCalculation?.result ?? null
+  const years = input.referenceYears ?? 0
+  const selectedCategory = participantCategory || null
+  const needsRelatedContribution = Boolean(
+    selectedCategory &&
+    requiresIdecoRelatedContribution(selectedCategory),
   )
+  const contributionLimit = getIdecoContributionLimit(input)
+  const specialIncomeTaxDescription =
+    input.effectiveDate >= '2027-01-01'
+      ? '防衛特別所得税・復興特別所得税を含む概算'
+      : '復興特別所得税を含む概算'
 
-  const incomeRate = Number(
-    normalizeDecimalInput(incomeTaxRate),
-  )
+  const fieldsWithValues: Record<IdecoRuleField, boolean> = {
+    effectiveDate: effectiveDate !== '',
+    participantCategory: participantCategory !== '',
+    relatedMonthlyContribution:
+      relatedMonthlyContribution !== '',
+    monthlyContribution: monthlyContribution !== '',
+    actualContributionMonths:
+      actualContributionMonths !== '',
+    incomeTaxRate: incomeTaxRate !== '',
+    residentTaxRate: residentTaxRate !== '',
+    referenceYears: contributionYears !== '',
+  }
 
-  const residentRate = Number(
-    normalizeDecimalInput(residentTaxRate),
-  )
+  const visibleErrors: IdecoValidationErrors =
+    isAutoCalculation
+      ? Object.fromEntries(
+        Object.entries(validationErrors).filter(([field]) =>
+          fieldsWithValues[field as IdecoRuleField],
+        ),
+      ) as IdecoValidationErrors
+      : hasSubmitted
+        ? validationErrors
+        : {}
+  const visibleErrorEntries = IDECO_FIELD_ORDER.flatMap((field) => {
+    const message = visibleErrors[field]
+    return message ? [[field, message] as const] : []
+  })
 
-  const years = Number(
-    normalizeDecimalInput(contributionYears),
-  )
+  useEffect(() => {
+    if (hasSubmitted && visibleErrorEntries.length > 0) {
+      errorSummaryRef.current?.focus()
+    }
+  }, [hasSubmitted, visibleErrorEntries.length])
 
   const longTermDisplayMax = Math.max(
-    displayedResult.totalContribution ?? 0,
-    displayedResult.totalTaxSaving ?? 0,
+    rawDisplayedResult?.totalContribution ?? 0,
+    rawDisplayedResult?.totalTaxSaving ?? 0,
   )
 
   const idecoTrajectory = useMemo(() => {
     if (
-      displayedResult.totalContribution === null ||
-      displayedResult.totalTaxSaving === null ||
+      rawDisplayedResult === null ||
       longTermDisplayMax <= 0
     ) {
       return []
@@ -246,13 +297,12 @@ function IdecoCalculator({
           : ratio === 1
             ? '終了'
             : `${Math.max(1, Math.round(years * ratio))}年後`,
-        contribution: displayedResult.totalContribution! * ratio,
-        saving: displayedResult.totalTaxSaving! * ratio,
+        contribution: rawDisplayedResult.totalContribution * ratio,
+        saving: rawDisplayedResult.totalTaxSaving * ratio,
       }
     })
   }, [
-    displayedResult.totalContribution,
-    displayedResult.totalTaxSaving,
+    rawDisplayedResult,
     longTermDisplayMax,
     years,
   ])
@@ -283,63 +333,57 @@ function IdecoCalculator({
     }
   }, [idecoTrajectory, longTermDisplayMax])
 
-  const canSimulate =
-    monthlyAmount > 0 &&
-    incomeRate >= 0 &&
-    residentRate >= 0 &&
-    years > 0
-
-  const clearManualResult = () => {
-    if (!isAutoCalculation) {
-      setManualResult(null)
-    }
+  const invalidateManualResult = () => {
+    setHasSubmitted(false)
+    setManualResult(null)
   }
 
   const handleMonthlyContributionChange = (
     value: string,
   ) => {
     setMonthlyContribution(value)
-    clearManualResult()
+    invalidateManualResult()
   }
 
   const handleIncomeTaxRateChange = (
     value: string,
   ) => {
     setIncomeTaxRate(value)
-    clearManualResult()
+    invalidateManualResult()
   }
 
   const handleResidentTaxRateChange = (
     value: string,
   ) => {
     setResidentTaxRate(value)
-    clearManualResult()
+    invalidateManualResult()
   }
 
   const handleContributionYearsChange = (
     value: string,
   ) => {
     setContributionYears(value)
-    clearManualResult()
+    invalidateManualResult()
   }
 
   const simulate = () => {
-    setManualResult(
-      calculateIdeco(
-        monthlyContribution,
-        incomeTaxRate,
-        residentTaxRate,
-        contributionYears,
-      ),
-    )
+    const outcome = calculateIdeco(input)
+
+    setHasSubmitted(true)
+    setManualResult(outcome.ok ? outcome : null)
   }
 
   const resetCalculator = () => {
+    setEffectiveDate('')
+    setParticipantCategory('')
+    setRelatedMonthlyContribution('')
     setMonthlyContribution('')
-    setIncomeTaxRate('10')
-    setResidentTaxRate('10')
+    setActualContributionMonths('')
+    setIncomeTaxRate('')
+    setResidentTaxRate('')
     setContributionYears('')
     setManualResult(null)
+    setHasSubmitted(false)
   }
 
   const changeCalculationMode = (
@@ -347,6 +391,7 @@ function IdecoCalculator({
   ) => {
     setIsAutoCalculation(checked)
     setManualResult(null)
+    setHasSubmitted(false)
   }
 
   const openTaxableIncomeCalculator = () => {
@@ -357,7 +402,25 @@ function IdecoCalculator({
     incomeTaxRates.find(
       (item) =>
         String(item.rate) === incomeTaxRate,
-    ) ?? incomeTaxRates[0]
+    ) ?? null
+
+  const focusField = (field: IdecoRuleField) => {
+    fieldRefs.current[field]?.focus()
+  }
+
+  const preventInputEnter = (
+    event: KeyboardEvent<HTMLDivElement>,
+  ) => {
+    if (
+      event.key === 'Enter' &&
+      event.target instanceof HTMLInputElement
+    ) {
+      event.preventDefault()
+    }
+  }
+
+  const getErrorDescription = (field: IdecoRuleField) =>
+    visibleErrors[field] ? `ideco-${field}-error` : undefined
 
   return (
     <section
@@ -383,7 +446,10 @@ function IdecoCalculator({
       </div>
 
       <div className="calculator-layout">
-        <div className="calculator-form">
+        <div
+          className="calculator-form"
+          onKeyDown={preventInputEnter}
+        >
           <div className="simulator-panel-heading">
             <span aria-hidden="true">01</span>
             <div>
@@ -392,19 +458,226 @@ function IdecoCalculator({
             </div>
           </div>
 
-          <label>
-            <span>毎月の掛金</span>
+          {visibleErrorEntries.length > 0 && (
+            <div
+              ref={errorSummaryRef}
+              className="ideco-error-summary"
+              role="alert"
+              tabIndex={-1}
+              aria-labelledby="ideco-error-summary-title"
+            >
+              <strong id="ideco-error-summary-title">
+                入力内容を確認してください
+              </strong>
+              <ul>
+                {visibleErrorEntries.map(([field, message]) => (
+                  <li key={field}>
+                    <button
+                      type="button"
+                      onClick={() => focusField(field)}
+                    >
+                      {message}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="ideco-field ideco-field--wide">
+            <label htmlFor="ideco-effective-date">
+              制度適用日
+            </label>
+            <input
+              ref={(node) => {
+                fieldRefs.current.effectiveDate = node ?? undefined
+              }}
+              id="ideco-effective-date"
+              type="date"
+              value={effectiveDate}
+              aria-invalid={Boolean(visibleErrors.effectiveDate)}
+              aria-describedby={getErrorDescription('effectiveDate')}
+              onChange={(event) => {
+                setEffectiveDate(event.target.value)
+                invalidateManualResult()
+              }}
+            />
+            {visibleErrors.effectiveDate && (
+              <p
+                id="ideco-effectiveDate-error"
+                className="ideco-field__error"
+              >
+                {visibleErrors.effectiveDate}
+              </p>
+            )}
+          </div>
+
+          <div className="ideco-field ideco-field--wide">
+            <label htmlFor="ideco-participant-category">
+              加入区分
+            </label>
+            <select
+              ref={(node) => {
+                fieldRefs.current.participantCategory = node ?? undefined
+              }}
+              id="ideco-participant-category"
+              value={participantCategory}
+              aria-invalid={Boolean(visibleErrors.participantCategory)}
+              aria-describedby={getErrorDescription('participantCategory')}
+              onChange={(event) => {
+                setRelatedMonthlyContribution('')
+                setParticipantCategory(
+                  event.target.value as IdecoParticipantCategory | '',
+                )
+                invalidateManualResult()
+              }}
+            >
+              <option value="">選択してください</option>
+              {IDECO_PARTICIPANT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {visibleErrors.participantCategory && (
+              <p
+                id="ideco-participantCategory-error"
+                className="ideco-field__error"
+              >
+                {visibleErrors.participantCategory}
+              </p>
+            )}
+          </div>
+
+          {needsRelatedContribution && selectedCategory && (
+            <div className="ideco-field ideco-field--wide">
+              <label htmlFor="ideco-related-contribution">
+                {getIdecoRelatedContributionLabel(selectedCategory)}
+              </label>
+              <div className="input-with-unit">
+                <MoneyInput
+                  ref={(node) => {
+                    fieldRefs.current.relatedMonthlyContribution =
+                      node ?? undefined
+                  }}
+                  id="ideco-related-contribution"
+                  value={relatedMonthlyContribution}
+                  aria-invalid={Boolean(
+                    visibleErrors.relatedMonthlyContribution,
+                  )}
+                  aria-describedby={getErrorDescription(
+                    'relatedMonthlyContribution',
+                  )}
+                  onValueChange={(value) => {
+                    setRelatedMonthlyContribution(value)
+                    invalidateManualResult()
+                  }}
+                  placeholder="該当額がない場合は0"
+                />
+                <span>円</span>
+              </div>
+              <p className="ideco-field__help">
+                掛金上限と合算する月額です。該当額がない場合も0円と入力してください。
+              </p>
+              {visibleErrors.relatedMonthlyContribution && (
+                <p
+                  id="ideco-relatedMonthlyContribution-error"
+                  className="ideco-field__error"
+                >
+                  {visibleErrors.relatedMonthlyContribution}
+                </p>
+              )}
+            </div>
+          )}
+
+          {contributionLimit && selectedCategory && (
+            <aside className="ideco-rule-summary">
+              <strong>{getIdecoRegimeLabel(contributionLimit.regime)}</strong>
+              <span>{getIdecoParticipantLabel(selectedCategory)}</span>
+              <span>計算モード：簡易税率モード</span>
+              <p>
+                この条件での月額上限は
+                <b>{contributionLimit.monthlyLimit.toLocaleString('ja-JP')}円</b>
+                です。
+              </p>
+            </aside>
+          )}
+
+          <div className="ideco-field">
+            <label htmlFor="ideco-monthly-contribution">
+              毎月の掛金
+            </label>
 
             <div className="input-with-unit">
               <MoneyInput
+                ref={(node) => {
+                  fieldRefs.current.monthlyContribution = node ?? undefined
+                }}
+                id="ideco-monthly-contribution"
                 value={monthlyContribution}
                 onValueChange={handleMonthlyContributionChange}
+                aria-invalid={Boolean(visibleErrors.monthlyContribution)}
+                aria-describedby={getErrorDescription('monthlyContribution')}
                 placeholder="例：23,000"
               />
 
               <span>円</span>
             </div>
-          </label>
+            <p className="ideco-field__help">
+              月5,000円以上、1,000円単位で入力してください。
+            </p>
+            {visibleErrors.monthlyContribution && (
+              <p
+                id="ideco-monthlyContribution-error"
+                className="ideco-field__error"
+              >
+                {visibleErrors.monthlyContribution}
+              </p>
+            )}
+          </div>
+
+          <div className="ideco-field">
+            <label htmlFor="ideco-actual-months">
+              実拠出月数
+            </label>
+            <div className="input-with-unit">
+              <input
+                ref={(node) => {
+                  fieldRefs.current.actualContributionMonths =
+                    node ?? undefined
+                }}
+                id="ideco-actual-months"
+                type="text"
+                inputMode="numeric"
+                value={actualContributionMonths}
+                aria-invalid={Boolean(
+                  visibleErrors.actualContributionMonths,
+                )}
+                aria-describedby={getErrorDescription(
+                  'actualContributionMonths',
+                )}
+                onChange={(event) => {
+                  setActualContributionMonths(
+                    normalizeDecimalInput(event.target.value),
+                  )
+                  invalidateManualResult()
+                }}
+                placeholder="例：12"
+              />
+              <span>か月</span>
+            </div>
+            <p className="ideco-field__help">
+              この年に実際に掛金を拠出する月数（1〜12か月）です。
+            </p>
+            {visibleErrors.actualContributionMonths && (
+              <p
+                id="ideco-actualContributionMonths-error"
+                className="ideco-field__error"
+              >
+                {visibleErrors.actualContributionMonths}
+              </p>
+            )}
+          </div>
 
           <div
             id="ideco-income-tax-rate-field"
@@ -443,7 +716,9 @@ function IdecoCalculator({
                 aria-hidden="true"
               >
                 <strong className="tax-rate-value">
-                  {selectedIncomeTaxRate.rate}%
+                  {selectedIncomeTaxRate
+                    ? `${selectedIncomeTaxRate.rate}%`
+                    : '未選択'}
                 </strong>
 
                 <span className="tax-rate-divider">
@@ -451,10 +726,9 @@ function IdecoCalculator({
                 </span>
 
                 <span className="tax-rate-guide">
-                  {
-                    selectedIncomeTaxRate
-                      .taxableIncomeGuide
-                  }
+                  {selectedIncomeTaxRate
+                    ? selectedIncomeTaxRate.taxableIncomeGuide
+                    : '所得税率を選択してください'}
                 </span>
 
                 <span className="tax-rate-arrow">
@@ -463,16 +737,22 @@ function IdecoCalculator({
               </div>
 
               <select
+                ref={(node) => {
+                  fieldRefs.current.incomeTaxRate = node ?? undefined
+                }}
                 id="ideco-income-tax-rate-select"
                 className="tax-rate-native-select"
                 value={incomeTaxRate}
                 aria-label="所得税率"
+                aria-invalid={Boolean(visibleErrors.incomeTaxRate)}
+                aria-describedby={getErrorDescription('incomeTaxRate')}
                 onChange={(event) =>
                   handleIncomeTaxRateChange(
                     event.target.value,
                   )
                 }
               >
+                <option value="">選択してください</option>
                 {incomeTaxRates.map((item) => (
                   <option
                     key={item.rate}
@@ -483,6 +763,14 @@ function IdecoCalculator({
                 ))}
               </select>
             </div>
+            {visibleErrors.incomeTaxRate && (
+              <p
+                id="ideco-incomeTaxRate-error"
+                className="ideco-field__error"
+              >
+                {visibleErrors.incomeTaxRate}
+              </p>
+            )}
           </div>
 
           <button
@@ -493,14 +781,22 @@ function IdecoCalculator({
             自分の所得税率を調べる
           </button>
 
-          <label>
-            <span>住民税率</span>
+          <div className="ideco-field">
+            <label htmlFor="ideco-resident-tax-rate">
+              住民税所得割率
+            </label>
 
             <div className="input-with-unit">
               <input
+                ref={(node) => {
+                  fieldRefs.current.residentTaxRate = node ?? undefined
+                }}
+                id="ideco-resident-tax-rate"
                 type="text"
                 inputMode="decimal"
                 value={residentTaxRate}
+                aria-invalid={Boolean(visibleErrors.residentTaxRate)}
+                aria-describedby={getErrorDescription('residentTaxRate')}
                 onChange={(event) => {
                   const value = event.target.value
 
@@ -537,16 +833,35 @@ function IdecoCalculator({
 
               <span>%</span>
             </div>
-          </label>
+            <p className="ideco-field__help">
+              ご自身の住民税所得割率を入力してください。標準値は自動設定しません。
+            </p>
+            {visibleErrors.residentTaxRate && (
+              <p
+                id="ideco-residentTaxRate-error"
+                className="ideco-field__error"
+              >
+                {visibleErrors.residentTaxRate}
+              </p>
+            )}
+          </div>
 
-          <label>
-            <span>積立期間</span>
+          <div className="ideco-field">
+            <label htmlFor="ideco-reference-years">
+              長期参考期間
+            </label>
 
             <div className="input-with-unit">
               <input
+                ref={(node) => {
+                  fieldRefs.current.referenceYears = node ?? undefined
+                }}
+                id="ideco-reference-years"
                 type="text"
-                inputMode="decimal"
+                inputMode="numeric"
                 value={contributionYears}
+                aria-invalid={Boolean(visibleErrors.referenceYears)}
+                aria-describedby={getErrorDescription('referenceYears')}
                 onChange={(event) => {
                   const value = event.target.value
 
@@ -583,7 +898,18 @@ function IdecoCalculator({
 
               <span>年</span>
             </div>
-          </label>
+            <p className="ideco-field__help">
+              税率・掛金・制度が毎年変わらないと仮定した参考期間です。
+            </p>
+            {visibleErrors.referenceYears && (
+              <p
+                id="ideco-referenceYears-error"
+                className="ideco-field__error"
+              >
+                {visibleErrors.referenceYears}
+              </p>
+            )}
+          </div>
 
           <div
             className="form-spacer"
@@ -631,7 +957,6 @@ function IdecoCalculator({
                 className="simulate-button"
                 type="button"
                 onClick={simulate}
-                disabled={!canSimulate}
               >
                 シミュレートする
               </button>
@@ -641,15 +966,12 @@ function IdecoCalculator({
           <aside className="simulator-input-point simulator-input-point--ideco">
             <strong>入力のポイント</strong>
             <p>
-              掛金と税率を入力すると、年間と積立期間全体の節税効果を比較できます。
+              加入区分と制度適用日による上限を確認し、実際に拠出する月数で概算します。
             </p>
           </aside>
         </div>
 
-        <div
-          className="calculator-results"
-          aria-live="polite"
-        >
+        <div className="calculator-results">
           <div className="simulator-results-heading">
             <div>
               <p>RESULT</p>
@@ -657,6 +979,30 @@ function IdecoCalculator({
             </div>
             <span>所得税・住民税の軽減額</span>
           </div>
+
+          <p className="sr-only" aria-live="polite">
+            {displayedResult.annualTaxSaving === null
+              ? ''
+              : `年間節税効果は${formatYen(displayedResult.annualTaxSaving)}です。`}
+          </p>
+
+          {displayedCalculation && (
+            <aside className="ideco-result-context">
+              <strong>{displayedCalculation.regimeLabel}</strong>
+              <span>{displayedCalculation.participantLabel}</span>
+              <span>計算モード：簡易税率モード</span>
+              <span>
+                制度適用日：{input.effectiveDate}
+              </span>
+              <span>
+                実拠出月数：{input.actualContributionMonths}か月
+              </span>
+              <span>
+                月額上限：
+                {displayedCalculation.contributionLimit.monthlyLimit.toLocaleString('ja-JP')}円
+              </span>
+            </aside>
+          )}
 
           <div className="ideco-kpi-grid" aria-label="iDeCoの主要結果">
           <div className="simulator-summary-grid simulator-summary-grid--ideco">
@@ -674,7 +1020,7 @@ function IdecoCalculator({
               </strong>
 
               <small>
-                復興特別所得税を含む概算
+                {specialIncomeTaxDescription}
               </small>
             </div>
 
@@ -731,7 +1077,7 @@ function IdecoCalculator({
               </strong>
 
               <small>
-                毎月の掛金 × 12か月
+                毎月の掛金 × 実拠出月数
               </small>
             </div>
 
@@ -749,7 +1095,7 @@ function IdecoCalculator({
               </strong>
 
               <small>
-                年間掛金額 × 積立期間
+                年間掛金額 × 長期参考期間
               </small>
             </div>
 
@@ -767,7 +1113,7 @@ function IdecoCalculator({
               </strong>
 
               <small>
-                年間節税額 × 積立期間
+                年間節税額 × 長期参考期間
               </small>
             </div>
           </div>

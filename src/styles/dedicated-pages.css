@@ -1065,6 +1065,196 @@
   gap: 12px;
 }
 
+/* iDeCo formal eligibility inputs and validation */
+.simulator-page--ideco .ideco-field {
+  display: grid;
+  gap: 7px;
+}
+
+.simulator-page--ideco .ideco-field > label {
+  color: #3f3965;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.simulator-page--ideco .ideco-field > :is(input, select) {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbc7dc;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #292441;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.simulator-page--ideco .ideco-field > :is(input, select):focus {
+  border-color: #7154ca;
+  outline: 3px solid rgba(113, 84, 202, 0.18);
+}
+
+.simulator-page--ideco :is(
+  .ideco-field > input,
+  .ideco-field > select,
+  .ideco-field .input-with-unit input
+)[aria-invalid="true"] {
+  border-color: #b42318;
+  box-shadow: 0 0 0 2px rgba(180, 35, 24, 0.12);
+}
+
+.simulator-page--ideco .tax-rate-select:has(
+  select[aria-invalid="true"]
+) .tax-rate-select-display {
+  border-color: #b42318;
+  box-shadow: 0 0 0 2px rgba(180, 35, 24, 0.12);
+}
+
+.ideco-field__help,
+.ideco-field__error {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.ideco-field__help {
+  color: #6a6680;
+}
+
+.ideco-field__error {
+  color: #a61b12;
+  font-weight: 750;
+}
+
+.ideco-error-summary {
+  padding: 13px 14px;
+  border: 1px solid #e2a7a1;
+  border-radius: 10px;
+  background: #fff5f4;
+  color: #791a14;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.ideco-error-summary:focus {
+  outline: 3px solid rgba(180, 35, 24, 0.18);
+  outline-offset: 2px;
+}
+
+.ideco-error-summary ul {
+  display: grid;
+  gap: 4px;
+  margin: 7px 0 0;
+  padding-left: 18px;
+}
+
+.ideco-error-summary button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ideco-rule-summary,
+.ideco-result-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 10px;
+  margin: 0;
+  padding: 11px 12px;
+  border: 1px solid #d8d0ee;
+  border-radius: 9px;
+  background: #f7f4ff;
+  color: #544a7b;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.ideco-rule-summary strong,
+.ideco-result-context strong {
+  color: #4b338e;
+}
+
+.ideco-rule-summary p {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.ideco-rule-summary b {
+  margin-inline: 0.2em;
+  color: #4b338e;
+}
+
+.ideco-result-context {
+  background: #faf9ff;
+}
+
+@media (min-width: 901px) {
+  .simulator-page--ideco .calculator-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .simulator-page--ideco .calculator-form > * {
+    min-width: 0;
+  }
+
+  .simulator-page--ideco .calculator-form > :is(
+    .simulator-panel-heading,
+    .ideco-field--wide,
+    .ideco-error-summary,
+    .ideco-rule-summary,
+    .calculator-field,
+    .calculator-helper-link,
+    .form-spacer,
+    .calculation-mode,
+    .simulator-form-actions,
+    .simulator-input-point
+  ) {
+    grid-column: 1 / -1;
+  }
+
+  .simulator-page--ideco .form-spacer {
+    display: none;
+  }
+
+  .simulator-page--ideco .ideco-field {
+    gap: 4px;
+  }
+
+  .simulator-page--ideco .ideco-field > label {
+    font-size: 0.7rem;
+  }
+
+  .simulator-page--ideco .ideco-field > :is(input, select) {
+    min-height: 38px;
+    padding-inline: 10px;
+    border-radius: 7px;
+    font-size: 0.8rem;
+  }
+
+  .simulator-page--ideco :is(
+    .ideco-field__help,
+    .ideco-field__error
+  ) {
+    font-size: 0.62rem;
+  }
+
+  .simulator-page--ideco :is(
+    .ideco-rule-summary,
+    .ideco-result-context,
+    .ideco-error-summary
+  ) {
+    padding: 8px 10px;
+    font-size: 0.64rem;
+  }
+}
+
 .simulator-page--ideco .result-card--contribution-total {
   border-color: #b9a9ee;
   background: #f5f2ff;

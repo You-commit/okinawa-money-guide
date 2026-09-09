@@ -11,7 +11,13 @@ function IdecoPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const initialIncomeTaxRate = useMemo(() => {
-    const value = Number(searchParams.get('incomeTaxRate'))
+    const parameter = searchParams.get('incomeTaxRate')
+
+    if (parameter === null || parameter === '') {
+      return undefined
+    }
+
+    const value = Number(parameter)
     return allowedIncomeTaxRates.includes(value as (typeof allowedIncomeTaxRates)[number]) ? value : undefined
   }, [searchParams])
 
