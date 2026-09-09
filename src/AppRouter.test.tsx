@@ -236,6 +236,65 @@ describe('dedicated page routing', () => {
     expect(window.location.search).not.toContain('5000000')
   })
 
+  it('returns to detailed iDeCo without applying the lookup rate to its calculation', async () => {
+    const user = userEvent.setup()
+    renderAt('/simulators/ideco')
+
+    await user.click(screen.getByRole('button', {
+      name: /課税所得から詳しく計算/,
+    }))
+    await user.type(
+      screen.getByLabelText('掛金控除前の課税所得'),
+      '3500000',
+    )
+
+    const lookup = screen.getByRole('button', {
+      name: '自分の所得税率を調べる',
+    })
+    lookup.focus()
+    await user.keyboard('{Enter}')
+    expect(`${window.location.pathname}${window.location.search}`)
+      .toBe('/simulators/taxable-income?return=ideco')
+
+    await user.type(screen.getByPlaceholderText('例：5,000,000'), '5000000')
+    await user.click(screen.getByRole('button', { name: 'シミュレートする' }))
+    await user.click(screen.getByRole('button', { name: /をiDeCoに反映する/ }))
+
+    expect(window.location.pathname).toBe('/simulators/ideco')
+    expect(screen.getByRole('button', {
+      name: /課税所得から詳しく計算/,
+    }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.queryByLabelText('所得税率')).toBeNull()
+    expect((screen.getByLabelText(
+      '掛金控除前の課税所得',
+    ) as HTMLInputElement).value).toBe('3,500,000')
+
+    fireEvent.change(screen.getByLabelText('制度適用日'), {
+      target: { value: '2026-11-30' },
+    })
+    fireEvent.change(screen.getByLabelText('現在の年齢'), {
+      target: { value: '40' },
+    })
+    fireEvent.change(screen.getByLabelText('加入区分'), {
+      target: { value: 'category2-no-pension' },
+    })
+    fireEvent.change(screen.getByLabelText('毎月の掛金'), {
+      target: { value: '23000' },
+    })
+    fireEvent.change(screen.getByLabelText('実拠出月数'), {
+      target: { value: '12' },
+    })
+    fireEvent.change(screen.getByLabelText('住民税所得割率'), {
+      target: { value: '10' },
+    })
+    fireEvent.change(screen.getByLabelText('長期参考期間'), {
+      target: { value: '20' },
+    })
+    await user.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    expect(screen.getAllByText('￥76,200').length).toBeGreaterThanOrEqual(1)
+  })
+
   it('starts iDeCo with a blank rate, accepts allowed rates, and ignores invalid query values', () => {
     renderAt('/simulators/ideco')
     expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('')

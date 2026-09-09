@@ -1,16 +1,17 @@
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import TaxableIncomeCalculator from '../TaxableIncomeCalculator'
 import { routes } from '../app/routes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
 
 function TaxableIncomePage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const shouldReturnToIdeco = searchParams.get('return') === 'ideco'
 
   const applyRate = (rate: number) => {
     const destination = `${routes.ideco}?incomeTaxRate=${encodeURIComponent(String(rate))}`
-    navigate(destination)
+    navigate(destination, { state: location.state })
   }
 
   return (

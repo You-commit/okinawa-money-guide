@@ -163,7 +163,14 @@ const IDECO_FIELD_ORDER: IdecoRuleField[] = [
 
 type IdecoCalculatorProps = {
   initialIncomeTaxRate?: number
-  onOpenTaxableIncome: () => void
+  initialCalculationMode?: IdecoCalculationMode
+  initialTaxableIncomeBeforeContribution?: string
+  onOpenTaxableIncome: (context: IdecoTaxLookupContext) => void
+}
+
+export type IdecoTaxLookupContext = {
+  calculationMode: IdecoCalculationMode
+  taxableIncomeBeforeContribution: string
 }
 
 type IdecoResetSnapshot = {
@@ -213,10 +220,12 @@ function FieldHelpTooltip({
 
 function IdecoCalculator({
   initialIncomeTaxRate,
+  initialCalculationMode = 'simple',
+  initialTaxableIncomeBeforeContribution = '',
   onOpenTaxableIncome,
 }: IdecoCalculatorProps) {
   const [calculationMode, setCalculationMode] =
-    useState<IdecoCalculationMode>('simple')
+    useState<IdecoCalculationMode>(initialCalculationMode)
   const [effectiveDate, setEffectiveDate] = useState('')
   const [currentAge, setCurrentAge] = useState('')
   const [participantCategory, setParticipantCategory] =
@@ -230,7 +239,7 @@ function IdecoCalculator({
   const [incomeTaxRate, setIncomeTaxRate] =
     useState(() => String(initialIncomeTaxRate ?? ''))
   const [taxableIncomeBeforeContribution, setTaxableIncomeBeforeContribution] =
-    useState('')
+    useState(initialTaxableIncomeBeforeContribution)
   const [residentTaxRate, setResidentTaxRate] =
     useState('')
   const [contributionYears, setContributionYears] =
@@ -626,7 +635,10 @@ function IdecoCalculator({
   }
 
   const openTaxableIncomeCalculator = () => {
-    onOpenTaxableIncome()
+    onOpenTaxableIncome({
+      calculationMode,
+      taxableIncomeBeforeContribution,
+    })
   }
 
   const useStandardResidentTaxRate = () => {
@@ -794,7 +806,7 @@ function IdecoCalculator({
               制度・加入条件
             </h4>
 
-          <div className="ideco-field">
+          <div className="ideco-field ideco-field--alignment-peer">
             <label htmlFor="ideco-effective-date">
               制度適用日
             </label>
@@ -822,7 +834,7 @@ function IdecoCalculator({
             )}
           </div>
 
-          <div className="ideco-field">
+          <div className="ideco-field ideco-field--alignment-peer">
             <label htmlFor="ideco-current-age">
               現在の年齢
             </label>
@@ -1197,13 +1209,6 @@ function IdecoCalculator({
                     {visibleErrors.incomeTaxRate}
                   </p>
                 )}
-                <button
-                  className="calculator-helper-link"
-                  type="button"
-                  onClick={openTaxableIncomeCalculator}
-                >
-                  自分の所得税率を調べる
-                </button>
               </div>
             </>
           ) : (
@@ -1243,6 +1248,14 @@ function IdecoCalculator({
               )}
             </div>
           )}
+
+          <button
+            className="calculator-helper-link"
+            type="button"
+            onClick={openTaxableIncomeCalculator}
+          >
+            自分の所得税率を調べる
+          </button>
 
           <div className="ideco-field ideco-field--wide">
             <div className="field-label-row">

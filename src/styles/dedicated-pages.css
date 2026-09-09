@@ -1138,6 +1138,7 @@
 .ideco-input-group {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   grid-column: 1 / -1;
   gap: 10px 12px;
   min-width: 0;
@@ -1162,14 +1163,20 @@
   .ideco-field--wide,
   .ideco-rule-summary,
   .ideco-tax-mode-note,
-  .calculator-field
+  .calculator-field,
+  .calculator-helper-link
 ) {
   grid-column: 1 / -1;
 }
 
 .simulator-page--ideco .ideco-field {
   display: grid;
+  align-content: start;
   gap: 7px;
+}
+
+.simulator-page--ideco .ideco-field--alignment-peer {
+  align-self: start;
 }
 
 .simulator-page--ideco .ideco-field > label {

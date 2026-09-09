@@ -1,15 +1,42 @@
 import { useMemo } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import IdecoCalculator from '../IdecoCalculator'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import IdecoCalculator, {
+  type IdecoTaxLookupContext,
+} from '../IdecoCalculator'
 import { routes } from '../app/routes'
 import SimulatorNotes from '../components/simulator/SimulatorNotes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
 
 const allowedIncomeTaxRates = [0, 5, 10, 20, 23, 33, 40, 45] as const
 
+type IdecoLookupNavigationState = {
+  idecoTaxLookupContext?: IdecoTaxLookupContext
+}
+
+const readLookupContext = (
+  state: unknown,
+): IdecoTaxLookupContext | undefined => {
+  if (state === null || typeof state !== 'object') return undefined
+
+  const context = (state as IdecoLookupNavigationState)
+    .idecoTaxLookupContext
+
+  if (
+    context === undefined ||
+    context.calculationMode !== 'detailed' ||
+    typeof context.taxableIncomeBeforeContribution !== 'string'
+  ) {
+    return undefined
+  }
+
+  return context
+}
+
 function IdecoPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const lookupContext = readLookupContext(location.state)
   const initialIncomeTaxRate = useMemo(() => {
     const parameter = searchParams.get('incomeTaxRate')
 
@@ -36,7 +63,18 @@ function IdecoPage() {
     >
       <IdecoCalculator
         initialIncomeTaxRate={initialIncomeTaxRate}
-        onOpenTaxableIncome={() => navigate(`${routes.taxableIncome}?return=ideco`)}
+        initialCalculationMode={lookupContext?.calculationMode}
+        initialTaxableIncomeBeforeContribution={
+          lookupContext?.taxableIncomeBeforeContribution
+        }
+        onOpenTaxableIncome={(context) => navigate(
+          `${routes.taxableIncome}?return=ideco`,
+          {
+            state: context.calculationMode === 'detailed'
+              ? { idecoTaxLookupContext: context }
+              : undefined,
+          },
+        )}
       />
     </SimulatorPageShell>
   )

@@ -227,7 +227,32 @@ describe('IdecoCalculator formal eligibility UX', () => {
     await user.click(
       screen.getByRole('button', { name: '自分の所得税率を調べる' }),
     )
-    expect(onOpenTaxableIncome).toHaveBeenCalledOnce()
+    expect(onOpenTaxableIncome).toHaveBeenCalledWith({
+      calculationMode: 'simple',
+      taxableIncomeBeforeContribution: '',
+    })
+  })
+
+  it('keeps the taxable-income helper accessible in detailed mode', async () => {
+    const user = userEvent.setup()
+    const { onOpenTaxableIncome } = renderCalculator()
+
+    switchToDetailedMode()
+    fireEvent.change(
+      screen.getByLabelText('掛金控除前の課税所得'),
+      { target: { value: '3500000' } },
+    )
+
+    const lookup = screen.getByRole('button', {
+      name: '自分の所得税率を調べる',
+    })
+    lookup.focus()
+    await user.keyboard('{Enter}')
+
+    expect(onOpenTaxableIncome).toHaveBeenCalledWith({
+      calculationMode: 'detailed',
+      taxableIncomeBeforeContribution: '3,500,000',
+    })
   })
 
   it('starts in simple mode and exposes an accessible two-mode selector', () => {
@@ -437,6 +462,22 @@ describe('IdecoCalculator formal eligibility UX', () => {
     expect(tax.contains(screen.getByRole('button', {
       name: '標準税率10%を入力',
     }))).toBe(true)
+  })
+
+  it('keeps the effective-date and age fields in the same alignment row', () => {
+    renderCalculator()
+
+    const dateField = screen.getByLabelText('制度適用日')
+      .closest('.ideco-field')
+    const ageField = screen.getByLabelText('現在の年齢')
+      .closest('.ideco-field')
+
+    expect(dateField?.classList.contains(
+      'ideco-field--alignment-peer',
+    )).toBe(true)
+    expect(ageField?.classList.contains(
+      'ideco-field--alignment-peer',
+    )).toBe(true)
   })
 
   it('recalculates after the standard resident-tax action only when AUTO is on and all other values are valid', () => {
