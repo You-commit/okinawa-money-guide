@@ -1140,11 +1140,90 @@
   gap: 7px;
 }
 
-.simulator-page--ideco .ideco-field > label {
+.simulator-page--ideco .ideco-field > label,
+.simulator-page--ideco .ideco-field-label-row label {
   color: #3f3965;
   font-size: 0.86rem;
   font-weight: 800;
   line-height: 1.45;
+}
+
+.ideco-field-label-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.ideco-info-tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.ideco-info-tooltip__trigger {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid #a99bd2;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #5a438f;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 850;
+  cursor: help;
+}
+
+.ideco-info-tooltip__trigger:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.2);
+  outline-offset: 2px;
+}
+
+.ideco-info-tooltip__content {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 7px);
+  left: 0;
+  display: none;
+  width: min(320px, 76vw);
+  padding: 11px 12px;
+  border: 1px solid #d6cdea;
+  border-radius: 9px;
+  background: #ffffff;
+  box-shadow: 0 10px 26px rgba(55, 40, 98, 0.14);
+  color: #57506c;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+.ideco-info-tooltip:hover .ideco-info-tooltip__content,
+.ideco-info-tooltip:focus-within .ideco-info-tooltip__content {
+  display: block;
+}
+
+.ideco-resident-tax-helper {
+  justify-self: start;
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 1px solid #bcb0dc;
+  border-radius: 8px;
+  background: #faf9ff;
+  color: #57428d;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ideco-resident-tax-helper:hover {
+  background: #f1edfc;
+}
+
+.ideco-resident-tax-helper:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.2);
+  outline-offset: 2px;
 }
 
 .simulator-page--ideco .ideco-field > :is(input, select) {
@@ -1324,6 +1403,270 @@
   line-height: 1.6;
 }
 
+.ideco-reset-undo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #cfc3ed;
+  border-radius: 10px;
+  background: #f7f4ff;
+  color: #51427c;
+  font-size: 0.72rem;
+}
+
+.ideco-reset-undo button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 6px 12px;
+  border: 1px solid #7658ce;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4b338e;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ideco-reset-undo button:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.2);
+  outline-offset: 2px;
+}
+
+.ideco-consultation-summary {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #ddd5ef;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(63, 42, 121, 0.06);
+}
+
+.ideco-consultation-summary__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.ideco-consultation-summary__heading p {
+  margin: 0 0 5px;
+  color: #7154ca;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+}
+
+.ideco-consultation-summary__heading h3 {
+  margin: 0;
+  color: #322a55;
+  font-size: 1.2rem;
+}
+
+.ideco-consultation-summary__heading span {
+  display: block;
+  margin-top: 7px;
+  color: #665f7d;
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.ideco-consultation-summary__actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ideco-consultation-summary__actions button {
+  min-height: 42px;
+  padding: 8px 13px;
+  border: 1px solid #7154ca;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #4b338e;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ideco-consultation-summary__actions button:first-child {
+  background: #7154ca;
+  color: #ffffff;
+}
+
+.ideco-consultation-summary__actions button:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.2);
+  outline-offset: 3px;
+}
+
+.ideco-consultation-summary__status {
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: #f3f9f5;
+  color: #356549;
+  font-size: 0.76rem;
+  font-weight: 750;
+  line-height: 1.55;
+}
+
+.ideco-consultation-summary__status[data-tone="error"] {
+  border: 1px solid #e3b6b6;
+  background: #fff5f5;
+  color: #8a3d3d;
+}
+
+.ideco-consultation-summary__content {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #e4def1;
+  border-radius: 11px;
+  background: #fbfaff;
+  color: #4a4262;
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+.ideco-consultation-summary__document-heading {
+  padding-bottom: 13px;
+  border-bottom: 2px solid #d0c4eb;
+}
+
+.ideco-consultation-summary__document-heading p,
+.ideco-consultation-summary__document-heading h4,
+.ideco-consultation-summary__document-heading span,
+.ideco-consultation-summary__section h5,
+.ideco-consultation-summary__section dl,
+.ideco-consultation-summary__section ul,
+.ideco-consultation-summary__supplement,
+.ideco-consultation-summary__notice {
+  margin: 0;
+}
+
+.ideco-consultation-summary__document-heading p {
+  color: #7154ca;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.ideco-consultation-summary__document-heading h4 {
+  margin-top: 3px;
+  color: #322a55;
+  font-size: 1.1rem;
+}
+
+.ideco-consultation-summary__document-heading span {
+  display: block;
+  margin-top: 5px;
+  color: #665f7d;
+}
+
+.ideco-consultation-summary__section {
+  padding: 13px 14px;
+  border: 1px solid #e4def1;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.ideco-consultation-summary__section h5 {
+  color: #322a55;
+  font-size: 0.87rem;
+}
+
+.ideco-consultation-summary__section dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 18px;
+  margin-top: 8px;
+}
+
+.ideco-consultation-summary__section dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  min-width: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #efebf6;
+}
+
+.ideco-consultation-summary__section dt {
+  color: #766e8c;
+}
+
+.ideco-consultation-summary__section dd {
+  max-width: 27rem;
+  margin: 0;
+  color: #3f345f;
+  font-weight: 750;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.ideco-consultation-summary__section ul {
+  columns: 2;
+  gap: 28px;
+  margin-top: 8px;
+  padding-left: 1.2rem;
+}
+
+.ideco-consultation-summary__section li {
+  break-inside: avoid;
+}
+
+.ideco-consultation-summary__supplement {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: #f3efff;
+  color: #625879;
+  font-size: 0.7rem;
+}
+
+.ideco-primary-source-list a {
+  color: #53399a;
+  font-weight: 750;
+  text-underline-offset: 3px;
+}
+
+.ideco-primary-source-list a:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid rgba(113, 84, 202, 0.18);
+  outline-offset: 3px;
+}
+
+.ideco-consultation-summary__notice,
+.ideco-privacy-note {
+  padding: 10px 12px;
+  border: 1px solid #ded8e9;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #5e5670;
+  font-size: 0.73rem;
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+.ideco-privacy-note {
+  margin-top: 16px;
+  background: #faf9fc;
+}
+
+.ideco-privacy-note strong {
+  color: #493986;
+}
+
+.ideco-privacy-note p {
+  margin: 4px 0 0;
+}
+
 @media (min-width: 901px) {
   .simulator-page--ideco .calculator-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1342,6 +1685,7 @@
     .ideco-rule-summary,
     .calculator-field,
     .calculator-helper-link,
+    .ideco-reset-undo,
     .form-spacer,
     .calculation-mode,
     .simulator-form-actions,
@@ -1358,7 +1702,8 @@
     gap: 4px;
   }
 
-  .simulator-page--ideco .ideco-field > label {
+  .simulator-page--ideco .ideco-field > label,
+  .simulator-page--ideco .ideco-field-label-row label {
     font-size: 0.7rem;
   }
 
@@ -1397,8 +1742,36 @@
 
 @media (max-width: 620px) {
   .ideco-tax-mode-selector > div,
-  .ideco-detailed-tax-breakdown dl {
+  .ideco-detailed-tax-breakdown dl,
+  .ideco-consultation-summary__section dl {
     grid-template-columns: 1fr;
+  }
+
+  .ideco-consultation-summary {
+    padding: 16px;
+  }
+
+  .ideco-consultation-summary__heading,
+  .ideco-reset-undo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ideco-consultation-summary__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .ideco-consultation-summary__actions button {
+    flex: 1 1 12rem;
+  }
+
+  .ideco-consultation-summary__section ul {
+    columns: 1;
+  }
+
+  .ideco-info-tooltip__content {
+    width: min(290px, 82vw);
   }
 }
 
@@ -3451,4 +3824,132 @@
     flex-direction: column;
   }
 
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm 15mm;
+  }
+
+  html:has(.simulator-page--ideco),
+  body:has(.simulator-page--ideco) {
+    background: #ffffff !important;
+  }
+
+  .simulator-page--ideco .skip-link,
+  .simulator-page--ideco .top-option02__header,
+  .simulator-page--ideco .simulator-page__hero,
+  .simulator-page--ideco .simulator-page__notes,
+  .simulator-page--ideco .site-footer,
+  .simulator-page--ideco .calculator > :not(.ideco-consultation-summary),
+  .simulator-page--ideco .ideco-consultation-summary__heading,
+  .simulator-page--ideco .ideco-consultation-summary__status {
+    display: none !important;
+  }
+
+  .simulator-page--ideco,
+  .simulator-page--ideco main,
+  .simulator-page--ideco .simulator-page__main,
+  .simulator-page--ideco .simulator-page__calculator,
+  .simulator-page--ideco .calculator {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__content {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: #ffffff;
+    color: #111111;
+    font-size: 10pt;
+    line-height: 1.5;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__document-heading {
+    margin-bottom: 8mm;
+    padding-bottom: 4mm;
+    border-bottom: 1px solid #555555;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__document-heading p,
+  .simulator-page--ideco .ideco-consultation-summary__document-heading h4,
+  .simulator-page--ideco .ideco-consultation-summary__document-heading span,
+  .simulator-page--ideco .ideco-consultation-summary__section h5,
+  .simulator-page--ideco .ideco-consultation-summary__section dt,
+  .simulator-page--ideco .ideco-consultation-summary__section dd,
+  .simulator-page--ideco .ideco-consultation-summary__section li,
+  .simulator-page--ideco .ideco-primary-source-list a,
+  .simulator-page--ideco .ideco-consultation-summary__supplement,
+  .simulator-page--ideco .ideco-consultation-summary__notice {
+    color: #111111;
+  }
+
+  .simulator-page--ideco .ideco-primary-source-list a {
+    text-decoration: underline;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__document-heading h4 {
+    font-size: 16pt;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section {
+    margin-top: 4mm;
+    padding: 3.5mm 4mm;
+    border: 1px solid #b8b8b8;
+    border-radius: 0;
+    background: #ffffff;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section h5 {
+    font-size: 11pt;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5mm 7mm;
+    margin-top: 2mm;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section dl > div {
+    gap: 3mm;
+    padding-bottom: 1mm;
+    border-bottom-color: #d8d8d8;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section ul {
+    columns: 2;
+    gap: 8mm;
+    margin-top: 2mm;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__supplement,
+  .simulator-page--ideco .ideco-consultation-summary__notice {
+    margin-top: 3mm;
+    padding: 3mm 4mm;
+    border: 1px solid #b8b8b8;
+    background: #ffffff;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
 }

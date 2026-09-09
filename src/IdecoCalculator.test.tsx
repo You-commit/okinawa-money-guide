@@ -10,7 +10,10 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import IdecoCalculator from './IdecoCalculator'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
 
 const renderCalculator = (
   onOpenTaxableIncome = vi.fn(),
@@ -27,6 +30,9 @@ const renderCalculator = (
 const fillValidInputs = () => {
   fireEvent.change(screen.getByLabelText('制度適用日'), {
     target: { value: '2026-11-30' },
+  })
+  fireEvent.change(screen.getByLabelText('現在の年齢'), {
+    target: { value: '40' },
   })
   fireEvent.change(screen.getByLabelText('加入区分'), {
     target: { value: 'category2-no-pension' },
@@ -70,6 +76,7 @@ describe('IdecoCalculator formal eligibility UX', () => {
     renderCalculator()
 
     expect(screen.getByLabelText('制度適用日')).toBeTruthy()
+    expect(screen.getByLabelText('現在の年齢')).toBeTruthy()
     expect(screen.getByLabelText('加入区分')).toBeTruthy()
     expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('')
     expect((screen.getByLabelText('住民税所得割率') as HTMLInputElement).value).toBe('')
@@ -196,7 +203,7 @@ describe('IdecoCalculator formal eligibility UX', () => {
     expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
   })
 
-  it('resets formal inputs but preserves the auto-calculation setting', () => {
+  it('resets all formal inputs and the auto-calculation setting', () => {
     renderCalculator()
     fillValidInputs()
     const auto = screen.getByRole('checkbox', {
@@ -205,8 +212,9 @@ describe('IdecoCalculator formal eligibility UX', () => {
     fireEvent.click(auto)
     fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
 
-    expect((auto as HTMLInputElement).checked).toBe(true)
+    expect((auto as HTMLInputElement).checked).toBe(false)
     expect((screen.getByLabelText('制度適用日') as HTMLInputElement).value).toBe('')
+    expect((screen.getByLabelText('現在の年齢') as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText('毎月の掛金') as HTMLInputElement).value).toBe('')
     expect((screen.getByLabelText('所得税率') as HTMLSelectElement).value).toBe('')
     expect((screen.getByLabelText('住民税所得割率') as HTMLInputElement).value).toBe('')
@@ -349,5 +357,211 @@ describe('IdecoCalculator formal eligibility UX', () => {
     )
 
     expect(screen.queryByText('￥76,200')).toBeNull()
+  })
+
+  it('keeps the resident tax rate empty until the user explicitly chooses the standard-rate helper', async () => {
+    const user = userEvent.setup()
+    renderCalculator()
+
+    const residentTaxRate = screen.getByLabelText(
+      '住民税所得割率',
+    ) as HTMLInputElement
+    const standardRateButton = screen.getByRole('button', {
+      name: '一般的な標準税率10%を入力',
+    })
+
+    expect(residentTaxRate.value).toBe('')
+    await user.click(standardRateButton)
+    expect(residentTaxRate.value).toBe('10')
+    expect(screen.queryByText('￥55,780')).toBeNull()
+  })
+
+  it('supports keyboard access to the resident-tax helper and info', async () => {
+    const user = userEvent.setup()
+    renderCalculator()
+
+    const info = screen.getByRole('button', {
+      name: '住民税所得割率の確認方法',
+    })
+    info.focus()
+    expect(document.activeElement).toBe(info)
+    expect(screen.getByText(
+      /所得の種類や課税方式によって異なる場合があるため/,
+    )).toBeTruthy()
+
+    const standardRateButton = screen.getByRole('button', {
+      name: '一般的な標準税率10%を入力',
+    })
+    standardRateButton.focus()
+    await user.keyboard('{Enter}')
+    expect(
+      (screen.getByLabelText('住民税所得割率') as HTMLInputElement).value,
+    ).toBe('10')
+  })
+
+  it('recalculates after the standard resident-tax action only when AUTO is on and all other values are valid', () => {
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.change(screen.getByLabelText('住民税所得割率'), {
+      target: { value: '' },
+    })
+    fireEvent.click(screen.getByRole('checkbox', {
+      name: '入力と同時に計算結果を更新する',
+    }))
+
+    expect(screen.queryByText('￥55,780')).toBeNull()
+    fireEvent.click(screen.getByRole('button', {
+      name: '一般的な標準税率10%を入力',
+    }))
+    expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('validates age at the formal regime boundary and does not calculate an ineligible condition', () => {
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.change(screen.getByLabelText('現在の年齢'), {
+      target: { value: '65' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    expect(screen.getAllByText(/65歳以上はこの試算の対象外/).length)
+      .toBeGreaterThanOrEqual(1)
+    expect(screen.queryByText('￥55,780')).toBeNull()
+  })
+
+  it('offers one-generation undo without restoring the previous result', () => {
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+    expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
+
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
+    expect(screen.getAllByText('入力内容をリセットしました。').length)
+      .toBeGreaterThanOrEqual(1)
+    expect((screen.getByLabelText('住民税所得割率') as HTMLInputElement).value).toBe('')
+    expect(screen.queryByText('￥55,780')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
+    expect((screen.getByLabelText('住民税所得割率') as HTMLInputElement).value).toBe('10')
+    expect((screen.getByLabelText('現在の年齢') as HTMLInputElement).value).toBe('40')
+    expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
+    expect(screen.queryByText('￥55,780')).toBeNull()
+  })
+
+  it('restores a resident rate entered with the standard helper', () => {
+    renderCalculator()
+    fireEvent.click(screen.getByRole('button', {
+      name: '一般的な標準税率10%を入力',
+    }))
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
+    fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
+
+    expect(
+      (screen.getByLabelText('住民税所得割率') as HTMLInputElement).value,
+    ).toBe('10')
+  })
+
+  it('expires reset undo when new input or a calculation-mode change begins', () => {
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
+    fireEvent.change(screen.getByLabelText('現在の年齢'), {
+      target: { value: '40' },
+    })
+    expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
+    fireEvent.click(screen.getByRole('button', {
+      name: /課税所得から詳しく計算/,
+    }))
+    expect(screen.queryByRole('button', { name: '元に戻す' })).toBeNull()
+  })
+
+  it('shows the simple consultation summary only after a successful calculation', () => {
+    renderCalculator()
+    expect(screen.queryByRole('region', { name: '相談用サマリー' })).toBeNull()
+
+    fillValidInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    const summary = screen.getByRole('region', { name: '相談用サマリー' })
+    expect(summary.textContent).toContain('現在の年齢40歳')
+    expect(summary.textContent).toContain('住民税所得割率10%')
+    expect(summary.textContent).toContain('適用月額上限23,000円')
+    expect(summary.textContent).toContain('未考慮事項')
+    expect(summary.textContent).toContain('一次資料')
+    expect(summary.textContent).not.toMatch(/OMG-DS-IDECO|モデル版|計算日時/)
+  })
+
+  it('shows detailed taxable-income values in the consultation summary', () => {
+    renderCalculator()
+    fillValidDetailedInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    const summary = screen.getByRole('region', { name: '相談用サマリー' })
+    expect(summary.textContent).toContain('詳細課税所得モード')
+    expect(summary.textContent).toContain('控除前課税所得3,500,000円')
+    expect(summary.textContent).toContain('iDeCo所得控除額276,000円')
+    expect(summary.textContent).toContain('控除後課税所得3,224,000円')
+  })
+
+  it('copies the plain-text summary and excludes developer metadata', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    fireEvent.click(screen.getByRole('button', {
+      name: '相談用サマリーをコピー',
+    }))
+
+    await vi.waitFor(() => expect(writeText).toHaveBeenCalledOnce())
+    const copied = writeText.mock.calls[0][0] as string
+    expect(copied).toContain('iDeCo節税シミュレーター 相談用サマリー')
+    expect(copied).toContain('年間節税効果: 55,780円')
+    expect(copied).not.toMatch(/OMG-DS-IDECO|モデル版|計算日時|debug/i)
+    expect(await screen.findByText('相談用サマリーをコピーしました。')).toBeTruthy()
+  })
+
+  it('reports a copy failure without removing the summary', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
+    })
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+    fireEvent.click(screen.getByRole('button', {
+      name: '相談用サマリーをコピー',
+    }))
+
+    expect(await screen.findByText('コピーできませんでした。もう一度お試しください。')).toBeTruthy()
+    expect(screen.getByRole('region', { name: '相談用サマリー' })).toBeTruthy()
+  })
+
+  it('prints only after calculation and keeps the printable summary metadata-free', () => {
+    const print = vi.spyOn(window, 'print').mockImplementation(() => undefined)
+    renderCalculator()
+    expect(screen.queryByRole('button', { name: '印刷する' })).toBeNull()
+
+    fillValidInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+    fireEvent.click(screen.getByRole('button', { name: '印刷する' }))
+
+    expect(print).toHaveBeenCalledOnce()
+    expect(screen.getByLabelText('相談用サマリー本文').textContent)
+      .not.toMatch(/OMG-DS-IDECO|モデル版|計算日時/)
+  })
+
+  it('states the formal privacy policy without exposing developer metadata', () => {
+    renderCalculator()
+
+    const privacy = screen.getByLabelText('入力データの取り扱い')
+    expect(privacy.textContent).toContain('保存・外部送信・広告利用・AI学習には利用しません')
+    expect(document.body.textContent).not.toMatch(/internal timestamp|debug snapshot|model version/i)
   })
 })

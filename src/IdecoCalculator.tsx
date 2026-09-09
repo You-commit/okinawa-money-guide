@@ -7,6 +7,16 @@ import {
 } from 'react'
 import MoneyInput from './components/form/MoneyInput'
 import {
+  createIdecoConsultationSummaryText,
+  formatIdecoYen,
+  getIdecoCalculationModeLabel,
+  getIdecoEligibilitySummary,
+  IDECO_CONFIRMATION_ITEMS,
+  IDECO_PRIMARY_SOURCES,
+  IDECO_UNCONSIDERED_ITEMS,
+  type IdecoConsultationRecord,
+} from './idecoConsultationSummary'
+import {
   calculateIdeco,
   roundHalfUp,
   type IdecoCalculationSuccess,
@@ -139,6 +149,7 @@ const toDisplayedResult = (
 
 const IDECO_FIELD_ORDER: IdecoRuleField[] = [
   'effectiveDate',
+  'currentAge',
   'participantCategory',
   'relatedMonthlyContribution',
   'monthlyContribution',
@@ -154,6 +165,23 @@ type IdecoCalculatorProps = {
   onOpenTaxableIncome: () => void
 }
 
+type IdecoResetSnapshot = {
+  calculationMode: IdecoCalculationMode
+  effectiveDate: string
+  currentAge: string
+  participantCategory: IdecoParticipantCategory | ''
+  relatedMonthlyContribution: string
+  monthlyContribution: string
+  actualContributionMonths: string
+  incomeTaxRate: string
+  taxableIncomeBeforeContribution: string
+  residentTaxRate: string
+  contributionYears: string
+  isAutoCalculation: boolean
+}
+
+type IdecoSummaryActionStatus = 'copied' | 'copy-error' | null
+
 function IdecoCalculator({
   initialIncomeTaxRate,
   onOpenTaxableIncome,
@@ -161,6 +189,7 @@ function IdecoCalculator({
   const [calculationMode, setCalculationMode] =
     useState<IdecoCalculationMode>('simple')
   const [effectiveDate, setEffectiveDate] = useState('')
+  const [currentAge, setCurrentAge] = useState('')
   const [participantCategory, setParticipantCategory] =
     useState<IdecoParticipantCategory | ''>('')
   const [relatedMonthlyContribution, setRelatedMonthlyContribution] =
@@ -182,7 +211,14 @@ function IdecoCalculator({
   const [manualResult, setManualResult] =
     useState<IdecoCalculationSuccess | null>(null)
   const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [resetSnapshot, setResetSnapshot] =
+    useState<IdecoResetSnapshot | null>(null)
+  const [summaryActionStatus, setSummaryActionStatus] =
+    useState<IdecoSummaryActionStatus>(null)
+  const [liveMessage, setLiveMessage] = useState('')
   const errorSummaryRef = useRef<HTMLDivElement>(null)
+  const summaryStatusTimerRef = useRef<number | null>(null)
+  const copyRequestIdRef = useRef(0)
   const fieldRefs = useRef<
     Partial<Record<IdecoRuleField, HTMLElement>>
   >({})
@@ -199,6 +235,7 @@ function IdecoCalculator({
     () => ({
       calculationMode,
       effectiveDate,
+      currentAge: parseDecimalValue(currentAge),
       participantCategory,
       relatedMonthlyContribution:
         parseMoneyValue(relatedMonthlyContribution),
@@ -215,6 +252,7 @@ function IdecoCalculator({
     [
       calculationMode,
       effectiveDate,
+      currentAge,
       participantCategory,
       relatedMonthlyContribution,
       monthlyContribution,
@@ -241,6 +279,43 @@ function IdecoCalculator({
   const displayedResult = toDisplayedResult(displayedCalculation)
   const rawDisplayedResult = displayedCalculation?.result ?? null
   const detailedTax = rawDisplayedResult?.detailedTax ?? null
+  const consultationRecord = useMemo<IdecoConsultationRecord | null>(() => {
+    if (
+      displayedCalculation === null ||
+      input.currentAge === null ||
+      !input.participantCategory ||
+      input.monthlyContribution === null ||
+      input.actualContributionMonths === null ||
+      input.residentTaxRate === null ||
+      input.referenceYears === null
+    ) {
+      return null
+    }
+
+    return {
+      input: {
+        calculationMode: input.calculationMode,
+        effectiveDate: input.effectiveDate,
+        currentAge: input.currentAge,
+        participantCategory: input.participantCategory,
+        relatedMonthlyContribution: input.relatedMonthlyContribution,
+        monthlyContribution: input.monthlyContribution,
+        actualContributionMonths: input.actualContributionMonths,
+        incomeTaxRate: input.incomeTaxRate,
+        taxableIncomeBeforeContribution:
+          input.taxableIncomeBeforeContribution,
+        residentTaxRate: input.residentTaxRate,
+        referenceYears: input.referenceYears,
+      },
+      calculation: displayedCalculation,
+    }
+  }, [displayedCalculation, input])
+  const consultationSummary = useMemo(
+    () => consultationRecord
+      ? createIdecoConsultationSummaryText(consultationRecord)
+      : null,
+    [consultationRecord],
+  )
   const years = input.referenceYears ?? 0
   const selectedCategory = participantCategory || null
   const needsRelatedContribution = Boolean(
@@ -261,6 +336,7 @@ function IdecoCalculator({
 
   const fieldsWithValues: Record<IdecoRuleField, boolean> = {
     effectiveDate: effectiveDate !== '',
+    currentAge: currentAge !== '',
     participantCategory: participantCategory !== '',
     relatedMonthlyContribution:
       relatedMonthlyContribution !== '',
@@ -294,6 +370,24 @@ function IdecoCalculator({
       errorSummaryRef.current?.focus()
     }
   }, [hasSubmitted, visibleErrorEntries.length])
+
+  useEffect(() => {
+    copyRequestIdRef.current += 1
+    setSummaryActionStatus(null)
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+      summaryStatusTimerRef.current = null
+    }
+  }, [displayedCalculation])
+
+  useEffect(() => () => {
+    copyRequestIdRef.current += 1
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+    }
+  }, [])
 
   const longTermDisplayMax = Math.max(
     rawDisplayedResult?.totalContribution ?? 0,
@@ -354,7 +448,13 @@ function IdecoCalculator({
     }
   }, [idecoTrajectory, longTermDisplayMax])
 
+  const dismissResetUndo = () => {
+    setResetSnapshot(null)
+  }
+
   const invalidateManualResult = () => {
+    dismissResetUndo()
+    setLiveMessage('')
     setHasSubmitted(false)
     setManualResult(null)
   }
@@ -400,8 +500,39 @@ function IdecoCalculator({
   }
 
   const resetCalculator = () => {
+    const shouldOfferUndo =
+      calculationMode !== 'simple' ||
+      effectiveDate !== '' ||
+      currentAge !== '' ||
+      participantCategory !== '' ||
+      relatedMonthlyContribution !== '' ||
+      monthlyContribution !== '' ||
+      actualContributionMonths !== '' ||
+      incomeTaxRate !== '' ||
+      taxableIncomeBeforeContribution !== '' ||
+      residentTaxRate !== '' ||
+      contributionYears !== '' ||
+      isAutoCalculation
+
+    setResetSnapshot(shouldOfferUndo
+      ? {
+          calculationMode,
+          effectiveDate,
+          currentAge,
+          participantCategory,
+          relatedMonthlyContribution,
+          monthlyContribution,
+          actualContributionMonths,
+          incomeTaxRate,
+          taxableIncomeBeforeContribution,
+          residentTaxRate,
+          contributionYears,
+          isAutoCalculation,
+        }
+      : null)
     setCalculationMode('simple')
     setEffectiveDate('')
+    setCurrentAge('')
     setParticipantCategory('')
     setRelatedMonthlyContribution('')
     setMonthlyContribution('')
@@ -410,13 +541,45 @@ function IdecoCalculator({
     setTaxableIncomeBeforeContribution('')
     setResidentTaxRate('')
     setContributionYears('')
+    setIsAutoCalculation(false)
     setManualResult(null)
     setHasSubmitted(false)
+    setLiveMessage(
+      shouldOfferUndo ? '入力内容をリセットしました。' : '',
+    )
+  }
+
+  const restoreReset = () => {
+    if (resetSnapshot === null) return
+
+    setCalculationMode(resetSnapshot.calculationMode)
+    setEffectiveDate(resetSnapshot.effectiveDate)
+    setCurrentAge(resetSnapshot.currentAge)
+    setParticipantCategory(resetSnapshot.participantCategory)
+    setRelatedMonthlyContribution(
+      resetSnapshot.relatedMonthlyContribution,
+    )
+    setMonthlyContribution(resetSnapshot.monthlyContribution)
+    setActualContributionMonths(
+      resetSnapshot.actualContributionMonths,
+    )
+    setIncomeTaxRate(resetSnapshot.incomeTaxRate)
+    setTaxableIncomeBeforeContribution(
+      resetSnapshot.taxableIncomeBeforeContribution,
+    )
+    setResidentTaxRate(resetSnapshot.residentTaxRate)
+    setContributionYears(resetSnapshot.contributionYears)
+    setIsAutoCalculation(resetSnapshot.isAutoCalculation)
+    setManualResult(null)
+    setHasSubmitted(false)
+    setResetSnapshot(null)
+    setLiveMessage('入力内容を元に戻しました。')
   }
 
   const changeCalculationMode = (
     checked: boolean,
   ) => {
+    dismissResetUndo()
     setIsAutoCalculation(checked)
     setManualResult(null)
     setHasSubmitted(false)
@@ -435,6 +598,44 @@ function IdecoCalculator({
 
   const openTaxableIncomeCalculator = () => {
     onOpenTaxableIncome()
+  }
+
+  const useStandardResidentTaxRate = () => {
+    handleResidentTaxRateChange('10')
+  }
+
+  const copyConsultationSummary = async () => {
+    if (consultationSummary === null) return
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+      summaryStatusTimerRef.current = null
+    }
+
+    const requestId = copyRequestIdRef.current + 1
+    copyRequestIdRef.current = requestId
+
+    try {
+      await navigator.clipboard.writeText(consultationSummary)
+
+      if (requestId !== copyRequestIdRef.current) return
+
+      setSummaryActionStatus('copied')
+      summaryStatusTimerRef.current = window.setTimeout(() => {
+        if (requestId === copyRequestIdRef.current) {
+          setSummaryActionStatus(null)
+          summaryStatusTimerRef.current = null
+        }
+      }, 3000)
+    } catch {
+      if (requestId !== copyRequestIdRef.current) return
+      setSummaryActionStatus('copy-error')
+    }
+  }
+
+  const printConsultationSummary = () => {
+    if (consultationSummary === null) return
+    window.print()
   }
 
   const selectedIncomeTaxRate =
@@ -483,6 +684,10 @@ function IdecoCalculator({
           概算します。
         </p>
       </div>
+
+      <p className="sr-only" aria-live="polite">
+        {liveMessage}
+      </p>
 
       <div className="calculator-layout">
         <div
@@ -577,7 +782,45 @@ function IdecoCalculator({
             )}
           </div>
 
-          <div className="ideco-field ideco-field--wide">
+          <div className="ideco-field">
+            <label htmlFor="ideco-current-age">
+              現在の年齢
+            </label>
+            <div className="input-with-unit">
+              <input
+                ref={(node) => {
+                  fieldRefs.current.currentAge = node ?? undefined
+                }}
+                id="ideco-current-age"
+                type="text"
+                inputMode="numeric"
+                value={currentAge}
+                aria-invalid={Boolean(visibleErrors.currentAge)}
+                aria-describedby={`ideco-current-age-help${visibleErrors.currentAge ? ' ideco-currentAge-error' : ''}`}
+                onChange={(event) => {
+                  setCurrentAge(
+                    normalizeDecimalInput(event.target.value),
+                  )
+                  invalidateManualResult()
+                }}
+                placeholder="例：40"
+              />
+              <span>歳</span>
+            </div>
+            <p id="ideco-current-age-help" className="ideco-field__help">
+              年齢だけで加入期間や受給開始年齢を推測せず、制度上の基本年齢範囲だけを確認します。
+            </p>
+            {visibleErrors.currentAge && (
+              <p
+                id="ideco-currentAge-error"
+                className="ideco-field__error"
+              >
+                {visibleErrors.currentAge}
+              </p>
+            )}
+          </div>
+
+          <div className="ideco-field">
             <label htmlFor="ideco-participant-category">
               加入区分
             </label>
@@ -884,9 +1127,29 @@ function IdecoCalculator({
           )}
 
           <div className="ideco-field">
-            <label htmlFor="ideco-resident-tax-rate">
-              住民税所得割率
-            </label>
+            <div className="ideco-field-label-row">
+              <label htmlFor="ideco-resident-tax-rate">
+                住民税所得割率
+              </label>
+              <span className="ideco-info-tooltip">
+                <button
+                  type="button"
+                  className="ideco-info-tooltip__trigger"
+                  aria-label="住民税所得割率の確認方法"
+                  aria-describedby="ideco-resident-tax-tooltip"
+                >
+                  i
+                </button>
+                <span
+                  id="ideco-resident-tax-tooltip"
+                  className="ideco-info-tooltip__content"
+                  role="tooltip"
+                >
+                  通常の給与所得などでは、市区町村民税と都道府県民税を合わせて10%となることが一般的です。
+                  所得の種類や課税方式によって異なる場合があるため、お住まいの市区町村の公式情報や住民税の税額決定通知書でご確認ください。
+                </span>
+              </span>
+            </div>
 
             <div className="input-with-unit">
               <input
@@ -938,6 +1201,13 @@ function IdecoCalculator({
             <p className="ideco-field__help">
               ご自身の住民税所得割率を入力してください。標準値は自動設定しません。
             </p>
+            <button
+              className="ideco-resident-tax-helper"
+              type="button"
+              onClick={useStandardResidentTaxRate}
+            >
+              一般的な標準税率10%を入力
+            </button>
             {visibleErrors.residentTaxRate && (
               <p
                 id="ideco-residentTaxRate-error"
@@ -1065,6 +1335,19 @@ function IdecoCalculator({
             )}
           </div>
 
+          {resetSnapshot && (
+            <div
+              className="ideco-reset-undo"
+              role="group"
+              aria-label="リセットの取り消し"
+            >
+              <strong>入力内容をリセットしました。</strong>
+              <button type="button" onClick={restoreReset}>
+                元に戻す
+              </button>
+            </div>
+          )}
+
           <aside className="simulator-input-point simulator-input-point--ideco">
             <strong>入力のポイント</strong>
             <p>
@@ -1093,6 +1376,9 @@ function IdecoCalculator({
               <strong>{displayedCalculation.regimeLabel}</strong>
               <span>{displayedCalculation.participantLabel}</span>
               <span>計算モード：{calculationModeLabel}</span>
+              <span>
+                現在の年齢：{input.currentAge}歳
+              </span>
               <span>
                 制度適用日：{input.effectiveDate}
               </span>
@@ -1350,14 +1636,203 @@ function IdecoCalculator({
         </div>
       </div>
 
+      {consultationRecord && (
+        <section
+          className="ideco-consultation-summary"
+          aria-labelledby="ideco-consultation-summary-title"
+        >
+          <header className="ideco-consultation-summary__heading">
+            <div>
+              <p>CONSULTATION SUMMARY</p>
+              <h3 id="ideco-consultation-summary-title">
+                相談用サマリー
+              </h3>
+              <span>
+                金融機関・勤務先・年金事務所・税務専門家への相談時に、入力条件と概算結果を確認するための資料です。
+              </span>
+            </div>
+            <div className="ideco-consultation-summary__actions">
+              <button type="button" onClick={copyConsultationSummary}>
+                相談用サマリーをコピー
+              </button>
+              <button type="button" onClick={printConsultationSummary}>
+                印刷する
+              </button>
+            </div>
+          </header>
+
+          {summaryActionStatus && (
+            <p
+              className="ideco-consultation-summary__status"
+              data-tone={summaryActionStatus === 'copied' ? 'success' : 'error'}
+              role="status"
+            >
+              {summaryActionStatus === 'copied'
+                ? '相談用サマリーをコピーしました。'
+                : 'コピーできませんでした。もう一度お試しください。'}
+            </p>
+          )}
+
+          <IdecoConsultationSummaryContent record={consultationRecord} />
+        </section>
+      )}
+
+      <aside className="ideco-privacy-note" aria-label="入力データの取り扱い">
+        <strong>入力データについて</strong>
+        <p>
+          入力した金額や条件は、このページでの計算にのみ使用します。保存・外部送信・広告利用・AI学習には利用しません。
+        </p>
+      </aside>
+
       <p className="calculator-note">
         本シミュレーターは概算です。
         実際の税額は課税所得、所得控除、
         税率区分、掛金の拠出月数などにより
         異なります。運用益、手数料、
         受取時の税金は含んでいません。
+        原則60歳まで資産を引き出せず、受給開始可能年齢は通算加入期間等で異なります。
       </p>
     </section>
+  )
+}
+
+const IdecoConsultationSummaryContent = ({
+  record,
+}: {
+  record: IdecoConsultationRecord
+}) => {
+  const { input, calculation } = record
+  const { rounded, detailedTax } = calculation.result
+  const hasRelatedContribution = requiresIdecoRelatedContribution(
+    input.participantCategory,
+  )
+
+  return (
+    <div
+      className="ideco-consultation-summary__content"
+      aria-label="相談用サマリー本文"
+    >
+      <header className="ideco-consultation-summary__document-heading">
+        <p>沖縄マネーガイド</p>
+        <h4>iDeCo節税シミュレーター 相談用サマリー</h4>
+        <span>
+          入力条件と概算結果を整理した、相談時の確認用資料です。
+        </span>
+      </header>
+
+      <section className="ideco-consultation-summary__section">
+        <h5>入力条件</h5>
+        <dl>
+          <div>
+            <dt>計算モード</dt>
+            <dd>{getIdecoCalculationModeLabel(input.calculationMode)}</dd>
+          </div>
+          <div><dt>制度適用日</dt><dd>{input.effectiveDate}</dd></div>
+          <div><dt>適用制度</dt><dd>{calculation.regimeLabel}</dd></div>
+          <div><dt>現在の年齢</dt><dd>{input.currentAge}歳</dd></div>
+          <div><dt>加入区分</dt><dd>{calculation.participantLabel}</dd></div>
+          <div><dt>毎月の掛金</dt><dd>{formatIdecoYen(input.monthlyContribution)}</dd></div>
+          <div><dt>実拠出月数</dt><dd>{input.actualContributionMonths}か月</dd></div>
+          <div><dt>年間掛金</dt><dd>{formatIdecoYen(rounded.annualContribution)}</dd></div>
+          {hasRelatedContribution && (
+            <div>
+              <dt>{getIdecoRelatedContributionLabel(input.participantCategory)}</dt>
+              <dd>{formatIdecoYen(input.relatedMonthlyContribution ?? 0)}</dd>
+            </div>
+          )}
+          {input.calculationMode === 'simple' ? (
+            <div><dt>所得税率</dt><dd>{input.incomeTaxRate}%</dd></div>
+          ) : (
+            <div>
+              <dt>掛金控除前の課税所得</dt>
+              <dd>{formatIdecoYen(input.taxableIncomeBeforeContribution ?? 0)}</dd>
+            </div>
+          )}
+          <div><dt>住民税所得割率</dt><dd>{input.residentTaxRate}%</dd></div>
+          <div><dt>長期参考期間</dt><dd>{input.referenceYears}年</dd></div>
+        </dl>
+        <p className="ideco-consultation-summary__supplement">
+          {getIdecoEligibilitySummary(record)}
+        </p>
+      </section>
+
+      <section className="ideco-consultation-summary__section">
+        <h5>概算結果</h5>
+        <dl>
+          <div><dt>年間所得税軽減額</dt><dd>{formatIdecoYen(rounded.incomeTaxSaving)}</dd></div>
+          <div><dt>年間住民税軽減額</dt><dd>{formatIdecoYen(rounded.residentTaxSaving)}</dd></div>
+          <div><dt>年間節税効果</dt><dd>{formatIdecoYen(rounded.annualTaxSaving)}</dd></div>
+          <div><dt>年間掛金</dt><dd>{formatIdecoYen(rounded.annualContribution)}</dd></div>
+          <div><dt>掛金累計</dt><dd>{formatIdecoYen(rounded.totalContribution)}</dd></div>
+          <div><dt>期間中の節税額合計</dt><dd>{formatIdecoYen(rounded.totalTaxSaving)}</dd></div>
+          {detailedTax && (
+            <>
+              <div><dt>控除前課税所得</dt><dd>{formatIdecoYen(detailedTax.taxableIncomeBeforeContribution)}</dd></div>
+              <div><dt>iDeCo所得控除額</dt><dd>{formatIdecoYen(detailedTax.idecoIncomeDeduction)}</dd></div>
+              <div><dt>控除後課税所得</dt><dd>{formatIdecoYen(detailedTax.taxableIncomeAfterContribution)}</dd></div>
+            </>
+          )}
+        </dl>
+      </section>
+
+      <section className="ideco-consultation-summary__section">
+        <h5>制度条件</h5>
+        <dl>
+          <div><dt>適用した制度基準</dt><dd>{calculation.regimeLabel}</dd></div>
+          <div><dt>加入区分</dt><dd>{calculation.participantLabel}</dd></div>
+          <div><dt>適用月額上限</dt><dd>{formatIdecoYen(calculation.contributionLimit.monthlyLimit)}</dd></div>
+          <div>
+            <dt>合算条件</dt>
+            <dd>
+              {hasRelatedContribution
+                ? `${getIdecoRelatedContributionLabel(input.participantCategory)}との合算を反映`
+                : 'この加入区分では合算対象額の入力なし'}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="ideco-consultation-summary__section">
+        <h5>未考慮事項</h5>
+        <ul>
+          {IDECO_UNCONSIDERED_ITEMS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="ideco-consultation-summary__section">
+        <h5>金融機関・勤務先・年金事務所・税務専門家へ確認する項目</h5>
+        <ul>
+          {IDECO_CONFIRMATION_ITEMS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="ideco-consultation-summary__section">
+        <h5>一次資料</h5>
+        <ul className="ideco-primary-source-list">
+          {IDECO_PRIMARY_SOURCES.map((source) => (
+            <li key={source.url}>
+              <a
+                href={source.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${source.label}を新しいタブで開く`}
+              >
+                {source.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <p className="ideco-consultation-summary__notice">
+        本サマリーは相談時の条件整理を目的とした概算資料であり、申込書・税務証明ではありません。
+        加入可否、正式な税額、運用成果、受取額を確定または保証するものではありません。
+      </p>
+    </div>
   )
 }
 

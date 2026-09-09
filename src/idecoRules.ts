@@ -16,6 +16,7 @@ export type IdecoParticipantCategory =
 
 export type IdecoRuleField =
   | 'effectiveDate'
+  | 'currentAge'
   | 'participantCategory'
   | 'relatedMonthlyContribution'
   | 'monthlyContribution'
@@ -32,6 +33,7 @@ export type IdecoValidationErrors = Partial<
 export type IdecoRuleInput = {
   calculationMode: IdecoCalculationMode
   effectiveDate: string
+  currentAge: number | null
   participantCategory: IdecoParticipantCategory | ''
   relatedMonthlyContribution: number | null
   monthlyContribution: number | null
@@ -252,6 +254,41 @@ export const validateIdecoRuleInput = (
     errors.effectiveDate = '制度適用日を入力してください。'
   } else if (!regime) {
     errors.effectiveDate = '制度適用日を正しく入力してください。'
+  }
+
+  if (input.currentAge === null) {
+    errors.currentAge = '現在の年齢を入力してください。'
+  } else if (
+    !Number.isInteger(input.currentAge) ||
+    input.currentAge < 20
+  ) {
+    errors.currentAge = '現在の年齢は20歳以上の整数で入力してください。'
+  } else if (regime === 'current' && input.currentAge >= 65) {
+    errors.currentAge =
+      '2026年11月30日までの制度では、65歳以上はこの試算の対象外です。加入可否はiDeCo公式等でご確認ください。'
+  } else if (regime === 'reformed' && input.currentAge >= 70) {
+    errors.currentAge =
+      '2026年12月1日以後の改正制度でも、70歳以上はこの試算の対象外です。'
+  } else if (
+    input.participantCategory &&
+    (input.participantCategory === 'category1' ||
+      input.participantCategory === 'category3') &&
+    input.currentAge >= 60
+  ) {
+    errors.currentAge =
+      '第1号・第3号被保険者は60歳未満の区分です。加入区分または年齢をご確認ください。'
+  } else if (
+    input.participantCategory === 'category4' &&
+    input.currentAge >= 65
+  ) {
+    errors.currentAge =
+      '第4号被保険者は65歳未満の区分です。加入区分または年齢をご確認ください。'
+  } else if (
+    input.participantCategory === 'category5' &&
+    input.currentAge < 60
+  ) {
+    errors.currentAge =
+      '第5号被保険者は60歳以上70歳未満の一定要件に該当する方向けの区分です。'
   }
 
   if (!input.participantCategory) {

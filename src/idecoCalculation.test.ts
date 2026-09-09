@@ -22,6 +22,7 @@ const validInput = (
 ): IdecoRuleInput => ({
   calculationMode: 'simple',
   effectiveDate: '2026-11-30',
+  currentAge: 40,
   participantCategory: 'category2-no-pension',
   relatedMonthlyContribution: null,
   monthlyContribution: 23_000,
@@ -31,6 +32,57 @@ const validInput = (
   residentTaxRate: 10,
   referenceYears: 20,
   ...overrides,
+})
+
+describe('iDeCo age eligibility boundaries', () => {
+  it('accepts the upper age boundary of the current regime and rejects 65', () => {
+    expect(validateIdecoRuleInput(validInput({ currentAge: 64 })))
+      .not.toHaveProperty('currentAge')
+    expect(validateIdecoRuleInput(validInput({ currentAge: 65 })))
+      .toHaveProperty('currentAge')
+  })
+
+  it('accepts age 69 after the reform and rejects 70', () => {
+    const reformed = {
+      effectiveDate: '2026-12-01',
+      participantCategory: 'category2-no-pension' as const,
+    }
+
+    expect(validateIdecoRuleInput(validInput({
+      ...reformed,
+      currentAge: 69,
+    }))).not.toHaveProperty('currentAge')
+    expect(validateIdecoRuleInput(validInput({
+      ...reformed,
+      currentAge: 70,
+    }))).toHaveProperty('currentAge')
+  })
+
+  it('checks participant-category age ranges without inferring a contribution period', () => {
+    expect(validateIdecoRuleInput(validInput({
+      participantCategory: 'category1',
+      relatedMonthlyContribution: 0,
+      currentAge: 60,
+    }))).toHaveProperty('currentAge')
+    expect(validateIdecoRuleInput(validInput({
+      effectiveDate: '2026-12-01',
+      participantCategory: 'category5',
+      currentAge: 59,
+    }))).toHaveProperty('currentAge')
+    expect(validateIdecoRuleInput(validInput({
+      effectiveDate: '2026-12-01',
+      participantCategory: 'category5',
+      currentAge: 60,
+    }))).not.toHaveProperty('currentAge')
+  })
+
+  it('does not return a normal calculation for an ineligible age', () => {
+    const outcome = calculateIdeco(validInput({ currentAge: 65 }))
+
+    expect(outcome.ok).toBe(false)
+    if (outcome.ok) return
+    expect(outcome.errors.currentAge).toBeTruthy()
+  })
 })
 
 describe('iDeCo formal contribution rules', () => {
