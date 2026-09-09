@@ -8,6 +8,7 @@ import {
 import MoneyInput from './components/form/MoneyInput'
 import {
   calculateIdeco,
+  roundHalfUp,
   type IdecoCalculationSuccess,
 } from './idecoCalculation'
 import {
@@ -17,6 +18,7 @@ import {
   getIdecoRelatedContributionLabel,
   IDECO_PARTICIPANT_OPTIONS,
   requiresIdecoRelatedContribution,
+  type IdecoCalculationMode,
   type IdecoParticipantCategory,
   type IdecoRuleField,
   type IdecoRuleInput,
@@ -142,6 +144,7 @@ const IDECO_FIELD_ORDER: IdecoRuleField[] = [
   'monthlyContribution',
   'actualContributionMonths',
   'incomeTaxRate',
+  'taxableIncomeBeforeContribution',
   'residentTaxRate',
   'referenceYears',
 ]
@@ -155,6 +158,8 @@ function IdecoCalculator({
   initialIncomeTaxRate,
   onOpenTaxableIncome,
 }: IdecoCalculatorProps) {
+  const [calculationMode, setCalculationMode] =
+    useState<IdecoCalculationMode>('simple')
   const [effectiveDate, setEffectiveDate] = useState('')
   const [participantCategory, setParticipantCategory] =
     useState<IdecoParticipantCategory | ''>('')
@@ -166,6 +171,8 @@ function IdecoCalculator({
     useState('')
   const [incomeTaxRate, setIncomeTaxRate] =
     useState(() => String(initialIncomeTaxRate ?? ''))
+  const [taxableIncomeBeforeContribution, setTaxableIncomeBeforeContribution] =
+    useState('')
   const [residentTaxRate, setResidentTaxRate] =
     useState('')
   const [contributionYears, setContributionYears] =
@@ -190,6 +197,7 @@ function IdecoCalculator({
 
   const input = useMemo<IdecoRuleInput>(
     () => ({
+      calculationMode,
       effectiveDate,
       participantCategory,
       relatedMonthlyContribution:
@@ -199,16 +207,20 @@ function IdecoCalculator({
       actualContributionMonths:
         parseDecimalValue(actualContributionMonths),
       incomeTaxRate: parseDecimalValue(incomeTaxRate),
+      taxableIncomeBeforeContribution:
+        parseMoneyValue(taxableIncomeBeforeContribution),
       residentTaxRate: parseDecimalValue(residentTaxRate),
       referenceYears: parseDecimalValue(contributionYears),
     }),
     [
+      calculationMode,
       effectiveDate,
       participantCategory,
       relatedMonthlyContribution,
       monthlyContribution,
       actualContributionMonths,
       incomeTaxRate,
+      taxableIncomeBeforeContribution,
       residentTaxRate,
       contributionYears,
     ],
@@ -228,6 +240,7 @@ function IdecoCalculator({
     : manualResult
   const displayedResult = toDisplayedResult(displayedCalculation)
   const rawDisplayedResult = displayedCalculation?.result ?? null
+  const detailedTax = rawDisplayedResult?.detailedTax ?? null
   const years = input.referenceYears ?? 0
   const selectedCategory = participantCategory || null
   const needsRelatedContribution = Boolean(
@@ -237,8 +250,14 @@ function IdecoCalculator({
   const contributionLimit = getIdecoContributionLimit(input)
   const specialIncomeTaxDescription =
     input.effectiveDate >= '2027-01-01'
-      ? '防衛特別所得税・復興特別所得税を含む概算'
-      : '復興特別所得税を含む概算'
+      ? '防衛特別所得税1%・復興特別所得税1.1%を含む概算'
+      : '復興特別所得税2.1%を含む概算'
+  const calculationModeLabel = calculationMode === 'simple'
+    ? '簡易税率モード'
+    : '詳細課税所得モード'
+  const incomeTaxResultDescription = calculationMode === 'detailed'
+    ? `控除前後の所得税額の差（${specialIncomeTaxDescription}）`
+    : specialIncomeTaxDescription
 
   const fieldsWithValues: Record<IdecoRuleField, boolean> = {
     effectiveDate: effectiveDate !== '',
@@ -249,6 +268,8 @@ function IdecoCalculator({
     actualContributionMonths:
       actualContributionMonths !== '',
     incomeTaxRate: incomeTaxRate !== '',
+    taxableIncomeBeforeContribution:
+      taxableIncomeBeforeContribution !== '',
     residentTaxRate: residentTaxRate !== '',
     referenceYears: contributionYears !== '',
   }
@@ -352,6 +373,11 @@ function IdecoCalculator({
     invalidateManualResult()
   }
 
+  const handleTaxableIncomeChange = (value: string) => {
+    setTaxableIncomeBeforeContribution(value)
+    invalidateManualResult()
+  }
+
   const handleResidentTaxRateChange = (
     value: string,
   ) => {
@@ -374,12 +400,14 @@ function IdecoCalculator({
   }
 
   const resetCalculator = () => {
+    setCalculationMode('simple')
     setEffectiveDate('')
     setParticipantCategory('')
     setRelatedMonthlyContribution('')
     setMonthlyContribution('')
     setActualContributionMonths('')
     setIncomeTaxRate('')
+    setTaxableIncomeBeforeContribution('')
     setResidentTaxRate('')
     setContributionYears('')
     setManualResult(null)
@@ -392,6 +420,17 @@ function IdecoCalculator({
     setIsAutoCalculation(checked)
     setManualResult(null)
     setHasSubmitted(false)
+  }
+
+  const changeTaxCalculationMode = (
+    nextMode: IdecoCalculationMode,
+  ) => {
+    if (nextMode === calculationMode) {
+      return
+    }
+
+    setCalculationMode(nextMode)
+    invalidateManualResult()
   }
 
   const openTaxableIncomeCalculator = () => {
@@ -439,7 +478,7 @@ function IdecoCalculator({
         </h2>
 
         <p>
-          毎月の掛金と税率から、
+          毎月の掛金と税率・課税所得から、
           iDeCoによる所得税・住民税の軽減額を
           概算します。
         </p>
@@ -455,6 +494,32 @@ function IdecoCalculator({
             <div>
               <p>INPUT</p>
               <h3>条件を入力する</h3>
+            </div>
+          </div>
+
+          <div
+            className="ideco-tax-mode-selector"
+            role="group"
+            aria-labelledby="ideco-tax-mode-label"
+          >
+            <strong id="ideco-tax-mode-label">計算方法</strong>
+            <div>
+              <button
+                type="button"
+                aria-pressed={calculationMode === 'simple'}
+                onClick={() => changeTaxCalculationMode('simple')}
+              >
+                <span>簡易税率で計算</span>
+                <small>確認した税率から概算</small>
+              </button>
+              <button
+                type="button"
+                aria-pressed={calculationMode === 'detailed'}
+                onClick={() => changeTaxCalculationMode('detailed')}
+              >
+                <span>課税所得から詳しく計算</span>
+                <small>控除前後の所得税額を比較</small>
+              </button>
             </div>
           </div>
 
@@ -594,7 +659,7 @@ function IdecoCalculator({
             <aside className="ideco-rule-summary">
               <strong>{getIdecoRegimeLabel(contributionLimit.regime)}</strong>
               <span>{getIdecoParticipantLabel(selectedCategory)}</span>
-              <span>計算モード：簡易税率モード</span>
+              <span>計算モード：{calculationModeLabel}</span>
               <p>
                 この条件での月額上限は
                 <b>{contributionLimit.monthlyLimit.toLocaleString('ja-JP')}円</b>
@@ -602,6 +667,12 @@ function IdecoCalculator({
               </p>
             </aside>
           )}
+
+          <p className="ideco-tax-mode-note">
+            {calculationMode === 'simple'
+              ? '税率区分をまたぐ場合などは実額と異なるため、課税所得から詳しく計算する方法も選べます。'
+              : '掛金全額に1つの税率を掛けず、控除前後の所得税額の差を計算します。'}
+          </p>
 
           <div className="ideco-field">
             <label htmlFor="ideco-monthly-contribution">
@@ -679,107 +750,138 @@ function IdecoCalculator({
             )}
           </div>
 
-          <div
-            id="ideco-income-tax-rate-field"
-            className="calculator-field"
-          >
-            <div className="field-label-row">
-              <label htmlFor="ideco-income-tax-rate-select">
-                所得税率
-              </label>
-
-              <span className="tooltip-container">
-                <button
-                  className="tooltip-button"
-                  type="button"
-                  aria-label="課税所得についての説明"
-                  aria-describedby="taxable-income-tooltip"
-                >
-                  ?
-                </button>
-
-                <span
-                  id="taxable-income-tooltip"
-                  className="tooltip-content"
-                  role="tooltip"
-                >
-                  課税所得は、給与収入から給与所得控除や
-                  社会保険料控除、基礎控除などを
-                  差し引いた後の金額です。
-                </span>
-              </span>
-            </div>
-
-            <div className="tax-rate-select">
+          {calculationMode === 'simple' ? (
+            <>
               <div
-                className="tax-rate-select-display"
-                aria-hidden="true"
+                id="ideco-income-tax-rate-field"
+                className="calculator-field"
               >
-                <strong className="tax-rate-value">
-                  {selectedIncomeTaxRate
-                    ? `${selectedIncomeTaxRate.rate}%`
-                    : '未選択'}
-                </strong>
+                <div className="field-label-row">
+                  <label htmlFor="ideco-income-tax-rate-select">
+                    所得税率
+                  </label>
 
-                <span className="tax-rate-divider">
-                  |
-                </span>
+                  <span className="tooltip-container">
+                    <button
+                      className="tooltip-button"
+                      type="button"
+                      aria-label="課税所得についての説明"
+                      aria-describedby="taxable-income-tooltip"
+                    >
+                      ?
+                    </button>
 
-                <span className="tax-rate-guide">
-                  {selectedIncomeTaxRate
-                    ? selectedIncomeTaxRate.taxableIncomeGuide
-                    : '所得税率を選択してください'}
-                </span>
+                    <span
+                      id="taxable-income-tooltip"
+                      className="tooltip-content"
+                      role="tooltip"
+                    >
+                      課税所得は、給与収入から給与所得控除や
+                      社会保険料控除、基礎控除などを
+                      差し引いた後の金額です。
+                    </span>
+                  </span>
+                </div>
 
-                <span className="tax-rate-arrow">
-                  ▼
-                </span>
+                <div className="tax-rate-select">
+                  <div
+                    className="tax-rate-select-display"
+                    aria-hidden="true"
+                  >
+                    <strong className="tax-rate-value">
+                      {selectedIncomeTaxRate
+                        ? `${selectedIncomeTaxRate.rate}%`
+                        : '未選択'}
+                    </strong>
+
+                    <span className="tax-rate-divider">|</span>
+
+                    <span className="tax-rate-guide">
+                      {selectedIncomeTaxRate
+                        ? selectedIncomeTaxRate.taxableIncomeGuide
+                        : '所得税率を選択してください'}
+                    </span>
+
+                    <span className="tax-rate-arrow">▼</span>
+                  </div>
+
+                  <select
+                    ref={(node) => {
+                      fieldRefs.current.incomeTaxRate = node ?? undefined
+                    }}
+                    id="ideco-income-tax-rate-select"
+                    className="tax-rate-native-select"
+                    value={incomeTaxRate}
+                    aria-label="所得税率"
+                    aria-invalid={Boolean(visibleErrors.incomeTaxRate)}
+                    aria-describedby={getErrorDescription('incomeTaxRate')}
+                    onChange={(event) =>
+                      handleIncomeTaxRateChange(event.target.value)
+                    }
+                  >
+                    <option value="">選択してください</option>
+                    {incomeTaxRates.map((item) => (
+                      <option key={item.rate} value={item.rate}>
+                        {item.rate}%｜{item.taxableIncomeGuide}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {visibleErrors.incomeTaxRate && (
+                  <p
+                    id="ideco-incomeTaxRate-error"
+                    className="ideco-field__error"
+                  >
+                    {visibleErrors.incomeTaxRate}
+                  </p>
+                )}
               </div>
 
-              <select
-                ref={(node) => {
-                  fieldRefs.current.incomeTaxRate = node ?? undefined
-                }}
-                id="ideco-income-tax-rate-select"
-                className="tax-rate-native-select"
-                value={incomeTaxRate}
-                aria-label="所得税率"
-                aria-invalid={Boolean(visibleErrors.incomeTaxRate)}
-                aria-describedby={getErrorDescription('incomeTaxRate')}
-                onChange={(event) =>
-                  handleIncomeTaxRateChange(
-                    event.target.value,
-                  )
-                }
+              <button
+                className="calculator-helper-link"
+                type="button"
+                onClick={openTaxableIncomeCalculator}
               >
-                <option value="">選択してください</option>
-                {incomeTaxRates.map((item) => (
-                  <option
-                    key={item.rate}
-                    value={item.rate}
-                  >
-                    {item.rate}%｜{item.taxableIncomeGuide}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {visibleErrors.incomeTaxRate && (
-              <p
-                id="ideco-incomeTaxRate-error"
-                className="ideco-field__error"
-              >
-                {visibleErrors.incomeTaxRate}
+                自分の所得税率を調べる
+              </button>
+            </>
+          ) : (
+            <div className="ideco-field ideco-field--wide ideco-taxable-income-field">
+              <label htmlFor="ideco-taxable-income-before">
+                掛金控除前の課税所得
+              </label>
+              <div className="input-with-unit">
+                <MoneyInput
+                  ref={(node) => {
+                    fieldRefs.current.taxableIncomeBeforeContribution =
+                      node ?? undefined
+                  }}
+                  id="ideco-taxable-income-before"
+                  value={taxableIncomeBeforeContribution}
+                  onValueChange={handleTaxableIncomeChange}
+                  aria-invalid={Boolean(
+                    visibleErrors.taxableIncomeBeforeContribution,
+                  )}
+                  aria-describedby={getErrorDescription(
+                    'taxableIncomeBeforeContribution',
+                  )}
+                  placeholder="例：3,500,000"
+                />
+                <span>円</span>
+              </div>
+              <p className="ideco-field__help">
+                給与収入ではなく、各種所得控除を差し引いた後の所得税の課税所得を入力してください。
               </p>
-            )}
-          </div>
-
-          <button
-            className="calculator-helper-link"
-            type="button"
-            onClick={openTaxableIncomeCalculator}
-          >
-            自分の所得税率を調べる
-          </button>
+              {visibleErrors.taxableIncomeBeforeContribution && (
+                <p
+                  id="ideco-taxableIncomeBeforeContribution-error"
+                  className="ideco-field__error"
+                >
+                  {visibleErrors.taxableIncomeBeforeContribution}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="ideco-field">
             <label htmlFor="ideco-resident-tax-rate">
@@ -990,7 +1092,7 @@ function IdecoCalculator({
             <aside className="ideco-result-context">
               <strong>{displayedCalculation.regimeLabel}</strong>
               <span>{displayedCalculation.participantLabel}</span>
-              <span>計算モード：簡易税率モード</span>
+              <span>計算モード：{calculationModeLabel}</span>
               <span>
                 制度適用日：{input.effectiveDate}
               </span>
@@ -1020,7 +1122,7 @@ function IdecoCalculator({
               </strong>
 
               <small>
-                {specialIncomeTaxDescription}
+                {incomeTaxResultDescription}
               </small>
             </div>
 
@@ -1118,6 +1220,55 @@ function IdecoCalculator({
             </div>
           </div>
           </div>
+
+          {detailedTax && (
+            <section
+              className="ideco-detailed-tax-breakdown"
+              aria-labelledby="ideco-detailed-tax-title"
+            >
+              <div>
+                <p>DETAILED TAX BREAKDOWN</p>
+                <h3 id="ideco-detailed-tax-title">
+                  課税所得と所得税額の変化
+                </h3>
+              </div>
+              <dl>
+                <div>
+                  <dt>掛金控除前課税所得</dt>
+                  <dd>{formatYen(detailedTax.taxableIncomeBeforeContribution)}</dd>
+                </div>
+                <div>
+                  <dt>iDeCo所得控除額</dt>
+                  <dd>{formatYen(detailedTax.idecoIncomeDeduction)}</dd>
+                </div>
+                <div>
+                  <dt>掛金控除後課税所得</dt>
+                  <dd>{formatYen(detailedTax.taxableIncomeAfterContribution)}</dd>
+                </div>
+                <div>
+                  <dt>所得税の適用税率</dt>
+                  <dd>
+                    {(detailedTax.before.marginalRate * 100).toLocaleString('ja-JP')}%
+                    <span aria-hidden="true"> → </span>
+                    <span className="sr-only">から</span>
+                    {(detailedTax.after.marginalRate * 100).toLocaleString('ja-JP')}%
+                  </dd>
+                </div>
+                <div>
+                  <dt>控除前の所得税額</dt>
+                  <dd>{formatYen(roundHalfUp(detailedTax.before.totalIncomeTax))}</dd>
+                </div>
+                <div>
+                  <dt>控除後の所得税額</dt>
+                  <dd>{formatYen(roundHalfUp(detailedTax.after.totalIncomeTax))}</dd>
+                </div>
+              </dl>
+              <p>
+                掛金全額に1つの税率を掛けた金額ではなく、控除前後の所得税額の差から算出しています。
+                所得税の課税所得は1,000円未満を切り捨てて計算します。
+              </p>
+            </section>
+          )}
 
           <div className="ideco-visual-grid">
             <div className="simulator-chart-panel simulator-chart-panel--ideco">

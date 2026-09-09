@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
   calculateAnnualIdecoContribution,
+  calculateDetailedIdecoTaxSaving,
   calculateIdeco,
   calculateIdecoIncomeTaxSaving,
   calculateIdecoResidentTaxSaving,
+  calculateIdecoSupplementaryIncomeTax,
+  calculateProgressiveIncomeTax,
   roundHalfUp,
 } from './idecoCalculation'
 import {
@@ -17,12 +20,14 @@ import {
 const validInput = (
   overrides: Partial<IdecoRuleInput> = {},
 ): IdecoRuleInput => ({
+  calculationMode: 'simple',
   effectiveDate: '2026-11-30',
   participantCategory: 'category2-no-pension',
   relatedMonthlyContribution: null,
   monthlyContribution: 23_000,
   actualContributionMonths: 12,
   incomeTaxRate: 10,
+  taxableIncomeBeforeContribution: null,
   residentTaxRate: 10,
   referenceYears: 20,
   ...overrides,
@@ -225,5 +230,150 @@ describe('iDeCo formal calculation', () => {
     expect(roundHalfUp(1.5)).toBe(2)
     expect(roundHalfUp(-1.49)).toBe(-1)
     expect(roundHalfUp(-1.5)).toBe(-2)
+  })
+})
+
+describe('iDeCo detailed taxable-income calculation', () => {
+  it.each([
+    [0, 0, 0],
+    [1_000, 0.05, 50],
+    [1_949_999, 0.05, 97_450],
+    [1_950_000, 0.1, 97_500],
+    [1_950_001, 0.1, 97_500],
+    [3_299_999, 0.1, 232_400],
+    [3_300_000, 0.2, 232_500],
+    [3_300_001, 0.2, 232_500],
+    [6_949_999, 0.2, 962_300],
+    [6_950_000, 0.23, 962_500],
+    [6_950_001, 0.23, 962_500],
+    [8_999_999, 0.23, 1_433_770],
+    [9_000_000, 0.33, 1_434_000],
+    [9_000_001, 0.33, 1_434_000],
+    [17_999_999, 0.33, 4_403_670],
+    [18_000_000, 0.4, 4_404_000],
+    [18_000_001, 0.4, 4_404_000],
+    [39_999_999, 0.4, 13_203_600],
+    [40_000_000, 0.45, 13_204_000],
+    [40_000_001, 0.45, 13_204_000],
+    [100_000_000, 0.45, 40_204_000],
+  ])(
+    'uses the formal progressive bracket at taxable income %i',
+    (taxableIncome, expectedRate, expectedBaseTax) => {
+      const tax = calculateProgressiveIncomeTax(
+        taxableIncome,
+        '2026-11-30',
+      )
+
+      expect(tax.marginalRate).toBe(expectedRate)
+      expect(tax.baseIncomeTax).toBe(expectedBaseTax)
+    },
+  )
+
+  it('calculates the saving from pre- and post-contribution tax across a bracket', () => {
+    const result = calculateDetailedIdecoTaxSaving({
+      taxableIncomeBeforeContribution: 3_500_000,
+      annualContribution: 276_000,
+      residentTaxRate: 10,
+      effectiveDate: '2026-11-30',
+    })
+
+    expect(result.detailedTax.before.marginalRate).toBe(0.2)
+    expect(result.detailedTax.after.marginalRate).toBe(0.1)
+    expect(result.detailedTax.before.baseIncomeTax).toBe(272_500)
+    expect(result.detailedTax.after.baseIncomeTax).toBe(224_900)
+    expect(result.incomeTaxSaving).toBeCloseTo(48_599.6, 8)
+    expect(result.residentTaxSaving).toBe(27_600)
+  })
+
+  it('handles a contribution within one bracket and a contribution crossing multiple boundaries', () => {
+    const sameBracket = calculateDetailedIdecoTaxSaving({
+      taxableIncomeBeforeContribution: 5_000_000,
+      annualContribution: 120_000,
+      residentTaxRate: 8,
+      effectiveDate: '2026-11-30',
+    })
+    const multipleBoundaries = calculateDetailedIdecoTaxSaving({
+      taxableIncomeBeforeContribution: 7_000_000,
+      annualContribution: 4_000_000,
+      residentTaxRate: 10,
+      effectiveDate: '2026-11-30',
+    })
+
+    expect(sameBracket.detailedTax.before.marginalRate).toBe(0.2)
+    expect(sameBracket.detailedTax.after.marginalRate).toBe(0.2)
+    expect(multipleBoundaries.detailedTax.before.marginalRate).toBe(0.23)
+    expect(multipleBoundaries.detailedTax.after.marginalRate).toBe(0.1)
+  })
+
+  it('floors post-contribution taxable income at zero and never exceeds pre-tax liability', () => {
+    const result = calculateDetailedIdecoTaxSaving({
+      taxableIncomeBeforeContribution: 100_000,
+      annualContribution: 276_000,
+      residentTaxRate: 10,
+      effectiveDate: '2026-11-30',
+    })
+
+    expect(result.detailedTax.taxableIncomeAfterContribution).toBe(0)
+    expect(result.detailedTax.idecoIncomeDeduction).toBe(100_000)
+    expect(result.detailedTax.after.totalIncomeTax).toBe(0)
+    expect(result.incomeTaxSaving).toBe(
+      result.detailedTax.before.totalIncomeTax,
+    )
+    expect(result.residentTaxSaving).toBe(10_000)
+  })
+
+  it('uses the formal special-tax split before and after 2027 without changing the 1.021 total factor', () => {
+    const through2026 = calculateProgressiveIncomeTax(
+      1_000_000,
+      '2026-12-31',
+    )
+    const from2027 = calculateProgressiveIncomeTax(
+      1_000_000,
+      '2027-01-01',
+    )
+
+    expect(through2026.reconstructionSpecialIncomeTax).toBe(1_050)
+    expect(through2026.defenseSpecialIncomeTax).toBe(0)
+    expect(from2027.reconstructionSpecialIncomeTax).toBe(550)
+    expect(from2027.defenseSpecialIncomeTax).toBe(500)
+    expect(from2027.totalIncomeTax).toBe(through2026.totalIncomeTax)
+    expect(
+      calculateIdecoSupplementaryIncomeTax(Number.NaN, '2027-01-01'),
+    ).toEqual({
+      defenseSpecialIncomeTax: 0,
+      reconstructionSpecialIncomeTax: 0,
+      supplementaryIncomeTax: 0,
+    })
+  })
+
+  it('validates mode-specific inputs and calculates the detailed result', () => {
+    const detailedInput = validInput({
+      calculationMode: 'detailed',
+      incomeTaxRate: null,
+      taxableIncomeBeforeContribution: 3_500_000,
+    })
+
+    expect(validateIdecoRuleInput(detailedInput)).toEqual({})
+    const outcome = calculateIdeco(detailedInput)
+    expect(outcome.ok).toBe(true)
+    if (!outcome.ok) return
+
+    expect(outcome.result.rounded.incomeTaxSaving).toBe(48_600)
+    expect(outcome.result.rounded.residentTaxSaving).toBe(27_600)
+    expect(outcome.result.rounded.annualTaxSaving).toBe(76_200)
+    expect(outcome.result.detailedTax).not.toBeNull()
+  })
+
+  it('rejects missing, negative, and non-finite detailed taxable income without requiring the simple rate', () => {
+    for (const taxableIncome of [null, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      const errors = validateIdecoRuleInput(validInput({
+        calculationMode: 'detailed',
+        incomeTaxRate: null,
+        taxableIncomeBeforeContribution: taxableIncome,
+      }))
+
+      expect(errors.taxableIncomeBeforeContribution).toBeTruthy()
+      expect(errors.incomeTaxRate).toBeUndefined()
+    }
   })
 })

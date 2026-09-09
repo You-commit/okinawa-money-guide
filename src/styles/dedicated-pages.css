@@ -1066,6 +1066,75 @@
 }
 
 /* iDeCo formal eligibility inputs and validation */
+.ideco-tax-mode-selector {
+  display: grid;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid #d8d0ee;
+  border-radius: 10px;
+  background: #faf9ff;
+}
+
+.ideco-tax-mode-selector > strong {
+  color: #493986;
+  font-size: 0.76rem;
+}
+
+.ideco-tax-mode-selector > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ideco-tax-mode-selector button {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 9px 10px;
+  border: 1px solid #d0c8e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #554d70;
+  font: inherit;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ideco-tax-mode-selector button[aria-pressed="true"] {
+  border-color: #7658ce;
+  background: #f0ebff;
+  color: #3e277e;
+  box-shadow: inset 0 0 0 1px rgba(118, 88, 206, 0.18);
+}
+
+.ideco-tax-mode-selector button:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.24);
+  outline-offset: 2px;
+}
+
+.ideco-tax-mode-selector button span {
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.ideco-tax-mode-selector button small {
+  color: #716b86;
+  font-size: 0.62rem;
+}
+
+.ideco-tax-mode-note {
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 3px solid #9a84d8;
+  border-radius: 0 7px 7px 0;
+  background: #f8f6ff;
+  color: #625a79;
+  font-size: 0.66rem;
+  line-height: 1.55;
+}
+
 .simulator-page--ideco .ideco-field {
   display: grid;
   gap: 7px;
@@ -1195,6 +1264,66 @@
   background: #faf9ff;
 }
 
+.ideco-detailed-tax-breakdown {
+  display: grid;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid #d9d0ef;
+  border-radius: 10px;
+  background: #fbfaff;
+}
+
+.ideco-detailed-tax-breakdown > div > p {
+  margin: 0;
+  color: #7658ce;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.ideco-detailed-tax-breakdown h3 {
+  margin: 2px 0 0;
+  color: #322a55;
+  font-size: 0.9rem;
+}
+
+.ideco-detailed-tax-breakdown dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0;
+}
+
+.ideco-detailed-tax-breakdown dl > div {
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid #e2dcf0;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.ideco-detailed-tax-breakdown dt {
+  color: #746d87;
+  font-size: 0.6rem;
+  line-height: 1.4;
+}
+
+.ideco-detailed-tax-breakdown dd {
+  margin: 4px 0 0;
+  color: #46317e;
+  font-size: 0.76rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.ideco-detailed-tax-breakdown > p {
+  margin: 0;
+  color: #665f7d;
+  font-size: 0.63rem;
+  line-height: 1.6;
+}
+
 @media (min-width: 901px) {
   .simulator-page--ideco .calculator-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1206,6 +1335,8 @@
 
   .simulator-page--ideco .calculator-form > :is(
     .simulator-panel-heading,
+    .ideco-tax-mode-selector,
+    .ideco-tax-mode-note,
     .ideco-field--wide,
     .ideco-error-summary,
     .ideco-rule-summary,
@@ -1252,6 +1383,22 @@
   ) {
     padding: 8px 10px;
     font-size: 0.64rem;
+  }
+
+  .simulator-page--ideco .ideco-tax-mode-selector {
+    padding: 8px 9px;
+  }
+
+  .simulator-page--ideco .ideco-tax-mode-selector button {
+    min-height: 45px;
+    padding: 7px 8px;
+  }
+}
+
+@media (max-width: 620px) {
+  .ideco-tax-mode-selector > div,
+  .ideco-detailed-tax-breakdown dl {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -48,6 +48,23 @@ const fillValidInputs = () => {
   })
 }
 
+const switchToDetailedMode = () => {
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: /課税所得から詳しく計算/,
+    }),
+  )
+}
+
+const fillValidDetailedInputs = () => {
+  fillValidInputs()
+  switchToDetailedMode()
+  fireEvent.change(
+    screen.getByLabelText('掛金控除前の課税所得'),
+    { target: { value: '3500000' } },
+  )
+}
+
 describe('IdecoCalculator formal eligibility UX', () => {
   it('starts with both tax rates empty and shows the formal fields', () => {
     renderCalculator()
@@ -203,5 +220,134 @@ describe('IdecoCalculator formal eligibility UX', () => {
       screen.getByRole('button', { name: '自分の所得税率を調べる' }),
     )
     expect(onOpenTaxableIncome).toHaveBeenCalledOnce()
+  })
+
+  it('starts in simple mode and exposes an accessible two-mode selector', () => {
+    renderCalculator()
+
+    const simple = screen.getByRole('button', {
+      name: /簡易税率で計算/,
+    })
+    const detailed = screen.getByRole('button', {
+      name: /課税所得から詳しく計算/,
+    })
+
+    expect(simple.getAttribute('aria-pressed')).toBe('true')
+    expect(detailed.getAttribute('aria-pressed')).toBe('false')
+    expect(screen.getByLabelText('所得税率')).toBeTruthy()
+    expect(
+      screen.queryByLabelText('掛金控除前の課税所得'),
+    ).toBeNull()
+  })
+
+  it('supports keyboard mode switching and preserves common inputs', async () => {
+    const user = userEvent.setup()
+    renderCalculator()
+    fillValidInputs()
+
+    const detailed = screen.getByRole('button', {
+      name: /課税所得から詳しく計算/,
+    })
+    detailed.focus()
+    await user.keyboard(' ')
+
+    expect(detailed.getAttribute('aria-pressed')).toBe('true')
+    expect(
+      (screen.getByLabelText('毎月の掛金') as HTMLInputElement).value,
+    ).toBe('23,000')
+    expect(
+      (screen.getByLabelText('実拠出月数') as HTMLInputElement).value,
+    ).toBe('12')
+    expect(screen.getByLabelText('掛金控除前の課税所得')).toBeTruthy()
+  })
+
+  it('keeps detailed-mode typing quiet until the manual action validates it', () => {
+    renderCalculator()
+    switchToDetailedMode()
+    fireEvent.change(
+      screen.getByLabelText('掛金控除前の課税所得'),
+      { target: { value: '' } },
+    )
+
+    expect(
+      screen.queryByText('掛金控除前の課税所得を入力してください。'),
+    ).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+    expect(
+      screen.getAllByText('掛金控除前の課税所得を入力してください。').length,
+    ).toBeGreaterThanOrEqual(1)
+    expect(screen.getByRole('alert')).toBe(document.activeElement)
+  })
+
+  it('calculates detailed pre/post tax and shows the breakdown', () => {
+    renderCalculator()
+    fillValidDetailedInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    expect(screen.getAllByText('￥76,200').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('課税所得と所得税額の変化')).toBeTruthy()
+    expect(screen.getByText('￥3,500,000')).toBeTruthy()
+    expect(screen.getByText('￥3,224,000')).toBeTruthy()
+    expect(screen.getByText(/20%/)).toBeTruthy()
+    expect(screen.getByText(/掛金全額に1つの税率を掛けた金額ではなく/)).toBeTruthy()
+  })
+
+  it('uses the formal special-income-tax names from 2027', () => {
+    renderCalculator()
+    fillValidDetailedInputs()
+    fireEvent.change(screen.getByLabelText('制度適用日'), {
+      target: { value: '2027-01-01' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    expect(
+      screen.getByText(/防衛特別所得税1%・復興特別所得税1.1%/),
+    ).toBeTruthy()
+  })
+
+  it('invalidates a calculated result when the mode changes', () => {
+    renderCalculator()
+    fillValidInputs()
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+    expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
+
+    switchToDetailedMode()
+
+    expect(screen.queryByText('￥55,780')).toBeNull()
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('calculates detailed mode automatically only after valid inputs are present', () => {
+    renderCalculator()
+    fillValidDetailedInputs()
+    fireEvent.click(
+      screen.getByRole('checkbox', {
+        name: '入力と同時に計算結果を更新する',
+      }),
+    )
+
+    expect(screen.getAllByText('￥76,200').length).toBeGreaterThanOrEqual(1)
+
+    fireEvent.change(
+      screen.getByLabelText('掛金控除前の課税所得'),
+      { target: { value: '' } },
+    )
+    expect(screen.queryByText('￥76,200')).toBeNull()
+    expect(
+      screen.queryByText('掛金控除前の課税所得を入力してください。'),
+    ).toBeNull()
+  })
+
+  it('does not calculate detailed mode when Enter is pressed in the taxable-income field', () => {
+    renderCalculator()
+    fillValidDetailedInputs()
+
+    fireEvent.keyDown(
+      screen.getByLabelText('掛金控除前の課税所得'),
+      { key: 'Enter', code: 'Enter' },
+    )
+
+    expect(screen.queryByText('￥76,200')).toBeNull()
   })
 })

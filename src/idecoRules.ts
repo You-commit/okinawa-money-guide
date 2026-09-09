@@ -4,6 +4,8 @@ export const IDECO_CONTRIBUTION_STEP = 1_000
 
 export type IdecoRegime = 'current' | 'reformed'
 
+export type IdecoCalculationMode = 'simple' | 'detailed'
+
 export type IdecoParticipantCategory =
   | 'category1'
   | 'category2-no-pension'
@@ -19,6 +21,7 @@ export type IdecoRuleField =
   | 'monthlyContribution'
   | 'actualContributionMonths'
   | 'incomeTaxRate'
+  | 'taxableIncomeBeforeContribution'
   | 'residentTaxRate'
   | 'referenceYears'
 
@@ -27,12 +30,14 @@ export type IdecoValidationErrors = Partial<
 >
 
 export type IdecoRuleInput = {
+  calculationMode: IdecoCalculationMode
   effectiveDate: string
   participantCategory: IdecoParticipantCategory | ''
   relatedMonthlyContribution: number | null
   monthlyContribution: number | null
   actualContributionMonths: number | null
   incomeTaxRate: number | null
+  taxableIncomeBeforeContribution: number | null
   residentTaxRate: number | null
   referenceYears: number | null
 }
@@ -312,13 +317,24 @@ export const validateIdecoRuleInput = (
       '実拠出月数は1〜12の整数で入力してください。'
   }
 
-  if (input.incomeTaxRate === null) {
-    errors.incomeTaxRate = '所得税率を選択してください。'
+  if (input.calculationMode !== 'detailed') {
+    if (input.incomeTaxRate === null) {
+      errors.incomeTaxRate = '所得税率を選択してください。'
+    } else if (
+      !Number.isFinite(input.incomeTaxRate) ||
+      !INCOME_TAX_RATES.includes(input.incomeTaxRate)
+    ) {
+      errors.incomeTaxRate = '所得税率を正しく選択してください。'
+    }
+  } else if (input.taxableIncomeBeforeContribution === null) {
+    errors.taxableIncomeBeforeContribution =
+      '掛金控除前の課税所得を入力してください。'
   } else if (
-    !Number.isFinite(input.incomeTaxRate) ||
-    !INCOME_TAX_RATES.includes(input.incomeTaxRate)
+    !Number.isSafeInteger(input.taxableIncomeBeforeContribution) ||
+    input.taxableIncomeBeforeContribution < 0
   ) {
-    errors.incomeTaxRate = '所得税率を正しく選択してください。'
+    errors.taxableIncomeBeforeContribution =
+      '掛金控除前の課税所得は0円以上の整数で入力してください。'
   }
 
   if (input.residentTaxRate === null) {
