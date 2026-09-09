@@ -1178,9 +1178,9 @@ function IdecoCalculator({
             <>
               <div
                 id="ideco-income-tax-rate-field"
-                className="calculator-field"
+                className="ideco-field ideco-field--wide ideco-tax-rate-field"
               >
-                <div className="field-label-row">
+                <div className="ideco-field-label-row">
                   <label htmlFor="ideco-income-tax-rate-select">
                     所得税率
                   </label>
@@ -1296,7 +1296,7 @@ function IdecoCalculator({
           </button>
 
           <div className="ideco-field ideco-field--wide">
-            <div className="field-label-row">
+            <div className="ideco-field-label-row">
               <label htmlFor="ideco-resident-tax-rate">
                 住民税所得割率
               </label>
@@ -1765,13 +1765,6 @@ function IdecoCalculator({
         </section>
       )}
 
-      <aside className="ideco-privacy-note" aria-label="入力データの取り扱い">
-        <strong>入力データについて</strong>
-        <p>
-          入力した金額や条件は、このページでの計算にのみ使用します。保存・外部送信・広告利用・AI学習には利用しません。
-        </p>
-      </aside>
-
       <p className="calculator-note">
         本シミュレーターは概算です。
         実際の税額は課税所得、所得控除、
@@ -1779,6 +1772,7 @@ function IdecoCalculator({
         異なります。運用益、手数料、
         受取時の税金は含んでいません。
         原則60歳まで資産を引き出せず、受給開始可能年齢は通算加入期間等で異なります。
+        入力内容はこのページの計算にのみ使用し、保存・外部送信しません。
       </p>
     </section>
   )

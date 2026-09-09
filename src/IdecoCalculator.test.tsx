@@ -608,12 +608,25 @@ describe('IdecoCalculator formal eligibility UX', () => {
     const monthsLabelRow = screen.getByText(
       '今年の掛金拠出月数',
     ).parentElement
+    const incomeTaxLabelRow = screen.getByText('所得税率').parentElement
+    const residentTaxLabelRow = screen.getByText(
+      '住民税所得割率',
+    ).parentElement
     expect(dateLabelRow?.classList.contains(
       'ideco-field-label-row',
     )).toBe(true)
     expect(monthsLabelRow?.classList.contains(
       'ideco-field-label-row',
     )).toBe(true)
+    expect(incomeTaxLabelRow?.classList.contains(
+      'ideco-field-label-row',
+    )).toBe(true)
+    expect(residentTaxLabelRow?.classList.contains(
+      'ideco-field-label-row',
+    )).toBe(true)
+
+    expect(screen.getByLabelText('所得税率')
+      .closest('.ideco-tax-rate-field')).toBeTruthy()
   })
 
   it('recalculates after the standard resident-tax action only when AUTO is on and all other values are valid', () => {
@@ -796,8 +809,11 @@ describe('IdecoCalculator formal eligibility UX', () => {
   it('states the formal privacy policy without exposing developer metadata', () => {
     renderCalculator()
 
-    const privacy = screen.getByLabelText('入力データの取り扱い')
-    expect(privacy.textContent).toContain('保存・外部送信・広告利用・AI学習には利用しません')
+    expect(screen.queryByLabelText('入力データの取り扱い')).toBeNull()
+    expect(document.body.textContent).toContain(
+      '入力内容はこのページの計算にのみ使用し、保存・外部送信しません。',
+    )
+    expect(document.body.textContent).not.toContain('AI学習')
     expect(document.body.textContent).not.toMatch(/internal timestamp|debug snapshot|model version/i)
   })
 

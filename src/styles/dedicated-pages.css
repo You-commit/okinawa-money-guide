@@ -1262,6 +1262,45 @@
   outline: 3px solid rgba(113, 84, 202, 0.18);
 }
 
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-select,
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-select-display {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-select-display {
+  min-height: 44px;
+  padding: 0 40px 0 12px;
+  border-color: #cbc7dc;
+  border-radius: 9px;
+  line-height: 1.35;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-value {
+  color: #292441;
+  font-size: 0.9rem;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-guide {
+  color: #6a6680;
+  font-size: 0.78rem;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-arrow {
+  right: 12px;
+  color: #7154ca;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-native-select {
+  box-sizing: border-box;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-select:focus-within
+  .tax-rate-select-display {
+  border-color: #7154ca;
+  box-shadow: 0 0 0 3px rgba(113, 84, 202, 0.18);
+}
+
 .simulator-page--ideco :is(
   .ideco-field > input,
   .ideco-field > select,
@@ -1695,8 +1734,7 @@
   outline-offset: 3px;
 }
 
-.ideco-consultation-summary__notice,
-.ideco-privacy-note {
+.ideco-consultation-summary__notice {
   padding: 10px 12px;
   border: 1px solid #ded8e9;
   border-radius: 8px;
@@ -1705,19 +1743,6 @@
   font-size: 0.73rem;
   font-weight: 650;
   line-height: 1.65;
-}
-
-.ideco-privacy-note {
-  margin-top: 16px;
-  background: #faf9fc;
-}
-
-.ideco-privacy-note strong {
-  color: #493986;
-}
-
-.ideco-privacy-note p {
-  margin: 4px 0 0;
 }
 
 @media (min-width: 901px) {
@@ -1768,6 +1793,24 @@
     padding-inline: 10px;
     border-radius: 7px;
     font-size: 0.8rem;
+  }
+
+  .simulator-page--ideco .ideco-tax-rate-field .tax-rate-select-display {
+    min-height: 38px;
+    padding: 0 36px 0 10px;
+    border-radius: 7px;
+  }
+
+  .simulator-page--ideco .ideco-tax-rate-field .tax-rate-value {
+    font-size: 0.8rem;
+  }
+
+  .simulator-page--ideco .ideco-tax-rate-field .tax-rate-guide {
+    font-size: 0.7rem;
+  }
+
+  .simulator-page--ideco .ideco-tax-rate-field .tax-rate-arrow {
+    right: 10px;
   }
 
   .simulator-page--ideco :is(
