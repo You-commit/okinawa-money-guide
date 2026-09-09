@@ -6,6 +6,7 @@ import {
   type KeyboardEvent,
 } from 'react'
 import MoneyInput from './components/form/MoneyInput'
+import { navigateToSimulationResult } from './utils/simulationResultNavigation'
 import {
   getMoneyInputDigits,
   normalizeMoneyInputCharacters,
@@ -730,6 +731,7 @@ function NisaCalculator() {
   const summaryStatusTimerRef = useRef<number | null>(null)
   const copyRequestIdRef = useRef(0)
   const modeButtonRefs = useRef<Array<HTMLButtonElement | null>>([])
+  const resultsRef = useRef<HTMLDivElement>(null)
 
   const autoState = useMemo(() => {
     if (!isAutoCalculation) {
@@ -882,6 +884,7 @@ function NisaCalculator() {
       parsed,
       isScenarioComparisonEnabled,
     ))
+    navigateToSimulationResult(resultsRef.current)
   }
 
   const resetCalculator = () => {
@@ -1407,7 +1410,7 @@ function NisaCalculator() {
             <p>
               {isAutoCalculation
                 ? '有効な条件がそろうと、結果を自動更新します。'
-                : '「計算する」を押した時に入力内容を確認します。'}
+                : '「シミュレートする」を押した時に入力内容を確認します。'}
             </p>
           </div>
 
@@ -1417,7 +1420,7 @@ function NisaCalculator() {
             </button>
             {!isAutoCalculation && (
               <button className="simulate-button" type="button" onClick={simulate}>
-                計算する
+                シミュレートする
               </button>
             )}
           </div>
@@ -1434,7 +1437,12 @@ function NisaCalculator() {
           )}
         </div>
 
-        <div className="calculator-results" aria-live="polite">
+        <div
+          className="calculator-results simulation-result-anchor"
+          ref={resultsRef}
+          aria-live="polite"
+          tabIndex={-1}
+        >
           <div className="simulator-results-heading">
             <div><p>RESULT</p><h3>概算結果</h3></div>
             <div className="nisa-calculation-assumption">
@@ -1500,7 +1508,7 @@ function NisaCalculator() {
               <p>
                 {isAutoCalculation
                   ? '有効な条件がそろうと概算結果を表示します。'
-                  : '条件を入力して「計算する」を押してください。'}
+                  : '条件を入力して「シミュレートする」を押してください。'}
               </p>
             </div>
           )}

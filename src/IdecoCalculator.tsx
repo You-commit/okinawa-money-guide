@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import MoneyInput from './components/form/MoneyInput'
+import { navigateToSimulationResult } from './utils/simulationResultNavigation'
 import {
   createIdecoConsultationSummaryText,
   formatIdecoYen,
@@ -260,6 +261,7 @@ function IdecoCalculator({
   const errorSummaryRef = useRef<HTMLDivElement>(null)
   const summaryStatusTimerRef = useRef<number | null>(null)
   const copyRequestIdRef = useRef(0)
+  const resultsRef = useRef<HTMLDivElement>(null)
   const fieldRefs = useRef<
     Partial<Record<IdecoRuleField, HTMLElement>>
   >({})
@@ -545,6 +547,10 @@ function IdecoCalculator({
 
     setHasSubmitted(true)
     setManualResult(outcome.ok ? outcome : null)
+
+    if (outcome.ok) {
+      navigateToSimulationResult(resultsRef.current)
+    }
   }
 
   const resetCalculator = () => {
@@ -1451,7 +1457,11 @@ function IdecoCalculator({
           </aside>
         </div>
 
-        <div className="calculator-results">
+        <div
+          className="calculator-results simulation-result-anchor"
+          ref={resultsRef}
+          tabIndex={-1}
+        >
           <div className="simulator-results-heading">
             <div>
               <p>RESULT</p>

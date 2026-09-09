@@ -10,6 +10,7 @@ import {
 } from 'react'
 import './MortgageCalculator.css'
 import MoneyInput from './components/form/MoneyInput'
+import { navigateToSimulationResult } from './utils/simulationResultNavigation'
 import {
   createMortgageConsultationSummary,
   MORTGAGE_EXCLUDED_ITEMS,
@@ -549,6 +550,8 @@ function MortgageCalculator() {
     useRef<HTMLInputElement>(null)
   const repaymentYearsRef =
     useRef<HTMLInputElement>(null)
+  const resultsRef =
+    useRef<HTMLElement>(null)
 
   const fieldRefs = {
     loanAmount: loanAmountRef,
@@ -898,6 +901,7 @@ function MortgageCalculator() {
       ),
     )
     setIsManualCalculationInvalidated(false)
+    navigateToSimulationResult(resultsRef.current)
   }
 
   const handleFormKeyDown = (
@@ -1498,8 +1502,10 @@ function MortgageCalculator() {
         </form>
 
         <section
-          className="mortgage-results"
+          className="mortgage-results simulation-result-anchor"
+          ref={resultsRef}
           aria-labelledby="mortgage-result-title"
+          tabIndex={-1}
           data-empty={
             activeCalculation === null &&
             calculationError === null

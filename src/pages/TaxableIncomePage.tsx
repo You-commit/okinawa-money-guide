@@ -2,6 +2,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import TaxableIncomeCalculator from '../TaxableIncomeCalculator'
 import { routes } from '../app/routes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
+import { taxRules2026 } from '../taxRules/2026'
 
 function TaxableIncomePage() {
   const location = useLocation()
@@ -28,7 +29,7 @@ function TaxableIncomePage() {
       notes={
         <>
           <article className="simulator-note-card simulator-note-card--warning">
-            <h2>正式税額を確定するものではありません</h2>
+            <h2>計算に含まれないもの</h2>
             <p>住宅ローン控除などの税額控除、所得金額調整控除、給与以外の所得、個別の事情は含みません。</p>
           </article>
           <article className="simulator-note-card simulator-note-card--blue">
@@ -38,7 +39,25 @@ function TaxableIncomePage() {
           <article className="simulator-note-card simulator-note-card--next">
             <h2>一次資料</h2>
             <p>国税庁の給与所得控除・基礎控除・所得税率の2026年分ルールを基準にしています。</p>
+            <ul className="taxable-primary-sources">
+              {taxRules2026.sources.map((source) => (
+                <li key={source.url}>
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {source.title}
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </article>
+          <p className="taxable-final-disclaimer">
+            <strong>正式税額を確定するものではありません。</strong>
+            実際の申告・手続きでは、国税庁の案内や税務署、税理士等へご確認ください。
+          </p>
         </>
       }
     >

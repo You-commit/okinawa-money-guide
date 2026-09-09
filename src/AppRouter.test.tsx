@@ -146,6 +146,52 @@ describe('dedicated page routing', () => {
     '/simulators/nisa',
     '/simulators/ideco',
     '/simulators/taxable-income',
+  ])('uses the shared manual simulation CTA on %s', (path) => {
+    renderAt(path)
+
+    expect(screen.getByRole('button', {
+      name: 'シミュレートする',
+    })).toBeTruthy()
+    expect(screen.queryByRole('button', {
+      name: '計算する',
+    })).toBeNull()
+  })
+
+  it('links the taxable income page to its verified primary sources', () => {
+    renderAt('/simulators/taxable-income')
+
+    const links = screen.getAllByRole('link', {
+      name: /令和8年度税制改正|令和8年4月 源泉所得税|所得税の税率/,
+    })
+    expect(links).toHaveLength(3)
+
+    for (const link of links) {
+      expect(link.getAttribute('href')).toMatch(/^https:\/\/www\.nta\.go\.jp\//)
+      expect(link.getAttribute('target')).toBe('_blank')
+      expect(link.getAttribute('rel')).toBe('noreferrer')
+    }
+  })
+
+  it.each([
+    '/simulators/military-land',
+    '/simulators/mortgage',
+    '/simulators/nisa',
+    '/simulators/ideco',
+    '/simulators/taxable-income',
+  ])('does not expose AI-related wording on %s', (path) => {
+    renderAt(path)
+
+    expect(document.body.textContent ?? '').not.toMatch(
+      /生成AI|人工知能|ChatGPT|OpenAI|\bGPT\b|\bLLM\b|機械学習|\bAI\b/i,
+    )
+  })
+
+  it.each([
+    '/simulators/military-land',
+    '/simulators/mortgage',
+    '/simulators/nisa',
+    '/simulators/ideco',
+    '/simulators/taxable-income',
   ])('keeps developer metadata out of the visible UI on %s', (path) => {
     renderAt(path)
 

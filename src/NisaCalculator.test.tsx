@@ -10,7 +10,7 @@ import {
   within,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import NisaCalculator from './NisaCalculator'
 import {
   NISA_CALCULATION_SPEC_VERSION,
@@ -25,7 +25,7 @@ const change = (label: string, value: string) => {
 }
 
 const calculate = () => {
-  fireEvent.click(screen.getByRole('button', { name: '計算する' }))
+  fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
 }
 
 const selectMode = (name: string) => {
@@ -212,6 +212,60 @@ describe('NISA planning modes', () => {
   })
 })
 
+describe('NISA result navigation', () => {
+  const scrollIntoView = vi.fn()
+
+  beforeEach(() => {
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      (callback: FrameRequestCallback) => {
+        callback(0)
+        return 0
+      },
+    )
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+      configurable: true,
+      writable: true,
+      value: scrollIntoView,
+    })
+  })
+
+  afterEach(() => {
+    cleanup()
+    scrollIntoView.mockClear()
+    Reflect.deleteProperty(HTMLElement.prototype, 'scrollIntoView')
+    vi.unstubAllGlobals()
+  })
+
+  it('moves to results after a successful manual simulation', () => {
+    render(<NisaCalculator />)
+    fillFuture()
+    calculate()
+
+    const results = document.querySelector('.calculator-results')!
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    })
+    expect(scrollIntoView.mock.instances[0]).toBe(results)
+    expect(document.activeElement).toBe(results)
+  })
+
+  it('does not move for validation errors or automatic calculation', () => {
+    render(<NisaCalculator />)
+    fillFuture({ years: '0', months: '0' })
+    calculate()
+    expect(scrollIntoView).not.toHaveBeenCalled()
+
+    cleanup()
+    render(<NisaCalculator />)
+    fillFuture()
+    fireEvent.click(screen.getByLabelText('入力と同時に計算結果を更新する'))
+    expect(screen.getAllByText('￥4,058,045').length).toBeGreaterThan(0)
+    expect(scrollIntoView).not.toHaveBeenCalled()
+  })
+})
+
 describe('NISA 2026 allowance UI', () => {
   afterEach(cleanup)
 
@@ -316,7 +370,7 @@ describe('NISA validation timing', () => {
 
     fillFuture()
     expect(screen.getAllByText('￥4,058,045').length).toBeGreaterThanOrEqual(2)
-    expect(screen.queryByRole('button', { name: '計算する' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'シミュレートする' })).toBeNull()
   })
 
   it('does not calculate when Enter is pressed in an input', async () => {

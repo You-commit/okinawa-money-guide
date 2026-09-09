@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import MoneyInput from './components/form/MoneyInput'
 import { getMoneyInputDigits } from './utils/moneyInput'
+import { navigateToSimulationResult } from './utils/simulationResultNavigation'
 import {
   getBasicDeduction2026,
   taxRules2026,
@@ -119,8 +120,35 @@ const deductionFields: Array<{
       label: 'その他の所得控除',
       help:
         '雑損控除などを入力します。iDeCo掛金は含めません。',
-    },
-  ]
+  },
+]
+
+type DeductionGroupId = 'social' | 'other'
+
+const deductionGroups: Array<{
+  id: DeductionGroupId
+  title: string
+  description: string
+  fields: typeof deductionFields
+}> = [
+  {
+    id: 'social',
+    title: '社会保険・人的控除',
+    description: '社会保険料、配偶者、扶養に関する控除',
+    fields: deductionFields.slice(0, 3),
+  },
+  {
+    id: 'other',
+    title: 'その他の所得控除',
+    description: '保険料、医療費、寄附金などの控除',
+    fields: deductionFields.slice(3),
+  },
+]
+
+const initialOpenDeductionGroups: Record<DeductionGroupId, boolean> = {
+  social: true,
+  other: false,
+}
 
 const getMoneyValue = (value: string) => {
   const digits = getMoneyInputDigits(value)
@@ -293,6 +321,9 @@ function TaxableIncomeCalculator({
     useState<TaxableIncomeResult | null>(
       null,
     )
+  const [openDeductionGroups, setOpenDeductionGroups] =
+    useState({ ...initialOpenDeductionGroups })
+  const resultsRef = useRef<HTMLDivElement>(null)
 
   const autoResult = useMemo(
     () =>
@@ -337,12 +368,13 @@ function TaxableIncomeCalculator({
   }
 
   const simulate = () => {
-    setManualResult(
-      calculateTaxableIncome(
-        salaryRevenue,
-        deductionInputs,
-      ),
+    const result = calculateTaxableIncome(
+      salaryRevenue,
+      deductionInputs,
     )
+
+    setManualResult(result)
+    navigateToSimulationResult(resultsRef.current)
   }
 
   const resetCalculator = () => {
@@ -352,7 +384,15 @@ function TaxableIncomeCalculator({
       ...initialDeductionInputs,
     })
 
+    setOpenDeductionGroups({ ...initialOpenDeductionGroups })
     setManualResult(null)
+  }
+
+  const toggleDeductionGroup = (groupId: DeductionGroupId) => {
+    setOpenDeductionGroups((current) => ({
+      ...current,
+      [groupId]: !current[groupId],
+    }))
   }
 
   const changeCalculationMode = (
@@ -415,11 +455,12 @@ function TaxableIncomeCalculator({
             </div>
           </div>
 
-          <label>
+          <label htmlFor="taxable-salary-revenue">
             <span>年間の給与収入</span>
 
             <div className="input-with-unit">
               <MoneyInput
+                id="taxable-salary-revenue"
                 value={salaryRevenue}
                 onValueChange={handleSalaryRevenueChange}
                 placeholder="例：5,000,000"
@@ -468,35 +509,64 @@ function TaxableIncomeCalculator({
                 </p>
               </div>
 
-              <div className="deduction-fields">
-                {deductionFields.map((field) => (
-                <label key={field.key}>
-                  <span>{field.label}</span>
+              <div className="taxable-deduction-groups">
+                {deductionGroups.map((group) => {
+                  const isOpen = openDeductionGroups[group.id]
+                  const panelId = `taxable-deduction-group-${group.id}`
 
-                  <div className="input-with-unit">
-                    <MoneyInput
-                      value={
-                        deductionInputs[
-                        field.key
-                        ]
-                      }
-                      onValueChange={(value) => {
-                        handleDeductionChange(
-                          field.key,
-                          value,
-                        )
-                      }}
-                      placeholder="0"
-                    />
+                  return (
+                    <section
+                      className="taxable-deduction-group"
+                      key={group.id}
+                    >
+                      <button
+                        className="taxable-deduction-group__trigger"
+                        type="button"
+                        aria-expanded={isOpen}
+                        aria-controls={panelId}
+                        onClick={() => toggleDeductionGroup(group.id)}
+                      >
+                        <span>
+                          <strong>{group.title}</strong>
+                          <small>{group.description}</small>
+                        </span>
+                        <span aria-hidden="true">{isOpen ? '−' : '＋'}</span>
+                      </button>
 
-                    <span>円</span>
-                  </div>
+                      <div
+                        className="deduction-fields"
+                        id={panelId}
+                        hidden={!isOpen}
+                      >
+                        {group.fields.map((field) => (
+                          <label
+                            htmlFor={`taxable-deduction-${field.key}`}
+                            key={field.key}
+                          >
+                            <span>{field.label}</span>
 
-                  <small className="field-help">
-                    {field.help}
-                  </small>
-                </label>
-                ))}
+                            <div className="input-with-unit">
+                              <MoneyInput
+                                id={`taxable-deduction-${field.key}`}
+                                value={deductionInputs[field.key]}
+                                onValueChange={(value) => {
+                                  handleDeductionChange(field.key, value)
+                                }}
+                                placeholder="0"
+                              />
+
+                              <span>円</span>
+                            </div>
+
+                            <small className="field-help">
+                              {field.help}
+                            </small>
+                          </label>
+                        ))}
+                      </div>
+                    </section>
+                  )
+                })}
               </div>
             </>
           ) : (
@@ -561,8 +631,10 @@ function TaxableIncomeCalculator({
         </div>
 
         <div
-          className="calculator-results"
+          className="calculator-results simulation-result-anchor"
+          ref={resultsRef}
           aria-live="polite"
+          tabIndex={-1}
         >
           <div className="simulator-results-heading">
             <div>
@@ -609,7 +681,7 @@ function TaxableIncomeCalculator({
                 <p>CALCULATION BREAKDOWN</p>
                 <h3>計算の内訳</h3>
               </div>
-              <span>正式税額を確定するものではありません</span>
+              <span>入力条件に基づく概算です</span>
             </div>
 
             <div className="taxable-breakdown-grid">
@@ -625,14 +697,6 @@ function TaxableIncomeCalculator({
         </div>
       </div>
 
-      <p className="calculator-note">
-        2026年分の給与所得のみを
-        対象とした概算です。
-        住宅ローン控除などの税額控除、
-        所得金額調整控除、特定支出控除、
-        給与以外の所得、住民税は
-        含んでいません。
-      </p>
     </section>
   )
 }

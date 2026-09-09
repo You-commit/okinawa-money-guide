@@ -18,6 +18,7 @@ import {
   getMoneyInputDigits,
   normalizeMoneyInputCharacters,
 } from './utils/moneyInput'
+import { navigateToSimulationResult } from './utils/simulationResultNavigation'
 
 type MoneyFieldProps = {
   label: string
@@ -313,7 +314,7 @@ function MilitaryLandCalculator() {
 
   const simulate = () => {
     setManualResult(calculateMilitaryLandResults(calculationInputs))
-    scrollToMobileTarget(resultsRef.current)
+    navigateToSimulationResult(resultsRef.current)
   }
 
   const returnToInputs = () => {
@@ -559,7 +560,7 @@ function MilitaryLandCalculator() {
             <p className="calculation-mode__description">
               {isAutoCalculation
                 ? '入力内容を変更すると結果が自動更新されます。'
-                : '計算ボタンを押すと結果が表示されます。'}
+                : 'シミュレートボタンを押すと結果が表示されます。'}
             </p>
           </div>
 
@@ -594,7 +595,7 @@ function MilitaryLandCalculator() {
         </div>
 
         <div
-          className="calculator-results military-expanded-results"
+          className="calculator-results military-expanded-results simulation-result-anchor"
           ref={resultsRef}
           role="region"
           aria-label="シミュレーション結果"

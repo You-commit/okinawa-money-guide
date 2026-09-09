@@ -19,6 +19,8 @@ import {
 } from 'vitest'
 import MortgageCalculator from './MortgageCalculator'
 
+const scrollIntoView = vi.fn()
+
 const fillValidConditions = async () => {
     const user = userEvent.setup()
 
@@ -77,6 +79,11 @@ describe('MortgageCalculator', () => {
         cleanup()
         vi.useRealTimers()
         vi.unstubAllGlobals()
+        scrollIntoView.mockClear()
+        Reflect.deleteProperty(
+            HTMLElement.prototype,
+            'scrollIntoView',
+        )
     })
 
     beforeEach(() => {
@@ -85,6 +92,15 @@ describe('MortgageCalculator', () => {
             (callback: FrameRequestCallback) => {
                 callback(0)
                 return 0
+            },
+        )
+        Object.defineProperty(
+            HTMLElement.prototype,
+            'scrollIntoView',
+            {
+                configurable: true,
+                writable: true,
+                value: scrollIntoView,
             },
         )
     })
@@ -126,6 +142,43 @@ describe('MortgageCalculator', () => {
                 name: '印刷する',
             }) as HTMLButtonElement).disabled,
         ).toBe(true)
+    })
+
+    it('moves to results only after a successful manual simulation', async () => {
+        render(<MortgageCalculator />)
+        const user = await fillValidConditions()
+
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+
+        const results = document.querySelector('.mortgage-results')!
+        expect(scrollIntoView).toHaveBeenCalledWith({
+            behavior: 'smooth',
+            block: 'start',
+        })
+        expect(scrollIntoView.mock.instances[0]).toBe(results)
+        expect(document.activeElement).toBe(results)
+
+        scrollIntoView.mockClear()
+        await user.clear(screen.getByLabelText('年利'))
+        await user.click(screen.getByRole('button', {
+            name: 'シミュレートする',
+        }))
+        expect(scrollIntoView).not.toHaveBeenCalled()
+    })
+
+    it('does not move to results during automatic calculation', async () => {
+        render(<MortgageCalculator />)
+        const user = await fillValidConditions()
+        scrollIntoView.mockClear()
+
+        await user.click(screen.getByRole('checkbox', {
+            name: '入力と同時に計算結果を更新する',
+        }))
+
+        expect(screen.getAllByText('約84,686円').length).toBeGreaterThan(0)
+        expect(scrollIntoView).not.toHaveBeenCalled()
     })
 
     it('copies only the latest calculated consultation summary and disables output after reset', async () => {

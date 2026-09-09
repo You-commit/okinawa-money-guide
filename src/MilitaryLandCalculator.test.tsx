@@ -110,7 +110,7 @@ const runManualCalculationWithAnnualCosts = async (
   return user
 }
 
-describe('MilitaryLandCalculator mobile result navigation', () => {
+describe('MilitaryLandCalculator result navigation', () => {
   const scrollIntoView = vi.fn()
 
   beforeEach(() => {
@@ -168,7 +168,7 @@ describe('MilitaryLandCalculator mobile result navigation', () => {
     ).toBe(results)
   })
 
-  it('does not move the viewport after a manual calculation on desktop', async () => {
+  it('moves to the result region after a successful manual calculation on desktop', async () => {
     setMobileViewport(false)
     render(<MilitaryLandCalculator />)
 
@@ -180,6 +180,27 @@ describe('MilitaryLandCalculator mobile result navigation', () => {
     )
 
     expect(screen.getByText('50.00倍')).toBeTruthy()
+    const results = screen.getByRole('region', {
+      name: 'シミュレーション結果',
+    })
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    })
+    expect(scrollIntoView.mock.instances[0]).toBe(results)
+    expect(document.activeElement).toBe(results)
+  })
+
+  it('does not move when the manual action is unavailable', async () => {
+    setMobileViewport(false)
+    render(<MilitaryLandCalculator />)
+
+    const button = screen.getByRole('button', {
+      name: 'シミュレートする',
+    })
+    expect((button as HTMLButtonElement).disabled).toBe(true)
+    await userEvent.setup().click(button)
+
     expect(scrollIntoView).not.toHaveBeenCalled()
   })
 

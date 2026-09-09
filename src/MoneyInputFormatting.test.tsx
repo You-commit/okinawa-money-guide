@@ -170,7 +170,7 @@ describe('simulator money fields', () => {
       target: { value: '20' },
     })
     fireEvent.click(screen.getByRole('button', {
-      name: '計算する',
+      name: 'シミュレートする',
     }))
 
     expect(screen.getAllByText('￥4,058,045').length).toBeGreaterThanOrEqual(2)

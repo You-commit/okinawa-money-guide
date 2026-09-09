@@ -428,6 +428,19 @@
   color: var(--page-accent);
 }
 
+.simulator-page .simulation-result-anchor {
+  scroll-margin-top: 104px;
+}
+
+.simulator-page .simulation-result-anchor:focus {
+  outline: none;
+}
+
+.simulator-page .simulation-result-anchor:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--page-accent) 28%, transparent);
+  outline-offset: 5px;
+}
+
 .tax-return-context {
   margin: 0 0 22px;
   padding: 13px 16px;
@@ -502,6 +515,84 @@
   border-color: #e6d6d9;
   background: rgba(255, 253, 253, 0.82);
   color: #685960;
+}
+
+.taxable-deduction-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.taxable-deduction-group {
+  overflow: clip;
+  border: 1px solid #e4d1d5;
+  border-radius: 12px;
+  background: rgba(255, 254, 254, 0.82);
+}
+
+.taxable-deduction-group__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  min-height: 58px;
+  padding: 11px 13px;
+  border: 0;
+  background: transparent;
+  color: #5f3440;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.taxable-deduction-group__trigger:hover {
+  background: rgba(244, 230, 232, 0.6);
+}
+
+.taxable-deduction-group__trigger:focus-visible {
+  outline: 3px solid rgba(147, 70, 85, 0.2);
+  outline-offset: -3px;
+}
+
+.taxable-deduction-group__trigger > span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.taxable-deduction-group__trigger strong {
+  color: #512d37;
+  font-size: 0.82rem;
+}
+
+.taxable-deduction-group__trigger small {
+  color: #79646a;
+  font-size: 0.67rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.taxable-deduction-group__trigger > span:last-child {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #d8bcc2;
+  border-radius: 50%;
+  background: #fffafa;
+  color: #934655;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.taxable-deduction-group .deduction-fields {
+  gap: 15px;
+  padding: 15px 13px 16px;
+  border-top: 1px solid #eadcdf;
+}
+
+.taxable-deduction-group .deduction-fields[hidden] {
+  display: none;
 }
 
 .simulator-page--taxable .simulator-chart-panel,
@@ -603,6 +694,76 @@
   font-size: 0.75rem;
   font-weight: 800;
   text-decoration: none;
+}
+
+.simulator-page--taxable .simulator-page__notes {
+  align-items: start;
+}
+
+.simulator-page--taxable .simulator-note-card {
+  min-height: 0;
+  padding: 18px;
+}
+
+.simulator-page--taxable .simulator-note-card--warning {
+  border-color: #ead5d9;
+  background: #fcf5f6;
+}
+
+.simulator-page--taxable .simulator-note-card--blue {
+  border-color: #e5d7d4;
+  background: #faf6f4;
+}
+
+.simulator-page--taxable .simulator-note-card--next {
+  border-color: #dfcbd0;
+  background: #fffafa;
+}
+
+.taxable-primary-sources {
+  display: grid;
+  gap: 7px;
+  margin: 11px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.simulator-note-card .taxable-primary-sources a {
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 0;
+  color: #813f4d;
+  font-size: 0.69rem;
+  line-height: 1.55;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.simulator-note-card .taxable-primary-sources a:hover {
+  color: #612f3a;
+}
+
+.simulator-note-card .taxable-primary-sources a:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid rgba(147, 70, 85, 0.2);
+  outline-offset: 3px;
+}
+
+.taxable-final-disclaimer {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 15px;
+  border-left: 3px solid #934655;
+  background: rgba(244, 230, 232, 0.62);
+  color: #6e5960;
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+
+.taxable-final-disclaimer strong {
+  margin-right: 0.4em;
+  color: #512d37;
 }
 
 /* Information pages */

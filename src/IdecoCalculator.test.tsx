@@ -7,7 +7,7 @@ import {
   screen,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import IdecoCalculator from './IdecoCalculator'
 import {
   IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR,
@@ -15,9 +15,29 @@ import {
   IDECO_SUPPORTED_EFFECTIVE_DATE_TO,
 } from './idecoRules'
 
+const scrollIntoView = vi.fn()
+
+beforeEach(() => {
+  vi.stubGlobal(
+    'requestAnimationFrame',
+    (callback: FrameRequestCallback) => {
+      callback(0)
+      return 0
+    },
+  )
+  Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+    configurable: true,
+    writable: true,
+    value: scrollIntoView,
+  })
+})
+
 afterEach(() => {
   cleanup()
+  scrollIntoView.mockClear()
+  Reflect.deleteProperty(HTMLElement.prototype, 'scrollIntoView')
   vi.restoreAllMocks()
+  vi.unstubAllGlobals()
 })
 
 const renderCalculator = (
@@ -177,6 +197,41 @@ describe('IdecoCalculator formal eligibility UX', () => {
     expect(screen.getAllByText('￥276,000').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('今年の掛金拠出月数').length)
       .toBeGreaterThanOrEqual(1)
+  })
+
+  it('moves to results only after a successful manual simulation', () => {
+    renderCalculator()
+    fillValidInputs()
+
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+    const results = document.querySelector('.calculator-results')!
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    })
+    expect(scrollIntoView.mock.instances[0]).toBe(results)
+    expect(document.activeElement).toBe(results)
+
+    scrollIntoView.mockClear()
+    fireEvent.change(screen.getByLabelText('毎月の掛金'), {
+      target: { value: '4000' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'シミュレートする' }))
+    expect(scrollIntoView).not.toHaveBeenCalled()
+  })
+
+  it('does not move to results during automatic calculation', () => {
+    renderCalculator()
+    fillValidInputs()
+    scrollIntoView.mockClear()
+
+    fireEvent.click(screen.getByRole('checkbox', {
+      name: '入力と同時に計算結果を更新する',
+    }))
+
+    expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
+    expect(scrollIntoView).not.toHaveBeenCalled()
   })
 
   it('clears a manual result and validation when editing resumes', () => {
