@@ -226,14 +226,34 @@
 }
 
 .simulator-page--taxable {
-  --page-accent: #5f43c7;
-  --page-accent-soft: #f3efff;
+  --page-accent: #934655;
+  --page-accent-soft: #f4e6e8;
+  background: #fcf7f7;
 }
 
 .simulator-page--taxable .simulator-page__hero {
   background:
-    linear-gradient(105deg, rgba(79, 55, 192, 0.96), rgba(50, 127, 218, 0.62)),
-    url('../assets/top-hero/OMG-TOP-HERO-PHOTO-ISHIGAKI-APPROVED-v1.0-20260816.png') center 52% / cover no-repeat;
+    linear-gradient(
+      90deg,
+      rgba(82, 25, 38, 0.92) 0%,
+      rgba(122, 51, 65, 0.82) 34%,
+      rgba(147, 70, 85, 0.48) 60%,
+      rgba(147, 70, 85, 0.16) 82%,
+      rgba(147, 70, 85, 0.06) 100%
+    ),
+    url('../assets/simulator-heroes/OMG-TAXABLE-INCOME-Hero-v1.png') center 40% / cover no-repeat;
+}
+
+.simulator-page--taxable .simulator-page__hero-wave {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath fill='%23FCF7F7' d='M0 31C180-12 346 56 570 31c236-26 380 26 570 3 126-15 211-5 300-25v55H0z'/%3E%3C/svg%3E");
+}
+
+.simulator-page--taxable .simulator-page__eyebrow {
+  color: #f8dfe4;
+}
+
+.simulator-page--taxable .simulator-page__hero-copy > p:last-child {
+  color: rgba(255, 247, 248, 0.9);
 }
 
 .simulator-page--ideco .simulator-page__benefits article {
@@ -254,13 +274,20 @@
 }
 
 .simulator-page--taxable .simulator-page__benefits article {
-  border-color: rgba(255, 255, 255, 0.62);
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--page-navy);
+  border-color: rgba(255, 232, 236, 0.38);
+  background: rgba(102, 39, 53, 0.46);
+  color: #ffffff;
+  box-shadow: 0 9px 22px rgba(75, 25, 38, 0.1);
+  backdrop-filter: blur(7px);
+}
+
+.simulator-page--taxable .simulator-page__benefits b {
+  background: rgba(244, 230, 232, 0.94);
+  color: #7a3341;
 }
 
 .simulator-page--taxable .simulator-page__benefits small {
-  color: #536c86;
+  color: rgba(255, 241, 244, 0.84);
 }
 
 .simulator-page__hero-inner {
@@ -444,6 +471,73 @@
   color: #60758a;
   font-size: 0.78rem;
   line-height: 1.75;
+}
+
+.simulator-page--taxable .simulator-page__calculator {
+  border-color: #eadcdf;
+  background: #fffefe;
+  box-shadow: 0 20px 52px rgba(82, 42, 51, 0.1);
+}
+
+.simulator-page--taxable .calculator-form {
+  border-color: #e4d1d5;
+  background: color-mix(in srgb, #f4e6e8 84%, #ffffff);
+}
+
+.simulator-page--taxable .taxable-input-mode {
+  border: 1px solid #e5d7d4;
+  background: #f3eae7;
+}
+
+.simulator-page--taxable .taxable-input-mode button {
+  color: #735b61;
+}
+
+.simulator-page--taxable .taxable-input-mode button.is-active {
+  color: #7a3341;
+  box-shadow: 0 4px 12px rgba(122, 51, 65, 0.09);
+}
+
+.simulator-page--taxable .taxable-basic-note {
+  border-color: #e6d6d9;
+  background: rgba(255, 253, 253, 0.82);
+  color: #685960;
+}
+
+.simulator-page--taxable .simulator-chart-panel,
+.simulator-page--taxable .simulator-breakdown-panel {
+  border-color: #eadcdf;
+  background: #fffefe;
+  box-shadow: 0 8px 22px rgba(82, 42, 51, 0.055);
+}
+
+.simulator-page--taxable .taxable-breakdown-grid .result-card {
+  border-color: #eadcdf;
+  background: #fffdfd;
+}
+
+.simulator-page--taxable .tax-return-context {
+  border-color: #d8cdf6;
+  background: #f8f5ff;
+  color: #55408f;
+}
+
+.simulator-page--taxable .apply-tax-rate-button--panel:not(:disabled) {
+  background: #6441c8;
+}
+
+.simulator-page--taxable .apply-tax-rate-button--panel:disabled {
+  background: #b6afb6;
+  color: #f8f6f8;
+}
+
+.simulator-page--taxable .apply-tax-rate-button--panel:hover:not(:disabled) {
+  background: #5234ad;
+  box-shadow: 0 8px 18px rgba(82, 52, 173, 0.2);
+}
+
+.simulator-page--taxable .apply-tax-rate-button--panel:focus-visible {
+  outline-color: rgba(100, 65, 200, 0.24);
 }
 
 .simulator-page__notes {
