@@ -1135,86 +1135,66 @@
   line-height: 1.55;
 }
 
+.ideco-input-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-column: 1 / -1;
+  gap: 10px 12px;
+  min-width: 0;
+}
+
+.ideco-input-group + .ideco-input-group {
+  padding-top: 11px;
+  border-top: 1px solid #e1dced;
+}
+
+.ideco-input-group__heading {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #5a438f;
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+.ideco-input-group > :is(
+  .ideco-field--wide,
+  .ideco-rule-summary,
+  .ideco-tax-mode-note,
+  .calculator-field
+) {
+  grid-column: 1 / -1;
+}
+
 .simulator-page--ideco .ideco-field {
   display: grid;
   gap: 7px;
 }
 
-.simulator-page--ideco .ideco-field > label,
-.simulator-page--ideco .ideco-field-label-row label {
+.simulator-page--ideco .ideco-field > label {
   color: #3f3965;
   font-size: 0.86rem;
   font-weight: 800;
   line-height: 1.45;
 }
 
-.ideco-field-label-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.ideco-info-tooltip {
-  position: relative;
-  display: inline-flex;
-}
-
-.ideco-info-tooltip__trigger {
-  display: inline-grid;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  place-items: center;
-  border: 1px solid #a99bd2;
-  border-radius: 999px;
-  background: #ffffff;
-  color: #5a438f;
-  font: inherit;
-  font-size: 0.72rem;
-  font-weight: 850;
-  cursor: help;
-}
-
-.ideco-info-tooltip__trigger:focus-visible {
-  outline: 3px solid rgba(113, 84, 202, 0.2);
-  outline-offset: 2px;
-}
-
-.ideco-info-tooltip__content {
-  position: absolute;
-  z-index: 20;
-  top: calc(100% + 7px);
-  left: 0;
-  display: none;
-  width: min(320px, 76vw);
-  padding: 11px 12px;
-  border: 1px solid #d6cdea;
-  border-radius: 9px;
-  background: #ffffff;
-  box-shadow: 0 10px 26px rgba(55, 40, 98, 0.14);
-  color: #57506c;
-  font-size: 0.68rem;
-  font-weight: 500;
-  line-height: 1.65;
-}
-
-.ideco-info-tooltip:hover .ideco-info-tooltip__content,
-.ideco-info-tooltip:focus-within .ideco-info-tooltip__content {
-  display: block;
-}
-
 .ideco-resident-tax-helper {
   justify-self: start;
-  min-height: 38px;
-  padding: 6px 10px;
-  border: 1px solid #bcb0dc;
+  min-height: 34px;
+  padding: 5px 11px;
+  border: 1px solid #7658ce;
   border-radius: 8px;
-  background: #faf9ff;
+  background: #ffffff;
   color: #57428d;
   font: inherit;
   font-size: 0.68rem;
   font-weight: 800;
   cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease;
 }
 
 .ideco-resident-tax-helper:hover {
@@ -1680,6 +1660,7 @@
     .simulator-panel-heading,
     .ideco-tax-mode-selector,
     .ideco-tax-mode-note,
+    .ideco-input-group,
     .ideco-field--wide,
     .ideco-error-summary,
     .ideco-rule-summary,
@@ -1702,8 +1683,7 @@
     gap: 4px;
   }
 
-  .simulator-page--ideco .ideco-field > label,
-  .simulator-page--ideco .ideco-field-label-row label {
+  .simulator-page--ideco .ideco-field > label {
     font-size: 0.7rem;
   }
 
@@ -1742,6 +1722,7 @@
 
 @media (max-width: 620px) {
   .ideco-tax-mode-selector > div,
+  .ideco-input-group,
   .ideco-detailed-tax-breakdown dl,
   .ideco-consultation-summary__section dl {
     grid-template-columns: 1fr;
@@ -1770,9 +1751,6 @@
     columns: 1;
   }
 
-  .ideco-info-tooltip__content {
-    width: min(290px, 82vw);
-  }
 }
 
 .simulator-page--ideco .result-card--contribution-total {

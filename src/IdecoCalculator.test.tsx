@@ -367,10 +367,11 @@ describe('IdecoCalculator formal eligibility UX', () => {
       '住民税所得割率',
     ) as HTMLInputElement
     const standardRateButton = screen.getByRole('button', {
-      name: '一般的な標準税率10%を入力',
+      name: '標準税率10%を入力',
     })
 
     expect(residentTaxRate.value).toBe('')
+    expect(standardRateButton.getAttribute('type')).toBe('button')
     await user.click(standardRateButton)
     expect(residentTaxRate.value).toBe('10')
     expect(screen.queryByText('￥55,780')).toBeNull()
@@ -383,6 +384,12 @@ describe('IdecoCalculator formal eligibility UX', () => {
     const info = screen.getByRole('button', {
       name: '住民税所得割率の確認方法',
     })
+    const incomeTaxInfo = screen.getByRole('button', {
+      name: '課税所得についての説明',
+    })
+
+    expect(info.textContent).toBe('?')
+    expect(info.className).toBe(incomeTaxInfo.className)
     info.focus()
     expect(document.activeElement).toBe(info)
     expect(screen.getByText(
@@ -390,13 +397,46 @@ describe('IdecoCalculator formal eligibility UX', () => {
     )).toBeTruthy()
 
     const standardRateButton = screen.getByRole('button', {
-      name: '一般的な標準税率10%を入力',
+      name: '標準税率10%を入力',
     })
     standardRateButton.focus()
     await user.keyboard('{Enter}')
     expect(
       (screen.getByLabelText('住民税所得割率') as HTMLInputElement).value,
     ).toBe('10')
+
+    fireEvent.change(screen.getByLabelText('住民税所得割率'), {
+      target: { value: '' },
+    })
+    standardRateButton.focus()
+    await user.keyboard(' ')
+    expect(
+      (screen.getByLabelText('住民税所得割率') as HTMLInputElement).value,
+    ).toBe('10')
+  })
+
+  it('groups eligibility, contribution, and tax inputs by meaning', () => {
+    renderCalculator()
+
+    const eligibility = screen.getByRole('region', {
+      name: '制度・加入条件',
+    })
+    const contribution = screen.getByRole('region', {
+      name: '掛金・期間',
+    })
+    const tax = screen.getByRole('region', { name: '税率' })
+
+    expect(eligibility.contains(screen.getByLabelText('制度適用日'))).toBe(true)
+    expect(eligibility.contains(screen.getByLabelText('現在の年齢'))).toBe(true)
+    expect(eligibility.contains(screen.getByLabelText('加入区分'))).toBe(true)
+    expect(contribution.contains(screen.getByLabelText('毎月の掛金'))).toBe(true)
+    expect(contribution.contains(screen.getByLabelText('実拠出月数'))).toBe(true)
+    expect(contribution.contains(screen.getByLabelText('長期参考期間'))).toBe(true)
+    expect(tax.contains(screen.getByLabelText('所得税率'))).toBe(true)
+    expect(tax.contains(screen.getByLabelText('住民税所得割率'))).toBe(true)
+    expect(tax.contains(screen.getByRole('button', {
+      name: '標準税率10%を入力',
+    }))).toBe(true)
   })
 
   it('recalculates after the standard resident-tax action only when AUTO is on and all other values are valid', () => {
@@ -411,7 +451,7 @@ describe('IdecoCalculator formal eligibility UX', () => {
 
     expect(screen.queryByText('￥55,780')).toBeNull()
     fireEvent.click(screen.getByRole('button', {
-      name: '一般的な標準税率10%を入力',
+      name: '標準税率10%を入力',
     }))
     expect(screen.getAllByText('￥55,780').length).toBeGreaterThanOrEqual(1)
   })
@@ -451,7 +491,7 @@ describe('IdecoCalculator formal eligibility UX', () => {
   it('restores a resident rate entered with the standard helper', () => {
     renderCalculator()
     fireEvent.click(screen.getByRole('button', {
-      name: '一般的な標準税率10%を入力',
+      name: '標準税率10%を入力',
     }))
     fireEvent.click(screen.getByRole('button', { name: '入力内容をリセット' }))
     fireEvent.click(screen.getByRole('button', { name: '元に戻す' }))
