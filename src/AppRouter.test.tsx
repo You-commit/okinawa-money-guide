@@ -297,6 +297,41 @@ describe('dedicated page routing', () => {
       .toBe('#popular-simulators')
   })
 
+  it('keeps the floating simulator CTA reusable by pointer and keyboard', async () => {
+    const user = userEvent.setup()
+    renderAt('/')
+
+    const simulatorList = document.getElementById('popular-simulators')!
+    const scrollIntoView = vi.mocked(simulatorList.scrollIntoView)
+    scrollIntoView.mockClear()
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const callCountBefore = scrollIntoView.mock.calls.length
+      const cta = screen.getByRole('link', {
+        name: '人気のシミュレーターへ移動する',
+      })
+      await user.click(cta)
+      expect(cta.hasAttribute('disabled')).toBe(false)
+      expect(scrollIntoView.mock.calls.length).toBeGreaterThan(callCountBefore)
+    }
+
+    expect(scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    })
+
+    const cta = screen.getByRole('link', {
+      name: '人気のシミュレーターへ移動する',
+    })
+    cta.focus()
+    const callCountBeforeKeyboard = scrollIntoView.mock.calls.length
+    await user.keyboard('{Enter}')
+    await user.keyboard(' ')
+
+    expect(scrollIntoView.mock.calls.length).toBe(callCountBeforeKeyboard + 2)
+    expect(document.activeElement).toBe(cta)
+  })
+
   it('moves from iDeCo to taxable income and returns only the calculated rate', async () => {
     const user = userEvent.setup()
     renderAt('/simulators/ideco')

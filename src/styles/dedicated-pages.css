@@ -728,6 +728,10 @@
   list-style: none;
 }
 
+.simulator-note-card .taxable-primary-sources {
+  padding-inline-start: 0;
+}
+
 .simulator-note-card .taxable-primary-sources a {
   display: inline;
   width: auto;
