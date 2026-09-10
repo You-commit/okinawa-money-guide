@@ -169,6 +169,8 @@ describe('dedicated page routing', () => {
       expect(link.getAttribute('href')).toMatch(/^https:\/\/www\.nta\.go\.jp\//)
       expect(link.getAttribute('target')).toBe('_blank')
       expect(link.getAttribute('rel')).toBe('noreferrer')
+      expect(link.lastElementChild?.textContent).toBe('↗')
+      expect(link.lastElementChild?.getAttribute('aria-hidden')).toBe('true')
     }
   })
 
@@ -265,6 +267,34 @@ describe('dedicated page routing', () => {
     expect(screen.getByRole('link', { name: /貯める/ }).getAttribute('href')).toBe('/knowledge#save')
     expect(screen.getByRole('link', { name: /増やす/ }).getAttribute('href')).toBe('/knowledge#grow')
     expect(document.querySelector('a[href="/knowledge#protect"]')).toBeTruthy()
+  })
+
+  it('adds meaningful homepage guidance using only existing destinations', () => {
+    renderAt('/')
+
+    const useCases = screen.getByRole('heading', {
+      level: 2,
+      name: 'こんなときに使えます',
+    }).closest('section')!
+    expect(within(useCases).getByRole('link', { name: /住宅を買う前に/ }).getAttribute('href'))
+      .toBe('/simulators/mortgage')
+    expect(within(useCases).getByRole('link', { name: /将来のお金を準備したい/ }).getAttribute('href'))
+      .toBe('/simulators/nisa')
+    expect(within(useCases).getByRole('link', { name: /節税額を確認したい/ }).getAttribute('href'))
+      .toBe('/simulators/ideco')
+    expect(within(useCases).getByRole('link', { name: /沖縄ならではの資産を検討したい/ }).getAttribute('href'))
+      .toBe('/simulators/military-land')
+
+    expect(screen.getByRole('heading', {
+      level: 2,
+      name: '数字を入れるだけで、判断材料が見えてきます',
+    })).toBeTruthy()
+    expect(screen.getByRole('link', { name: /お金の知識を見る/ }).getAttribute('href'))
+      .toBe('/knowledge')
+    expect(screen.getByRole('link', { name: /情報と運営の方針を見る/ }).getAttribute('href'))
+      .toBe('/trust')
+    expect(screen.getByRole('link', { name: /シミュレーターを選ぶ/ }).getAttribute('href'))
+      .toBe('#popular-simulators')
   })
 
   it('moves from iDeCo to taxable income and returns only the calculated rate', async () => {

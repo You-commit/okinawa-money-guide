@@ -729,15 +729,21 @@
 }
 
 .simulator-note-card .taxable-primary-sources a {
-  align-items: flex-start;
-  justify-content: space-between;
-  width: 100%;
+  display: inline;
+  width: auto;
+  max-width: 100%;
   margin-top: 0;
   color: #813f4d;
   font-size: 0.69rem;
   line-height: 1.55;
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.simulator-note-card .taxable-primary-sources a > span {
+  display: inline-block;
+  margin-left: 5px;
+  text-decoration: none;
 }
 
 .simulator-note-card .taxable-primary-sources a:hover {

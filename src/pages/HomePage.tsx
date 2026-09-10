@@ -2,10 +2,10 @@ import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { oldToolHashRoutes } from '../app/routes'
 import FloatingSimulatorCta from '../components/top/FloatingSimulatorCta'
+import HomeEnrichment from '../components/top/HomeEnrichment'
 import PopularSimulators from '../components/top/PopularSimulators'
 import PurposeGuide from '../components/top/PurposeGuide'
 import TopHero from '../components/top/TopHero'
-import TrustSection from '../components/top/TrustSection'
 import SiteLayout from '../layouts/SiteLayout'
 
 function HomePage() {
@@ -25,7 +25,7 @@ function HomePage() {
         <TopHero />
         <PopularSimulators />
         <PurposeGuide />
-        <TrustSection />
+        <HomeEnrichment />
       </main>
       <FloatingSimulatorCta />
     </SiteLayout>
