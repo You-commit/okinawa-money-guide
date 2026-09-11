@@ -1,21 +1,10 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { routes } from './routes'
-
-const siteName = '沖縄マネーガイド'
-const canonicalOrigin = 'https://okinawamoneyguide.jp'
-
-const metadata: Record<string, { title: string; description: string }> = {
-  [routes.home]: { title: siteName, description: 'ローン、資産運用、軍用地など、沖縄に関係するお金の情報と無料計算ツールを提供する沖縄マネーガイドです。' },
-  [routes.militaryLand]: { title: `軍用地利回りシミュレーター | ${siteName}`, description: '年間借地料と購入価格から、軍用地の倍率・表面利回り・購入価格の目安を無料で試算できます。' },
-  [routes.mortgage]: { title: `住宅ローンシミュレーター | ${siteName}`, description: '元利均等返済と元金均等返済の毎月返済額・総返済額を比較できる無料シミュレーターです。' },
-  [routes.nisa]: { title: `NISAシミュレーター | ${siteName}`, description: '積立額、想定利回り、運用期間から将来の資産額と運用益の目安を試算できます。' },
-  [routes.ideco]: { title: `iDeCo節税シミュレーター | ${siteName}`, description: '毎月の掛金と税率から、iDeCoによる所得税・住民税の軽減額を無料で試算できます。' },
-  [routes.taxableIncome]: { title: `課税所得・所得税率シミュレーター | ${siteName}`, description: '給与収入と所得控除から、2026年分の課税所得・所得税率・所得税額を概算します。' },
-  [routes.knowledge]: { title: `お金の知識 | ${siteName}`, description: '借りる・貯める・増やす・備えるの目的から、基礎知識と無料シミュレーターを探せます。' },
-  [routes.about]: { title: `このサイトについて | ${siteName}`, description: '沖縄マネーガイドの目的、対象、情報とシミュレーターの読み方をご案内します。' },
-  [routes.trust]: { title: `信頼情報 | ${siteName}`, description: '情報源、基準時点、更新・訂正、計算方針、データ、広告・提携に関する運営方針です。' },
-}
+import {
+  getRouteSeo,
+  getRouteStructuredData,
+  notFoundSeo,
+} from './seo'
 
 function updateMeta(name: string, content: string) {
   let element = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`)
@@ -27,22 +16,91 @@ function updateMeta(name: string, content: string) {
   element.content = content
 }
 
+function updatePropertyMeta(property: string, content: string) {
+  let element = document.querySelector<HTMLMetaElement>(`meta[property="${property}"]`)
+  if (!element) {
+    element = document.createElement('meta')
+    element.setAttribute('property', property)
+    document.head.append(element)
+  }
+  element.content = content
+}
+
+function removeMeta(selector: string) {
+  document.querySelector(selector)?.remove()
+}
+
+function updateCanonical(href: string | undefined) {
+  const current = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+
+  if (!href) {
+    current?.remove()
+    return
+  }
+
+  const canonical = current ?? document.createElement('link')
+  canonical.rel = 'canonical'
+  canonical.href = href
+  if (!current) document.head.append(canonical)
+}
+
+function updateStructuredData(structuredData: object | undefined) {
+  const current = document.querySelector<HTMLScriptElement>(
+    '#website-structured-data',
+  )
+
+  if (!structuredData) {
+    current?.remove()
+    return
+  }
+
+  const element = current ?? document.createElement('script')
+  element.id = 'website-structured-data'
+  element.type = 'application/ld+json'
+  element.textContent = JSON.stringify(structuredData)
+  if (!current) document.head.append(element)
+}
+
 function RouteEffects() {
   const location = useLocation()
 
   useEffect(() => {
-    const current = metadata[location.pathname]
-    document.title = current?.title ?? `ページが見つかりません | ${siteName}`
-    updateMeta('description', current?.description ?? 'お探しのページは見つかりませんでした。')
-    updateMeta('robots', current ? 'index, follow' : 'noindex, follow')
+    const current = getRouteSeo(location.pathname)
+    document.title = current?.title ?? notFoundSeo.title
+    updateMeta('description', current?.description ?? notFoundSeo.description)
+    updateMeta('robots', current?.robots ?? notFoundSeo.robots)
+    updateCanonical(current?.canonical)
+    updateStructuredData(getRouteStructuredData(location.pathname))
 
-    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
-    if (!canonical) {
-      canonical = document.createElement('link')
-      canonical.rel = 'canonical'
-      document.head.append(canonical)
+    if (current) {
+      updatePropertyMeta('og:title', current.openGraph.title)
+      updatePropertyMeta('og:description', current.openGraph.description)
+      updatePropertyMeta('og:url', current.openGraph.url)
+      updatePropertyMeta('og:type', current.openGraph.type)
+      updatePropertyMeta('og:site_name', current.openGraph.siteName)
+      updatePropertyMeta('og:locale', current.openGraph.locale)
+      updateMeta('twitter:card', current.twitter.card)
+      updateMeta('twitter:title', current.twitter.title)
+      updateMeta('twitter:description', current.twitter.description)
+    } else {
+      for (const property of [
+        'og:title',
+        'og:description',
+        'og:url',
+        'og:type',
+        'og:site_name',
+        'og:locale',
+      ]) {
+        removeMeta(`meta[property="${property}"]`)
+      }
+      for (const name of [
+        'twitter:card',
+        'twitter:title',
+        'twitter:description',
+      ]) {
+        removeMeta(`meta[name="${name}"]`)
+      }
     }
-    canonical.href = `${canonicalOrigin}${location.pathname}`
   }, [location.pathname])
 
   useEffect(() => {

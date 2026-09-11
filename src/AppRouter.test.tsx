@@ -49,12 +49,47 @@ describe('dedicated page routing', () => {
   ])('renders %s as a dedicated route', (path, heading) => {
     renderAt(path)
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeTruthy()
+    expect(document.querySelectorAll('h1')).toHaveLength(1)
   })
 
   it('renders a 404 page for an unknown URL', () => {
     renderAt('/missing-page')
     expect(screen.getByRole('heading', { level: 1, name: 'ページが見つかりません' })).toBeTruthy()
     expect(document.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex, follow')
+    expect(document.querySelector('link[rel="canonical"]')).toBeNull()
+    expect(document.querySelector('meta[property^="og:"]')).toBeNull()
+  })
+
+  it.each([
+    ['/', 'https://okinawamoneyguide.jp/'],
+    ['/simulators/military-land', 'https://okinawamoneyguide.jp/simulators/military-land'],
+    ['/simulators/mortgage', 'https://okinawamoneyguide.jp/simulators/mortgage'],
+    ['/simulators/nisa', 'https://okinawamoneyguide.jp/simulators/nisa'],
+    ['/simulators/ideco?incomeTaxRate=10', 'https://okinawamoneyguide.jp/simulators/ideco'],
+    ['/simulators/taxable-income', 'https://okinawamoneyguide.jp/simulators/taxable-income'],
+    ['/knowledge', 'https://okinawamoneyguide.jp/knowledge'],
+    ['/about', 'https://okinawamoneyguide.jp/about'],
+    ['/trust', 'https://okinawamoneyguide.jp/trust'],
+  ])('applies complete runtime metadata on %s', (path, canonical) => {
+    renderAt(path)
+
+    const title = document.title
+    const description = document.querySelector('meta[name="description"]')
+      ?.getAttribute('content')
+    expect(title).not.toBe('')
+    expect(description).toBeTruthy()
+    expect(document.querySelector('meta[name="robots"]')?.getAttribute('content'))
+      .toBe('index, follow')
+    expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href'))
+      .toBe(canonical)
+    expect(document.querySelector('meta[property="og:title"]')?.getAttribute('content'))
+      .toBe(title)
+    expect(document.querySelector('meta[property="og:description"]')?.getAttribute('content'))
+      .toBe(description)
+    expect(document.querySelector('meta[property="og:url"]')?.getAttribute('content'))
+      .toBe(canonical)
+    expect(document.querySelector('meta[name="twitter:title"]')?.getAttribute('content'))
+      .toBe(title)
   })
 
   it('renders the approved NISA hero content without the retired motion layer', () => {
