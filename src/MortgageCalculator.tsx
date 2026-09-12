@@ -6,14 +6,24 @@ import {
   type ChangeEvent,
   type FocusEvent,
   type FormEvent,
+  type KeyboardEvent,
 } from 'react'
 import './MortgageCalculator.css'
+import MoneyInput from './components/form/MoneyInput'
+import { navigateToSimulationResult } from './utils/simulationResultNavigation'
+import {
+  createMortgageConsultationSummary,
+  MORTGAGE_EXCLUDED_ITEMS,
+  MORTGAGE_LENDER_CONFIRMATION_ITEMS,
+} from './mortgageConsultationSummary'
 import {
   calculateMortgageComparison,
+  calculateMortgageTrajectory,
   createMortgageComparisonExplanation,
   createMortgageComparisonInputKey,
   formatApproxMortgageYen,
   formatLoanAmountForDisplay,
+  MORTGAGE_LIMITS,
   normalizeAnnualRateText,
   normalizeRepaymentYearsText,
   validateMortgageFields,
@@ -23,6 +33,7 @@ import {
   type MortgageFieldValues,
   type MortgageComparison,
   type MortgageInput,
+  type MortgageTrajectoryPoint,
   type RepaymentMethod,
 } from './mortgage'
 
@@ -32,6 +43,7 @@ type StoredCalculation = {
   input: MortgageInput
   inputKey: string
   comparison: MortgageComparison
+  calculatedAt: string
 }
 
 type ResetSnapshot = {
@@ -41,6 +53,7 @@ type ResetSnapshot = {
   isAutoCalculation: boolean
   hasSubmitted: boolean
   manualCalculation: StoredCalculation | null
+  isManualCalculationInvalidated: boolean
   manualCalculationError: MortgageCalculationError | null
 }
 
@@ -50,8 +63,286 @@ type CalculatorViewState =
   | 'invalid'
   | 'ready'
   | 'calculated'
-  | 'stale'
   | 'calculation-error'
+
+type MortgageTrajectoryChartProps = {
+  title: string
+  tone: 'blue' | 'green'
+  points: MortgageTrajectoryPoint[]
+  paymentCount: number
+}
+
+const formatMortgageChartYen = (value: number) =>
+  `${Math.round(value / 10_000).toLocaleString('ja-JP')}万円`
+
+const formatMortgageDifferenceYen = (value: number) => {
+  const absoluteDifference = Math.abs(value)
+
+  return Math.round(absoluteDifference) === 0
+    ? '0円'
+    : formatApproxMortgageYen(absoluteDifference)
+}
+
+function MortgageTrajectoryChart({
+  title,
+  tone,
+  points,
+  paymentCount,
+}: MortgageTrajectoryChartProps) {
+  const maxTotal = Math.max(
+    1,
+    ...points.map(
+      (point) =>
+        point.cumulativePrincipal + point.cumulativeInterest,
+    ),
+  )
+
+  return (
+    <article
+      className="mortgage-trajectory-card"
+      data-tone={tone}
+    >
+      <header>
+        <h4>{title}</h4>
+        <span>
+          <i className="mortgage-trajectory-legend__principal" />
+          元金
+          <i className="mortgage-trajectory-legend__interest" />
+          利息
+        </span>
+      </header>
+      <div
+        className="mortgage-trajectory"
+        aria-label={`${title}の元金と利息の累計推移`}
+      >
+        {points.map((point) => {
+          const total =
+            point.cumulativePrincipal +
+            point.cumulativeInterest
+          const totalHeight = total / maxTotal * 100
+          const interestRatio =
+            total > 0
+              ? point.cumulativeInterest / total * 100
+              : 0
+
+          return (
+            <div
+              className="mortgage-trajectory__point"
+              key={point.paymentNumber}
+            >
+              <span>
+                {point.paymentNumber === paymentCount
+                  ? formatMortgageChartYen(total)
+                  : ''}
+              </span>
+              <div className="mortgage-trajectory__plot">
+                <i style={{ height: `${totalHeight}%` }}>
+                  <b style={{ height: `${interestRatio}%` }} />
+                </i>
+              </div>
+              <small>
+                {point.paymentNumber === 0
+                  ? '開始'
+                  : point.paymentNumber === paymentCount
+                    ? '完済'
+                    : `${Math.round(point.paymentNumber / 12)}年`}
+              </small>
+            </div>
+          )
+        })}
+      </div>
+    </article>
+  )
+}
+
+function MortgageEmptyResults() {
+  const emptyMethods = [
+    { title: '元利均等返済', tone: 'blue' as const },
+    { title: '元金均等返済', tone: 'green' as const },
+  ]
+
+  return (
+    <div className="mortgage-empty-skeleton">
+      <div
+        className="mortgage-results-overview mortgage-results-overview--empty"
+        aria-label="返済方式の比較結果（未計算）"
+      >
+        {emptyMethods.map((method) => (
+          <article
+            className="mortgage-comparison-card"
+            data-tone={method.tone}
+            key={method.title}
+          >
+            <header className="mortgage-comparison-card__heading">
+              <div>
+                <p>条件入力後に表示</p>
+                <h4>{method.title}</h4>
+              </div>
+            </header>
+            <dl className="mortgage-comparison-card__values">
+              {['毎月返済額', '初年度年間返済額（概算）', '最終回返済額', '総返済額', '支払利息総額'].map((label) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>―</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        ))}
+
+        <article className="mortgage-comparison-delta">
+          <header>
+            <p>COMPARISON</p>
+            <h4>2方式の差額</h4>
+          </header>
+          <dl>
+            <div><dt>初回返済額の差</dt><dd>―</dd></div>
+            <div><dt>支払利息の差</dt><dd>―</dd></div>
+          </dl>
+          <p>条件を入力すると、2つの返済方式の差額を表示します。</p>
+        </article>
+      </div>
+
+      <section className="mortgage-trajectories-section mortgage-trajectories-section--empty">
+        <header>
+          <div>
+            <p>PAYMENT TRAJECTORY</p>
+            <h4>累計返済額の推移</h4>
+          </div>
+          <span>条件入力後に表示</span>
+        </header>
+        <div className="mortgage-trajectories-grid">
+          {emptyMethods.map((method) => (
+            <article
+              className="mortgage-trajectory-card"
+              data-tone={method.tone}
+              key={method.title}
+            >
+              <header>
+                <h4>{method.title}</h4>
+                <span>元金・利息</span>
+              </header>
+              <div className="mortgage-trajectory mortgage-trajectory--empty" aria-hidden="true">
+                {[12, 24, 36, 48, 60, 72, 84].map((height, index) => (
+                  <div className="mortgage-trajectory__point" key={height}>
+                    <span />
+                    <div className="mortgage-trajectory__plot">
+                      <i style={{ height: `${height}%` }}><b /></i>
+                    </div>
+                    <small>{index === 0 ? '開始' : index === 6 ? '完済' : '―'}</small>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <div className="mortgage-results__condition-heading mortgage-results__condition-heading--compact">
+        <strong>入力条件</strong>
+        <span>条件入力後に表示</span>
+      </div>
+      <dl className="mortgage-conditions mortgage-conditions--compact">
+        {['借入金額', '年利', '返済期間', '返済回数'].map((label) => (
+          <div key={label}><dt>{label}</dt><dd>―</dd></div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
+type MortgageConsultationSummaryContentProps = {
+  calculation: StoredCalculation
+  repaymentMethod: RepaymentMethod
+}
+
+function MortgageConsultationSummaryContent({
+  calculation,
+  repaymentMethod,
+}: MortgageConsultationSummaryContentProps) {
+  const { comparison, input } = calculation
+  const repaymentMethodLabel = repaymentMethod === 'equal-payment'
+    ? '元利均等返済'
+    : '元金均等返済'
+
+  return (
+    <div
+      className="mortgage-consultation-summary__content"
+      aria-label="相談用サマリー本文"
+    >
+      <header className="mortgage-consultation-summary__document-heading">
+        <p>沖縄マネーガイド</p>
+        <h4>住宅ローンシミュレーター 相談用サマリー</h4>
+        <span>
+          金融機関への相談時に、入力条件と概算結果を確認するための資料です。
+        </span>
+      </header>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>入力条件</h5>
+        <dl>
+          <div><dt>借入金額</dt><dd>{input.principal.toLocaleString('ja-JP')}円</dd></div>
+          <div><dt>年利</dt><dd>{input.annualRate.toLocaleString('ja-JP', { maximumFractionDigits: 3 })}%</dd></div>
+          <div><dt>返済期間</dt><dd>{input.paymentCount / 12}年</dd></div>
+          <div><dt>返済回数</dt><dd>{input.paymentCount.toLocaleString('ja-JP')}回</dd></div>
+          <div><dt>強調表示中の返済方式</dt><dd>{repaymentMethodLabel}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>元利均等返済</h5>
+        <dl>
+          <div><dt>毎月返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.firstPayment)}</dd></div>
+          <div><dt>初年度年間返済額（概算）</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.firstYearPaymentTotal)}</dd></div>
+          <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.lastPayment)}</dd></div>
+          <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.totalPayment)}</dd></div>
+          <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(comparison.equalPayment.totalInterest)}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>元金均等返済</h5>
+        <dl>
+          <div><dt>初回返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.firstPayment)}</dd></div>
+          <div><dt>初年度年間返済額（概算）</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.firstYearPaymentTotal)}</dd></div>
+          <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.lastPayment)}</dd></div>
+          <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.totalPayment)}</dd></div>
+          <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(comparison.equalPrincipal.totalInterest)}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>2方式の差額</h5>
+        <dl>
+          <div><dt>初回返済額の差</dt><dd>{formatMortgageDifferenceYen(comparison.differences.firstPayment)}</dd></div>
+          <div><dt>支払利息の差</dt><dd>{formatMortgageDifferenceYen(comparison.differences.totalInterest)}</dd></div>
+        </dl>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>計算上含まれない費用・条件</h5>
+        <ul>
+          {MORTGAGE_EXCLUDED_ITEMS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mortgage-consultation-summary__section">
+        <h5>金融機関へ確認する項目</h5>
+        <ul>
+          {MORTGAGE_LENDER_CONFIRMATION_ITEMS.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <p className="mortgage-consultation-summary__notice">
+        本サマリーは概算結果です。実際の返済条件は金融機関へご確認ください。
+      </p>
+    </div>
+  )
+}
 
 const FIELD_NAMES: MortgageFieldName[] = [
   'loanAmount',
@@ -79,6 +370,33 @@ const EMPTY_TOUCHED_FIELDS: TouchedFields = {
 
 const CALCULATION_ERROR_MESSAGE =
   '計算処理中に問題が発生しました。入力内容を確認して、もう一度お試しください。'
+
+const getRepaymentYearsSliderState = (
+  value: string,
+) => {
+  const normalized = normalizeRepaymentYearsText(value)
+  const parsed = Number(normalized)
+  const isValid =
+    /^\d+$/.test(normalized) &&
+    parsed >= MORTGAGE_LIMITS.repaymentYears.min &&
+    parsed <= MORTGAGE_LIMITS.repaymentYears.max
+
+  if (isValid) {
+    return {
+      value: String(parsed),
+      valueText: `${parsed}年`,
+      isEmpty: false,
+    }
+  }
+
+  return {
+    value: String(MORTGAGE_LIMITS.repaymentYears.min),
+    valueText: normalized === ''
+      ? '未入力'
+      : '入力値を確認してください',
+    isEmpty: normalized === '',
+  }
+}
 
 const hasAnyInput = (values: MortgageFieldValues) =>
   FIELD_NAMES.some((fieldName) => values[fieldName] !== '')
@@ -140,16 +458,10 @@ const createStoredCalculation = (
   input,
   inputKey: createMortgageComparisonInputKey(input),
   comparison,
+  calculatedAt: new Date().toISOString(),
 })
 
-const getResultHeading = (
-  isStale: boolean,
-  hasResult: boolean,
-) => {
-  if (isStale) {
-    return '前回の概算結果'
-  }
-
+const getResultHeading = (hasResult: boolean) => {
   if (hasResult) {
     return '概算結果'
   }
@@ -159,7 +471,6 @@ const getResultHeading = (
 
 const getStatusMessage = (
   viewState: CalculatorViewState,
-  hasVisibleErrors: boolean,
 ) => {
   switch (viewState) {
     case 'idle':
@@ -172,10 +483,6 @@ const getStatusMessage = (
       return '入力内容を確認し、シミュレートしてください。'
     case 'calculated':
       return '概算結果を更新しました。'
-    case 'stale':
-      return hasVisibleErrors
-        ? '条件が変更され、入力内容にも確認が必要です。前回の結果を表示しています。'
-        : '条件が変更されました。再計算してください。前回の結果を表示しています。'
     case 'calculation-error':
       return CALCULATION_ERROR_MESSAGE
   }
@@ -188,8 +495,6 @@ const getStatusTone = (
     case 'invalid':
     case 'calculation-error':
       return 'error'
-    case 'stale':
-      return 'warning'
     case 'calculated':
       return 'success'
     case 'ready':
@@ -217,6 +522,10 @@ function MortgageCalculator() {
   const [manualCalculation, setManualCalculation] =
     useState<StoredCalculation | null>(null)
   const [
+    isManualCalculationInvalidated,
+    setIsManualCalculationInvalidated,
+  ] = useState(false)
+  const [
     manualCalculationError,
     setManualCalculationError,
   ] = useState<MortgageCalculationError | null>(null)
@@ -224,17 +533,25 @@ function MortgageCalculator() {
     useState<ResetSnapshot | null>(null)
   const [statusMessageOverride, setStatusMessageOverride] =
     useState<string | null>(null)
+  const [summaryActionStatus, setSummaryActionStatus] =
+    useState<'copied' | 'copy-error' | null>(null)
 
   const errorSummaryRef =
     useRef<HTMLDivElement>(null)
   const pendingErrorSummaryFocusRef =
     useRef(false)
+  const summaryStatusTimerRef =
+    useRef<number | null>(null)
+  const copyRequestIdRef =
+    useRef(0)
   const loanAmountRef =
     useRef<HTMLInputElement>(null)
   const annualInterestRateRef =
     useRef<HTMLInputElement>(null)
   const repaymentYearsRef =
     useRef<HTMLInputElement>(null)
+  const resultsRef =
+    useRef<HTMLElement>(null)
 
   const fieldRefs = {
     loanAmount: loanAmountRef,
@@ -290,15 +607,17 @@ function MortgageCalculator() {
     }
 
     const errors: MortgageFieldErrors = {}
-    const showAllErrors =
-      !isAutoCalculation && hasSubmitted
+
+    if (!isAutoCalculation && !hasSubmitted) {
+      return errors
+    }
 
     for (const fieldName of FIELD_NAMES) {
       const error = validation.errors[fieldName]
 
       if (
         error &&
-        (showAllErrors || touchedFields[fieldName])
+        (!isAutoCalculation || touchedFields[fieldName])
       ) {
         errors[fieldName] = error
       }
@@ -344,17 +663,67 @@ function MortgageCalculator() {
     pendingErrorSummaryFocusRef.current = false
   }, [shouldShowErrorSummary])
 
-  const isManualResultStale =
-    !isAutoCalculation &&
-    manualCalculation !== null &&
-    currentInputKey !== manualCalculation.inputKey
-
   const activeCalculation =
     isAutoCalculation
       ? autoCalculationOutcome?.ok
         ? autoCalculationOutcome.stored
         : null
-      : manualCalculation
+      : isManualCalculationInvalidated
+        ? null
+        : manualCalculation
+
+  const mortgageTrajectories = useMemo(() => {
+    if (activeCalculation === null) {
+      return null
+    }
+
+    const equalPayment = calculateMortgageTrajectory(
+      activeCalculation.input,
+      'equal-payment',
+    )
+    const equalPrincipal = calculateMortgageTrajectory(
+      activeCalculation.input,
+      'equal-principal',
+    )
+
+    if (!equalPayment.ok || !equalPrincipal.ok) {
+      return null
+    }
+
+    return {
+      equalPayment: equalPayment.points,
+      equalPrincipal: equalPrincipal.points,
+    }
+  }, [activeCalculation])
+
+  const consultationSummary = useMemo(
+    () => activeCalculation
+      ? createMortgageConsultationSummary({
+          comparison: activeCalculation.comparison,
+          repaymentMethod,
+          calculatedAt: activeCalculation.calculatedAt,
+        })
+      : null,
+    [activeCalculation, repaymentMethod],
+  )
+
+  useEffect(() => {
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+      summaryStatusTimerRef.current = null
+    }
+
+    copyRequestIdRef.current += 1
+    setSummaryActionStatus(null)
+  }, [activeCalculation, repaymentMethod])
+
+  useEffect(() => () => {
+    copyRequestIdRef.current += 1
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+    }
+  }, [])
 
   const calculationError =
     isAutoCalculation
@@ -371,10 +740,6 @@ function MortgageCalculator() {
 
     if (calculationError) {
       return 'calculation-error'
-    }
-
-    if (isManualResultStale) {
-      return 'stale'
     }
 
     if (hasVisibleErrors) {
@@ -408,16 +773,25 @@ function MortgageCalculator() {
 
   const statusMessage =
     statusMessageOverride ??
-    getStatusMessage(
-      viewState,
-      hasVisibleErrors,
-    )
+    getStatusMessage(viewState)
 
   const updateFieldValue = (
     fieldName: MortgageFieldName,
     value: string,
+    clearManualValidation = true,
   ) => {
     dismissResetUndo()
+
+    if (!isAutoCalculation && clearManualValidation) {
+      pendingErrorSummaryFocusRef.current = false
+      setHasSubmitted(false)
+      setTouchedFields(EMPTY_TOUCHED_FIELDS)
+      setIsManualCalculationInvalidated(
+        (currentInvalidated) =>
+          currentInvalidated || manualCalculation !== null,
+      )
+    }
+
     setValues((currentValues) => ({
       ...currentValues,
       [fieldName]: value,
@@ -447,6 +821,7 @@ function MortgageCalculator() {
         fieldName,
         event.currentTarget.value,
       ),
+      false,
     )
   }
 
@@ -525,6 +900,19 @@ function MortgageCalculator() {
         calculation.comparison,
       ),
     )
+    setIsManualCalculationInvalidated(false)
+    navigateToSimulationResult(resultsRef.current)
+  }
+
+  const handleFormKeyDown = (
+    event: KeyboardEvent<HTMLFormElement>,
+  ) => {
+    if (
+      event.key === 'Enter' &&
+      event.target instanceof HTMLInputElement
+    ) {
+      event.preventDefault()
+    }
   }
 
   const handleRepaymentMethodChange = (
@@ -548,12 +936,62 @@ function MortgageCalculator() {
       setManualCalculation(
         autoCalculationOutcome.stored,
       )
+      setIsManualCalculationInvalidated(false)
     }
 
     pendingErrorSummaryFocusRef.current = false
     setIsAutoCalculation(nextIsAutoCalculation)
     setHasSubmitted(false)
     setManualCalculationError(null)
+  }
+
+  const copyConsultationSummary = async () => {
+    if (!consultationSummary) {
+      return
+    }
+
+    if (summaryStatusTimerRef.current !== null) {
+      window.clearTimeout(summaryStatusTimerRef.current)
+      summaryStatusTimerRef.current = null
+    }
+
+    const requestId = copyRequestIdRef.current + 1
+    copyRequestIdRef.current = requestId
+
+    try {
+      await navigator.clipboard.writeText(
+        consultationSummary,
+      )
+
+      if (requestId !== copyRequestIdRef.current) {
+        return
+      }
+
+      setSummaryActionStatus('copied')
+      summaryStatusTimerRef.current = window.setTimeout(
+        () => {
+          if (requestId === copyRequestIdRef.current) {
+            setSummaryActionStatus(null)
+            summaryStatusTimerRef.current = null
+          }
+        },
+        3000,
+      )
+    } catch {
+      if (requestId !== copyRequestIdRef.current) {
+        return
+      }
+
+      setSummaryActionStatus('copy-error')
+    }
+  }
+
+  const printConsultationSummary = () => {
+    if (!consultationSummary) {
+      return
+    }
+
+    window.print()
   }
 
   const resetCalculator = () => {
@@ -567,6 +1005,7 @@ function MortgageCalculator() {
         isAutoCalculation,
         hasSubmitted,
         manualCalculation,
+        isManualCalculationInvalidated,
         manualCalculationError,
       })
       setStatusMessageOverride(
@@ -584,6 +1023,7 @@ function MortgageCalculator() {
     setIsAutoCalculation(false)
     setHasSubmitted(false)
     setManualCalculation(null)
+    setIsManualCalculationInvalidated(false)
     setManualCalculationError(null)
 
     if (!shouldOfferUndo) {
@@ -603,6 +1043,9 @@ function MortgageCalculator() {
     setIsAutoCalculation(resetSnapshot.isAutoCalculation)
     setHasSubmitted(resetSnapshot.hasSubmitted)
     setManualCalculation(resetSnapshot.manualCalculation)
+    setIsManualCalculationInvalidated(
+      resetSnapshot.isManualCalculationInvalidated,
+    )
     setManualCalculationError(
       resetSnapshot.manualCalculationError,
     )
@@ -617,9 +1060,12 @@ function MortgageCalculator() {
   }
 
   const resultHeading = getResultHeading(
-    isManualResultStale,
     Boolean(activeCalculation),
   )
+  const repaymentYearsSlider =
+    getRepaymentYearsSliderState(
+      values.repaymentYears,
+    )
 
   return (
     <section
@@ -659,8 +1105,17 @@ function MortgageCalculator() {
           className="mortgage-form"
           aria-labelledby="mortgage-title"
           onSubmit={handleSubmit}
+          onKeyDown={handleFormKeyDown}
           noValidate
         >
+          <div className="simulator-panel-heading">
+            <span aria-hidden="true">01</span>
+            <div>
+              <p>INPUT</p>
+              <h3>ローン条件を入力</h3>
+            </div>
+          </div>
+
           <fieldset className="mortgage-method">
             <legend>強調して表示する返済方式</legend>
 
@@ -770,14 +1225,13 @@ function MortgageCalculator() {
             </label>
 
             <div className="mortgage-input-with-unit">
-              <input
+              <MoneyInput
                 ref={loanAmountRef}
                 id="mortgage-loan-amount"
                 name="loanAmount"
-                type="text"
-                inputMode="numeric"
                 autoComplete="off"
                 value={values.loanAmount}
+                invalidCharacterPolicy="preserve"
                 placeholder="例：30,000,000"
                 aria-required="true"
                 aria-invalid={Boolean(
@@ -788,10 +1242,10 @@ function MortgageCalculator() {
                     ? 'mortgage-loan-amount-help mortgage-loan-amount-error'
                     : 'mortgage-loan-amount-help'
                 }
-                onChange={(event) =>
-                  handleFieldChange(
+                onValueChange={(value) =>
+                  updateFieldValue(
                     'loanAmount',
-                    event,
+                    value,
                   )
                 }
                 onBlur={(event) =>
@@ -927,6 +1381,34 @@ function MortgageCalculator() {
               <span>年</span>
             </div>
 
+            <div
+              className="mortgage-repayment-slider"
+              data-empty={repaymentYearsSlider.isEmpty}
+            >
+              <input
+                id="mortgage-repayment-years-slider"
+                type="range"
+                min={MORTGAGE_LIMITS.repaymentYears.min}
+                max={MORTGAGE_LIMITS.repaymentYears.max}
+                step="1"
+                value={repaymentYearsSlider.value}
+                aria-label="返済期間スライダー"
+                aria-valuetext={repaymentYearsSlider.valueText}
+                aria-describedby="mortgage-repayment-years-help"
+                onChange={(event) =>
+                  updateFieldValue(
+                    'repaymentYears',
+                    event.target.value,
+                  )
+                }
+              />
+              <output
+                htmlFor="mortgage-repayment-years-slider"
+              >
+                {repaymentYearsSlider.valueText}
+              </output>
+            </div>
+
             <small
               id="mortgage-repayment-years-help"
               className="mortgage-field__help"
@@ -964,26 +1446,31 @@ function MortgageCalculator() {
             <p>
               {isAutoCalculation
                 ? '未操作の項目にはエラーを表示せず、有効な条件がそろった時点で自動計算します。'
-                : '入力後にEnterキー、またはシミュレートボタンで計算できます。'}
+                : '入力後にシミュレートボタンを押すと計算できます。'}
             </p>
           </div>
 
-          {!isAutoCalculation && (
-            <button
-              className="mortgage-button mortgage-button--primary"
-              type="submit"
-            >
-              シミュレートする
-            </button>
-          )}
-
-          <button
-            className="mortgage-button mortgage-button--secondary"
-            type="button"
-            onClick={resetCalculator}
+          <div
+            className="mortgage-form-actions"
+            data-single={isAutoCalculation}
           >
-            入力内容をリセット
-          </button>
+            <button
+              className="mortgage-button mortgage-button--secondary"
+              type="button"
+              onClick={resetCalculator}
+            >
+              入力内容をリセット
+            </button>
+
+            {!isAutoCalculation && (
+              <button
+                className="mortgage-button mortgage-button--primary"
+                type="submit"
+              >
+                シミュレートする
+              </button>
+            )}
+          </div>
 
           {resetSnapshot && (
             <div
@@ -1004,12 +1491,21 @@ function MortgageCalculator() {
               </button>
             </div>
           )}
+
+          <aside className="simulator-input-point simulator-input-point--mortgage">
+            <strong>入力のポイント</strong>
+            <p>
+              同じ借入条件で2つの返済方式を比較します。
+              期間や金利を変えて、毎月返済額と総返済額の違いを確認してください。
+            </p>
+          </aside>
         </form>
 
         <section
-          className="mortgage-results"
+          className="mortgage-results simulation-result-anchor"
+          ref={resultsRef}
           aria-labelledby="mortgage-result-title"
-          data-stale={isManualResultStale}
+          tabIndex={-1}
           data-empty={
             activeCalculation === null &&
             calculationError === null
@@ -1028,15 +1524,13 @@ function MortgageCalculator() {
 
           </div>
 
-          {isManualResultStale && (
-            <div
-              className="mortgage-stale-note"
-              role="note"
-            >
-              条件変更前の結果です。現在の条件を反映するには、
-              もう一度シミュレートしてください。
-            </div>
-          )}
+          {!isAutoCalculation &&
+            isManualCalculationInvalidated &&
+            !hasVisibleErrors && (
+              <p className="mortgage-results-helper">
+                条件を変更しました。シミュレートすると結果を更新します。
+              </p>
+            )}
 
           {getCalculationErrorLabel(
             calculationError,
@@ -1053,32 +1547,7 @@ function MortgageCalculator() {
 
           {activeCalculation ? (
             <>
-              <div className="mortgage-results__condition-heading">
-                <strong>この条件で比較</strong>
-                <button
-                  className="mortgage-results__edit-button"
-                  type="button"
-                  onClick={() =>
-                    loanAmountRef.current?.focus()
-                  }
-                >
-                  入力条件を確認・変更する
-                </button>
-              </div>
-
-              <dl className="mortgage-conditions">
-                <div><dt>借入金額</dt><dd>{activeCalculation.input.principal.toLocaleString('ja-JP')}円</dd></div>
-                <div><dt>年利</dt><dd>{activeCalculation.input.annualRate.toLocaleString('ja-JP', { maximumFractionDigits: 3 })}%</dd></div>
-                <div><dt>返済期間</dt><dd>{activeCalculation.input.paymentCount / 12}年</dd></div>
-                <div><dt>返済回数</dt><dd>{activeCalculation.input.paymentCount.toLocaleString('ja-JP')}回</dd></div>
-              </dl>
-
-              <div className="mortgage-comparison-summary" role="note">
-                <strong>比較のポイント</strong>
-                <p>{createMortgageComparisonExplanation(activeCalculation.comparison)}</p>
-              </div>
-
-              <div className="mortgage-comparison-grid" aria-label="返済方式の比較結果">
+              <div className="mortgage-results-overview" aria-label="返済方式の比較結果">
                 <article className="mortgage-comparison-card" data-selected={repaymentMethod === 'equal-payment'} aria-labelledby="mortgage-equal-payment-title">
                   <header className="mortgage-comparison-card__heading">
                     <div><p>毎月の安定を重視</p><h4 id="mortgage-equal-payment-title">元利均等返済</h4></div>
@@ -1086,6 +1555,7 @@ function MortgageCalculator() {
                   </header>
                   <dl className="mortgage-comparison-card__values">
                     <div><dt>毎月返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.firstPayment)}</dd><small>毎月の返済額が原則一定</small></div>
+                    <div><dt>初年度年間返済額（概算）</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.firstYearPaymentTotal)}</dd></div>
                     <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.lastPayment)}</dd></div>
                     <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.totalPayment)}</dd></div>
                     <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPayment.totalInterest)}</dd></div>
@@ -1099,22 +1569,93 @@ function MortgageCalculator() {
                   </header>
                   <dl className="mortgage-comparison-card__values">
                     <div><dt>初回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.firstPayment)}</dd><small>返済額は徐々に減少</small></div>
+                    <div><dt>初年度年間返済額（概算）</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.firstYearPaymentTotal)}</dd></div>
                     <div><dt>最終回返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.lastPayment)}</dd></div>
                     <div><dt>総返済額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.totalPayment)}</dd></div>
                     <div><dt>支払利息総額</dt><dd>{formatApproxMortgageYen(activeCalculation.comparison.equalPrincipal.totalInterest)}</dd></div>
                   </dl>
                 </article>
+
+                <article className="mortgage-comparison-delta" role="note">
+                  <header>
+                    <p>COMPARISON</p>
+                    <h4>2方式の差額</h4>
+                  </header>
+                  <dl>
+                    <div>
+                      <dt>初回返済額の差</dt>
+                      <dd>{formatMortgageDifferenceYen(activeCalculation.comparison.differences.firstPayment)}</dd>
+                    </div>
+                    <div>
+                      <dt>支払利息の差</dt>
+                      <dd>{formatMortgageDifferenceYen(activeCalculation.comparison.differences.totalInterest)}</dd>
+                    </div>
+                  </dl>
+                  <p>{createMortgageComparisonExplanation(activeCalculation.comparison)}</p>
+                </article>
               </div>
-            </>          ) : (
-            <div className="mortgage-results__empty">
-              <span aria-hidden="true">¥</span>
-              <strong>
-                ここに概算結果が表示されます
-              </strong>
-              <p>
-                借入金額・年利・返済期間を入力してください。
-              </p>
-            </div>
+
+              {mortgageTrajectories && (
+                <section className="mortgage-trajectories-section" aria-labelledby="mortgage-trajectories-title">
+                  <header>
+                    <div>
+                      <p>PAYMENT TRAJECTORY</p>
+                      <h4 id="mortgage-trajectories-title">累計返済額の推移</h4>
+                    </div>
+                    <span>元金と利息の累計</span>
+                  </header>
+                  <div className="mortgage-trajectories-grid">
+                    <MortgageTrajectoryChart
+                      title="元利均等返済"
+                      tone="blue"
+                      points={mortgageTrajectories.equalPayment}
+                      paymentCount={activeCalculation.input.paymentCount}
+                    />
+                    <MortgageTrajectoryChart
+                      title="元金均等返済"
+                      tone="green"
+                      points={mortgageTrajectories.equalPrincipal}
+                      paymentCount={activeCalculation.input.paymentCount}
+                    />
+                  </div>
+                  <aside
+                    className="mortgage-trajectory-guide"
+                    aria-label="グラフの見方"
+                  >
+                    <strong>グラフの見方</strong>
+                    <p>
+                      濃色は累計元金、淡色は累計利息です。
+                      各時点までの返済内訳の積み上がりを示し、
+                      元利均等と元金均等の違いを比較できます。
+                      金融機関固有の端数処理などを
+                      完全に再現するものではありません。
+                    </p>
+                  </aside>
+                </section>
+              )}
+
+              <div className="mortgage-results__condition-heading mortgage-results__condition-heading--compact">
+                <strong>入力条件</strong>
+                <button
+                  className="mortgage-results__edit-button"
+                  type="button"
+                  onClick={() =>
+                    loanAmountRef.current?.focus()
+                  }
+                >
+                  入力条件を確認・変更する
+                </button>
+              </div>
+
+              <dl className="mortgage-conditions mortgage-conditions--compact">
+                <div><dt>借入金額</dt><dd>{activeCalculation.input.principal.toLocaleString('ja-JP')}円</dd></div>
+                <div><dt>年利</dt><dd>{activeCalculation.input.annualRate.toLocaleString('ja-JP', { maximumFractionDigits: 3 })}%</dd></div>
+                <div><dt>返済期間</dt><dd>{activeCalculation.input.paymentCount / 12}年</dd></div>
+                <div><dt>返済回数</dt><dd>{activeCalculation.input.paymentCount.toLocaleString('ja-JP')}回</dd></div>
+              </dl>
+            </>
+          ) : (
+            <MortgageEmptyResults />
           )}
         </section>
       </div>
@@ -1140,6 +1681,68 @@ function MortgageCalculator() {
           実際の返済予定表とは差が生じる場合があります。
         </p>
       </aside>
+
+      <section
+        className="mortgage-consultation-summary"
+        data-empty={consultationSummary === null}
+        aria-labelledby="mortgage-consultation-summary-title"
+      >
+        <header className="mortgage-consultation-summary__heading">
+          <div>
+            <p>CONSULTATION SUMMARY</p>
+            <h3 id="mortgage-consultation-summary-title">
+              相談用サマリー
+            </h3>
+            <span>
+              計算結果を金融機関への相談用に整理します。
+              入力内容は保存・外部送信しません。
+            </span>
+          </div>
+
+          <div className="mortgage-consultation-summary__actions">
+            <button
+              type="button"
+              disabled={!consultationSummary}
+              onClick={copyConsultationSummary}
+            >
+              相談用サマリーをコピー
+            </button>
+            <button
+              type="button"
+              disabled={!consultationSummary}
+              onClick={printConsultationSummary}
+            >
+              印刷する
+            </button>
+          </div>
+        </header>
+
+        {summaryActionStatus && (
+          <p
+            className="mortgage-consultation-summary__status"
+            data-tone={summaryActionStatus === 'copied'
+              ? 'success'
+              : 'error'}
+            role="status"
+            aria-live="polite"
+          >
+            {summaryActionStatus === 'copied'
+              ? '相談用サマリーをコピーしました。'
+              : 'コピーできませんでした。もう一度お試しください。'}
+          </p>
+        )}
+
+        {activeCalculation ? (
+          <MortgageConsultationSummaryContent
+            calculation={activeCalculation}
+            repaymentMethod={repaymentMethod}
+          />
+        ) : (
+          <p className="mortgage-consultation-summary__empty">
+            シミュレーション後にコピー・印刷できます。
+          </p>
+        )}
+      </section>
     </section>
   )
 }

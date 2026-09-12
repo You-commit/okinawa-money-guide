@@ -1,39 +1,147 @@
-import { useState } from 'react'
-import { ChevronDownIcon, SearchIcon } from './TopIcons'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { routes, simulatorRoutes } from '../../app/routes'
+import {
+  BuildingIcon,
+  CalculatorIcon,
+  ChevronDownIcon,
+  GrowthChartIcon,
+  HouseIcon,
+  SearchIcon,
+  SproutIcon,
+} from './TopIcons'
+
+const simulatorMenuDetails = {
+  [routes.militaryLand]: {
+    id: 'military',
+    description: '利回り・倍率・収支を確認',
+    Icon: BuildingIcon,
+  },
+  [routes.mortgage]: {
+    id: 'mortgage',
+    description: '返済額と2つの返済方式を比較',
+    Icon: HouseIcon,
+  },
+  [routes.nisa]: {
+    id: 'nisa',
+    description: '積立・目標額・期間を試算',
+    Icon: GrowthChartIcon,
+  },
+  [routes.ideco]: {
+    id: 'ideco',
+    description: '掛金と節税効果を確認',
+    Icon: SproutIcon,
+  },
+  [routes.taxableIncome]: {
+    id: 'taxable',
+    description: '課税所得と税率の目安を確認',
+    Icon: CalculatorIcon,
+  },
+} as const
 
 function BrandMark() {
   return (
-    <span className="top-option02__brand-mark" aria-hidden="true">
-      <span className="top-option02__brand-stone" />
-      <span className="top-option02__brand-wave top-option02__brand-wave--blue" />
-      <span className="top-option02__brand-wave top-option02__brand-wave--mint" />
-    </span>
+    <img
+      className="top-option02__brand-mark"
+      src="/favicon-192x192.png"
+      alt=""
+      aria-hidden="true"
+      width="44"
+      height="44"
+      draggable={false}
+    />
   )
 }
 
 function TopHeader() {
+  const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false)
+  const menuToggleRef = useRef<HTMLButtonElement>(null)
+  const simulatorMenuRef = useRef<HTMLDivElement>(null)
+  const simulatorTriggerRef = useRef<HTMLButtonElement>(null)
+
+  const closeNavigation = () => {
+    setIsOpen(false)
+    setIsSimulatorOpen(false)
+  }
+
+  useEffect(() => {
+    setIsOpen(false)
+    setIsSimulatorOpen(false)
+  }, [location.pathname])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    document.body.classList.add('top-option02-navigation-open')
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || isSimulatorOpen) return
+
+      setIsOpen(false)
+      setIsSimulatorOpen(false)
+      menuToggleRef.current?.focus()
+    }
+
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.body.classList.remove('top-option02-navigation-open')
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isOpen, isSimulatorOpen])
+
+  useEffect(() => {
+    if (!isSimulatorOpen) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !simulatorMenuRef.current?.contains(event.target)
+      ) {
+        setIsSimulatorOpen(false)
+      }
+    }
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+
+      setIsSimulatorOpen(false)
+      simulatorTriggerRef.current?.focus()
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isSimulatorOpen])
 
   return (
-    <header className="top-option02__header">
-      <div className="top-option02__header-inner">
-        <a
+    <>
+      <header className="top-option02__header">
+        <div className="top-option02__header-inner">
+        <Link
           className="top-option02__brand"
-          href="#top"
+          to={routes.home}
           aria-label="沖縄マネーガイド トップへ戻る"
+          onClick={closeNavigation}
         >
           <BrandMark />
           <span className="top-option02__brand-copy">
             <strong>沖縄マネーガイド</strong>
             <small>okinawa money guide</small>
           </span>
-        </a>
+        </Link>
 
         <button
           className="top-option02__menu-toggle"
           type="button"
           aria-expanded={isOpen}
           aria-controls="top-option02-navigation"
+          ref={menuToggleRef}
           onClick={() => setIsOpen((current) => !current)}
         >
           <span aria-hidden="true" />
@@ -51,18 +159,75 @@ function TopHeader() {
           }
           aria-label="メインメニュー"
         >
-          <a
-            className="top-option02__nav-simulators"
-            href="#popular-simulators"
-            onClick={() => setIsOpen(false)}
+          <div
+            className="top-option02__simulator-menu"
+            ref={simulatorMenuRef}
           >
-            シミュレーター
-            <ChevronDownIcon className="top-option02__nav-chevron" />
-          </a>
-          <span aria-disabled="true">記事・コラム</span>
-          <span aria-disabled="true">比較・ランキング</span>
-          <span aria-disabled="true">はじめての方へ</span>
-          <span aria-disabled="true">お問い合わせ</span>
+            <button
+              className="top-option02__nav-simulators"
+              type="button"
+              aria-expanded={isSimulatorOpen}
+              aria-controls="top-option02-simulator-menu"
+              aria-haspopup="true"
+              ref={simulatorTriggerRef}
+              onClick={() => setIsSimulatorOpen((current) => !current)}
+            >
+              シミュレーター
+              <ChevronDownIcon className="top-option02__nav-chevron" />
+            </button>
+            <div
+              id="top-option02-simulator-menu"
+              className={
+                isSimulatorOpen
+                  ? 'top-option02__simulator-menu-panel is-open'
+                  : 'top-option02__simulator-menu-panel'
+              }
+              aria-label="シミュレーター一覧"
+            >
+              <div className="top-option02__simulator-menu-heading">
+                <div>
+                  <p>SIMULATORS</p>
+                  <strong>目的に合わせてシミュレーターを選択</strong>
+                </div>
+              </div>
+              <div className="top-option02__simulator-menu-grid">
+                {simulatorRoutes.map((item) => {
+                  const details = simulatorMenuDetails[item.path]
+                  const isCurrent = location.pathname === item.path
+                  const Icon = details.Icon
+
+                  return (
+                    <Link
+                      className="top-option02__simulator-menu-card"
+                      data-simulator={details.id}
+                      to={item.path}
+                      key={item.path}
+                      aria-current={isCurrent ? 'page' : undefined}
+                      onClick={closeNavigation}
+                    >
+                      <span className="top-option02__simulator-menu-icon">
+                        <Icon />
+                      </span>
+                      <span className="top-option02__simulator-menu-copy">
+                        <strong>{item.label}</strong>
+                        <small>{details.description}</small>
+                      </span>
+                      {isCurrent && (
+                        <span className="top-option02__simulator-menu-current">
+                          表示中
+                        </span>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+          <Link to={routes.knowledge} onClick={closeNavigation}>記事・コラム</Link>
+          <span aria-disabled="true">比較・ランキング<span className="sr-only">（準備中）</span></span>
+          <Link to={routes.about} onClick={closeNavigation}>はじめての方へ</Link>
+          <Link to={routes.trust} onClick={closeNavigation}>信頼情報</Link>
+          <span aria-disabled="true">お問い合わせ<span className="sr-only">（準備中）</span></span>
           <button
             className="top-option02__search"
             type="button"
@@ -71,16 +236,26 @@ function TopHeader() {
           >
             <SearchIcon />
           </button>
-          <a
+          <Link
             className="top-option02__header-cta"
-            href="#popular-simulators"
-            onClick={() => setIsOpen(false)}
+            to="/#popular-simulators"
+            onClick={closeNavigation}
           >
             シミュレーターを試す
-          </a>
+          </Link>
         </nav>
-      </div>
-    </header>
+        </div>
+      </header>
+      {isOpen && (
+        <button
+          className="top-option02__navigation-backdrop"
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={closeNavigation}
+        />
+      )}
+    </>
   )
 }
 

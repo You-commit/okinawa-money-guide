@@ -1,4 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import MoneyInput from './components/form/MoneyInput'
+import { getMoneyInputDigits } from './utils/moneyInput'
+import { navigateToSimulationResult } from './utils/simulationResultNavigation'
 import {
   getBasicDeduction2026,
   taxRules2026,
@@ -117,41 +120,44 @@ const deductionFields: Array<{
       label: 'その他の所得控除',
       help:
         '雑損控除などを入力します。iDeCo掛金は含めません。',
-    },
-  ]
+  },
+]
 
-const convertToHalfWidth = (
-  value: string,
-) => value.normalize('NFKC')
+type DeductionGroupId = 'social' | 'other'
 
-const getMoneyDigits = (value: string) =>
-  convertToHalfWidth(value).replace(
-    /[^\d]/g,
-    '',
-  )
+const deductionGroups: Array<{
+  id: DeductionGroupId
+  title: string
+  description: string
+  fields: typeof deductionFields
+}> = [
+  {
+    id: 'social',
+    title: '社会保険・人的控除',
+    description: '社会保険料、配偶者、扶養に関する控除',
+    fields: deductionFields.slice(0, 3),
+  },
+  {
+    id: 'other',
+    title: 'その他の所得控除',
+    description: '保険料、医療費、寄附金などの控除',
+    fields: deductionFields.slice(3),
+  },
+]
+
+const initialOpenDeductionGroups: Record<DeductionGroupId, boolean> = {
+  social: true,
+  other: false,
+}
 
 const getMoneyValue = (value: string) => {
-  const digits = getMoneyDigits(value)
+  const digits = getMoneyInputDigits(value)
 
   if (digits === '') {
     return 0
   }
 
   return Number(digits)
-}
-
-const formatMoneyInput = (
-  value: string,
-) => {
-  const digits = getMoneyDigits(value)
-
-  if (digits === '') {
-    return ''
-  }
-
-  return Number(digits).toLocaleString(
-    'ja-JP',
-  )
 }
 
 const formatYen = (value: number) =>
@@ -291,6 +297,9 @@ const calculateTaxableIncome = (
 function TaxableIncomeCalculator({
   onApplyIncomeTaxRate,
 }: TaxableIncomeCalculatorProps) {
+  const [inputMode, setInputMode] =
+    useState<'basic' | 'detail'>('basic')
+
   const [
     salaryRevenue,
     setSalaryRevenue,
@@ -312,6 +321,9 @@ function TaxableIncomeCalculator({
     useState<TaxableIncomeResult | null>(
       null,
     )
+  const [openDeductionGroups, setOpenDeductionGroups] =
+    useState({ ...initialOpenDeductionGroups })
+  const resultsRef = useRef<HTMLDivElement>(null)
 
   const autoResult = useMemo(
     () =>
@@ -356,12 +368,13 @@ function TaxableIncomeCalculator({
   }
 
   const simulate = () => {
-    setManualResult(
-      calculateTaxableIncome(
-        salaryRevenue,
-        deductionInputs,
-      ),
+    const result = calculateTaxableIncome(
+      salaryRevenue,
+      deductionInputs,
     )
+
+    setManualResult(result)
+    navigateToSimulationResult(resultsRef.current)
   }
 
   const resetCalculator = () => {
@@ -371,7 +384,15 @@ function TaxableIncomeCalculator({
       ...initialDeductionInputs,
     })
 
+    setOpenDeductionGroups({ ...initialOpenDeductionGroups })
     setManualResult(null)
+  }
+
+  const toggleDeductionGroup = (groupId: DeductionGroupId) => {
+    setOpenDeductionGroups((current) => ({
+      ...current,
+      [groupId]: !current[groupId],
+    }))
   }
 
   const changeCalculationMode = (
@@ -379,6 +400,14 @@ function TaxableIncomeCalculator({
   ) => {
     setIsAutoCalculation(checked)
     setManualResult(null)
+  }
+
+  const changeInputMode = (mode: 'basic' | 'detail') => {
+    setInputMode(mode)
+    if (mode === 'basic') {
+      setDeductionInputs({ ...initialDeductionInputs })
+      clearManualResult()
+    }
   }
 
   const handleApplyIncomeTaxRate = () => {
@@ -418,49 +447,22 @@ function TaxableIncomeCalculator({
 
       <div className="calculator-layout">
         <div className="calculator-form">
-          <label>
+          <div className="simulator-panel-heading">
+            <span aria-hidden="true">01</span>
+            <div>
+              <p>INPUT</p>
+              <h3>条件を入力する</h3>
+            </div>
+          </div>
+
+          <label htmlFor="taxable-salary-revenue">
             <span>年間の給与収入</span>
 
             <div className="input-with-unit">
-              <input
-                type="text"
-                inputMode="numeric"
+              <MoneyInput
+                id="taxable-salary-revenue"
                 value={salaryRevenue}
-                onChange={(event) => {
-                  const value =
-                    event.target.value
-
-                  if (
-                    (event.nativeEvent as InputEvent).isComposing
-                  ) {
-                    handleSalaryRevenueChange(
-                      value,
-                    )
-                    return
-                  }
-
-                  handleSalaryRevenueChange(
-                    formatMoneyInput(value),
-                  )
-                }}
-                onCompositionEnd={(
-                  event,
-                ) => {
-                  handleSalaryRevenueChange(
-                    formatMoneyInput(
-                      event.currentTarget
-                        .value,
-                    ),
-                  )
-                }}
-                onBlur={(event) => {
-                  handleSalaryRevenueChange(
-                    formatMoneyInput(
-                      event.currentTarget
-                        .value,
-                    ),
-                  )
-                }}
+                onValueChange={handleSalaryRevenueChange}
                 placeholder="例：5,000,000"
               />
 
@@ -473,93 +475,105 @@ function TaxableIncomeCalculator({
             入力してください。
           </p>
 
-          <div className="form-subheading">
-            <strong>
-              基礎控除以外の所得控除
-            </strong>
+          <div className="taxable-input-mode" aria-label="入力モード">
+            <button
+              type="button"
+              className={inputMode === 'basic' ? 'is-active' : ''}
+              aria-pressed={inputMode === 'basic'}
+              onClick={() => changeInputMode('basic')}
+            >
+              基本
+            </button>
+            <button
+              type="button"
+              className={inputMode === 'detail' ? 'is-active' : ''}
+              aria-pressed={inputMode === 'detail'}
+              onClick={() => changeInputMode('detail')}
+            >
+              詳細
+            </button>
+          </div>
 
-            <p>
-              該当しない項目や
-              分からない項目は、
-              空欄のままで計算できます。
-              基礎控除は自動計算されます。
+          {inputMode === 'detail' ? (
+            <>
+              <div className="form-subheading">
+                <strong>
+                  基礎控除以外の所得控除
+                </strong>
+
+                <p>
+                  該当しない項目や
+                  分からない項目は、
+                  空欄のままで計算できます。
+                  基礎控除は自動計算されます。
+                </p>
+              </div>
+
+              <div className="taxable-deduction-groups">
+                {deductionGroups.map((group) => {
+                  const isOpen = openDeductionGroups[group.id]
+                  const panelId = `taxable-deduction-group-${group.id}`
+
+                  return (
+                    <section
+                      className="taxable-deduction-group"
+                      key={group.id}
+                    >
+                      <button
+                        className="taxable-deduction-group__trigger"
+                        type="button"
+                        aria-expanded={isOpen}
+                        aria-controls={panelId}
+                        onClick={() => toggleDeductionGroup(group.id)}
+                      >
+                        <span>
+                          <strong>{group.title}</strong>
+                          <small>{group.description}</small>
+                        </span>
+                        <span aria-hidden="true">{isOpen ? '−' : '＋'}</span>
+                      </button>
+
+                      <div
+                        className="deduction-fields"
+                        id={panelId}
+                        hidden={!isOpen}
+                      >
+                        {group.fields.map((field) => (
+                          <label
+                            htmlFor={`taxable-deduction-${field.key}`}
+                            key={field.key}
+                          >
+                            <span>{field.label}</span>
+
+                            <div className="input-with-unit">
+                              <MoneyInput
+                                id={`taxable-deduction-${field.key}`}
+                                value={deductionInputs[field.key]}
+                                onValueChange={(value) => {
+                                  handleDeductionChange(field.key, value)
+                                }}
+                                placeholder="0"
+                              />
+
+                              <span>円</span>
+                            </div>
+
+                            <small className="field-help">
+                              {field.help}
+                            </small>
+                          </label>
+                        ))}
+                      </div>
+                    </section>
+                  )
+                })}
+              </div>
+            </>
+          ) : (
+            <p className="taxable-basic-note">
+              基本モードでは給与収入と基礎控除で概算します。社会保険料控除などを反映する場合は「詳細」を選んでください。
             </p>
-          </div>
-
-          <div className="deduction-fields">
-            {deductionFields.map(
-              (field) => (
-                <label key={field.key}>
-                  <span>{field.label}</span>
-
-                  <div className="input-with-unit">
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      value={
-                        deductionInputs[
-                        field.key
-                        ]
-                      }
-                      onChange={(
-                        event,
-                      ) => {
-                        const value =
-                          event.target
-                            .value
-
-                        if (
-                          (event.nativeEvent as InputEvent).isComposing
-                        ) {
-                          handleDeductionChange(
-                            field.key,
-                            value,
-                          )
-                          return
-                        }
-
-                        handleDeductionChange(
-                          field.key,
-                          formatMoneyInput(
-                            value,
-                          ),
-                        )
-                      }}
-                      onCompositionEnd={(
-                        event,
-                      ) => {
-                        handleDeductionChange(
-                          field.key,
-                          formatMoneyInput(
-                            event
-                              .currentTarget
-                              .value,
-                          ),
-                        )
-                      }}
-                      onBlur={(event) => {
-                        handleDeductionChange(
-                          field.key,
-                          formatMoneyInput(
-                            event
-                              .currentTarget
-                              .value,
-                          ),
-                        )
-                      }}
-                      placeholder="0"
-                    />
-
-                    <span>円</span>
-                  </div>
-
-                  <small className="field-help">
-                    {field.help}
-                  </small>
-                </label>
-              ),
-            )}
-          </div>
+          )}
 
           <div
             className="form-spacer"
@@ -591,242 +605,98 @@ function TaxableIncomeCalculator({
             </p>
           </div>
 
-          {!isAutoCalculation && (
-            <button
-              className="simulate-button"
-              type="button"
-              onClick={simulate}
-              disabled={!canSimulate}
-            >
-              シミュレートする
-            </button>
-          )}
-
-          <button
-            className="reset-button"
-            type="button"
-            onClick={resetCalculator}
+          <div
+            className="simulator-form-actions"
+            data-single={isAutoCalculation}
           >
-            入力内容をリセット
-          </button>
+            <button
+              className="reset-button"
+              type="button"
+              onClick={resetCalculator}
+            >
+              入力内容をリセット
+            </button>
+
+            {!isAutoCalculation && (
+              <button
+                className="simulate-button"
+                type="button"
+                onClick={simulate}
+                disabled={!canSimulate}
+              >
+                シミュレートする
+              </button>
+            )}
+          </div>
         </div>
 
         <div
-          className="calculator-results"
+          className="calculator-results simulation-result-anchor"
+          ref={resultsRef}
           aria-live="polite"
+          tabIndex={-1}
         >
-          <div className="result-card">
-            <span>
-              給与所得控除相当額
-            </span>
-
-            <strong>
-              {displayedResult
-                .salaryIncomeDeduction ===
-                null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .salaryIncomeDeduction,
-                )}
-            </strong>
-
-            <small>
-              給与収入から差し引かれる金額
-            </small>
+          <div className="simulator-results-heading">
+            <div>
+              <p>RESULT</p>
+              <h3>シミュレーション結果</h3>
+            </div>
+            <span>2026年分・給与所得の概算</span>
           </div>
 
-          <div className="result-card">
-            <span>給与所得</span>
+          <div className="simulator-summary-grid simulator-summary-grid--taxable">
+            <div className="result-card emphasis-result">
+              <span>課税所得</span>
+              <strong>{displayedResult.taxableIncome === null ? '―' : formatYen(displayedResult.taxableIncome)}</strong>
+              <small>1,000円未満切捨て</small>
+            </div>
 
-            <strong>
-              {displayedResult
-                .salaryIncome === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .salaryIncome,
-                )}
-            </strong>
+            <div className="result-card emphasis-result">
+              <span>所得税率</span>
+              <strong>{displayedResult.incomeTaxRate === null ? '―' : `${displayedResult.incomeTaxRate}%`}</strong>
+              <small>課税所得に適用される税率</small>
+            </div>
 
-            <small>
-              給与収入－給与所得控除相当額
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>基礎控除</span>
-
-            <strong>
-              {displayedResult
-                .basicDeduction === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .basicDeduction,
-                )}
-            </strong>
-
-            <small>
-              給与所得から自動判定
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>
-              基礎控除以外の所得控除
-            </span>
-
-            <strong>
-              {displayedResult
-                .otherDeductions === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .otherDeductions,
-                )}
-            </strong>
-
-            <small>
-              入力した所得控除の合計
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>所得控除合計</span>
-
-            <strong>
-              {displayedResult
-                .totalDeductions === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .totalDeductions,
-                )}
-            </strong>
-
-            <small>
-              基礎控除＋その他の所得控除
-            </small>
-          </div>
-
-          <div className="result-card emphasis-result">
-            <span>課税所得</span>
-
-            <strong>
-              {displayedResult
-                .taxableIncome === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .taxableIncome,
-                )}
-            </strong>
-
-            <small>
-              1,000円未満切捨て
-            </small>
-          </div>
-
-          <div className="result-card emphasis-result">
-            <span>所得税率</span>
-
-            <strong>
-              {displayedResult
-                .incomeTaxRate === null
-                ? '―'
-                : `${displayedResult.incomeTaxRate}%`}
-            </strong>
-
-            <small>
-              課税所得に適用される税率
-            </small>
+            <div className="result-card result-card--total">
+              <span>所得税等の合計</span>
+              <strong>{displayedResult.totalIncomeTax === null ? '―' : formatYen(displayedResult.totalIncomeTax)}</strong>
+              <small>100円未満切捨ての概算</small>
+            </div>
           </div>
 
           <button
-            className="apply-tax-rate-button"
+            className="apply-tax-rate-button apply-tax-rate-button--panel"
             type="button"
             onClick={handleApplyIncomeTaxRate}
-            disabled={
-              displayedResult.incomeTaxRate ===
-              null
-            }
+            disabled={displayedResult.incomeTaxRate === null}
           >
-            {displayedResult.incomeTaxRate ===
-              null
+            {displayedResult.incomeTaxRate === null
               ? '所得税率を計算してください'
               : `この${displayedResult.incomeTaxRate}%をiDeCoに反映する`}
           </button>
 
-          <div className="result-card">
-            <span>所得税額</span>
+          <div className="simulator-breakdown-panel simulator-breakdown-panel--taxable">
+            <div className="simulator-subheading">
+              <div>
+                <p>CALCULATION BREAKDOWN</p>
+                <h3>計算の内訳</h3>
+              </div>
+              <span>入力条件に基づく概算です</span>
+            </div>
 
-            <strong>
-              {displayedResult
-                .baseIncomeTax === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .baseIncomeTax,
-                )}
-            </strong>
-
-            <small>
-              税額控除適用前の概算
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>
-              復興特別所得税
-            </span>
-
-            <strong>
-              {displayedResult
-                .reconstructionSpecialIncomeTax ===
-                null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .reconstructionSpecialIncomeTax,
-                )}
-            </strong>
-
-            <small>
-              所得税額の2.1％
-            </small>
-          </div>
-
-          <div className="result-card">
-            <span>
-              所得税等の合計
-            </span>
-
-            <strong>
-              {displayedResult
-                .totalIncomeTax === null
-                ? '―'
-                : formatYen(
-                  displayedResult
-                    .totalIncomeTax,
-                )}
-            </strong>
-
-            <small>
-              100円未満切捨ての概算
-            </small>
+            <div className="taxable-breakdown-grid">
+              <div className="result-card"><span>給与所得控除相当額</span><strong>{displayedResult.salaryIncomeDeduction === null ? '―' : formatYen(displayedResult.salaryIncomeDeduction)}</strong><small>給与収入から差し引かれる金額</small></div>
+              <div className="result-card"><span>給与所得</span><strong>{displayedResult.salaryIncome === null ? '―' : formatYen(displayedResult.salaryIncome)}</strong><small>給与収入－給与所得控除相当額</small></div>
+              <div className="result-card"><span>基礎控除</span><strong>{displayedResult.basicDeduction === null ? '―' : formatYen(displayedResult.basicDeduction)}</strong><small>給与所得から自動判定</small></div>
+              <div className="result-card"><span>基礎控除以外の所得控除</span><strong>{displayedResult.otherDeductions === null ? '―' : formatYen(displayedResult.otherDeductions)}</strong><small>入力した所得控除の合計</small></div>
+              <div className="result-card"><span>所得控除合計</span><strong>{displayedResult.totalDeductions === null ? '―' : formatYen(displayedResult.totalDeductions)}</strong><small>基礎控除＋その他の所得控除</small></div>
+              <div className="result-card"><span>所得税額</span><strong>{displayedResult.baseIncomeTax === null ? '―' : formatYen(displayedResult.baseIncomeTax)}</strong><small>税額控除適用前の概算</small></div>
+              <div className="result-card"><span>復興特別所得税</span><strong>{displayedResult.reconstructionSpecialIncomeTax === null ? '―' : formatYen(displayedResult.reconstructionSpecialIncomeTax)}</strong><small>所得税額の2.1％</small></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <p className="calculator-note">
-        2026年分の給与所得のみを
-        対象とした概算です。
-        住宅ローン控除などの税額控除、
-        所得金額調整控除、特定支出控除、
-        給与以外の所得、住民税は
-        含んでいません。
-      </p>
     </section>
   )
 }

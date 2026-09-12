@@ -1,0 +1,4385 @@
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 200;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #082b68;
+  color: #ffffff;
+  text-decoration: none;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.site-footer .footer-inner {
+  align-items: center;
+}
+
+.site-footer .footer-inner > div {
+  display: grid;
+  gap: 5px;
+}
+
+.site-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px 24px;
+}
+
+.site-footer nav a {
+  color: #dce8ef;
+  text-decoration: none;
+}
+
+.site-footer nav a:hover {
+  color: #79dec9;
+}
+
+.dedicated-page {
+  --page-navy: #082b68;
+  --page-accent: #0f766e;
+  --page-accent-soft: #eaf7f5;
+  --simulator-hero-height-desktop: 255px;
+  --simulator-hero-wave-height: 42px;
+  overflow-x: clip;
+  background: #f6f9fb;
+  color: #17314f;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.breadcrumb a {
+  color: inherit;
+}
+
+.simulator-page__hero {
+  position: relative;
+  min-height: 270px;
+  overflow: hidden;
+  background:
+    linear-gradient(105deg, rgba(5, 65, 83, 0.96), rgba(5, 126, 139, 0.75)),
+    url('../assets/top-hero/OMG-TOP-HERO-PHOTO-ISHIGAKI-APPROVED-v1.0-20260816.png') center 54% / cover no-repeat;
+  color: #ffffff;
+}
+
+.simulator-page__hero-wave {
+  position: absolute;
+  right: -2%;
+  bottom: -1px;
+  left: -2%;
+  z-index: 2;
+  height: var(--simulator-hero-wave-height);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath fill='%23f6f9fb' d='M0 31C180-12 346 56 570 31c236-26 380 26 570 3 126-15 211-5 300-25v55H0z'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
+  pointer-events: none;
+}
+
+.simulator-page--mortgage {
+  --page-accent: #1769d2;
+  --page-accent-soft: #edf5ff;
+}
+
+.simulator-page--mortgage .simulator-page__hero {
+  background:
+    linear-gradient(
+      96deg,
+      rgba(3, 35, 92, 0.97) 0%,
+      rgba(5, 66, 137, 0.9) 42%,
+      rgba(0, 117, 163, 0.62) 72%,
+      rgba(0, 91, 130, 0.34) 100%
+    ),
+    url('../assets/simulator-heroes/OMG-Mortgage-Hero-v2.png') center 42% / cover no-repeat;
+}
+
+.simulator-page--mortgage .simulator-page__hero-inner {
+  padding-bottom: 48px;
+}
+
+.simulator-page--mortgage .simulator-page__benefits article {
+  border-color: rgba(207, 235, 255, 0.45);
+  background: rgba(9, 72, 133, 0.58);
+}
+
+.simulator-page--mortgage .simulator-page__benefits small {
+  color: rgba(239, 249, 255, 0.86);
+}
+
+.simulator-page--mortgage .simulator-page__main {
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+.simulator-page--mortgage .simulator-page__calculator {
+  border-top: 1px solid #dce8ef;
+}
+
+.simulator-page--nisa {
+  --page-accent: #008f63;
+  --page-accent-soft: #eaf9f2;
+}
+
+.simulator-page--nisa .simulator-page__hero {
+  min-height: 255px;
+  background: url('../assets/simulator-heroes/OMG-NISA-Hero-v1.png') center 66% / cover no-repeat;
+  color: #ffffff;
+}
+
+.simulator-page--nisa .simulator-page__hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 63, 42, 0.24) 0%,
+    rgba(0, 72, 50, 0.1) 39%,
+    rgba(0, 84, 60, 0) 67%
+  );
+  pointer-events: none;
+}
+
+.simulator-page--nisa .simulator-page__hero-inner {
+  min-height: 255px;
+  padding-bottom: 48px;
+}
+
+.simulator-page--nisa .breadcrumb {
+  color: rgba(245, 255, 251, 0.86);
+}
+
+.simulator-page--nisa .simulator-page__eyebrow {
+  color: #c9ffeb;
+}
+
+.simulator-page--nisa .simulator-page__hero-copy h1 {
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 55, 38, 0.18);
+}
+
+.simulator-page--nisa .simulator-page__hero-copy > p:last-child {
+  color: rgba(244, 255, 251, 0.92);
+  text-shadow: 0 1px 10px rgba(0, 50, 36, 0.18);
+}
+
+.simulator-page--nisa .simulator-page__benefits {
+  align-self: end;
+  margin-bottom: 2px;
+  gap: 10px;
+}
+
+.simulator-page--nisa .simulator-page__benefits article {
+  border-color: rgba(222, 255, 243, 0.34);
+  background: rgba(0, 104, 76, 0.43);
+  box-shadow: 0 9px 22px rgba(0, 63, 47, 0.09);
+  color: #ffffff;
+  backdrop-filter: blur(7px);
+}
+
+.simulator-page--nisa .simulator-page__benefits b {
+  background: rgba(240, 255, 249, 0.16);
+  color: #ffffff;
+}
+
+.simulator-page--nisa .simulator-page__benefits small {
+  color: rgba(239, 255, 249, 0.85);
+}
+
+.simulator-page--nisa .simulator-page__main {
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+.simulator-page--nisa .simulator-page__calculator {
+  border-top: 1px solid #dce8ef;
+}
+
+.simulator-page--ideco {
+  --page-accent: #6441c8;
+  --page-accent-soft: #f3efff;
+}
+
+.simulator-page--ideco .simulator-page__hero {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(45, 29, 123, 0.68) 0%,
+      rgba(55, 41, 150, 0.42) 38%,
+      rgba(69, 50, 170, 0.08) 68%
+    ),
+    url('../assets/simulator-heroes/OMG-iDeCo-Hero-v1.png') center 46% / cover no-repeat;
+}
+
+.simulator-page--ideco .simulator-page__hero-inner {
+  padding-bottom: 48px;
+}
+
+.simulator-page--taxable {
+  --page-accent: #934655;
+  --page-accent-soft: #f4e6e8;
+  background: #fcf7f7;
+}
+
+.simulator-page--taxable .simulator-page__hero {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(82, 25, 38, 0.92) 0%,
+      rgba(122, 51, 65, 0.82) 34%,
+      rgba(147, 70, 85, 0.48) 60%,
+      rgba(147, 70, 85, 0.16) 82%,
+      rgba(147, 70, 85, 0.06) 100%
+    ),
+    url('../assets/simulator-heroes/OMG-TAXABLE-INCOME-Hero-v1.png') center 40% / cover no-repeat;
+}
+
+.simulator-page--taxable .simulator-page__hero-wave {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 64' preserveAspectRatio='none'%3E%3Cpath fill='%23FCF7F7' d='M0 31C180-12 346 56 570 31c236-26 380 26 570 3 126-15 211-5 300-25v55H0z'/%3E%3C/svg%3E");
+}
+
+.simulator-page--taxable .simulator-page__eyebrow {
+  color: #f8dfe4;
+}
+
+.simulator-page--taxable .simulator-page__hero-copy > p:last-child {
+  color: rgba(255, 247, 248, 0.9);
+}
+
+.simulator-page--ideco .simulator-page__benefits article {
+  border-color: rgba(238, 232, 255, 0.38);
+  background: rgba(48, 31, 133, 0.48);
+  box-shadow: 0 8px 20px rgba(29, 19, 83, 0.08);
+  color: #ffffff;
+  backdrop-filter: blur(7px);
+}
+
+.simulator-page--ideco .simulator-page__benefits b {
+  background: rgba(248, 245, 255, 0.18);
+  color: #ffffff;
+}
+
+.simulator-page--ideco .simulator-page__benefits small {
+  color: rgba(247, 243, 255, 0.86);
+}
+
+.simulator-page--taxable .simulator-page__benefits article {
+  border-color: rgba(255, 232, 236, 0.38);
+  background: rgba(102, 39, 53, 0.46);
+  color: #ffffff;
+  box-shadow: 0 9px 22px rgba(75, 25, 38, 0.1);
+  backdrop-filter: blur(7px);
+}
+
+.simulator-page--taxable .simulator-page__benefits b {
+  background: rgba(244, 230, 232, 0.94);
+  color: #7a3341;
+}
+
+.simulator-page--taxable .simulator-page__benefits small {
+  color: rgba(255, 241, 244, 0.84);
+}
+
+.simulator-page__hero-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(520px, 1.08fr);
+  align-items: center;
+  gap: 44px;
+  width: min(100% - 64px, 1360px);
+  min-height: 270px;
+  margin: 0 auto;
+  padding: 30px 0 40px;
+}
+
+.simulator-page__hero-copy h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 3.6vw, 3.45rem);
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+}
+
+.simulator-page__hero-copy > p:last-child {
+  max-width: 650px;
+  margin-top: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 650;
+  line-height: 1.8;
+}
+
+.simulator-page__eyebrow {
+  margin-bottom: 8px;
+  color: #adf1e4;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.simulator-page__benefits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.simulator-page__benefits article {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  min-height: 92px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 12px 28px rgba(0, 25, 65, 0.12);
+  backdrop-filter: blur(12px);
+}
+
+.simulator-page__benefits b {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--page-accent);
+  font-size: 0.72rem;
+}
+
+.simulator-page__benefits span {
+  display: grid;
+  gap: 4px;
+}
+
+.simulator-page__benefits strong {
+  font-size: 0.82rem;
+}
+
+.simulator-page__benefits small {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+.simulator-page__main {
+  width: min(100% - 64px, 1360px);
+  margin: 0 auto;
+  padding: 10px 0 76px;
+}
+
+.simulator-page__calculator {
+  position: relative;
+  z-index: 2;
+  padding: 34px;
+  border: 1px solid #dce8ef;
+  border-top: 1px solid #dce8ef;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 20px 52px rgba(8, 43, 80, 0.13);
+}
+
+.simulator-page .calculator-heading {
+  margin-bottom: 28px;
+}
+
+.simulator-page .calculator-heading h2 {
+  color: var(--page-navy);
+  font-size: clamp(1.65rem, 2.5vw, 2.35rem);
+}
+
+.simulator-page .section-label,
+.simulator-page .calculator-helper-link {
+  color: var(--page-accent);
+}
+
+.simulator-page .calculator-form {
+  border-color: color-mix(in srgb, var(--page-accent) 22%, #dce8ef);
+  background: color-mix(in srgb, var(--page-accent-soft) 84%, #ffffff);
+}
+
+.simulator-page .simulate-button,
+.simulator-page .apply-tax-rate-button {
+  background: var(--page-accent);
+}
+
+.simulator-page .reset-button {
+  border-color: var(--page-accent);
+  color: var(--page-accent);
+}
+
+.simulator-page .result-card.emphasis-result {
+  border-color: color-mix(in srgb, var(--page-accent) 55%, #ffffff);
+  background: var(--page-accent-soft);
+}
+
+.simulator-page .result-card strong,
+.simulator-page .result-card.emphasis-result strong {
+  color: var(--page-accent);
+}
+
+.simulator-page .simulation-result-anchor {
+  scroll-margin-top: 104px;
+}
+
+.simulator-page .simulation-result-anchor:focus {
+  outline: none;
+}
+
+.simulator-page .simulation-result-anchor:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--page-accent) 28%, transparent);
+  outline-offset: 5px;
+}
+
+.tax-return-context {
+  margin: 0 0 22px;
+  padding: 13px 16px;
+  border: 1px solid #bde3dc;
+  border-radius: 12px;
+  background: #effaf7;
+  color: #356a63;
+  font-size: 0.82rem;
+}
+
+.taxable-input-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #dfeaf0;
+}
+
+.taxable-input-mode button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #60758a;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.taxable-input-mode button.is-active {
+  background: #ffffff;
+  color: var(--page-accent);
+  box-shadow: 0 4px 12px rgba(12, 53, 93, 0.08);
+}
+
+.taxable-basic-note {
+  padding: 14px 15px;
+  border: 1px solid #d6e6ed;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.74);
+  color: #60758a;
+  font-size: 0.78rem;
+  line-height: 1.75;
+}
+
+.simulator-page--taxable .simulator-page__calculator {
+  border-color: #eadcdf;
+  background: #fffefe;
+  box-shadow: 0 20px 52px rgba(82, 42, 51, 0.1);
+}
+
+.simulator-page--taxable .calculator-form {
+  border-color: #e4d1d5;
+  background: color-mix(in srgb, #f4e6e8 84%, #ffffff);
+}
+
+.simulator-page--taxable .taxable-input-mode {
+  border: 1px solid #e5d7d4;
+  background: #f3eae7;
+}
+
+.simulator-page--taxable .taxable-input-mode button {
+  color: #735b61;
+}
+
+.simulator-page--taxable .taxable-input-mode button.is-active {
+  color: #7a3341;
+  box-shadow: 0 4px 12px rgba(122, 51, 65, 0.09);
+}
+
+.simulator-page--taxable .taxable-basic-note {
+  border-color: #e6d6d9;
+  background: rgba(255, 253, 253, 0.82);
+  color: #685960;
+}
+
+.taxable-deduction-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.taxable-deduction-group {
+  overflow: clip;
+  border: 1px solid #e4d1d5;
+  border-radius: 12px;
+  background: rgba(255, 254, 254, 0.82);
+}
+
+.taxable-deduction-group__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  min-height: 58px;
+  padding: 11px 13px;
+  border: 0;
+  background: transparent;
+  color: #5f3440;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.taxable-deduction-group__trigger:hover {
+  background: rgba(244, 230, 232, 0.6);
+}
+
+.taxable-deduction-group__trigger:focus-visible {
+  outline: 3px solid rgba(147, 70, 85, 0.2);
+  outline-offset: -3px;
+}
+
+.taxable-deduction-group__trigger > span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.taxable-deduction-group__trigger strong {
+  color: #512d37;
+  font-size: 0.82rem;
+}
+
+.taxable-deduction-group__trigger small {
+  color: #79646a;
+  font-size: 0.67rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.taxable-deduction-group__trigger > span:last-child {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid #d8bcc2;
+  border-radius: 50%;
+  background: #fffafa;
+  color: #934655;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.taxable-deduction-group .deduction-fields {
+  gap: 15px;
+  padding: 15px 13px 16px;
+  border-top: 1px solid #eadcdf;
+}
+
+.taxable-deduction-group .deduction-fields[hidden] {
+  display: none;
+}
+
+.simulator-page--taxable .simulator-chart-panel,
+.simulator-page--taxable .simulator-breakdown-panel {
+  border-color: #eadcdf;
+  background: #fffefe;
+  box-shadow: 0 8px 22px rgba(82, 42, 51, 0.055);
+}
+
+.simulator-page--taxable .taxable-breakdown-grid .result-card {
+  border-color: #eadcdf;
+  background: #fffdfd;
+}
+
+.simulator-page--taxable .tax-return-context {
+  border-color: #d8cdf6;
+  background: #f8f5ff;
+  color: #55408f;
+}
+
+.simulator-page--taxable .apply-tax-rate-button--panel:not(:disabled) {
+  background: #6441c8;
+}
+
+.simulator-page--taxable .apply-tax-rate-button--panel:disabled {
+  background: #b6afb6;
+  color: #f8f6f8;
+}
+
+.simulator-page--taxable .apply-tax-rate-button--panel:hover:not(:disabled) {
+  background: #5234ad;
+  box-shadow: 0 8px 18px rgba(82, 52, 173, 0.2);
+}
+
+.simulator-page--taxable .apply-tax-rate-button--panel:focus-visible {
+  outline-color: rgba(100, 65, 200, 0.24);
+}
+
+.simulator-page__notes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.simulator-note-card {
+  min-height: 170px;
+  padding: 21px;
+  border: 1px solid #dce8ef;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.simulator-note-card--warning {
+  border-color: #eed9a7;
+  background: #fffaf0;
+}
+
+.simulator-note-card--military,
+.simulator-note-card--nisa {
+  border-color: #bfe3d6;
+  background: #f2fbf7;
+}
+
+.simulator-note-card--ideco {
+  border-color: #d8cdf6;
+  background: #f8f5ff;
+}
+
+.simulator-note-card--blue,
+.simulator-note-card--next {
+  border-color: #cfe3f3;
+  background: #f4f9fd;
+}
+
+.simulator-note-card h2 {
+  margin: 0 0 9px;
+  color: var(--page-navy);
+  font-size: 1rem;
+}
+
+.simulator-note-card p,
+.simulator-note-card li {
+  color: #5b7186;
+  font-size: 0.73rem;
+  line-height: 1.75;
+}
+
+.simulator-note-card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.simulator-note-card a {
+  display: inline-flex;
+  gap: 7px;
+  margin-top: 12px;
+  color: var(--page-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.simulator-page--taxable .simulator-page__notes {
+  align-items: start;
+}
+
+.simulator-page--taxable .simulator-note-card {
+  min-height: 0;
+  padding: 18px;
+}
+
+.simulator-page--taxable .simulator-note-card--warning {
+  border-color: #ead5d9;
+  background: #fcf5f6;
+}
+
+.simulator-page--taxable .simulator-note-card--blue {
+  border-color: #e5d7d4;
+  background: #faf6f4;
+}
+
+.simulator-page--taxable .simulator-note-card--next {
+  border-color: #dfcbd0;
+  background: #fffafa;
+}
+
+.taxable-primary-sources {
+  display: grid;
+  gap: 7px;
+  margin: 11px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.simulator-note-card .taxable-primary-sources {
+  padding-inline-start: 0;
+}
+
+.simulator-note-card .taxable-primary-sources a {
+  display: inline;
+  width: auto;
+  max-width: 100%;
+  margin-top: 0;
+  color: #813f4d;
+  font-size: 0.69rem;
+  line-height: 1.55;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.simulator-note-card .taxable-primary-sources a > span {
+  display: inline-block;
+  margin-left: 5px;
+  text-decoration: none;
+}
+
+.simulator-note-card .taxable-primary-sources a:hover {
+  color: #612f3a;
+}
+
+.simulator-note-card .taxable-primary-sources a:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid rgba(147, 70, 85, 0.2);
+  outline-offset: 3px;
+}
+
+.taxable-final-disclaimer {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 15px;
+  border-left: 3px solid #934655;
+  background: rgba(244, 230, 232, 0.62);
+  color: #6e5960;
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+
+.taxable-final-disclaimer strong {
+  margin-right: 0.4em;
+  color: #512d37;
+}
+
+/* Information pages */
+.info-page {
+  --info-navy: #082b68;
+  --info-blue: #1769d2;
+  --info-mint: #008f6e;
+  --info-text: #17314f;
+  --info-muted: #60758a;
+  --info-line: #dce8ef;
+}
+
+.info-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(112deg, #fffdf9 0%, #f3f9ff 52%, #eef9f5 100%);
+}
+
+.info-hero::before {
+  content: "";
+  position: absolute;
+  bottom: -225px;
+  left: 16%;
+  width: 620px;
+  height: 310px;
+  border: 1px solid rgba(222, 132, 114, 0.14);
+  border-radius: 50%;
+  box-shadow: 0 -30px 0 -28px rgba(0, 143, 110, 0.1), 0 -60px 0 -58px rgba(23, 105, 210, 0.08);
+}
+
+.info-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 510px;
+  align-items: center;
+  gap: 48px;
+  width: min(100% - 64px, 1240px);
+  min-height: 340px;
+  margin: 0 auto;
+  padding: 42px 0;
+}
+
+.info-hero h1 {
+  margin: 0 0 12px;
+  color: var(--info-navy);
+  font-size: clamp(2.25rem, 3.55vw, 3.35rem);
+  letter-spacing: -0.04em;
+  line-height: 1.22;
+}
+
+.info-eyebrow {
+  margin: 0 0 9px;
+  color: #087c72;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.info-hero__lead {
+  max-width: 760px;
+  color: #425f7c;
+  font-size: 0.94rem;
+  font-weight: 560;
+  line-height: 1.75;
+}
+
+.info-main {
+  padding: 56px 32px 96px;
+  background: linear-gradient(180deg, #ffffff 0, #f8fbfc 42%, #ffffff 100%);
+}
+
+.info-shell {
+  width: min(100%, 1240px);
+  margin: 0 auto;
+}
+
+.info-section + .info-section {
+  margin-top: 64px;
+}
+
+.info-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 24px;
+}
+
+.info-section-heading h2 {
+  margin: 0;
+  color: var(--info-navy);
+  font-size: 1.65rem;
+  letter-spacing: -0.025em;
+}
+
+.info-section-heading > p {
+  max-width: 560px;
+  color: var(--info-muted);
+  font-size: 0.82rem;
+  line-height: 1.75;
+}
+
+.info-surface {
+  border: 1px solid var(--info-line);
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 18px 48px rgba(12, 53, 93, 0.09);
+}
+
+.info-icon-box {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: #e7f4ff;
+  color: var(--info-blue);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.info-tag,
+.preparing {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 850;
+}
+
+.info-tag { background: #e9f5ff; color: #1763a2; }
+.preparing { border: 1px solid #d5e0e8; background: #f5f7f9; color: #728294; }
+
+.knowledge-hero-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.knowledge-hero-tile {
+  --category-color: #1769d2;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 0 12px;
+  min-height: 92px;
+  padding: 15px;
+  border: 1px solid var(--category-color);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--category-color);
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(16, 52, 80, 0.07);
+}
+
+.knowledge-hero-tile .knowledge-category-icon {
+  display: block;
+  grid-row: 1 / 3;
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.knowledge-hero-tile span { align-self: end; color: var(--info-navy); font-weight: 900; }
+.knowledge-hero-tile small { align-self: start; color: #687e91; font-size: 0.62rem; }
+.knowledge-hero-tile--save { --category-color: #d76a59; }
+.knowledge-hero-tile--grow { --category-color: #008f6e; }
+.knowledge-hero-tile--protect { --category-color: #146f79; }
+
+.start-path {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border-top: 4px solid transparent;
+  border-image: linear-gradient(90deg, #1769d2, #d76a59, #008f6e, #146f79) 1;
+  border-radius: 0 0 20px 20px;
+}
+
+.start-path article { min-height: 142px; padding: 24px; }
+.start-path article + article { border-left: 1px solid var(--info-line); }
+.start-path b { display: grid; place-items: center; width: 28px; height: 28px; margin-bottom: 12px; border-radius: 9px; background: #e9f5ff; color: var(--info-blue); }
+.start-path strong { color: var(--info-navy); font-size: 0.9rem; }
+.start-path p { margin-top: 5px; color: #667c90; font-size: 0.72rem; line-height: 1.7; }
+
+.knowledge-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; }
+.knowledge-card { --category-color: #1769d2; min-height: 252px; padding: 22px; border-top: 5px solid var(--category-color); scroll-margin-top: 104px; }
+.knowledge-card--save { --category-color: #d65b70; }
+.knowledge-card--grow { --category-color: #008f6e; }
+.knowledge-card--protect { --category-color: #344a94; }
+.knowledge-card__icon { display: block; width: 58px; height: 58px; margin-bottom: 15px; object-fit: contain; }
+.knowledge-card h3 { margin: 0 0 6px; color: var(--info-navy); }
+.knowledge-card > p { min-height: 64px; margin-bottom: 16px; color: var(--info-muted); font-size: 0.72rem; line-height: 1.7; }
+.topic-list { display: grid; gap: 8px; }
+.topic-list > span { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #4f687f; font-size: 0.69rem; font-weight: 760; }
+
+.okinawa-panel { display: grid; grid-template-columns: 0.8fr 1.2fr; overflow: hidden; border: 0; }
+.okinawa-intro { padding: 28px; background: radial-gradient(circle at 85% 12%, rgba(95, 224, 200, 0.24), transparent 30%), linear-gradient(145deg, #07275a, #08717a); color: #ffffff; }
+.okinawa-intro .info-eyebrow { color: #7ee3cf; }
+.okinawa-intro h2 { margin: 0 0 10px; font-size: 1.5rem; }
+.okinawa-intro > p:last-child { color: #cde1ef; font-size: 0.74rem; line-height: 1.7; }
+.okinawa-topics { display: grid; grid-template-columns: 1fr 1fr; }
+.okinawa-topics article { padding: 22px; border-bottom: 1px solid #e1ebf0; }
+.okinawa-topics article:nth-child(odd) { border-right: 1px solid #e1ebf0; }
+.okinawa-topics h3 { margin: 0 0 5px; color: var(--info-navy); font-size: 0.86rem; }
+.okinawa-topics p { margin-bottom: 10px; color: #657b90; font-size: 0.68rem; line-height: 1.65; }
+.simulator-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.simulator-links a { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border: 1px solid #cde1ec; border-radius: 999px; background: #ffffff; color: #1b547e; font-size: 0.72rem; font-weight: 800; text-decoration: none; }
+
+/* About */
+.info-page--about { background: #fcfbf7; }
+.about-hero { background: radial-gradient(circle at 86% 8%, rgba(87, 137, 112, 0.16), transparent 23%), linear-gradient(112deg, #fbf7ef 0%, #f3ede2 58%, #edf6f1 100%); }
+.about-hero__inner { display: block; min-height: 405px; padding-block: 72px 64px; }
+.about-hero__copy { max-width: 930px; padding-left: 38px; border-left: 3px solid #8ba991; }
+.about-hero .info-eyebrow { color: #7d715f; }
+.about-hero h1 { max-width: 900px; color: #17314f; font-size: clamp(2.55rem, 4.15vw, 3.9rem); line-height: 1.3; }
+.about-hero .info-hero__lead { max-width: 720px; color: #5c6d70; }
+.about-principles { display: flex; align-items: center; gap: 14px; margin-top: 30px; color: #4d6458; font-size: 0.72rem; font-weight: 850; }
+.about-principles i { width: 42px; height: 1px; background: #ac9f89; }
+.info-page--about .info-main { padding-top: 76px; background: #fcfbf7; }
+.info-shell--about { width: min(100%, 1120px); }
+.info-page--about .info-section + .info-section { margin-top: 88px; }
+.mission-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr); gap: 64px; }
+.mission-story { padding: 8px 20px 8px 0; }
+.mission-story h2 { margin: 0 0 16px; color: var(--info-navy); font-size: 2rem; line-height: 1.5; }
+.mission-story > p:not(.info-eyebrow) { margin-bottom: 16px; color: #536d84; font-size: 0.86rem; line-height: 2.05; }
+.audience-card { position: relative; padding: 31px 30px; background: #f2ebdf; }
+.audience-card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 84px; background: #7c9c88; }
+.audience-card h2 { margin: 0 0 13px; color: var(--info-navy); font-size: 1.1rem; }
+.check-list { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; }
+.check-list li { position: relative; padding-left: 26px; color: #45677a; font-size: 0.75rem; }
+.check-list li::before { content: "✓"; position: absolute; left: 0; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #d9f3eb; color: #00876a; font-size: 0.65rem; font-weight: 900; }
+.about-reasons article { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 28px; padding: 30px 0; border-bottom: 1px solid #ded5c7; }
+.about-reasons article > span { color: #b5a58d; font-family: Georgia, serif; font-size: 2.2rem; }
+.about-reasons h3 { margin: 0 0 6px; color: var(--info-navy); }
+.about-reasons article > div > p:last-child { max-width: 760px; color: var(--info-muted); font-size: 0.78rem; line-height: 1.8; }
+.scope-grid, .page-links { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.scope-card { padding: 25px; border-radius: 4px; box-shadow: none; }
+.scope-card:first-child { border-color: #bfd9cf; background: #f3f9f6; }
+.scope-card h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 13px; color: var(--info-navy); }
+.scope-card li { color: #536d84; font-size: 0.76rem; line-height: 1.9; }
+.reading-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+.reading-steps article { padding: 22px 0 0; border-top: 2px solid #b7a98f; }
+.reading-steps b { color: #7f7566; font-size: 0.67rem; }
+.reading-steps h3 { margin: 7px 0 5px; color: var(--info-navy); }
+.reading-steps p { color: var(--info-muted); font-size: 0.72rem; }
+.page-link { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 100px; padding: 22px; color: inherit; text-decoration: none; }
+.page-link > span:first-child { display: grid; gap: 4px; }
+.page-link strong { color: var(--info-navy); }
+.page-link span span { color: var(--info-muted); font-size: 0.72rem; }
+
+/* Trust */
+.info-page--trust { background: #f2f6f8; }
+.trust-hero { background: radial-gradient(circle at 78% 18%, rgba(35, 190, 173, 0.2), transparent 27%), linear-gradient(116deg, #041533 0%, #062852 58%, #07535d 100%); }
+.trust-hero__inner { grid-template-columns: minmax(0, 1fr) 390px; min-height: 350px; }
+.trust-hero .info-eyebrow { color: #6ee0ca; }
+.trust-hero h1 { color: #ffffff; }
+.trust-hero .info-hero__lead { color: #bfd3e2; }
+.trust-console { padding: 22px; border: 1px solid rgba(112, 225, 207, 0.24); border-radius: 18px; background: rgba(2, 18, 46, 0.56); color: #ffffff; box-shadow: 0 22px 54px rgba(0, 12, 35, 0.28); }
+.trust-console > div:first-child { display: flex; align-items: center; margin-bottom: 14px; }
+.trust-console > div:first-child span { color: #76dfcf; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.14em; }
+.trust-console__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.trust-console__grid span { padding: 9px 10px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: rgba(255,255,255,.055); color: #d5e5ed; font-size: 0.65rem; }
+.trust-console > p { display: flex; align-items: center; gap: 8px; margin-top: 15px; color: #9ebcca; font-size: 0.61rem; }
+.trust-console > p span { width: 7px; height: 7px; border-radius: 50%; background: #54d6bd; }
+.info-page--trust .info-main { padding-top: 0; background: linear-gradient(180deg, #e7f0f3 0, #f3f7f8 240px, #ffffff 100%); }
+.trust-summary { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: -28px; }
+.trust-summary article { padding: 22px; border: 0; border-top: 4px solid #0d9992; border-radius: 10px; }
+.trust-summary .info-icon-box { border-radius: 50%; background: #e1f5f1; color: #087c72; }
+.trust-summary h2 { margin: 12px 0 6px; color: var(--info-navy); font-size: 1.05rem; }
+.trust-summary p { color: var(--info-muted); font-size: 0.73rem; line-height: 1.75; }
+.trust-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); align-items: start; gap: 24px; }
+.trust-nav { position: sticky; top: 96px; display: grid; padding: 15px; border: 0; border-radius: 12px; background: #071e3f; }
+.trust-nav strong { padding: 10px; color: #ffffff; }
+.trust-nav a { padding: 9px 10px; border-radius: 8px; color: #b9cedb; font-size: 0.72rem; text-decoration: none; }
+.trust-nav a:hover { background: rgba(255,255,255,.08); color: #77dfcd; }
+.policy-stack { display: grid; gap: 18px; }
+.policy-card { padding: 23px; border: 0; border-left: 4px solid #b8cdd5; border-radius: 8px; }
+.policy-heading { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 13px; margin-bottom: 15px; }
+.policy-number { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: #e4f4f2; color: #087c72; font-weight: 900; }
+.policy-heading h2 { margin: 0; color: var(--info-navy); font-size: 1rem; }
+.policy-heading p { color: #7a8e9f; font-size: 0.64rem; }
+.policy-body p, .policy-body li { color: #536d84; font-size: 0.75rem; line-height: 1.85; }
+.data-pledge { padding: 26px; border-color: rgba(71, 208, 184, 0.22); border-radius: 12px; background: radial-gradient(circle at 92% 12%, rgba(56, 212, 180, 0.24), transparent 28%), linear-gradient(135deg, #071d49, #083b64); color: #ffffff; }
+.data-pledge .info-eyebrow { color: #7ee3cf; }
+.data-pledge h2 { margin: 0 0 10px; font-size: 1.35rem; }
+.data-pledge > p:not(.info-eyebrow) { color: #c8deed; font-size: 0.77rem; line-height: 1.75; }
+.data-pledge > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+.data-pledge > div span { padding: 15px; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; background: rgba(255,255,255,.06); font-size: 0.7rem; font-weight: 750; }
+.principles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 12px; border-radius: 16px; background: #e7eff2; }
+.principles article { min-height: 132px; padding: 17px; border-radius: 9px; background: #ffffff; }
+.principles b { color: #087c72; font-size: 0.68rem; letter-spacing: 0.08em; }
+.principles p { margin-top: 8px; color: #536e84; font-size: 0.69rem; font-weight: 700; }
+
+.not-found-page__main {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  min-height: calc(100svh - 180px);
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.not-found-page__main > p:first-child { color: #0f766e; font-size: 1rem; font-weight: 900; letter-spacing: 0.2em; }
+.not-found-page__main h1 { margin: 8px 0 12px; color: #082b68; font-size: clamp(2rem, 5vw, 3.5rem); }
+.not-found-page__main > p:not(:first-child) { color: #60758a; }
+.not-found-page__main a { margin-top: 24px; padding: 12px 22px; border-radius: 999px; background: #0f766e; color: #ffffff; font-weight: 800; text-decoration: none; }
+
+@media (min-width: 901px) {
+  .simulator-page__hero {
+    min-height: var(--simulator-hero-height-desktop);
+  }
+
+  .simulator-page__hero-inner {
+    grid-template-columns: minmax(0, 0.8fr) minmax(560px, 1.2fr);
+    gap: 30px;
+    min-height: var(--simulator-hero-height-desktop);
+    padding: 20px 0 28px;
+  }
+
+  .simulator-page__hero-copy {
+    min-width: 0;
+  }
+
+  .breadcrumb {
+    margin-bottom: 10px;
+  }
+
+  .simulator-page__hero-copy h1 {
+    font-size: clamp(2.2rem, 2.9vw, 2.55rem);
+    white-space: nowrap;
+  }
+
+  .simulator-page--taxable .simulator-page__hero-copy h1 {
+    max-width: 620px;
+    white-space: normal;
+  }
+
+  .simulator-page__hero-copy > p:last-child {
+    margin-top: 9px;
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+
+  .simulator-page__benefits {
+    gap: 10px;
+  }
+
+  .simulator-page__benefits article {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 9px;
+    min-height: 76px;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .simulator-page__benefits b {
+    width: 32px;
+    height: 32px;
+  }
+
+  .simulator-page__benefits strong {
+    font-size: 0.76rem;
+  }
+
+  .simulator-page__benefits small {
+    font-size: 0.61rem;
+  }
+
+  .simulator-page__main {
+    margin-top: 0;
+    padding-bottom: 64px;
+  }
+
+  .simulator-page__calculator {
+    padding: 22px;
+    border-radius: 15px;
+  }
+
+  .simulator-page .calculator,
+  .simulator-page .mortgage-calculator {
+    padding: 0;
+  }
+
+  .simulator-page .calculator-heading,
+  .simulator-page .mortgage-calculator__heading {
+    max-width: none;
+    margin-bottom: 17px;
+  }
+
+  .simulator-page .calculator-heading h2,
+  .simulator-page .mortgage-calculator__heading h2 {
+    font-size: 1.55rem;
+    line-height: 1.28;
+  }
+
+  .simulator-page .calculator-heading > p:last-child,
+  .simulator-page .mortgage-calculator__heading > p:last-child {
+    margin-top: 8px;
+    font-size: 0.76rem;
+    line-height: 1.65;
+  }
+
+  .simulator-page .calculator-layout {
+    grid-template-columns: minmax(330px, 0.7fr) minmax(0, 1.3fr);
+    gap: 18px;
+  }
+
+  .simulator-page .calculator-form {
+    gap: 14px;
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .simulator-page .calculator-form label {
+    gap: 7px;
+    font-size: 0.82rem;
+  }
+
+  .simulator-page .input-with-unit input,
+  .simulator-page .input-with-unit select {
+    min-height: 45px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+  }
+
+  .simulator-page .form-spacer {
+    height: 4px;
+  }
+
+  .simulator-page .calculation-mode {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .simulator-page .calculator-form .mode-checkbox {
+    font-size: 0.78rem;
+  }
+
+  .simulator-page .calculation-mode > p,
+  .simulator-page .calculation-mode__description {
+    font-size: 0.71rem;
+    line-height: 1.55;
+  }
+
+  .simulator-page .simulate-button,
+  .simulator-page .reset-button,
+  .simulator-page .apply-tax-rate-button {
+    min-height: 46px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+  }
+
+  .simulator-page .calculator-results {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .simulator-page .result-card {
+    min-height: 112px;
+    padding: 16px;
+    border-radius: 13px;
+  }
+
+  .simulator-page .result-card > span {
+    min-height: 34px;
+    margin-bottom: 7px;
+    font-size: 0.76rem;
+  }
+
+  .simulator-page .result-card strong,
+  .simulator-page .result-card.emphasis-result strong {
+    font-size: clamp(1.05rem, 7.5cqi, 1.55rem);
+  }
+
+  .simulator-page .result-card small {
+    margin-top: 7px;
+    font-size: 0.67rem;
+  }
+
+  .simulator-page .calculator-note,
+  .simulator-page .mortgage-note {
+    margin-top: 16px;
+    padding: 13px 15px;
+    font-size: 0.73rem;
+    line-height: 1.7;
+  }
+
+  .simulator-page .mortgage-calculator {
+    gap: 15px;
+  }
+
+  .simulator-page .mortgage-status {
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+  }
+
+  .simulator-page .mortgage-calculator__layout {
+    grid-template-columns: minmax(380px, 0.82fr) minmax(0, 1.18fr);
+    gap: 18px;
+  }
+
+  .simulator-page .mortgage-form,
+  .simulator-page .mortgage-results {
+    gap: 14px;
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .simulator-page .mortgage-method__option {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .simulator-page .mortgage-field {
+    gap: 6px;
+  }
+
+  .simulator-page .mortgage-input-with-unit input {
+    min-height: 45px;
+    border-radius: 10px;
+  }
+
+  .simulator-page .mortgage-mode {
+    padding: 12px;
+  }
+
+  .simulator-page .mortgage-button--primary,
+  .simulator-page .mortgage-button--secondary {
+    min-height: 46px;
+  }
+
+  .simulator-page .mortgage-results[data-empty="true"] {
+    grid-template-rows: max-content minmax(260px, 1fr);
+  }
+
+  .simulator-page .mortgage-results__empty {
+    min-height: 260px;
+    padding: 50px 24px 24px;
+  }
+}
+
+/* WBS 3.6.11 round 2: iDeCo tax and contribution hierarchy */
+.ideco-longterm-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* iDeCo formal eligibility inputs and validation */
+.ideco-tax-mode-selector {
+  display: grid;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid #d8d0ee;
+  border-radius: 10px;
+  background: #faf9ff;
+}
+
+.ideco-tax-mode-selector > strong {
+  color: #493986;
+  font-size: 0.76rem;
+}
+
+.ideco-tax-mode-selector > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ideco-tax-mode-selector button {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 9px 10px;
+  border: 1px solid #d0c8e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #554d70;
+  font: inherit;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ideco-tax-mode-selector button[aria-pressed="true"] {
+  border-color: #7658ce;
+  background: #f0ebff;
+  color: #3e277e;
+  box-shadow: inset 0 0 0 1px rgba(118, 88, 206, 0.18);
+}
+
+.ideco-tax-mode-selector button:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.24);
+  outline-offset: 2px;
+}
+
+.ideco-tax-mode-selector button span {
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.ideco-tax-mode-selector button small {
+  color: #716b86;
+  font-size: 0.62rem;
+}
+
+.ideco-tax-mode-note {
+  margin: 0;
+  padding: 8px 10px;
+  border-left: 3px solid #9a84d8;
+  border-radius: 0 7px 7px 0;
+  background: #f8f6ff;
+  color: #625a79;
+  font-size: 0.66rem;
+  line-height: 1.55;
+}
+
+.ideco-input-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  grid-column: 1 / -1;
+  gap: 8px 12px;
+  min-width: 0;
+}
+
+.ideco-input-group + .ideco-input-group {
+  padding-top: 9px;
+  border-top: 1px solid #e1dced;
+}
+
+.ideco-input-group__heading {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #5a438f;
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+.ideco-input-group > :is(
+  .ideco-field--wide,
+  .ideco-rule-summary,
+  .ideco-tax-mode-note,
+  .calculator-field,
+  .calculator-helper-link
+) {
+  grid-column: 1 / -1;
+}
+
+.simulator-page--ideco .ideco-field {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+
+.simulator-page--ideco .ideco-field--alignment-peer {
+  align-self: start;
+}
+
+.simulator-page--ideco .ideco-field--alignment-peer > :is(
+  .ideco-field-label-row,
+  label
+) {
+  min-height: 22px;
+  align-items: center;
+}
+
+.simulator-page--ideco :is(
+  .ideco-field > label,
+  .ideco-field-label-row
+) {
+  min-height: 22px;
+}
+
+.simulator-page--ideco .ideco-field > label,
+.simulator-page--ideco .ideco-field-label-row {
+  display: flex;
+  align-items: center;
+}
+
+.simulator-page--ideco .ideco-field-label-row {
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.simulator-page--ideco :is(
+  .ideco-field > label,
+  .ideco-field-label-row > label
+) {
+  margin: 0;
+  padding: 0;
+  color: #3f3965;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.ideco-field-helper-button {
+  justify-self: start;
+  min-height: 34px;
+  padding: 5px 11px;
+  border: 1px solid #7658ce;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #57428d;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.ideco-field-helper-button:hover {
+  background: #f1edfc;
+}
+
+.ideco-field-helper-button:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.2);
+  outline-offset: 2px;
+}
+
+.simulator-page--ideco .ideco-field > :is(input, select) {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbc7dc;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #292441;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.simulator-page--ideco .ideco-field > :is(input, select):focus {
+  border-color: #7154ca;
+  outline: 3px solid rgba(113, 84, 202, 0.18);
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-select,
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-select-display {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-select-display {
+  min-height: 44px;
+  padding: 0 40px 0 12px;
+  border-color: #cbc7dc;
+  border-radius: 9px;
+  line-height: 1.35;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-value {
+  color: #292441;
+  font-size: 0.9rem;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-guide {
+  color: #6a6680;
+  font-size: 0.78rem;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-arrow {
+  right: 12px;
+  color: #7154ca;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-native-select {
+  box-sizing: border-box;
+}
+
+.simulator-page--ideco .ideco-tax-rate-field .tax-rate-select:focus-within
+  .tax-rate-select-display {
+  border-color: #7154ca;
+  box-shadow: 0 0 0 3px rgba(113, 84, 202, 0.18);
+}
+
+.simulator-page--ideco :is(
+  .ideco-field > input,
+  .ideco-field > select,
+  .ideco-field .input-with-unit input
+)[aria-invalid="true"] {
+  border-color: #b42318;
+  box-shadow: 0 0 0 2px rgba(180, 35, 24, 0.12);
+}
+
+.simulator-page--ideco .tax-rate-select:has(
+  select[aria-invalid="true"]
+) .tax-rate-select-display {
+  border-color: #b42318;
+  box-shadow: 0 0 0 2px rgba(180, 35, 24, 0.12);
+}
+
+.ideco-field__help,
+.ideco-field__error {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.ideco-field__help {
+  color: #6a6680;
+}
+
+.ideco-field__error {
+  color: #a61b12;
+  font-weight: 750;
+}
+
+.ideco-error-summary {
+  padding: 13px 14px;
+  border: 1px solid #e2a7a1;
+  border-radius: 10px;
+  background: #fff5f4;
+  color: #791a14;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.ideco-error-summary:focus {
+  outline: 3px solid rgba(180, 35, 24, 0.18);
+  outline-offset: 2px;
+}
+
+.ideco-error-summary ul {
+  display: grid;
+  gap: 4px;
+  margin: 7px 0 0;
+  padding-left: 18px;
+}
+
+.ideco-error-summary button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ideco-rule-summary,
+.ideco-result-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 10px;
+  margin: 0;
+  padding: 11px 12px;
+  border: 1px solid #d8d0ee;
+  border-radius: 9px;
+  background: #f7f4ff;
+  color: #544a7b;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.ideco-rule-summary strong,
+.ideco-result-context strong {
+  color: #4b338e;
+}
+
+.ideco-rule-summary p {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.ideco-rule-summary b {
+  margin-inline: 0.2em;
+  color: #4b338e;
+}
+
+.ideco-result-context {
+  display: grid;
+  align-items: start;
+  gap: 7px;
+  background: #faf9ff;
+}
+
+.ideco-result-context__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+}
+
+.ideco-result-context__items span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 3px 7px;
+  border: 1px solid #e3ddf2;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #5f5875;
+  white-space: nowrap;
+}
+
+.ideco-result-context__items b {
+  color: #514177;
+  font-weight: 850;
+}
+
+.simulator-page--ideco .calculator-layout {
+  align-items: start;
+}
+
+.simulator-page--ideco .calculator-results {
+  align-self: start;
+}
+
+.ideco-detailed-tax-breakdown {
+  display: grid;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid #d9d0ef;
+  border-radius: 10px;
+  background: #fbfaff;
+}
+
+.ideco-detailed-tax-breakdown > div > p {
+  margin: 0;
+  color: #7658ce;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.ideco-detailed-tax-breakdown h3 {
+  margin: 2px 0 0;
+  color: #322a55;
+  font-size: 0.9rem;
+}
+
+.ideco-detailed-tax-breakdown dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0;
+}
+
+.ideco-detailed-tax-breakdown dl > div {
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid #e2dcf0;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.ideco-detailed-tax-breakdown dt {
+  color: #746d87;
+  font-size: 0.6rem;
+  line-height: 1.4;
+}
+
+.ideco-detailed-tax-breakdown dd {
+  margin: 4px 0 0;
+  color: #46317e;
+  font-size: 0.76rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.ideco-detailed-tax-breakdown > p {
+  margin: 0;
+  color: #665f7d;
+  font-size: 0.63rem;
+  line-height: 1.6;
+}
+
+.ideco-reset-undo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #cfc3ed;
+  border-radius: 10px;
+  background: #f7f4ff;
+  color: #51427c;
+  font-size: 0.72rem;
+}
+
+.ideco-reset-undo button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 6px 12px;
+  border: 1px solid #7658ce;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4b338e;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ideco-reset-undo button:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.2);
+  outline-offset: 2px;
+}
+
+.ideco-consultation-summary {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 22px;
+  border: 1px solid #ddd5ef;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(63, 42, 121, 0.06);
+}
+
+.ideco-consultation-summary__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.ideco-consultation-summary__heading p {
+  margin: 0 0 5px;
+  color: #7154ca;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+}
+
+.ideco-consultation-summary__heading h3 {
+  margin: 0;
+  color: #322a55;
+  font-size: 1.2rem;
+}
+
+.ideco-consultation-summary__heading span {
+  display: block;
+  margin-top: 7px;
+  color: #665f7d;
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.ideco-consultation-summary__actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ideco-consultation-summary__actions button {
+  min-height: 42px;
+  padding: 8px 13px;
+  border: 1px solid #7154ca;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #4b338e;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ideco-consultation-summary__actions button:first-child {
+  background: #7154ca;
+  color: #ffffff;
+}
+
+.ideco-consultation-summary__actions button:focus-visible {
+  outline: 3px solid rgba(113, 84, 202, 0.2);
+  outline-offset: 3px;
+}
+
+.ideco-consultation-summary__status {
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: 9px;
+  background: #f3f9f5;
+  color: #356549;
+  font-size: 0.76rem;
+  font-weight: 750;
+  line-height: 1.55;
+}
+
+.ideco-consultation-summary__status[data-tone="error"] {
+  border: 1px solid #e3b6b6;
+  background: #fff5f5;
+  color: #8a3d3d;
+}
+
+.ideco-consultation-summary__content {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #e4def1;
+  border-radius: 11px;
+  background: #fbfaff;
+  color: #4a4262;
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+.ideco-consultation-summary__document-heading {
+  padding-bottom: 13px;
+  border-bottom: 2px solid #d0c4eb;
+}
+
+.ideco-consultation-summary__document-heading p,
+.ideco-consultation-summary__document-heading h4,
+.ideco-consultation-summary__document-heading span,
+.ideco-consultation-summary__section h5,
+.ideco-consultation-summary__section dl,
+.ideco-consultation-summary__section ul,
+.ideco-consultation-summary__supplement,
+.ideco-consultation-summary__notice {
+  margin: 0;
+}
+
+.ideco-consultation-summary__document-heading p {
+  color: #7154ca;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.ideco-consultation-summary__document-heading h4 {
+  margin-top: 3px;
+  color: #322a55;
+  font-size: 1.1rem;
+}
+
+.ideco-consultation-summary__document-heading span {
+  display: block;
+  margin-top: 5px;
+  color: #665f7d;
+}
+
+.ideco-consultation-summary__section {
+  padding: 13px 14px;
+  border: 1px solid #e4def1;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.ideco-consultation-summary__section h5 {
+  color: #322a55;
+  font-size: 0.87rem;
+}
+
+.ideco-consultation-summary__section dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 18px;
+  margin-top: 8px;
+}
+
+.ideco-consultation-summary__section dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  min-width: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #efebf6;
+}
+
+.ideco-consultation-summary__section dt {
+  color: #766e8c;
+}
+
+.ideco-consultation-summary__section dd {
+  max-width: 27rem;
+  margin: 0;
+  color: #3f345f;
+  font-weight: 750;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.ideco-consultation-summary__section ul {
+  columns: 2;
+  gap: 28px;
+  margin-top: 8px;
+  padding-left: 1.2rem;
+}
+
+.ideco-consultation-summary__section li {
+  break-inside: avoid;
+}
+
+.ideco-consultation-summary__supplement {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: #f3efff;
+  color: #625879;
+  font-size: 0.7rem;
+}
+
+.ideco-primary-source-list a {
+  color: #53399a;
+  font-weight: 750;
+  text-underline-offset: 3px;
+}
+
+.ideco-primary-source-list a:focus-visible {
+  border-radius: 3px;
+  outline: 3px solid rgba(113, 84, 202, 0.18);
+  outline-offset: 3px;
+}
+
+.ideco-consultation-summary__notice {
+  padding: 10px 12px;
+  border: 1px solid #ded8e9;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #5e5670;
+  font-size: 0.73rem;
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+@media (min-width: 901px) {
+  .simulator-page--ideco .calculator-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .simulator-page--ideco .calculator-form > * {
+    min-width: 0;
+  }
+
+  .simulator-page--ideco .calculator-form > :is(
+    .simulator-panel-heading,
+    .ideco-tax-mode-selector,
+    .ideco-tax-mode-note,
+    .ideco-input-group,
+    .ideco-field--wide,
+    .ideco-error-summary,
+    .ideco-rule-summary,
+    .calculator-field,
+    .calculator-helper-link,
+    .ideco-reset-undo,
+    .form-spacer,
+    .calculation-mode,
+    .simulator-form-actions,
+    .simulator-input-point
+  ) {
+    grid-column: 1 / -1;
+  }
+
+  .simulator-page--ideco .form-spacer {
+    display: none;
+  }
+
+  .simulator-page--ideco .ideco-field {
+    gap: 4px;
+  }
+
+  .simulator-page--ideco :is(
+    .ideco-field > label,
+    .ideco-field-label-row > label
+  ) {
+    font-size: 0.7rem;
+  }
+
+  .simulator-page--ideco .ideco-field > :is(input, select) {
+    min-height: 38px;
+    padding-inline: 10px;
+    border-radius: 7px;
+    font-size: 0.8rem;
+  }
+
+  .simulator-page--ideco .ideco-tax-rate-field .tax-rate-select-display {
+    min-height: 38px;
+    padding: 0 36px 0 10px;
+    border-radius: 7px;
+  }
+
+  .simulator-page--ideco .ideco-tax-rate-field .tax-rate-value {
+    font-size: 0.8rem;
+  }
+
+  .simulator-page--ideco .ideco-tax-rate-field .tax-rate-guide {
+    font-size: 0.7rem;
+  }
+
+  .simulator-page--ideco .ideco-tax-rate-field .tax-rate-arrow {
+    right: 10px;
+  }
+
+  .simulator-page--ideco :is(
+    .ideco-field__help,
+    .ideco-field__error
+  ) {
+    font-size: 0.62rem;
+  }
+
+  .simulator-page--ideco :is(
+    .ideco-rule-summary,
+    .ideco-result-context,
+    .ideco-error-summary
+  ) {
+    padding: 8px 10px;
+    font-size: 0.64rem;
+  }
+
+  .simulator-page--ideco .ideco-tax-mode-selector {
+    padding: 8px 9px;
+  }
+
+  .simulator-page--ideco .ideco-tax-mode-selector button {
+    min-height: 45px;
+    padding: 7px 8px;
+  }
+}
+
+@media (max-width: 620px) {
+  .ideco-tax-mode-selector > div,
+  .ideco-input-group,
+  .ideco-detailed-tax-breakdown dl,
+  .ideco-consultation-summary__section dl {
+    grid-template-columns: 1fr;
+  }
+
+  .ideco-consultation-summary {
+    padding: 16px;
+  }
+
+  .ideco-consultation-summary__heading,
+  .ideco-reset-undo {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ideco-consultation-summary__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .ideco-consultation-summary__actions button {
+    flex: 1 1 12rem;
+  }
+
+  .ideco-consultation-summary__section ul {
+    columns: 1;
+  }
+
+}
+
+.simulator-page--ideco .result-card--contribution-total {
+  border-color: #b9a9ee;
+  background: #f5f2ff;
+}
+
+.simulator-page--ideco .ideco-longterm-summary .result-card--total {
+  border-color: #d0c4f4;
+  background: #faf8ff;
+}
+
+.ideco-trajectory-wrap {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.ideco-trajectory-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  color: #6d6488;
+  font-size: 0.62rem;
+  font-weight: 750;
+}
+
+.ideco-trajectory-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ideco-trajectory-legend i {
+  width: 11px;
+  height: 8px;
+  background: #6441c8;
+}
+
+.ideco-trajectory-legend span:nth-child(2) i {
+  background: #a692e5;
+}
+
+.asset-trajectory--ideco {
+  margin-top: 0;
+}
+
+.asset-trajectory--ideco .ideco-trajectory__plot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+}
+
+.asset-trajectory--ideco .ideco-trajectory__plot > i {
+  width: min(25px, 36%);
+  min-height: 2px;
+  border-radius: 5px 5px 1px 1px;
+  box-shadow: none;
+}
+
+.asset-trajectory--ideco .ideco-trajectory__contribution {
+  background: linear-gradient(180deg, #8f73df, #6441c8);
+}
+
+.asset-trajectory--ideco .ideco-trajectory__saving {
+  background: linear-gradient(180deg, #c9bdf0, #a692e5);
+}
+
+.ideco-trajectory-note {
+  margin: 0;
+  color: #746d89;
+  font-size: 0.64rem;
+  text-align: right;
+}
+
+@media (min-width: 901px) {
+  .simulator-page--ideco .simulator-summary-grid--ideco {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .simulator-page--ideco .simulator-summary-grid--ideco .emphasis-result {
+    border-color: #8f73df;
+    background: #f3efff;
+  }
+}
+
+@media (max-width: 700px) {
+  .ideco-longterm-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1200px) {
+  .simulator-page__hero-inner { grid-template-columns: minmax(0, 0.9fr) minmax(460px, 1.1fr); gap: 28px; width: min(100% - 48px, 1120px); }
+  .simulator-page__hero-copy h1 { font-size: clamp(2rem, 3vw, 2.25rem); }
+  .simulator-page__main { width: min(100% - 48px, 1120px); }
+  .simulator-page__benefits article { padding: 13px; }
+  .knowledge-grid { gap: 12px; }
+  .knowledge-card { padding: 19px; }
+  .principles { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .simulator-page__hero-inner,
+  .info-hero__inner,
+  .mission-grid,
+  .okinawa-panel,
+  .trust-layout { grid-template-columns: 1fr; }
+  .simulator-page__benefits { max-width: 720px; }
+  .simulator-page__notes,
+  .knowledge-grid,
+  .trust-summary { grid-template-columns: 1fr 1fr; }
+  .trust-summary article:last-child { grid-column: 1 / -1; }
+  .trust-nav { position: static; }
+  .scope-grid, .page-links { grid-template-columns: 1fr; }
+  .reading-steps, .start-path { grid-template-columns: 1fr 1fr; }
+  .start-path article + article { border-left: 0; border-top: 1px solid var(--info-line); }
+}
+
+@media (max-width: 760px) {
+  .simulator-page__hero-inner,
+  .simulator-page__main,
+  .info-hero__inner { width: min(100% - 32px, 680px); }
+  .simulator-page__hero-copy,
+  .simulator-page__benefits {
+    min-width: 0;
+    width: 100%;
+  }
+  .simulator-page--mortgage .simulator-page__hero-copy h1 {
+    font-size: 1.95rem;
+  }
+  .simulator-page--ideco .simulator-page__hero-copy h1 {
+    font-size: 1.9rem;
+  }
+  .simulator-page__benefits {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+  .simulator-page--nisa .simulator-page__benefits {
+    gap: 9px;
+  }
+  .simulator-page__benefits article {
+    min-height: 72px;
+    padding: 10px 13px;
+  }
+  .simulator-page__calculator { padding: 22px 18px; }
+  .simulator-page__notes,
+  .knowledge-grid,
+  .trust-summary,
+  .reading-steps,
+  .start-path { grid-template-columns: 1fr; }
+  .trust-summary article:last-child { grid-column: auto; }
+  .info-main { padding: 44px 18px 72px; }
+  .info-section-heading { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .knowledge-hero-nav { grid-template-columns: 1fr 1fr; }
+  .okinawa-topics { grid-template-columns: 1fr; }
+  .okinawa-topics article:nth-child(odd) { border-right: 0; }
+  .about-hero__copy { padding-left: 22px; }
+  .about-principles { flex-wrap: wrap; }
+  .about-reasons article { grid-template-columns: 64px 1fr; gap: 18px; }
+  .policy-heading { grid-template-columns: 42px minmax(0, 1fr); }
+  .policy-heading > :last-child { grid-column: 2; justify-self: start; }
+  .data-pledge > div, .principles { grid-template-columns: 1fr; }
+  .site-footer .footer-inner { align-items: flex-start; }
+  .site-footer nav { justify-content: flex-start; }
+  .site-footer nav a,
+  .trust-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .simulator-page--military .military-scenario-tooltip-trigger {
+    position: relative;
+  }
+
+  .simulator-page--military .military-scenario-tooltip-trigger::after {
+    content: "";
+    position: absolute;
+    inset: -11px;
+  }
+
+  .simulator-page--ideco .ideco-field-label-row {
+    position: relative;
+  }
+
+  .simulator-page--ideco .ideco-field-label-row .tooltip-container {
+    position: static;
+  }
+
+  .simulator-page--ideco .ideco-field-helper-button,
+  .simulator-page--ideco .calculator-helper-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* WBS 3.6.11: approved PC simulator-body alignment */
+.simulator-panel-heading,
+.simulator-results-heading,
+.simulator-subheading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.simulator-panel-heading {
+  justify-content: flex-start;
+  padding-bottom: 13px;
+  border-bottom: 1px solid color-mix(in srgb, var(--page-accent) 18%, #dce8ef);
+}
+
+.simulator-panel-heading > span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--page-accent);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.simulator-panel-heading p,
+.simulator-results-heading p,
+.simulator-subheading p {
+  margin: 0 0 3px;
+  color: var(--page-accent);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.simulator-panel-heading h3,
+.simulator-results-heading h3,
+.simulator-subheading h3 {
+  margin: 0;
+  color: var(--page-navy);
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.simulator-results-heading > span,
+.simulator-subheading > span {
+  color: #718699;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.simulator-summary-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.simulator-summary-grid--military,
+.simulator-summary-grid--ideco {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.simulator-summary-grid--nisa,
+.simulator-summary-grid--taxable {
+  grid-template-columns: 1fr;
+}
+
+.simulator-chart-panel,
+.simulator-breakdown-panel {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #dce8ef;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(24, 57, 82, 0.055);
+}
+
+.simulator-chart-empty {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  margin-top: 14px;
+  border: 1px dashed #c9d8df;
+  border-radius: 11px;
+  background: #f8fbfc;
+  color: #7890a2;
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.asset-trajectory {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  height: 230px;
+  margin-top: 14px;
+  padding: 16px 12px 10px;
+  border-radius: 11px;
+  background:
+    repeating-linear-gradient(to top, transparent 0 47px, #e7eef2 48px),
+    linear-gradient(180deg, #fbfdfd, #f5faf8);
+}
+
+.asset-trajectory__point {
+  display: grid;
+  grid-template-rows: 32px minmax(0, 1fr) 26px;
+  gap: 5px;
+  height: 100%;
+  min-width: 0;
+  text-align: center;
+}
+
+.asset-trajectory__point > span {
+  overflow: hidden;
+  color: var(--page-accent);
+  font-size: 0.62rem;
+  font-weight: 850;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-trajectory__point > div {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 0;
+}
+
+.asset-trajectory__point i {
+  display: block;
+  width: min(54px, 72%);
+  min-height: 12px;
+  border-radius: 7px 7px 2px 2px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--page-accent) 58%, #ffffff), var(--page-accent));
+  box-shadow: 0 7px 14px color-mix(in srgb, var(--page-accent) 14%, transparent);
+}
+
+.asset-trajectory__point small {
+  color: #657d91;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.simulator-breakdown-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 20px;
+  margin: 14px 0 0;
+}
+
+.simulator-breakdown-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5edf1;
+}
+
+.simulator-breakdown-list dt {
+  color: #60758a;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.simulator-breakdown-list dd {
+  margin: 0;
+  color: var(--page-navy);
+  font-size: 0.82rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.ideco-visual-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.tax-saving-bars {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.tax-saving-bars > div {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.tax-saving-bars span {
+  color: #60758a;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.tax-saving-bars i {
+  display: block;
+  overflow: hidden;
+  height: 10px;
+  border-radius: 999px;
+  background: #e6e0f8;
+}
+
+.tax-saving-bars b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--page-accent);
+}
+
+.tax-saving-bars strong {
+  color: var(--page-accent);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.taxable-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.apply-tax-rate-button--panel {
+  width: 100%;
+}
+
+@media (min-width: 901px) {
+  .simulator-page__calculator {
+    padding: 20px;
+  }
+
+  .simulator-page .calculator-heading,
+  .simulator-page .mortgage-calculator__heading {
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .simulator-page .calculator-layout {
+    grid-template-columns: minmax(330px, 0.68fr) minmax(0, 1.32fr);
+    gap: 16px;
+  }
+
+  .simulator-page .calculator-form {
+    gap: 12px;
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .simulator-page .calculator-results {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    align-content: start;
+  }
+
+  .simulator-page .input-with-unit input,
+  .simulator-page .input-with-unit select {
+    min-height: 44px;
+  }
+
+  .simulator-page .result-card {
+    min-height: 118px;
+    padding: 15px;
+    border-radius: 11px;
+    box-shadow: 0 6px 16px rgba(24, 57, 82, 0.055);
+  }
+
+  .simulator-page .result-card > span {
+    min-height: 32px;
+    margin-bottom: 6px;
+    font-size: 0.7rem;
+  }
+
+  .simulator-page .result-card strong,
+  .simulator-page .result-card.emphasis-result strong {
+    font-size: clamp(1rem, 7cqi, 1.48rem);
+  }
+
+  .simulator-page .result-card small {
+    margin-top: 6px;
+    font-size: 0.62rem;
+    line-height: 1.5;
+  }
+
+  .simulator-summary-grid--military {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .simulator-summary-grid--nisa,
+  .simulator-summary-grid--taxable {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .simulator-summary-grid--ideco {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .simulator-page--military .result-card--accent,
+  .simulator-page--nisa .result-card--gain,
+  .simulator-page--ideco .result-card--total,
+  .simulator-page--taxable .result-card--total {
+    border-color: color-mix(in srgb, var(--page-accent) 38%, #dce8ef);
+    background: color-mix(in srgb, var(--page-accent-soft) 72%, #ffffff);
+  }
+
+  .ideco-visual-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
+  }
+
+  .taxable-breakdown-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .taxable-breakdown-grid .result-card {
+    min-height: 105px;
+    padding: 13px;
+  }
+
+  .taxable-breakdown-grid .result-card > span {
+    min-height: 30px;
+  }
+}
+
+@media (max-width: 900px) {
+  .simulator-results-heading,
+  .simulator-subheading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .simulator-results-heading > span,
+  .simulator-subheading > span {
+    text-align: left;
+  }
+
+  .simulator-summary-grid--nisa,
+  .simulator-summary-grid--taxable {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .simulator-summary-grid--nisa .emphasis-result,
+  .simulator-summary-grid--taxable .result-card--total {
+    grid-column: 1 / -1;
+  }
+
+  .taxable-breakdown-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .simulator-summary-grid,
+  .simulator-summary-grid--military,
+  .simulator-summary-grid--ideco,
+  .simulator-summary-grid--nisa,
+  .simulator-summary-grid--taxable,
+  .simulator-breakdown-list {
+    grid-template-columns: 1fr;
+  }
+
+  .simulator-summary-grid--nisa .emphasis-result,
+  .simulator-summary-grid--taxable .result-card--total {
+    grid-column: auto;
+  }
+
+  .asset-trajectory {
+    gap: 6px;
+    height: 205px;
+    padding-inline: 4px;
+  }
+
+  .asset-trajectory__point > span {
+    font-size: 0.55rem;
+  }
+
+  .tax-saving-bars > div {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .tax-saving-bars strong {
+    grid-column: 2;
+  }
+}
+
+/* WBS 3.6.11 round 2: NISA principal/gain trajectory */
+.simulator-page--nisa .result-card--future {
+  border-color: #72c89f;
+  background: #eefaf4;
+}
+
+.simulator-page--nisa .simulator-summary-grid--nisa .result-card:nth-child(2) {
+  border-color: #a9c8f1;
+  background: #f3f7ff;
+}
+
+.simulator-page--nisa .simulator-summary-grid--nisa .result-card--gain {
+  border-color: #a9d8bf;
+  background: #f4fbf7;
+}
+
+.nisa-trajectory-wrap {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.nisa-trajectory-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  color: #657d91;
+  font-size: 0.64rem;
+  font-weight: 750;
+}
+
+.nisa-trajectory-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nisa-trajectory-legend i {
+  width: 11px;
+  height: 8px;
+  background: #168f5d;
+}
+
+.nisa-trajectory-legend span:nth-child(2) i {
+  background: #a7dc88;
+}
+
+.nisa-trajectory-legend span:nth-child(3) i {
+  width: 16px;
+  height: 2px;
+  background: #1769d2;
+}
+
+.asset-trajectory--nisa {
+  margin-top: 0;
+}
+
+.asset-trajectory--nisa .nisa-trajectory__plot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.asset-trajectory--nisa .nisa-trajectory__plot > i {
+  flex: 0 0 auto;
+  width: min(62px, 72%);
+  min-height: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.asset-trajectory--nisa .nisa-trajectory__plot > .nisa-trajectory__gain {
+  border-top: 2px solid #1769d2;
+  border-radius: 7px 7px 0 0;
+  background: #a7dc88;
+}
+
+.asset-trajectory--nisa .nisa-trajectory__plot > .nisa-trajectory__principal {
+  background: #168f5d;
+}
+
+@media (min-width: 901px) {
+  .simulator-page--nisa .simulator-summary-grid--nisa {
+    grid-template-columns: 1.16fr 1fr 1fr;
+  }
+
+  .simulator-page--nisa .result-card--future strong {
+    font-size: clamp(1.05rem, 1.55vw, 1.7rem);
+  }
+}
+
+/* WBS 3.6.11 round 2: military-land result hierarchy */
+.military-primary-results,
+.military-support-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.simulator-page--military .military-primary-results .result-card {
+  min-height: 142px;
+  padding: 18px;
+}
+
+.simulator-page--military .military-primary-results .result-card > span {
+  color: #276379;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.simulator-page--military .military-primary-results .result-card strong {
+  margin-top: 14px;
+  font-size: clamp(1.55rem, 2.35vw, 2.4rem);
+}
+
+.simulator-page--military .military-result-card--yield {
+  border-color: #6cb8aa;
+  background: #edf9f6;
+}
+
+.simulator-page--military .military-result-card--multiple {
+  border-color: #a7cbe3;
+  background: #f3f9fd;
+}
+
+.simulator-page--military .military-support-results .result-card {
+  min-height: 110px;
+  padding: 14px 16px;
+}
+
+@media (max-width: 620px) {
+  .military-primary-results,
+  .military-support-results {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* WBS 3.6.11 round 3: page-specific approved PC simulator density */
+.simulator-form-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: 9px;
+}
+
+.simulator-form-actions[data-single="true"] {
+  grid-template-columns: 1fr;
+}
+
+.simulator-form-actions > :is(.simulate-button, .reset-button) {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.military-kpi-grid,
+.ideco-kpi-grid {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 901px) {
+  .simulator-page__calculator {
+    padding: 15px;
+    border-radius: 14px;
+  }
+
+  .simulator-page .calculator-layout {
+    grid-template-columns: minmax(340px, 0.64fr) minmax(0, 1.36fr);
+    gap: 13px;
+  }
+
+  .simulator-page .calculator-form {
+    align-content: start;
+    gap: 9px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #fbfdfd;
+  }
+
+  .simulator-panel-heading {
+    padding-bottom: 9px;
+  }
+
+  .simulator-panel-heading > span {
+    flex-basis: 31px;
+    width: 31px;
+    height: 31px;
+    font-size: 0.63rem;
+  }
+
+  .simulator-panel-heading h3,
+  .simulator-results-heading h3,
+  .simulator-subheading h3 {
+    font-size: 0.96rem;
+  }
+
+  .simulator-page .calculator-results {
+    gap: 10px;
+  }
+
+  .simulator-page .calculator-form > label {
+    grid-template-columns: minmax(116px, 0.82fr) minmax(0, 1.18fr);
+    align-items: center;
+    gap: 8px;
+    font-size: 0.74rem;
+  }
+
+  .simulator-page .calculator-form > label > span:first-child {
+    line-height: 1.45;
+  }
+
+  .simulator-page .input-with-unit {
+    gap: 7px;
+  }
+
+  .simulator-page .input-with-unit input,
+  .simulator-page .input-with-unit select {
+    min-height: 38px;
+    padding-inline: 11px;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .simulator-page .input-with-unit > span {
+    min-width: 22px;
+    font-size: 0.73rem;
+  }
+
+  .simulator-page .form-spacer {
+    height: 0;
+  }
+
+  .simulator-page .calculation-mode {
+    margin-top: 0;
+    padding: 9px 10px;
+    border-radius: 8px;
+  }
+
+  .simulator-page .calculator-form .mode-checkbox {
+    gap: 8px;
+    font-size: 0.7rem;
+  }
+
+  .simulator-page .calculator-form .mode-checkbox input {
+    width: 18px;
+    height: 18px;
+    margin-top: 0;
+  }
+
+  .simulator-page .calculator-form .mode-checkbox input:checked::after {
+    top: 1px;
+    left: 5px;
+    width: 5px;
+    height: 9px;
+  }
+
+  .simulator-page .calculation-mode > p,
+  .simulator-page .calculation-mode__description {
+    margin: 3px 0 0 26px;
+    font-size: 0.62rem;
+    line-height: 1.45;
+  }
+
+  .simulator-page .simulate-button,
+  .simulator-page .reset-button,
+  .simulator-page .apply-tax-rate-button {
+    min-height: 40px;
+    border-radius: 7px;
+    font-size: 0.75rem;
+  }
+
+  .simulator-page .result-card {
+    min-height: 105px;
+    padding: 12px;
+    border-radius: 9px;
+    box-shadow: 0 5px 13px rgba(24, 57, 82, 0.05);
+  }
+
+  .simulator-page .result-card > span {
+    min-height: 29px;
+    margin-bottom: 4px;
+    font-size: 0.65rem;
+    line-height: 1.45;
+  }
+
+  .simulator-page .result-card strong,
+  .simulator-page .result-card.emphasis-result strong {
+    font-size: clamp(0.95rem, 6.8cqi, 1.42rem);
+  }
+
+  .simulator-page .result-card small {
+    margin-top: 5px;
+    font-size: 0.57rem;
+    line-height: 1.42;
+  }
+
+  .simulator-chart-panel,
+  .simulator-breakdown-panel {
+    padding: 13px;
+    border-radius: 10px;
+  }
+
+  .simulator-page .calculator-note {
+    margin-top: 10px;
+    padding: 10px 13px;
+    font-size: 0.65rem;
+    line-height: 1.55;
+  }
+
+  /* Military land: four KPI cards on the same visual line. */
+  .simulator-page--military .military-kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .simulator-page--military .military-kpi-grid .result-card {
+    min-height: 126px;
+    padding: 13px 11px;
+    text-align: center;
+  }
+
+  .simulator-page--military .military-kpi-grid .result-card > span {
+    color: #35596f;
+    font-size: 0.67rem;
+    font-weight: 850;
+  }
+
+  .simulator-page--military .military-kpi-grid .result-card strong {
+    margin-top: 8px;
+    font-size: clamp(1.12rem, 7.6cqi, 1.8rem);
+  }
+
+  .simulator-page--military .military-result-card--yield {
+    border-color: #88cdb4;
+    background: #effaf4;
+  }
+
+  .simulator-page--military .military-result-card--multiple {
+    border-color: #a8c9ee;
+    background: #f2f7fd;
+  }
+
+  .simulator-page--military .military-result-card--rent {
+    border-color: #cebaf2;
+    background: #f8f4ff;
+  }
+
+  .simulator-page--military .military-result-card--rent strong {
+    color: #7541c7;
+  }
+
+  .simulator-page--military .military-result-card--price {
+    border-color: #f0c49e;
+    background: #fff8f1;
+  }
+
+  .simulator-page--military .military-result-card--price strong {
+    color: #d96617;
+  }
+
+  .simulator-page--military .simulator-breakdown-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .simulator-page--military .simulator-breakdown-list > div {
+    display: grid;
+    align-content: center;
+    min-height: 72px;
+    padding: 9px 10px;
+    border: 1px solid #e1eaef;
+    border-radius: 8px;
+    background: #fbfdfd;
+    text-align: center;
+  }
+
+  .simulator-page--military .simulator-breakdown-list dd {
+    margin-top: 5px;
+  }
+
+  /* NISA: four KPI cards and one dominant area chart. */
+  .simulator-page--nisa .simulator-summary-grid--nisa {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .simulator-page--nisa .simulator-summary-grid--nisa .result-card {
+    min-height: 118px;
+  }
+
+  .simulator-page--nisa .simulator-chart-panel--nisa {
+    min-height: 328px;
+  }
+
+  .nisa-trajectory-wrap {
+    gap: 5px;
+    margin-top: 7px;
+  }
+
+  /* iDeCo: six KPI cards in the approved horizontal hierarchy. */
+  .simulator-page--ideco .ideco-kpi-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .simulator-page--ideco :is(.simulator-summary-grid--ideco, .ideco-longterm-summary) {
+    display: contents;
+  }
+
+  .simulator-page--ideco .ideco-kpi-grid .result-card {
+    min-height: 125px;
+    padding: 11px 9px;
+    text-align: center;
+  }
+
+  .simulator-page--ideco .ideco-kpi-grid .result-card > span {
+    min-height: 38px;
+  }
+
+  .simulator-page--ideco .ideco-kpi-grid .emphasis-result {
+    border: 2px solid #8061dc;
+    background: #f3efff;
+  }
+
+  .simulator-page--ideco .ideco-visual-grid {
+    grid-template-columns: minmax(0, 1.28fr) minmax(230px, 0.72fr);
+    gap: 10px;
+  }
+
+  .simulator-page--ideco .simulator-chart-panel--ideco,
+  .simulator-page--ideco .simulator-breakdown-panel--ideco {
+    min-height: 282px;
+  }
+
+  .simulator-page--ideco .tax-saving-bars {
+    gap: 22px;
+    margin-top: 30px;
+  }
+
+  /* Taxable income follows the iDeCo visual family without changing its content. */
+  .simulator-page--taxable .calculator-layout {
+    grid-template-columns: minmax(350px, 0.64fr) minmax(0, 1.36fr);
+  }
+
+  .simulator-page--taxable .simulator-summary-grid--taxable {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .simulator-page--taxable .taxable-breakdown-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .simulator-page--taxable .taxable-breakdown-grid .result-card {
+    min-height: 92px;
+    padding: 10px;
+  }
+
+  .simulator-page--taxable .apply-tax-rate-button--panel {
+    justify-self: end;
+    width: min(100%, 360px);
+  }
+}
+
+.nisa-area-graph,
+.ideco-area-graph {
+  position: relative;
+  min-width: 0;
+  padding: 5px 4px 0;
+}
+
+.nisa-area-graph__canvas {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.nisa-area-graph__y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  height: 225px;
+  padding: 30px 0 22px;
+  color: #62798c;
+  font-size: 0.56rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-area-graph__plot {
+  position: relative;
+  min-width: 0;
+}
+
+.nisa-area-graph svg,
+.ideco-area-graph svg {
+  display: block;
+  width: 100%;
+  height: 225px;
+  overflow: visible;
+}
+
+.nisa-area-graph__grid line,
+.ideco-area-graph__grid line {
+  stroke: #dce8e7;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.nisa-area-graph__principal {
+  fill: #0e9a63;
+  opacity: 0.92;
+}
+
+.nisa-area-graph__gain {
+  fill: #a9df89;
+  opacity: 0.82;
+}
+
+.nisa-area-graph__total {
+  fill: none;
+  stroke: #1769d2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.nisa-area-graph__labels,
+.ideco-area-graph__labels {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-top: 3px;
+  color: #62798c;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.nisa-area-graph__plot > strong {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  padding: 5px 8px;
+  border: 1px solid #86b1eb;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #1769d2;
+  font-size: 0.72rem;
+}
+
+.nisa-area-graph--empty,
+.ideco-area-graph--empty {
+  margin-top: 9px;
+  border-radius: 8px;
+  background: #fbfdfd;
+}
+
+.nisa-area-graph--empty svg,
+.ideco-area-graph--empty svg {
+  opacity: 0.58;
+}
+
+.nisa-area-graph__placeholder,
+.ideco-area-graph__placeholder {
+  fill: none;
+  stroke: #c0d0d7;
+  stroke-dasharray: 7 7;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.nisa-area-graph--empty p,
+.ideco-area-graph--empty p {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: min(90%, 360px);
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #75899a;
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.ideco-area-graph__contribution {
+  fill: #cfc4f3;
+  opacity: 0.75;
+}
+
+.ideco-area-graph__saving {
+  fill: #7454cc;
+  opacity: 0.42;
+}
+
+.ideco-area-graph__contribution-line,
+.ideco-area-graph__saving-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.ideco-area-graph__contribution-line {
+  stroke: #6441c8;
+}
+
+.ideco-area-graph__saving-line {
+  stroke: #a38ee2;
+}
+
+@media (max-width: 900px) {
+  .military-kpi-grid,
+  .ideco-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .simulator-page--ideco :is(.simulator-summary-grid--ideco, .ideco-longterm-summary) {
+    display: contents;
+  }
+}
+
+@media (max-width: 520px) {
+  .simulator-form-actions,
+  .military-kpi-grid,
+  .ideco-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-area-graph svg,
+  .ideco-area-graph svg {
+    height: 190px;
+  }
+
+  .nisa-area-graph__y-axis {
+    height: 190px;
+    padding-top: 25px;
+    font-size: 0.5rem;
+  }
+
+  .nisa-area-graph__labels,
+  .ideco-area-graph__labels {
+    font-size: 0.5rem;
+  }
+}
+
+.simulator-input-point {
+  padding: 10px 11px;
+  border: 1px solid color-mix(in srgb, var(--page-accent) 24%, #dce8ef);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--page-accent-soft) 72%, #ffffff);
+}
+
+.simulator-input-point strong {
+  display: block;
+  color: var(--page-accent);
+  font-size: 0.7rem;
+}
+
+.simulator-input-point p {
+  margin: 4px 0 0;
+  color: #60758a;
+  font-size: 0.61rem;
+  line-height: 1.55;
+}
+
+.military-result-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.28fr) minmax(220px, 0.72fr);
+  gap: 10px;
+}
+
+.military-formula-panel,
+.military-result-guide {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #dce8ef;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.military-formula-panel dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0 0;
+}
+
+.military-formula-panel dl > div {
+  display: grid;
+  gap: 5px;
+  padding: 9px;
+  border-radius: 7px;
+  background: #f7fafc;
+}
+
+.military-formula-panel dt {
+  color: #60758a;
+  font-size: 0.61rem;
+  font-weight: 700;
+}
+
+.military-formula-panel dd {
+  margin: 0;
+  color: var(--page-accent);
+  font-size: 0.86rem;
+  font-weight: 850;
+}
+
+.military-result-guide {
+  border-color: #cbe2d7;
+  background: #f5fbf8;
+}
+
+.military-result-guide strong {
+  color: #14764d;
+  font-size: 0.72rem;
+}
+
+.military-result-guide p {
+  margin: 8px 0 0;
+  color: #5c7368;
+  font-size: 0.62rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 700px) {
+  .military-result-detail-grid,
+  .military-formula-panel dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Military-land page: approved mock alignment */
+.simulator-page--military {
+  --page-accent: #087f70;
+  --page-accent-soft: #eaf8f4;
+}
+
+.simulator-page--military .simulator-page__hero {
+  background:
+    linear-gradient(
+      96deg,
+      rgba(0, 54, 68, 0.97) 0%,
+      rgba(0, 89, 99, 0.9) 42%,
+      rgba(0, 104, 111, 0.58) 72%,
+      rgba(0, 72, 78, 0.28) 100%
+    ),
+    url('../assets/simulator-heroes/OMG-Military-Land-Hero-v1.png') center 54% / cover no-repeat;
+}
+
+.simulator-page--military .simulator-page__hero-inner {
+  padding-bottom: 48px;
+}
+
+.simulator-page--military .simulator-page__main {
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+.simulator-page--military .simulator-page__benefits article {
+  border-color: rgba(210, 249, 242, 0.42);
+  background: rgba(4, 82, 90, 0.58);
+}
+
+.simulator-page--military .simulator-page__benefits small {
+  color: rgba(239, 255, 252, 0.84);
+}
+
+.simulator-page--military .simulator-page__calculator {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.simulator-page--military .military-expanded-form {
+  border-color: #dce6eb;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(25, 57, 78, 0.07);
+}
+
+.simulator-page--military .military-expanded-results {
+  padding: 14px;
+  border: 1px solid #e1e9ed;
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(25, 57, 78, 0.06);
+}
+
+.simulator-page--military .military-input-row > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.simulator-page--military .military-scenario-period-field {
+  display: grid;
+  gap: 10px;
+  color: #24455c;
+  font-weight: 700;
+}
+
+.simulator-page--military .military-scenario-period-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.simulator-page--military .military-scenario-period-label > label {
+  display: inline;
+  color: inherit;
+  font: inherit;
+}
+
+.simulator-page--military .military-scenario-tooltip-trigger {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid #8fb5ad;
+  border-radius: 50%;
+  background: #f3faf8;
+  color: #287e70;
+  font: inherit;
+  font-size: 0.62rem;
+  line-height: 1;
+  cursor: help;
+}
+
+.simulator-page--military .military-scenario-tooltip-trigger:focus {
+  border-color: #167866;
+  outline: 3px solid rgba(22, 120, 102, 0.18);
+  outline-offset: 2px;
+}
+
+.simulator-page--military .military-scenario-tooltip {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  z-index: 30;
+  width: min(280px, calc(100vw - 80px));
+  padding: 9px 11px;
+  border: 1px solid #cddfdb;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(25, 57, 78, 0.14);
+  color: #4d6774;
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.65;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-3px);
+  transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
+}
+
+.simulator-page--military .military-scenario-tooltip-trigger:is(:hover, :focus) + .military-scenario-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .simulator-page--military .military-scenario-tooltip {
+    transition: none;
+  }
+}
+
+.simulator-page--military .military-input-row em {
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: #fff0ed;
+  color: #df4c39;
+  font-size: 0.52rem;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.military-loan-choice {
+  display: grid;
+  grid-template-columns: minmax(155px, 1fr) auto auto;
+  align-items: center;
+  gap: 13px;
+  margin: 0;
+  padding: 7px 0;
+  border: 0;
+}
+
+.military-loan-choice legend {
+  float: left;
+  width: auto;
+  margin: 0;
+  color: #29465d;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.military-loan-choice label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #49677b;
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.military-loan-choice input {
+  accent-color: var(--page-accent);
+}
+
+.military-loan-fields {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #d7e8e4;
+  border-radius: 9px;
+  background: #f4faf8;
+}
+
+.military-loan-fields > strong {
+  color: #1d6f65;
+  font-size: 0.7rem;
+}
+
+.simulator-page--military .military-field-note {
+  margin: -2px 0 2px;
+  color: #6b7f8d;
+  font-size: 0.58rem;
+  line-height: 1.55;
+}
+
+.simulator-page--military .simulator-input-point ul {
+  display: grid;
+  gap: 3px;
+  margin: 5px 0 0;
+  padding-left: 17px;
+  color: #60758a;
+  font-size: 0.59rem;
+  line-height: 1.5;
+}
+
+.simulator-page--military .military-results-heading > span {
+  white-space: nowrap;
+}
+
+.simulator-page--military .military-result-card--yield {
+  border-color: #9cc8ef;
+  background: #f1f7fd;
+}
+
+.simulator-page--military .military-result-card--yield strong {
+  color: #1267d6;
+}
+
+.simulator-page--military .military-result-card--net-yield {
+  border-color: #98d1ae;
+  background: #f0faf4;
+}
+
+.simulator-page--military .military-result-card--net-yield strong {
+  color: #178944;
+}
+
+.simulator-page--military .military-result-card--income {
+  border-color: #cfb5ef;
+  background: #f8f3fd;
+}
+
+.simulator-page--military .military-result-card--income strong {
+  color: #7640c5;
+}
+
+.simulator-page--military .military-result-card--payback {
+  border-color: #efc3a4;
+  background: #fff7f1;
+}
+
+.simulator-page--military .military-result-card--payback strong {
+  color: #dd5d14;
+}
+
+.military-breakdown-and-guide {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(230px, 0.55fr);
+  gap: 10px;
+}
+
+.military-income-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 9px 0 0;
+  border: 1px solid #dce7ed;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.military-income-breakdown > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 42px;
+  padding: 8px 11px;
+  border-bottom: 1px solid #e6edf1;
+}
+
+.military-income-breakdown > div:nth-child(odd) {
+  border-right: 1px solid #e6edf1;
+}
+
+.military-income-breakdown dt {
+  color: #566f82;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.military-income-breakdown dd {
+  margin: 0;
+  color: #183d5b;
+  font-size: 0.72rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.military-income-breakdown .military-breakdown-total dd {
+  color: #1267d6;
+  font-size: 0.82rem;
+}
+
+.military-net-yield-guide {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 9px;
+  padding: 14px;
+  border: 1px solid #cbe2d7;
+  border-radius: 10px;
+  background: #f5fbf8;
+}
+
+.military-net-yield-guide > span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #159a61;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.military-net-yield-guide strong {
+  color: #164e3b;
+  font-size: 0.75rem;
+}
+
+.military-net-yield-guide p {
+  margin: 7px 0;
+  color: #597166;
+  font-size: 0.61rem;
+  line-height: 1.65;
+}
+
+.military-net-yield-guide a {
+  color: #1267d6;
+  font-size: 0.62rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.simulator-page--military .military-missing-cost-warning {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid #ead7a6;
+  border-radius: 8px;
+  background: #fffaf0;
+  color: #775d22;
+  font-size: 0.62rem;
+  line-height: 1.6;
+}
+
+.simulator-page--military .military-loan-reference {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.72fr) minmax(0, 1.28fr);
+  gap: 12px;
+  align-items: center;
+  padding: 11px 13px;
+  border: 1px solid #d7e8e4;
+  border-radius: 9px;
+  background: #f4faf8;
+}
+
+.simulator-page--military .military-loan-reference > div strong {
+  color: #1d6f65;
+  font-size: 0.72rem;
+}
+
+.simulator-page--military .military-loan-reference > div p {
+  margin: 4px 0 0;
+  color: #647a73;
+  font-size: 0.58rem;
+  line-height: 1.55;
+}
+
+.simulator-page--military .military-loan-reference dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.simulator-page--military .military-loan-reference dl > div {
+  padding: 8px 10px;
+  border: 1px solid #dce8e4;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.simulator-page--military .military-loan-reference dt {
+  color: #647a73;
+  font-size: 0.58rem;
+  font-weight: 750;
+}
+
+.simulator-page--military .military-loan-reference dd {
+  margin: 4px 0 0;
+  color: #167866;
+  font-size: 0.75rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.military-future-panel {
+  padding: 13px;
+  border: 1px solid #dce8ef;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.military-future-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.simulator-page--military .military-future-note {
+  margin: 9px 0 0;
+  color: #687e8d;
+  font-size: 0.59rem;
+  line-height: 1.6;
+}
+
+.simulator-page--military .military-future-note--repayment {
+  color: #665c8e;
+}
+
+.military-line-chart,
+.military-period-chart {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #dfe8ed;
+  border-radius: 8px;
+  background: #fbfdfd;
+}
+
+.military-line-chart header,
+.military-period-chart header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #183d5b;
+  font-size: 0.68rem;
+}
+
+.military-line-chart header small,
+.military-period-chart header small {
+  color: #768b9b;
+  font-size: 0.56rem;
+}
+
+.military-line-chart svg {
+  display: block;
+  width: 100%;
+  height: 150px;
+  margin-top: 4px;
+  overflow: visible;
+}
+
+.military-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 7px;
+  color: #607687;
+  font-size: 0.55rem;
+  font-weight: 750;
+}
+
+.military-chart-legend span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.military-chart-legend i {
+  width: 16px;
+  height: 3px;
+  border-radius: 999px;
+  background: #159a51;
+}
+
+.military-chart-legend span:nth-child(2) i {
+  background: #7567c9;
+}
+
+.military-chart-axis {
+  stroke: #cddce4;
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+}
+
+.military-chart-area {
+  fill: rgba(41, 169, 99, 0.13);
+}
+
+.military-chart-line {
+  fill: none;
+  stroke: #159a51;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.military-chart-line--repayment {
+  stroke: #7567c9;
+  stroke-dasharray: 7 5;
+}
+
+.military-line-chart circle {
+  fill: #159a51;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.military-line-chart .military-chart-point--repayment {
+  fill: #7567c9;
+}
+
+.military-chart-labels {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  color: #718799;
+  font-size: 0.52rem;
+  text-align: center;
+}
+
+.military-chart-total {
+  display: block;
+  margin-top: 0;
+  color: #16884b;
+  font-size: 0.68rem;
+  text-align: right;
+}
+
+.military-chart-totals {
+  display: grid;
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.military-chart-total--repayment {
+  color: #6859b5;
+}
+
+.military-period-bars {
+  display: grid;
+  align-items: flex-end;
+  gap: 4px;
+  height: 184px;
+  padding: 22px 14px 0;
+}
+
+.military-period-bars > div {
+  display: grid;
+  grid-template-rows: 24px 1fr 20px;
+  align-items: end;
+  justify-items: center;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.military-period-bars strong {
+  color: #1267d6;
+  font-size: 0.48rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.military-period-bars i {
+  display: block;
+  align-self: end;
+  width: min(38px, 82%);
+  min-height: 8px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(#64b4ed, #268fe0);
+}
+
+.military-period-bars i[data-negative="true"] {
+  background: #e09191;
+}
+
+.military-period-bars span {
+  color: #718799;
+  font-size: 0.5rem;
+  white-space: nowrap;
+}
+
+.military-chart-empty {
+  display: grid;
+  place-items: center;
+  height: 190px;
+  margin-top: 8px;
+  border-radius: 7px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 36px, #e8eff2 36px 37px),
+    #fafcfd;
+  color: #8194a2;
+  font-size: 0.64rem;
+}
+
+.military-formula-strip {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1.65fr);
+  gap: 8px;
+}
+
+.military-formula-strip > div,
+.military-formula-strip > p {
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid #e0e9ee;
+  border-radius: 8px;
+  background: #f8fbfc;
+}
+
+.military-formula-strip > div {
+  display: grid;
+  gap: 3px;
+}
+
+.military-formula-strip span,
+.military-formula-strip p {
+  color: #647a8b;
+  font-size: 0.58rem;
+  line-height: 1.55;
+}
+
+.military-formula-strip strong {
+  color: #167866;
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.military-calculator-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.simulator-page--military .military-calculator-footer .calculator-note {
+  flex: 1;
+}
+
+.simulator-page--military .simulator-page__notes {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.simulator-note-card--share {
+  border-color: #dfd2ef;
+  background: #faf7ff;
+}
+
+.simulator-note-card--share button {
+  width: 100%;
+  min-height: 30px;
+  margin-top: 6px;
+  border: 1px solid #d8c8eb;
+  border-radius: 6px;
+  background: #fff;
+  color: #8267a1;
+  font-size: 0.62rem;
+  font-weight: 750;
+}
+
+.simulator-note-card--share button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+@media (min-width: 901px) {
+  .simulator-page--military .military-calculator-layout {
+    grid-template-columns: minmax(390px, 0.72fr) minmax(0, 1.28fr);
+  }
+
+  .simulator-page--military .military-expanded-form {
+    gap: 8px;
+  }
+
+  .simulator-page--military .military-expanded-form > label {
+    grid-template-columns: minmax(165px, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .simulator-page--military .military-scenario-period-field {
+    grid-template-columns: minmax(165px, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: 8px;
+    font-size: 0.74rem;
+  }
+
+  .simulator-page--military .military-kpi-grid .result-card {
+    min-height: 124px;
+  }
+}
+
+@media (max-width: 1280px) and (min-width: 1101px) {
+  .simulator-page--military .military-period-bars strong {
+    font-size: 0.44rem;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 901px) {
+  .simulator-page--military .military-calculator-layout {
+    grid-template-columns: minmax(350px, 0.78fr) minmax(0, 1.22fr);
+  }
+
+  .military-breakdown-and-guide,
+  .military-future-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .simulator-page--military .simulator-page__notes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .military-breakdown-and-guide,
+  .military-future-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .simulator-page--military .simulator-page__notes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .simulator-page--military .simulator-page__hero-copy,
+  .simulator-page--military .simulator-page__benefits {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .simulator-page--military .simulator-page__hero-copy h1 {
+    font-size: clamp(1.55rem, 7vw, 1.9rem);
+    overflow-wrap: anywhere;
+  }
+
+  .military-loan-choice {
+    grid-template-columns: 1fr auto auto;
+  }
+
+  .military-income-breakdown,
+  .military-formula-strip,
+  .simulator-page--military .military-loan-reference,
+  .simulator-page--military .military-loan-reference dl,
+  .simulator-page--military .simulator-page__notes {
+    grid-template-columns: 1fr;
+  }
+
+  .military-income-breakdown > div:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .military-calculator-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm 15mm;
+  }
+
+  html:has(.simulator-page--ideco),
+  body:has(.simulator-page--ideco) {
+    background: #ffffff !important;
+  }
+
+  .simulator-page--ideco .skip-link,
+  .simulator-page--ideco .top-option02__header,
+  .simulator-page--ideco .simulator-page__hero,
+  .simulator-page--ideco .simulator-page__notes,
+  .simulator-page--ideco .site-footer,
+  .simulator-page--ideco .calculator > :not(.ideco-consultation-summary),
+  .simulator-page--ideco .ideco-consultation-summary__heading,
+  .simulator-page--ideco .ideco-consultation-summary__status {
+    display: none !important;
+  }
+
+  .simulator-page--ideco,
+  .simulator-page--ideco main,
+  .simulator-page--ideco .simulator-page__main,
+  .simulator-page--ideco .simulator-page__calculator,
+  .simulator-page--ideco .calculator {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary {
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__content {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: #ffffff;
+    color: #111111;
+    font-size: 10pt;
+    line-height: 1.5;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__document-heading {
+    margin-bottom: 8mm;
+    padding-bottom: 4mm;
+    border-bottom: 1px solid #555555;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__document-heading p,
+  .simulator-page--ideco .ideco-consultation-summary__document-heading h4,
+  .simulator-page--ideco .ideco-consultation-summary__document-heading span,
+  .simulator-page--ideco .ideco-consultation-summary__section h5,
+  .simulator-page--ideco .ideco-consultation-summary__section dt,
+  .simulator-page--ideco .ideco-consultation-summary__section dd,
+  .simulator-page--ideco .ideco-consultation-summary__section li,
+  .simulator-page--ideco .ideco-primary-source-list a,
+  .simulator-page--ideco .ideco-consultation-summary__supplement,
+  .simulator-page--ideco .ideco-consultation-summary__notice {
+    color: #111111;
+  }
+
+  .simulator-page--ideco .ideco-primary-source-list a {
+    text-decoration: underline;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__document-heading h4 {
+    font-size: 16pt;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section {
+    margin-top: 4mm;
+    padding: 3.5mm 4mm;
+    border: 1px solid #b8b8b8;
+    border-radius: 0;
+    background: #ffffff;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section h5 {
+    font-size: 11pt;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5mm 7mm;
+    margin-top: 2mm;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section dl > div {
+    gap: 3mm;
+    padding-bottom: 1mm;
+    border-bottom-color: #d8d8d8;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__section ul {
+    columns: 2;
+    gap: 8mm;
+    margin-top: 2mm;
+  }
+
+  .simulator-page--ideco .ideco-consultation-summary__supplement,
+  .simulator-page--ideco .ideco-consultation-summary__notice {
+    margin-top: 3mm;
+    padding: 3mm 4mm;
+    border: 1px solid #b8b8b8;
+    background: #ffffff;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

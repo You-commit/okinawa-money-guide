@@ -1,4 +1,5 @@
-import type { MouseEvent } from 'react'
+import { Link } from 'react-router-dom'
+import { routes } from '../../app/routes'
 import {
   ArrowRightIcon,
   BuildingIcon,
@@ -10,10 +11,6 @@ import {
 } from './TopIcons'
 
 export type TopSimulatorId = 'military' | 'mortgage' | 'nisa' | 'ideco'
-
-type PopularSimulatorsProps = {
-  onSelectSimulator: (toolId: TopSimulatorId) => void
-}
 
 function SimulatorIcon({ id }: { id: TopSimulatorId | 'insurance' }) {
   if (id === 'military') {
@@ -47,28 +44,28 @@ const simulators: Array<{
     title: '軍用地投資シミュレーター',
     description: '利回りや地主金の配当をもとに、収益をシミュレーション',
     action: 'シミュレーションする',
-    href: '#tool-panel-military',
+    href: routes.militaryLand,
   },
   {
     id: 'mortgage',
     title: '住宅ローンシミュレーター',
     description: '借入可能額や返済額、金利比較で最適なプランを見つける',
     action: 'シミュレーションする',
-    href: '#tool-panel-mortgage',
+    href: routes.mortgage,
   },
   {
     id: 'nisa',
     title: 'NISAシミュレーター',
     description: '積立額や利回りから将来の資産額をシミュレーション',
     action: 'シミュレーションする',
-    href: '#tool-panel-nisa',
+    href: routes.nisa,
   },
   {
     id: 'ideco',
     title: 'iDeCoシミュレーター',
     description: '節税メリットや受取額を見通し、老後資産を整理する',
     action: 'シミュレーションする',
-    href: '#tool-panel-ideco',
+    href: routes.ideco,
   },
   {
     id: 'insurance',
@@ -79,19 +76,7 @@ const simulators: Array<{
   },
 ]
 
-function PopularSimulators({ onSelectSimulator }: PopularSimulatorsProps) {
-  const handleClick = (
-    event: MouseEvent<HTMLAnchorElement>,
-    id: TopSimulatorId | 'insurance',
-  ) => {
-    if (id === 'insurance') {
-      return
-    }
-
-    event.preventDefault()
-    onSelectSimulator(id)
-  }
-
+function PopularSimulators() {
   return (
     <section
       className="top-option02__popular"
@@ -116,10 +101,10 @@ function PopularSimulators({ onSelectSimulator }: PopularSimulatorsProps) {
             <h3>{simulator.title}</h3>
             <p>{simulator.description}</p>
             {simulator.href ? (
-              <a href={simulator.href} onClick={(event) => handleClick(event, simulator.id)}>
+              <Link to={simulator.href}>
                 {simulator.action}
                 <ArrowRightIcon className="top-option02__card-arrow" />
-              </a>
+              </Link>
             ) : (
               <button
                 className="top-option02__simulator-status"

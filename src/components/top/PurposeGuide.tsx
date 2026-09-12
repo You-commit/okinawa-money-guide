@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { routes } from '../../app/routes'
 import {
   ArrowRightIcon,
   HandYenIcon,
@@ -38,9 +40,9 @@ function PurposeGuide() {
       </div>
       <div className="top-option02__purpose-grid">
         {purposes.map((purpose) => (
-          <a
+          <Link
             className={`top-option02__purpose-card top-option02__purpose-card--${purpose.color}`}
-            href="#categories"
+            to={`${routes.knowledge}#${purpose.id}`}
             key={purpose.id}
           >
             <span className="top-option02__purpose-icon"><PurposeIcon purpose={purpose.id} /></span>
@@ -49,7 +51,7 @@ function PurposeGuide() {
               <small>{purpose.description}</small>
             </span>
             <ArrowRightIcon className="top-option02__purpose-arrow" />
-          </a>
+          </Link>
         ))}
       </div>
     </section>
