@@ -13,7 +13,7 @@ function TrustPage() {
       <main id="main-content">
         <section className="info-hero trust-hero"><div className="info-hero__inner trust-hero__inner">
           <div><p className="info-eyebrow">Trust &amp; Transparency</p><h1>判断材料を届けるための、<br />情報と運営の方針</h1><p className="info-hero__lead">情報源、基準時点、計算結果、データ、広告・提携について、利用前に確認できる形で明示します。</p></div>
-          <div className="trust-console" aria-label="信頼方針の概要"><div><span>TRUST CENTER</span><strong>06</strong></div><div className="trust-console__grid"><span>一次資料</span><span>更新・訂正</span><span>計算方針</span><span>データ保護</span><span>広告・提携</span><span>問い合わせ</span></div><p><span aria-hidden="true" />基準時点：2026年8月</p></div>
+          <div className="trust-console" aria-label="信頼方針の概要"><div><span>TRUST CENTER</span></div><div className="trust-console__grid"><span>一次資料</span><span>更新・訂正</span><span>計算方針</span><span>データ保護</span><span>広告・提携</span><span>問い合わせ</span></div><p><span aria-hidden="true" />基準時点：2026年8月</p></div>
         </div></section>
 
         <div className="info-main"><div className="info-shell">

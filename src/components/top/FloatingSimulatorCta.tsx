@@ -3,8 +3,12 @@ import { CalculatorIcon, ChevronUpIcon } from './TopIcons'
 
 function FloatingSimulatorCta() {
   const scrollToSimulatorList = () => {
+    const prefersReducedMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
     document.getElementById('popular-simulators')?.scrollIntoView({
-      behavior: 'smooth',
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
       block: 'start',
     })
   }

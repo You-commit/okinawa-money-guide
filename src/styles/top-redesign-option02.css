@@ -49,6 +49,10 @@ html:has(.top-option02) {
   backdrop-filter: blur(16px);
 }
 
+.top-option02__navigation-backdrop {
+  display: none;
+}
+
 .top-option02__header-inner {
   display: flex;
   align-items: center;
@@ -1936,6 +1940,26 @@ html:has(.top-option02) {
 }
 
 @media (max-width: 1120px) {
+  body.top-option02-navigation-open {
+    overflow: hidden;
+  }
+
+  .top-option02__header-inner {
+    position: relative;
+    z-index: 2;
+  }
+
+  .top-option02__navigation-backdrop {
+    position: fixed;
+    inset: 74px 0 0;
+    z-index: 1;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: rgba(5, 25, 48, 0.32);
+    cursor: pointer;
+  }
+
   .top-option02__simulator-card a {
     min-height: 44px;
     margin-top: 0;

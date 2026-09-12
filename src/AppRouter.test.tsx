@@ -60,6 +60,17 @@ describe('dedicated page routing', () => {
     expect(document.querySelector('meta[property^="og:"]')).toBeNull()
   })
 
+  it('keeps the Trust Center content without an unexplained decorative count', () => {
+    const { container } = renderAt('/trust')
+    const trustConsole = container.querySelector<HTMLElement>('.trust-console')!
+
+    expect(within(trustConsole).getByText('TRUST CENTER')).toBeTruthy()
+    expect(within(trustConsole).getAllByText(
+      /一次資料|更新・訂正|計算方針|データ保護|広告・提携|問い合わせ/,
+    )).toHaveLength(6)
+    expect(within(trustConsole).queryByText('06')).toBeNull()
+  })
+
   it.each([
     ['/', 'https://okinawamoneyguide.jp/'],
     ['/simulators/military-land', 'https://okinawamoneyguide.jp/simulators/military-land'],
@@ -151,6 +162,25 @@ describe('dedicated page routing', () => {
     expect(navigationTrigger.getAttribute('aria-expanded')).toBe('false')
     await user.click(navigationTrigger)
     expect(navigationTrigger.getAttribute('aria-expanded')).toBe('true')
+    expect(document.body.classList.contains('top-option02-navigation-open'))
+      .toBe(true)
+    const backdrop = document.querySelector(
+      '.top-option02__navigation-backdrop',
+    ) as HTMLButtonElement
+    expect(backdrop).toBeTruthy()
+    expect(backdrop.closest('header')).toBeNull()
+
+    await user.click(backdrop)
+    expect(navigationTrigger.getAttribute('aria-expanded')).toBe('false')
+    expect(document.body.classList.contains('top-option02-navigation-open'))
+      .toBe(false)
+
+    await user.click(navigationTrigger)
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(navigationTrigger.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(navigationTrigger)
+
+    await user.click(navigationTrigger)
 
     const simulatorTrigger = screen.getByRole('button', {
       name: 'シミュレーター',
@@ -160,6 +190,12 @@ describe('dedicated page routing', () => {
     expect(document.querySelectorAll(
       '#top-option02-simulator-menu .top-option02__simulator-menu-card',
     )).toHaveLength(5)
+
+    await user.click(screen.getByRole('link', { name: '記事・コラム' }))
+    expect(window.location.pathname).toBe('/knowledge')
+    expect(navigationTrigger.getAttribute('aria-expanded')).toBe('false')
+    expect(document.body.classList.contains('top-option02-navigation-open'))
+      .toBe(false)
   })
 
   it.each([
@@ -365,6 +401,24 @@ describe('dedicated page routing', () => {
 
     expect(scrollIntoView.mock.calls.length).toBe(callCountBeforeKeyboard + 2)
     expect(document.activeElement).toBe(cta)
+  })
+
+  it('uses immediate scrolling for the floating CTA when reduced motion is preferred', async () => {
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }))
+    const user = userEvent.setup()
+    renderAt('/')
+
+    const simulatorList = document.getElementById('popular-simulators')!
+    const scrollIntoView = vi.mocked(simulatorList.scrollIntoView)
+
+    await user.click(screen.getByRole('link', {
+      name: '人気のシミュレーターへ移動する',
+    }))
+
+    expect(scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'auto',
+      block: 'start',
+    })
   })
 
   it('moves from iDeCo to taxable income and returns only the calculated rate', async () => {

@@ -1037,9 +1037,8 @@
 .trust-hero h1 { color: #ffffff; }
 .trust-hero .info-hero__lead { color: #bfd3e2; }
 .trust-console { padding: 22px; border: 1px solid rgba(112, 225, 207, 0.24); border-radius: 18px; background: rgba(2, 18, 46, 0.56); color: #ffffff; box-shadow: 0 22px 54px rgba(0, 12, 35, 0.28); }
-.trust-console > div:first-child { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.trust-console > div:first-child { display: flex; align-items: center; margin-bottom: 14px; }
 .trust-console > div:first-child span { color: #76dfcf; font-size: 0.66rem; font-weight: 900; letter-spacing: 0.14em; }
-.trust-console > div:first-child strong { font-size: 1.6rem; }
 .trust-console__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
 .trust-console__grid span { padding: 9px 10px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: rgba(255,255,255,.055); color: #d5e5ed; font-size: 0.65rem; }
 .trust-console > p { display: flex; align-items: center; gap: 8px; margin-top: 15px; color: #9ebcca; font-size: 0.61rem; }
@@ -2259,7 +2258,28 @@
   .simulator-page__hero-inner,
   .simulator-page__main,
   .info-hero__inner { width: min(100% - 32px, 680px); }
-  .simulator-page__benefits { grid-template-columns: 1fr; }
+  .simulator-page__hero-copy,
+  .simulator-page__benefits {
+    min-width: 0;
+    width: 100%;
+  }
+  .simulator-page--mortgage .simulator-page__hero-copy h1 {
+    font-size: 1.95rem;
+  }
+  .simulator-page--ideco .simulator-page__hero-copy h1 {
+    font-size: 1.9rem;
+  }
+  .simulator-page__benefits {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+  .simulator-page--nisa .simulator-page__benefits {
+    gap: 9px;
+  }
+  .simulator-page__benefits article {
+    min-height: 72px;
+    padding: 10px 13px;
+  }
   .simulator-page__calculator { padding: 22px 18px; }
   .simulator-page__notes,
   .knowledge-grid,
@@ -2280,6 +2300,37 @@
   .data-pledge > div, .principles { grid-template-columns: 1fr; }
   .site-footer .footer-inner { align-items: flex-start; }
   .site-footer nav { justify-content: flex-start; }
+  .site-footer nav a,
+  .trust-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .simulator-page--military .military-scenario-tooltip-trigger {
+    position: relative;
+  }
+
+  .simulator-page--military .military-scenario-tooltip-trigger::after {
+    content: "";
+    position: absolute;
+    inset: -11px;
+  }
+
+  .simulator-page--ideco .ideco-field-label-row {
+    position: relative;
+  }
+
+  .simulator-page--ideco .ideco-field-label-row .tooltip-container {
+    position: static;
+  }
+
+  .simulator-page--ideco .ideco-field-helper-button,
+  .simulator-page--ideco .calculator-helper-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 /* WBS 3.6.11: approved PC simulator-body alignment */
@@ -3571,6 +3622,12 @@
   transform: translateY(0);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .simulator-page--military .military-scenario-tooltip {
+    transition: none;
+  }
+}
+
 .simulator-page--military .military-input-row em {
   padding: 2px 4px;
   border-radius: 3px;
@@ -4165,6 +4222,17 @@
 }
 
 @media (max-width: 620px) {
+  .simulator-page--military .simulator-page__hero-copy,
+  .simulator-page--military .simulator-page__benefits {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .simulator-page--military .simulator-page__hero-copy h1 {
+    font-size: clamp(1.55rem, 7vw, 1.9rem);
+    overflow-wrap: anywhere;
+  }
+
   .military-loan-choice {
     grid-template-columns: 1fr auto auto;
   }

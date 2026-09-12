@@ -57,6 +57,7 @@ function TopHeader() {
   const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false)
+  const menuToggleRef = useRef<HTMLButtonElement>(null)
   const simulatorMenuRef = useRef<HTMLDivElement>(null)
   const simulatorTriggerRef = useRef<HTMLButtonElement>(null)
 
@@ -64,6 +65,32 @@ function TopHeader() {
     setIsOpen(false)
     setIsSimulatorOpen(false)
   }
+
+  useEffect(() => {
+    setIsOpen(false)
+    setIsSimulatorOpen(false)
+  }, [location.pathname])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    document.body.classList.add('top-option02-navigation-open')
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || isSimulatorOpen) return
+
+      setIsOpen(false)
+      setIsSimulatorOpen(false)
+      menuToggleRef.current?.focus()
+    }
+
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.body.classList.remove('top-option02-navigation-open')
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isOpen, isSimulatorOpen])
 
   useEffect(() => {
     if (!isSimulatorOpen) return
@@ -93,8 +120,9 @@ function TopHeader() {
   }, [isSimulatorOpen])
 
   return (
-    <header className="top-option02__header">
-      <div className="top-option02__header-inner">
+    <>
+      <header className="top-option02__header">
+        <div className="top-option02__header-inner">
         <Link
           className="top-option02__brand"
           to={routes.home}
@@ -113,6 +141,7 @@ function TopHeader() {
           type="button"
           aria-expanded={isOpen}
           aria-controls="top-option02-navigation"
+          ref={menuToggleRef}
           onClick={() => setIsOpen((current) => !current)}
         >
           <span aria-hidden="true" />
@@ -215,8 +244,18 @@ function TopHeader() {
             シミュレーターを試す
           </Link>
         </nav>
-      </div>
-    </header>
+        </div>
+      </header>
+      {isOpen && (
+        <button
+          className="top-option02__navigation-backdrop"
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={closeNavigation}
+        />
+      )}
+    </>
   )
 }
 

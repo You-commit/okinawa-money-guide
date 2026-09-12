@@ -197,6 +197,12 @@
   visibility: visible;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .nisa-info-tooltip__content {
+    transition: none;
+  }
+}
+
 .nisa-field__help,
 .nisa-field__error {
   display: block;
@@ -1310,6 +1316,38 @@
 }
 
 @media (max-width: 760px) {
+  .nisa-field__label-row,
+  .nisa-calculation-assumption {
+    position: relative;
+  }
+
+  .nisa-calculation-assumption {
+    width: 100%;
+  }
+
+  .nisa-field__label-row .nisa-info-tooltip,
+  .nisa-calculation-assumption .nisa-info-tooltip {
+    position: static;
+  }
+
+  .nisa-info-tooltip__trigger {
+    position: relative;
+  }
+
+  .nisa-info-tooltip__trigger::after {
+    content: "";
+    position: absolute;
+    inset: -9px;
+  }
+
+  .nisa-scenario-segmented-control {
+    min-height: 50px;
+  }
+
+  .nisa-scenario-segmented-control button {
+    min-height: 44px;
+  }
+
   .nisa-consultation-summary__heading {
     flex-direction: column;
   }

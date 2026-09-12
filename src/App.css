@@ -719,6 +719,13 @@ a {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .tool-panel-enter,
+  .taxable-income-panel:not([hidden]) {
+    animation: none;
+  }
+}
+
 .apply-tax-rate-button {
   width: 100%;
   min-height: 54px;
@@ -999,6 +1006,16 @@ a {
 }
 
 @media (max-width: 760px) {
+  .tooltip-button {
+    position: relative;
+  }
+
+  .tooltip-button::after {
+    content: "";
+    position: absolute;
+    inset: -9px;
+  }
+
   .simulator-shell {
     padding: 12px;
     border-radius: 18px;
