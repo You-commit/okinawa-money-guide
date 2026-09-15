@@ -81,7 +81,7 @@ export const getIdecoEligibilitySummary = (
     input.participantCategory === 'category5' &&
     input.currentAge >= 60
   ) {
-    return '第5号被保険者の基本年齢範囲内です。加入歴、年金受給状況等の要件は公式窓口で確認が必要です。'
+    return '第5号加入者の基本年齢範囲内です。加入歴、年金受給状況等の要件は公式窓口で確認が必要です。'
   }
 
   return '入力した制度・加入区分の基本年齢範囲内です。年齢だけでは加入可否や受給開始年齢を確定できません。'

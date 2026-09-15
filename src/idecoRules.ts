@@ -88,7 +88,7 @@ export const IDECO_PARTICIPANT_OPTIONS: ReadonlyArray<{
   { value: 'category4', label: '第4号被保険者' },
   {
     value: 'category5',
-    label: '第5号被保険者（改正制度の一定要件該当者）',
+    label: '第5号加入者（改正制度の一定要件該当者）',
   },
 ]
 
@@ -165,12 +165,13 @@ export const requiresIdecoRelatedContribution = (
 ) =>
   category === 'category1' ||
   category === 'category4' ||
-  category === 'category2-with-pension'
+  category === 'category2-with-pension' ||
+  category === 'category5'
 
 export const getIdecoRelatedContributionLabel = (
   category: IdecoParticipantCategory,
 ) =>
-  category === 'category2-with-pension'
+  category === 'category2-with-pension' || category === 'category5'
     ? '企業年金等の合算対象額（月額）'
     : '国民年金基金・付加保険料等（月額）'
 
@@ -265,7 +266,10 @@ export const getIdecoContributionLimit = ({
     }
   }
 
-  if (participantCategory === 'category2-with-pension') {
+  if (
+    participantCategory === 'category2-with-pension' ||
+    participantCategory === 'category5'
+  ) {
     return {
       regime,
       combinedLimit: 62_000,
@@ -276,8 +280,10 @@ export const getIdecoContributionLimit = ({
 
   return {
     regime,
-    combinedLimit: 62_000,
-    monthlyLimit: 62_000,
+    combinedLimit:
+      participantCategory === 'category3' ? 23_000 : 62_000,
+    monthlyLimit:
+      participantCategory === 'category3' ? 23_000 : 62_000,
     requiresRelatedContribution: false,
   }
 }
@@ -328,7 +334,7 @@ export const validateIdecoRuleInput = (
     input.currentAge < 60
   ) {
     errors.currentAge =
-      '第5号被保険者は60歳以上70歳未満の一定要件に該当する方向けの区分です。'
+      '第5号加入者は60歳以上70歳未満の一定要件に該当する方向けの区分です。'
   }
 
   if (!input.participantCategory) {
@@ -338,7 +344,7 @@ export const validateIdecoRuleInput = (
     input.participantCategory === 'category5'
   ) {
     errors.participantCategory =
-      '第5号被保険者は2026年12月1日以後の改正制度で選択できます。'
+      '第5号加入者は2026年12月1日以後の改正制度で選択できます。'
   }
 
   if (
