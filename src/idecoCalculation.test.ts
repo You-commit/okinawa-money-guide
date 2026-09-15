@@ -11,6 +11,7 @@ import {
 } from './idecoCalculation'
 import {
   getIdecoContributionLimit,
+  getIdecoParticipantLabel,
   getIdecoRegime,
   IDECO_RULE_PERIODS,
   IDECO_SUPPORTED_EFFECTIVE_DATE_ERROR,
@@ -137,9 +138,10 @@ describe('iDeCo formal contribution rules', () => {
     ['category1', '2026-12-01', 0, 75_000],
     ['category2-no-pension', '2026-12-01', null, 62_000],
     ['category2-with-pension', '2026-12-01', 12_000, 50_000],
-    ['category3', '2026-12-01', null, 62_000],
+    ['category3', '2026-12-01', null, 23_000],
     ['category4', '2026-12-01', 5_000, 70_000],
-    ['category5', '2026-12-01', null, 62_000],
+    ['category5', '2026-12-01', 0, 62_000],
+    ['category5', '2026-12-01', 12_000, 50_000],
   ])(
     'calculates %s limit on %s',
     (participantCategory, effectiveDate, related, expected) => {
@@ -163,6 +165,15 @@ describe('iDeCo formal contribution rules', () => {
     expect(errors.participantCategory).toContain('2026年12月1日')
   })
 
+  it('uses the official Category 5 participant terminology', () => {
+    expect(getIdecoParticipantLabel('category5')).toContain(
+      '第5号加入者',
+    )
+    expect(getIdecoParticipantLabel('category5')).not.toContain(
+      '第5号被保険者',
+    )
+  })
+
   it('requires the aggregation input only for relevant categories', () => {
     expect(
       validateIdecoRuleInput(
@@ -179,6 +190,16 @@ describe('iDeCo formal contribution rules', () => {
         }),
       ).relatedMonthlyContribution,
     ).toBeUndefined()
+    expect(
+      validateIdecoRuleInput(
+        validInput({
+          effectiveDate: '2026-12-01',
+          participantCategory: 'category5',
+          relatedMonthlyContribution: null,
+          monthlyContribution: 5_000,
+        }),
+      ).relatedMonthlyContribution,
+    ).toBeTruthy()
   })
 
   it('accepts the combined limit and rejects an excess', () => {
@@ -200,6 +221,43 @@ describe('iDeCo formal contribution rules', () => {
       }).monthlyContribution,
     ).toContain('20,000円')
   })
+
+  it.each<[
+    IdecoParticipantCategory,
+    string,
+    number | null,
+    number,
+  ]>([
+    ['category1', '2026-11-30', 0, 68_000],
+    ['category2-no-pension', '2026-11-30', null, 23_000],
+    ['category2-with-pension', '2026-11-30', 35_000, 20_000],
+    ['category3', '2026-11-30', null, 23_000],
+    ['category4', '2026-11-30', 8_000, 60_000],
+    ['category1', '2026-12-01', 0, 75_000],
+    ['category2-no-pension', '2026-12-01', null, 62_000],
+    ['category2-with-pension', '2026-12-01', 12_000, 50_000],
+    ['category3', '2026-12-01', null, 23_000],
+    ['category4', '2026-12-01', 5_000, 70_000],
+    ['category5', '2026-12-01', 12_000, 50_000],
+  ])(
+    'accepts the %s limit and rejects the next 1,000 yen on %s',
+    (participantCategory, effectiveDate, related, limit) => {
+      const input = validInput({
+        participantCategory,
+        effectiveDate,
+        relatedMonthlyContribution: related,
+      })
+
+      expect(validateIdecoRuleInput({
+        ...input,
+        monthlyContribution: limit,
+      }).monthlyContribution).toBeUndefined()
+      expect(validateIdecoRuleInput({
+        ...input,
+        monthlyContribution: limit + 1_000,
+      }).monthlyContribution).toBeTruthy()
+    },
+  )
 
   it('rounds a remaining combined allowance down to the 1,000-yen contribution step', () => {
     expect(
@@ -269,6 +327,8 @@ describe('iDeCo supported calculation date range', () => {
     ['2026-01-01', true],
     ['2026-11-30', true],
     ['2026-12-01', true],
+    ['2026-12-31', true],
+    ['2027-01-01', true],
     ['2027-12-31', true],
     ['2028-01-01', false],
     ['2026-02-30', false],
@@ -282,6 +342,8 @@ describe('iDeCo supported calculation date range', () => {
     expect(getIdecoRegime('2026-01-01')).toBe('current')
     expect(getIdecoRegime('2026-11-30')).toBe('current')
     expect(getIdecoRegime('2026-12-01')).toBe('reformed')
+    expect(getIdecoRegime('2026-12-31')).toBe('reformed')
+    expect(getIdecoRegime('2027-01-01')).toBe('reformed')
     expect(getIdecoRegime('2027-12-31')).toBe('reformed')
     expect(getIdecoRegime('2028-01-01')).toBeNull()
   })
