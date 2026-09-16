@@ -1,3 +1,4 @@
+import { knowledgeArticles } from '../content/knowledgeArticles.ts'
 import { routes } from './routes.ts'
 
 export const siteName = '沖縄マネーガイド'
@@ -76,6 +77,11 @@ const routeSeoInputs: RouteSeoInput[] = [
     title: `信頼情報 | ${siteName}`,
     description: '情報源、基準時点、更新・訂正、計算方針、データ、広告・提携に関する運営方針です。',
   },
+  ...knowledgeArticles.map((article) => ({
+    path: article.path,
+    title: `${article.title} | ${siteName}`,
+    description: article.description,
+  })),
 ]
 
 function createRouteSeo({ path, title, description }: RouteSeoInput): RouteSeo {
