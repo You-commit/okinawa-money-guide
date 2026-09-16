@@ -6,13 +6,44 @@ import {
   PurposeGrowthIcon,
   PurposeShieldIcon,
 } from '../components/top/TopIcons'
+import { knowledgeArticles } from '../content/knowledgeArticles'
 import SiteLayout from '../layouts/SiteLayout'
 
 const categories = [
-  { id: 'borrow', title: '借りる', short: '住まい・ローン', description: '住宅・教育・軍用地ローンなど、返済を含めて考えるための基礎。', topics: ['金利と返済方法', '借入可能額の考え方'] },
-  { id: 'save', title: '貯める', short: '家計・積立', description: '生活防衛資金と目的別の積立を、無理のない順序で整理。', topics: ['家計の土台づくり', '目的別積立'] },
-  { id: 'grow', title: '増やす', short: 'NISA・iDeCo', description: 'NISA・iDeCo・投資信託を、制度とリスクの両面から理解。', topics: ['NISAの基本', 'iDeCoの税制'] },
-  { id: 'protect', title: '備える', short: '保険・年金', description: '保険・年金・相続を、必要性と優先順位から考えるための入口。', topics: ['保険見直しの基本', '公的保障の確認'] },
+  {
+    id: 'borrow',
+    title: '借りる',
+    short: '住まい・ローン',
+    description: '住宅・教育・軍用地ローンなど、返済を含めて考えるための基礎。',
+    topics: [
+      { label: '元利均等と元金均等', path: '/knowledge/mortgage-repayment-methods' },
+      { label: '借入可能額の考え方' },
+    ],
+  },
+  {
+    id: 'save',
+    title: '貯める',
+    short: '家計・積立',
+    description: '生活防衛資金と目的別の積立を、無理のない順序で整理。',
+    topics: [{ label: '家計の土台づくり' }, { label: '目的別積立' }],
+  },
+  {
+    id: 'grow',
+    title: '増やす',
+    short: 'NISA・iDeCo',
+    description: 'NISA・iDeCo・投資信託を、制度とリスクの両面から理解。',
+    topics: [
+      { label: 'NISAの基本', path: '/knowledge/nisa-basics' },
+      { label: 'iDeCoの税制' },
+    ],
+  },
+  {
+    id: 'protect',
+    title: '備える',
+    short: '保険・年金',
+    description: '保険・年金・相続を、必要性と優先順位から考えるための入口。',
+    topics: [{ label: '保険見直しの基本' }, { label: '公的保障の確認' }],
+  },
 ] as const
 
 type KnowledgeCategoryId = (typeof categories)[number]['id']
@@ -63,13 +94,39 @@ function KnowledgePage() {
           </section>
 
           <section className="info-section">
+            <div className="info-section-heading">
+              <div><p className="info-eyebrow">NEW ARTICLES</p><h2>公開中の記事</h2></div>
+              <p>制度や返済方法の基本を一次情報に沿って整理し、関連シミュレーターへつなげます。</p>
+            </div>
+            <div className="knowledge-grid">
+              {knowledgeArticles.map((article) => (
+                <article className={`knowledge-card knowledge-card--${article.category} info-surface`} key={article.path}>
+                  <KnowledgeCategoryIcon id={article.category} className="knowledge-card__icon" />
+                  <p className="info-eyebrow">{article.categoryLabel}</p>
+                  <h3>{article.title}</h3>
+                  <p>{article.description}</p>
+                  <Link to={article.path}>
+                    記事を読む <span aria-hidden="true">→</span>
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="info-section">
             <div className="info-section-heading"><div><p className="info-eyebrow">PURPOSE</p><h2>目的から探す</h2></div><p>未公開の知識コンテンツは、存在する記事のように見せず「準備中」と明示します。</p></div>
             <div className="knowledge-grid">
               {categories.map((category) => (
                 <article className={`knowledge-card knowledge-card--${category.id} info-surface`} id={category.id} key={category.id}>
                   <KnowledgeCategoryIcon id={category.id} className="knowledge-card__icon" />
                   <h3>{category.title}</h3><p>{category.description}</p>
-                  <div className="topic-list">{category.topics.map((topic) => <span key={topic}>{topic}<small className="preparing">準備中</small></span>)}</div>
+                  <div className="topic-list">
+                    {category.topics.map((topic) => topic.path ? (
+                      <Link key={topic.label} to={topic.path}>{topic.label}<small>公開中</small></Link>
+                    ) : (
+                      <span key={topic.label}>{topic.label}<small className="preparing">準備中</small></span>
+                    ))}
+                  </div>
                 </article>
               ))}
             </div>
