@@ -1,4 +1,6 @@
 import NisaCalculator from '../NisaCalculator'
+import { affiliatePrograms } from '../affiliate/affiliateConfig'
+import AffiliateProgramPlacement from '../components/affiliate/AffiliateProgramPlacement'
 import SimulatorNotes from '../components/simulator/SimulatorNotes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
 
@@ -27,6 +29,10 @@ function NisaPage() {
         />
       )}
     >
+      <AffiliateProgramPlacement
+        program={affiliatePrograms.nisa}
+        placement="nisa-before-simulation"
+      />
       <NisaCalculator />
     </SimulatorPageShell>
   )
