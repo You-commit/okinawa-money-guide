@@ -46,10 +46,10 @@ describe('AffiliateCard', () => {
     window.history.pushState({}, '', '/')
   })
 
-  it('keeps every production program disabled by default', () => {
-    expect(Object.values(affiliatePrograms).every((program) => (
-      !program.enabled
-    ))).toBe(true)
+  it('enables the approved NISA program while keeping unapproved programs disabled', () => {
+    expect(affiliatePrograms.nisa.enabled).toBe(true)
+    expect(affiliatePrograms.ideco.enabled).toBe(false)
+    expect(affiliatePrograms.mortgage.enabled).toBe(false)
     expect(affiliatePrograms.nisa.provider).toBe('DMM 株')
     expect(affiliatePrograms.nisa.creativeType).toBe('banner')
     expect(affiliatePrograms.nisa.placement)
