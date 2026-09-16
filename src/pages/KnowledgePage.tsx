@@ -121,7 +121,7 @@ function KnowledgePage() {
                   <KnowledgeCategoryIcon id={category.id} className="knowledge-card__icon" />
                   <h3>{category.title}</h3><p>{category.description}</p>
                   <div className="topic-list">
-                    {category.topics.map((topic) => topic.path ? (
+                    {category.topics.map((topic) => 'path' in topic && topic.path ? (
                       <Link key={topic.label} to={topic.path}>{topic.label}<small>公開中</small></Link>
                     ) : (
                       <span key={topic.label}>{topic.label}<small className="preparing">準備中</small></span>
