@@ -14,7 +14,28 @@ Base: `main` at `e3ec9c53bf1d8cf21c8b8b2f99ecba4769455d27`
 - Before any implementation, inspect the repository broadly enough to understand existing approved patterns.
 - Treat OMG Design Language and approved existing pages as constraints, not inspiration that may be freely reinterpreted.
 
-## 2. Product principles to preserve
+## 2. Authoritative references
+
+Read these formal repository artifacts before implementation:
+
+- `docs/OMG-WBS-ADDENDUM-v1.0-20260916.md`
+- `docs/OMG-SEO-CONTENT-GROWTH-PLAN-v1.0-20260916.md`
+- `docs/OMG-MONETIZATION-FINANCIAL-PARTNERSHIP-POLICY-v1.0-20260916.md`
+- `docs/OMG-PHASE4-FINANCIAL-RULES-AUDIT-v1.0-20260914.md`
+- `docs/OMG-TECH-SEO-ACCEPTANCE-v1.0-20260911.md`
+
+The formal OMG Design Language original is `OMG-DL_v1.0_正式原本.docx`. If it is not present inside the local repository/workspace, stop and obtain/mount that approved original rather than substituting an inferred design system.
+
+Priority when information conflicts:
+1. latest explicit user approval,
+2. latest formal WBS/spec/audit/artifact,
+3. actual Git code/commit/test result,
+4. Project Sources,
+5. prior project chat,
+6. memory,
+7. general knowledge.
+
+## 3. Product principles to preserve
 
 Core OMG principle: `信頼 × 先進性 × 穏やかさ`.
 
@@ -25,7 +46,7 @@ Priority order for this work:
 
 Do not make the site look “AI-generated”. Avoid visual devices that are generic, ornamental, or mechanically repeated.
 
-## 3. Mandatory audit before coding
+## 4. Mandatory audit before coding
 
 Read and summarize the current architecture and approved patterns before editing code. At minimum inspect:
 
@@ -48,7 +69,7 @@ Read and summarize the current architecture and approved patterns before editing
 - `public/_redirects`
 - `vite.config.ts`
 - relevant tests
-- formal docs under `docs/`, especially OMG-DL, WBS addendum, SEO/content growth plan, monetization / partnership policy if present
+- the formal artifacts listed above
 
 Audit output must identify:
 - which existing patterns are approved and should be reused,
@@ -59,7 +80,7 @@ Audit output must identify:
 
 Do not start implementation until this audit is complete.
 
-## 4. Simulator SEO objective
+## 5. Simulator SEO objective
 
 Current simulator pages already have individual URLs, title/description/canonical, `index, follow`, sitemap entries, and robots crawl permission. Do not claim these are missing and do not rebuild them without a concrete reason.
 
@@ -84,7 +105,7 @@ Requirements:
 
 Investigate whether the current static-SEO build approach should be enhanced so meaningful page-specific content is present in initial HTML. If proposing SSG/prerendering, keep the React/Vite architecture stable and justify the smallest safe change.
 
-## 5. Article/content objective
+## 6. Article/content objective
 
 Articles are not “SEO filler”. They must function as editorial decision-support content that naturally feeds into simulators.
 
@@ -108,7 +129,7 @@ Article requirements:
 - no forced Okinawa keyword insertion,
 - no unverified rankings or payout-driven recommendations.
 
-## 6. Visual / editorial design rules
+## 7. Visual / editorial design rules
 
 Do NOT create a generic “AI article template” made from stacked rounded cards.
 
@@ -135,7 +156,7 @@ Preferred approach:
 
 The article visual system should feel like an extension of the existing approved OMG site, not a new mini-site.
 
-## 7. Monetization rules
+## 8. Monetization rules
 
 Monetization must follow the approved financial affiliate / partnership policy.
 
@@ -147,7 +168,7 @@ Monetization must follow the approved financial affiliate / partnership policy.
 - Article monetization may be added only after the article information architecture is sound.
 - Existing DMM NISA affiliate behavior must not regress.
 
-## 8. SEO implementation requirements
+## 9. SEO implementation requirements
 
 For approved article pages and simulator enhancements, verify as applicable:
 - unique title,
@@ -165,7 +186,7 @@ For approved article pages and simulator enhancements, verify as applicable:
 
 Do not use structured data to describe content that is not visibly present.
 
-## 9. Quality gate
+## 10. Quality gate
 
 Before requesting user visual approval:
 - `git diff --check`
@@ -185,7 +206,7 @@ Before requesting user visual approval:
 
 Then deploy only to a Cloudflare Preview / feature branch environment.
 
-## 10. Approval boundary
+## 11. Approval boundary
 
 Stop at Preview after QA and report:
 - audit findings,
@@ -197,7 +218,7 @@ Stop at Preview after QA and report:
 
 Do not merge to `main` or deploy Production until the user explicitly approves the Preview.
 
-## 11. First Codex deliverable
+## 12. First Codex deliverable
 
 Before writing implementation code, produce a concise audit/design memo containing:
 1. current architecture findings,
