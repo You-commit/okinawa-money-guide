@@ -173,6 +173,13 @@ export function AffiliateBannerView({
 }
 
 function AffiliateCard({ program }: AffiliateCardProps) {
+  if (
+    program.category === 'nisa' &&
+    program.placement === 'nisa-before-consultation-summary'
+  ) {
+    return null
+  }
+
   if (!isAffiliateProgramVisible(program)) return null
 
   const safeTrackingPixelUrl =
