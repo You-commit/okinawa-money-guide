@@ -9,6 +9,11 @@
 
 名前は「おうち分担」です。
 
+デモ版はこちらです。
+https://raw.githack.com/You-commit/okinawa-money-guide/note-issue23-family-chore-app-20260916/demos/ouchi-buntan/index.html
+
+※試作版です。入力内容は使っている端末のブラウザ内に保存されます。個人情報や重要な情報は入力しないでください。
+
 ## 今回作ったもの
 
 アプリでできることは、あえて4つに絞りました。
