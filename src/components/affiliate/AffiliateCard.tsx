@@ -23,6 +23,48 @@ type AffiliateCardViewProps = {
   action: ReactNode
 }
 
+type AffiliateBannerViewProps = {
+  category: AffiliateCategory
+  provider: string
+  disclosureLabel?: string
+  bannerImageUrl: string
+  bannerAlt: string
+  bannerWidth?: number
+  bannerHeight?: number
+  riskDisclosure?: string
+  riskUrl?: string
+  href?: string
+  onClick?: () => void
+  preview?: boolean
+}
+
+function AffiliateRiskNote({
+  riskDisclosure,
+  riskUrl,
+}: Pick<AffiliateBannerViewProps, 'riskDisclosure' | 'riskUrl'>) {
+  const safeRiskUrl = riskUrl && isHttpsUrl(riskUrl) ? riskUrl : undefined
+
+  if (!riskDisclosure) return null
+
+  return (
+    <p className="affiliate-card__risk">
+      {riskDisclosure}
+      {safeRiskUrl && (
+        <>
+          {' '}
+          <a
+            href={safeRiskUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            公式情報
+          </a>
+        </>
+      )}
+    </p>
+  )
+}
+
 export function AffiliateCardView({
   category,
   title,
@@ -33,8 +75,6 @@ export function AffiliateCardView({
   riskUrl,
   action,
 }: AffiliateCardViewProps) {
-  const safeRiskUrl = riskUrl && isHttpsUrl(riskUrl) ? riskUrl : undefined
-
   return (
     <aside
       className="affiliate-card"
@@ -60,27 +100,74 @@ export function AffiliateCardView({
               提供：{provider}
             </small>
           )}
-          {riskDisclosure && (
-            <p className="affiliate-card__risk">
-              {riskDisclosure}
-              {safeRiskUrl && (
-                <>
-                  {' '}
-                  <a
-                    href={safeRiskUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    公式情報
-                  </a>
-                </>
-              )}
-            </p>
-          )}
+          <AffiliateRiskNote
+            riskDisclosure={riskDisclosure}
+            riskUrl={riskUrl}
+          />
         </div>
 
         {action}
       </div>
+    </aside>
+  )
+}
+
+export function AffiliateBannerView({
+  category,
+  provider,
+  disclosureLabel,
+  bannerImageUrl,
+  bannerAlt,
+  bannerWidth,
+  bannerHeight,
+  riskDisclosure,
+  riskUrl,
+  href,
+  onClick,
+  preview = false,
+}: AffiliateBannerViewProps) {
+  const image = (
+    <img
+      className="affiliate-banner__image"
+      src={bannerImageUrl}
+      width={bannerWidth}
+      height={bannerHeight}
+      alt={bannerAlt}
+    />
+  )
+
+  return (
+    <aside
+      className="affiliate-banner"
+      data-category={category}
+      aria-label={`${provider}の関連サービス${disclosureLabel ? `（${disclosureLabel}）` : ''}`}
+    >
+      <div className="affiliate-banner__header">
+        {disclosureLabel && (
+          <span className="affiliate-card__disclosure">
+            {disclosureLabel}
+          </span>
+        )}
+      </div>
+
+      <div className="affiliate-banner__creative">
+        {href && !preview ? (
+          <a
+            href={href}
+            target="_blank"
+            rel="sponsored noopener noreferrer"
+            onClick={onClick}
+            aria-label={`${provider}の詳細を見る`}
+          >
+            {image}
+          </a>
+        ) : image}
+      </div>
+
+      <AffiliateRiskNote
+        riskDisclosure={riskDisclosure}
+        riskUrl={riskUrl}
+      />
     </aside>
   )
 }
@@ -92,6 +179,44 @@ function AffiliateCard({ program }: AffiliateCardProps) {
     program.trackingPixelUrl && isHttpsUrl(program.trackingPixelUrl)
       ? program.trackingPixelUrl
       : undefined
+
+  if (
+    program.creativeType === 'banner' &&
+    program.bannerImageUrl &&
+    isHttpsUrl(program.bannerImageUrl)
+  ) {
+    return (
+      <>
+        <AffiliateBannerView
+          category={program.category}
+          provider={program.provider}
+          disclosureLabel={program.disclosureLabel}
+          bannerImageUrl={program.bannerImageUrl}
+          bannerAlt={program.bannerAlt || program.provider}
+          bannerWidth={program.bannerWidth}
+          bannerHeight={program.bannerHeight}
+          riskDisclosure={program.riskDisclosure}
+          riskUrl={program.riskUrl}
+          href={program.url}
+          onClick={() => trackAffiliateClick({
+            provider: program.provider,
+            category: program.category,
+            placement: program.placement,
+          })}
+        />
+        {safeTrackingPixelUrl && (
+          <img
+            className="affiliate-card__tracking-pixel"
+            src={safeTrackingPixelUrl}
+            width="1"
+            height="1"
+            alt=""
+            aria-hidden="true"
+          />
+        )}
+      </>
+    )
+  }
 
   return (
     <>
