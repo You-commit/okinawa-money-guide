@@ -15,6 +15,10 @@ export type AffiliateProgramConfig = {
   title: string
   description: string
   ctaLabel: string
+  disclosureLabel?: string
+  riskDisclosure?: string
+  riskUrl?: string
+  trackingPixelUrl?: string
 }
 
 export const affiliatePrograms: Record<
@@ -22,15 +26,22 @@ export const affiliatePrograms: Record<
   AffiliateProgramConfig
 > = {
   nisa: {
-    id: 'nisa-primary',
+    id: 'nisa-dmm-kabu-a8',
     enabled: false,
-    provider: '',
+    provider: 'DMM 株',
     category: 'nisa',
     placement: 'nisa-after-consultation-summary',
-    url: '',
-    title: '',
-    description: '',
-    ctaLabel: '',
+    url: 'https://px.a8.net/svt/ejp?a8mat=4BCCJF+FUDB2Y+1WP2+15RK36',
+    title: 'NISA口座を検討している方へ',
+    description:
+      'NISAを含む資産形成の選択肢として、DMM 株のサービス内容や取引条件を確認できます。',
+    ctaLabel: 'DMM 株の詳細を見る',
+    disclosureLabel: 'PR',
+    riskDisclosure:
+      '投資には価格変動等による元本割れのリスクがあります。手数料・リスク等は公式情報をご確認ください。',
+    riskUrl: 'https://kabu.dmm.com/',
+    trackingPixelUrl:
+      'https://www16.a8.net/0.gif?a8mat=4BCCJF+FUDB2Y+1WP2+15RK36',
   },
   ideco: {
     id: 'ideco-primary',
@@ -56,6 +67,14 @@ export const affiliatePrograms: Record<
   },
 }
 
+export const isHttpsUrl = (value: string) => {
+  try {
+    return new URL(value).protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 export const isAffiliateProgramVisible = (
   program: AffiliateProgramConfig,
 ) => {
@@ -69,11 +88,7 @@ export const isAffiliateProgramVisible = (
     return false
   }
 
-  try {
-    return new URL(program.url).protocol === 'https:'
-  } catch {
-    return false
-  }
+  return isHttpsUrl(program.url)
 }
 
 export const isAffiliateVisualPreviewEnabled = () =>
