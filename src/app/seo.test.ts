@@ -3,6 +3,7 @@ import indexTemplate from '../../index.html?raw'
 import redirects from '../../public/_redirects?raw'
 import robotsTxt from '../../public/robots.txt?raw'
 import sitemapXml from '../../public/sitemap.xml?raw'
+import { knowledgeArticles } from '../content/knowledgeArticles'
 import { routes } from './routes'
 import {
   canonicalOrigin,
@@ -15,13 +16,17 @@ import {
 } from './seo'
 import { injectSeoHead } from './seoMarkup'
 
-const expectedRoutes = Object.values(routes)
+const expectedRoutes = [
+  ...Object.values(routes),
+  ...knowledgeArticles.map(({ path }) => path),
+]
 
 describe('technical SEO source of truth', () => {
-  it('defines complete, indexable metadata for exactly the nine formal routes', () => {
-    expect(routeSeoEntries).toHaveLength(9)
+  it('defines complete, indexable metadata for every formal route and published article', () => {
+    expect(routeSeoEntries).toHaveLength(expectedRoutes.length)
     expect(routeSeoEntries.map(({ path }) => path)).toEqual(expectedRoutes)
-    expect(new Set(routeSeoEntries.map(({ path }) => path)).size).toBe(9)
+    expect(new Set(routeSeoEntries.map(({ path }) => path)).size)
+      .toBe(expectedRoutes.length)
 
     for (const metadata of routeSeoEntries) {
       expect(metadata.title).not.toBe('')
@@ -46,11 +51,14 @@ describe('technical SEO source of truth', () => {
 
   it('canonicalizes query, hash, and trailing-slash variants to the formal URL', () => {
     const canonical = `${canonicalOrigin}${routes.ideco}`
+    const articleCanonical = `${canonicalOrigin}${knowledgeArticles[0].path}`
 
     expect(getRouteSeo(`${routes.ideco}?incomeTaxRate=10`)?.canonical)
       .toBe(canonical)
     expect(getRouteSeo(`${routes.ideco}#result`)?.canonical).toBe(canonical)
     expect(getRouteSeo(`${routes.ideco}/`)?.canonical).toBe(canonical)
+    expect(getRouteSeo(`${knowledgeArticles[0].path}/`)?.canonical)
+      .toBe(articleCanonical)
     expect(getRouteSeo('/this-page-does-not-exist')).toBeUndefined()
   })
 
@@ -86,6 +94,7 @@ describe('technical SEO source of truth', () => {
   it('uses only factual WebSite structured data on the homepage', () => {
     expect(getRouteStructuredData(routes.home)).toEqual(websiteStructuredData)
     expect(getRouteStructuredData(routes.mortgage)).toBeUndefined()
+    expect(getRouteStructuredData(knowledgeArticles[0].path)).toBeUndefined()
     expect(websiteStructuredData).toEqual({
       '@context': 'https://schema.org',
       '@type': 'WebSite',
@@ -94,14 +103,14 @@ describe('technical SEO source of truth', () => {
     })
   })
 
-  it('keeps sitemap URLs synchronized with the formal route source', () => {
+  it('keeps sitemap URLs synchronized with every indexable route', () => {
     const sitemapUrls = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)]
       .map((match) => match[1])
 
     expect(sitemapUrls).toEqual(
       routeSeoEntries.map(({ canonical }) => canonical),
     )
-    expect(new Set(sitemapUrls).size).toBe(9)
+    expect(new Set(sitemapUrls).size).toBe(expectedRoutes.length)
   })
 
   it('keeps robots.txt indexable and points to the canonical sitemap', () => {
