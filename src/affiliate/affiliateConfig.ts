@@ -2,7 +2,7 @@ export type AffiliateCategory = 'nisa' | 'ideco' | 'mortgage'
 export type AffiliateCreativeType = 'text' | 'banner'
 
 export type AffiliatePlacement =
-  | 'nisa-before-simulation'
+  | 'nisa-before-consultation-summary'
   | 'nisa-after-consultation-summary'
   | 'ideco-after-consultation-summary'
   | 'mortgage-after-consultation-summary'
@@ -37,7 +37,7 @@ export const affiliatePrograms: Record<
     enabled: false,
     provider: 'DMM 株',
     category: 'nisa',
-    placement: 'nisa-before-simulation',
+    placement: 'nisa-before-consultation-summary',
     creativeType: 'banner',
     url: 'https://px.a8.net/svt/ejp?a8mat=4BCCJF+FUDB2Y+1WP2+15Q22P',
     title: 'DMM 株',
