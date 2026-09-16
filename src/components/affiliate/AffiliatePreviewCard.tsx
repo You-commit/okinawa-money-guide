@@ -2,7 +2,10 @@ import {
   affiliatePrograms,
   type AffiliateCategory,
 } from '../../affiliate/affiliateConfig'
-import { AffiliateCardView } from './AffiliateCard'
+import {
+  AffiliateBannerView,
+  AffiliateCardView,
+} from './AffiliateCard'
 
 type AffiliatePreviewCardProps = {
   category: AffiliateCategory
@@ -12,6 +15,28 @@ function AffiliatePreviewCard({ category }: AffiliatePreviewCardProps) {
   if (!import.meta.env.DEV) return null
 
   const program = affiliatePrograms[category]
+
+  if (
+    program.creativeType === 'banner' &&
+    program.provider.trim() &&
+    program.bannerImageUrl
+  ) {
+    return (
+      <AffiliateBannerView
+        category={category}
+        provider={program.provider}
+        disclosureLabel={program.disclosureLabel}
+        bannerImageUrl={program.bannerImageUrl}
+        bannerAlt={program.bannerAlt || program.provider}
+        bannerWidth={program.bannerWidth}
+        bannerHeight={program.bannerHeight}
+        riskDisclosure={program.riskDisclosure}
+        riskUrl={program.riskUrl}
+        preview
+      />
+    )
+  }
+
   const hasConfiguredContent = Boolean(
     program.provider.trim() &&
     program.title.trim() &&
