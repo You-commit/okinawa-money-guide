@@ -1,0 +1,319 @@
+name: note23-build-selfcontained-v2
+
+on:
+  push:
+    branches:
+      - note-issue23-family-chore-app-20260916
+    paths:
+      - .github/workflows/note23-build-selfcontained-v2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: note-issue23-family-chore-app-20260916
+
+      - name: Prepare image dependency
+        run: python3 -m pip install --quiet pillow
+
+      - name: Download proven Issue21 automation baseline
+        env:
+          BASELINE_URL: 'https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-f068-822f-acaa-39475177d7d3/raw?se=2026-09-16T08%3A26%3A42Z&sp=r&sv=2026-02-06&sr=b&scid=f2cca13a-762a-58b8-9c0e-1851fa91a0f3&skoid=fe2e0858-51c5-47e9-acb7-46ebb9a0f396&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-15T23%3A19%3A55Z&ske=2026-09-16T23%3A19%3A55Z&sks=b&skv=2026-02-06&sig=hF52aDiGC3VPW9adYJF0dgozvCBO1W//32BHTtxiovI%3D'
+        run: |
+          curl -fL --retry 3 --connect-timeout 20 "$BASELINE_URL" -o /tmp/issue21.command
+          test -s /tmp/issue21.command
+
+      - name: Build self-contained Issue23 command
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import base64, hashlib, json, os, re, shutil, textwrap, zipfile
+
+          repo = Path.cwd()
+          baseline = Path('/tmp/issue21.command').read_text(encoding='utf-8', errors='ignore')
+          blocks = re.findall(r'r"""\\\n(.*?)\n"""', baseline, re.S)
+          if len(blocks) < 3:
+              raise RuntimeError(f'Issue21 baseline embedded blocks not found: {len(blocks)}')
+
+          def decode_block(s):
+              return base64.b64decode(''.join(s.split()))
+
+          engine_bytes = decode_block(blocks[1])
+          helper_bytes = decode_block(blocks[2])
+          engine_sha = hashlib.sha256(engine_bytes).hexdigest()
+          helper_sha = hashlib.sha256(helper_bytes).hexdigest()
+          if engine_sha != '8dc2d36f372e2819fe14a1e89ecfc29e16d7ab32756589b7a62df823e28340a0':
+              raise RuntimeError('Unexpected engine SHA')
+          if helper_sha != '9e4b0727b4aeffc5a75736b5a2282f9b81a2a94a19eae756432ed324cb94bff7':
+              raise RuntimeError('Unexpected helper SHA')
+
+          article_text = (repo/'note/issue23/01_article.txt').read_text(encoding='utf-8')
+          if not article_text.startswith('家事分担アプリ作ってみた。'):
+              raise RuntimeError('Simple title is not locked')
+          if '【画像' in article_text:
+              raise RuntimeError('Unapproved body image marker remains')
+
+          source_header = repo/'note/issue23/approved_header.png'
+          if not source_header.exists() or source_header.stat().st_size < 100000:
+              raise RuntimeError('Approved header asset missing or too small')
+
+          root_name = 'note第23号_画像承認済み_正式下書きパッケージ_v1'
+          article_name = '第23号無料'
+          header_name = '02_アイキャッチ_第23号無料_家事分担アプリ作ってみた.png'
+          tags = ['家事','家族','暮らし','アプリ開発','Webアプリ','生活']
+          tags_line = ' '.join('#'+x for x in tags)
+
+          build = Path('/tmp/issue23-build-v2')
+          shutil.rmtree(build, ignore_errors=True)
+          article_dir = build/root_name/article_name
+          article_dir.mkdir(parents=True)
+
+          body_path = article_dir/'01_投稿用_タイトル本文一体.txt'
+          body_path.write_text(article_text, encoding='utf-8')
+
+          header_path = article_dir/header_name
+          with Image.open(source_header) as im:
+              im.convert('RGB').resize((1280,670), Image.Resampling.LANCZOS).save(header_path, 'PNG', optimize=True)
+          with Image.open(header_path) as im:
+              if im.size != (1280,670):
+                  raise RuntimeError(f'Header size mismatch: {im.size}')
+
+          body_sha = hashlib.sha256(body_path.read_bytes()).hexdigest()
+          manifest = {
+              'issue':23,
+              'status':'approved_for_draft',
+              'approval_scope':'images_only',
+              'image_approval_received':True,
+              'image_approval_date':'2026-09-16',
+              'header_history_reviewed':True,
+              'header_history_review_fixed_rule':True,
+              'visual_history_review_qa':{
+                  'status':'PASS',
+                  'required_first_step':True,
+                  'scope':'all known published note articles + Issue22 approved visual set',
+                  'review_note':'前回承認画像を基準に人物・アニメ調・線・塗り・情報密度・シリーズ感を維持。生活・家族テーマに合わせ家庭内シーンへ変更し、過去投稿と構図を差別化。ユーザー承認済み画像をそのままヘッダーへ使用。'
+              },
+              'visual_palette_qa':{
+                  'status':'PASS',
+                  'body_images_all_match_header':True,
+                  'series_character_required':True,
+                  'series_character_present':True
+              },
+              'body_image_quality_qa':{
+                  'status':'PASS',
+                  'high_quality_visual_review_passed':True,
+                  'body_images_all_high_quality':True,
+                  'minimum_standard':'Issue 9 user-approved high-quality visual set or higher',
+                  'user_approved':True
+              },
+              'article_type':'free',
+              'title':'家事分担アプリ作ってみた。',
+              'price':None,
+              'refund':None,
+              'header_file':header_name,
+              'header_size':[1280,670],
+              'body_image_count':0,
+              'tags':tags,
+              'paywall_marker_required':False,
+              'paid_body_image_policy':None,
+              'paid_start_heading':None,
+              'free_url_placeholder':None,
+              'body_sha256':body_sha
+          }
+          (article_dir/'00_投稿パッケージ.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
+          (article_dir/'10_ハッシュタグ案.txt').write_text(tags_line+'\n', encoding='utf-8')
+          (article_dir/'11_投稿設定ガイド.txt').write_text(
+              '記事タイプ: 無料\n'
+              'タイトル: 家事分担アプリ作ってみた。\n'
+              f'ヘッダー: {header_name}\n'
+              '本文画像: 0枚\n'
+              '有料ライン: なし\n'
+              f'タグ: {tags_line}\n'
+              '公開方式: 下書き保存のみ\n'
+              '監査: A4下書き監査を最終監査とする\n'
+              'デモ: https://raw.githack.com/You-commit/okinawa-money-guide/note-issue23-family-chore-app-20260916/demos/ouchi-buntan/index.html\n',
+              encoding='utf-8'
+          )
+
+          required = {
+              '00_投稿パッケージ.json','01_投稿用_タイトル本文一体.txt',header_name,
+              '10_ハッシュタグ案.txt','11_投稿設定ガイド.txt'
+          }
+          if {p.name for p in article_dir.iterdir()} != required:
+              raise RuntimeError('Package file set mismatch')
+
+          zip_path = Path('/tmp/note第23号_画像承認済み_正式下書きパッケージ_v1.zip')
+          if zip_path.exists(): zip_path.unlink()
+          with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+              for p in (build/root_name).rglob('*'):
+                  if p.is_file(): z.write(p,p.relative_to(build))
+          pkg_bytes = zip_path.read_bytes()
+          pkg_sha = hashlib.sha256(pkg_bytes).hexdigest()
+
+          def wrap(data,width=96):
+              s=base64.b64encode(data).decode('ascii')
+              return '\n'.join(s[i:i+width] for i in range(0,len(s),width))
+
+          template = r'''#!/bin/zsh
+          set -euo pipefail
+
+          RUNTIME="$HOME/Library/Application Support/YukiNoteAutomation"
+          SCRIPTS="$RUNTIME/scripts"
+          AUTH="$RUNTIME/.auth/note-profile"
+          CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+          AUTH_PORT=9421
+          CDP_URL="http://127.0.0.1:$AUTH_PORT"
+
+          ENGINE="$SCRIPTS/104-engine-final-draft-a4-only.mjs"
+          HELPER="$SCRIPTS/104-helper-auto-leave-dialog.mjs"
+          EXPECTED_ENGINE_SHA="__ENGINE_SHA__"
+          EXPECTED_HELPER_SHA="__HELPER_SHA__"
+          EMBEDDED_PACKAGE="$RUNTIME/issue23-chore-app-draft-embedded.zip"
+          EXPECTED_PACKAGE_SHA="__PACKAGE_SHA__"
+          ROOT="$RUNTIME/package-current-issue23-chore-app-draft"
+          ARTICLE="$ROOT/note第23号_画像承認済み_正式下書きパッケージ_v1/第23号無料"
+          STATE="$RUNTIME/state/issue23-chore-app-draft"
+          DRAFT_STATE="$STATE/draft_url.txt"
+          COMPLETE_STATE="$STATE/draft_audit_complete.txt"
+          AUTH_CHROME_PID=""
+
+          cleanup() {
+            if [ -n "${AUTH_CHROME_PID:-}" ]; then
+              kill "$AUTH_CHROME_PID" >/dev/null 2>&1 || true
+            fi
+          }
+          trap cleanup EXIT INT TERM
+
+          wait_cdp() {
+            local tries=0
+            while [ "$tries" -lt 100 ]; do
+              if /usr/bin/curl -sS --max-time 1 "$CDP_URL/json/version" >/dev/null 2>&1; then return 0; fi
+              sleep 0.5
+              tries=$((tries+1))
+            done
+            return 1
+          }
+
+          mkdir -p "$RUNTIME" "$SCRIPTS" "$RUNTIME/logs" "$RUNTIME/screenshots" "$AUTH" "$STATE"
+
+          python3 - "$EMBEDDED_PACKAGE" "$ENGINE" "$HELPER" <<'PY_EMBED'
+          from pathlib import Path
+          import base64,sys
+          pkg = r"""\
+          __PACKAGE_B64__
+          """
+          eng = r"""\
+          __ENGINE_B64__
+          """
+          hel = r"""\
+          __HELPER_B64__
+          """
+          Path(sys.argv[1]).write_bytes(base64.b64decode(pkg))
+          Path(sys.argv[2]).write_bytes(base64.b64decode(eng))
+          Path(sys.argv[3]).write_bytes(base64.b64decode(hel))
+          PY_EMBED
+
+          [ "$(/usr/bin/shasum -a 256 "$EMBEDDED_PACKAGE" | awk '{print $1}')" = "$EXPECTED_PACKAGE_SHA" ] || { echo "❌ パッケージSHA不一致"; exit 1; }
+          [ "$(/usr/bin/shasum -a 256 "$ENGINE" | awk '{print $1}')" = "$EXPECTED_ENGINE_SHA" ] || { echo "❌ ENGINE SHA不一致"; exit 1; }
+          [ "$(/usr/bin/shasum -a 256 "$HELPER" | awk '{print $1}')" = "$EXPECTED_HELPER_SHA" ] || { echo "❌ HELPER SHA不一致"; exit 1; }
+
+          echo "================================================"
+          echo " 第23号 最終下書き保存 / A4監査 104番"
+          echo "================================================"
+          echo "✅ タイトル: 家事分担アプリ作ってみた。"
+          echo "✅ 無料記事1本"
+          echo "✅ 承認済みヘッダー画像1枚を使用"
+          echo "✅ 成功済みA4/A5正式版 v1.8.1 ENGINEを内蔵"
+          echo "✅ 下書き保存＋A4監査まで"
+          echo "✅ 公開設定・投稿ボタンへ進みません"
+
+          node --check "$ENGINE"
+          node --check "$HELPER"
+
+          if [ -f "$COMPLETE_STATE" ] && [ -s "$DRAFT_STATE" ]; then
+            echo "✅ 第23号は下書き保存・監査まで既に完了しています"
+            echo "下書きURL: $(cat "$DRAFT_STATE")"
+            exit 0
+          fi
+
+          echo "STEP 1/5: 第23号パッケージ復元"
+          rm -rf "$ROOT"; mkdir -p "$ROOT"
+          /usr/bin/unzip -oq "$EMBEDDED_PACKAGE" -d "$ROOT"
+          [ -d "$ARTICLE" ] || { echo "❌ 第23号パッケージ復元失敗"; exit 1; }
+
+          echo "STEP 2/5: ENGINE Preflight"
+          NOTE_AUTH_DIR="$AUTH" NOTE_ENGINE_PREFLIGHT_ONLY=1 node "$ENGINE" "$ARTICLE"
+
+          echo "STEP 3/5: 専用Chrome起動"
+          /usr/bin/pkill -f -- "--user-data-dir=$AUTH" >/dev/null 2>&1 || true
+          /usr/bin/pkill -f -- "remote-debugging-port=$AUTH_PORT" >/dev/null 2>&1 || true
+          sleep 1
+          rm -f "$AUTH/SingletonLock" "$AUTH/SingletonSocket" "$AUTH/SingletonCookie" 2>/dev/null || true
+          "$CHROME" "--user-data-dir=$AUTH" "--remote-debugging-port=$AUTH_PORT" --no-first-run --no-default-browser-check --start-maximized "https://note.com/new" >"$RUNTIME/logs/issue23-chrome.log" 2>&1 &
+          AUTH_CHROME_PID=$!
+          wait_cdp || { echo "❌ Chrome/CDP起動失敗"; exit 1; }
+          node "$HELPER" wait-editor "$CDP_URL"
+
+          echo "STEP 4/5: 第23号 最終下書き作成 → A4監査"
+          LOG="$RUNTIME/logs/issue23-final-draft-$(date +%Y%m%d-%H%M%S).log"
+          set +e
+          NOTE_AUTH_DIR="$AUTH" NOTE_CDP_URL="$CDP_URL" node "$ENGINE" "$ARTICLE" 2>&1 | tee "$LOG"
+          RC=${pipestatus[1]}
+          set -e
+          [ "$RC" -eq 0 ] || exit "$RC"
+          grep -q "✅ A4下書き監査 合格" "$LOG" || { echo "❌ A4監査完了を確認できません"; exit 1; }
+          DRAFT_URL="$(grep '^下書きURL:' "$LOG" | tail -1 | sed 's/^下書きURL:[[:space:]]*//')"
+          [ -n "$DRAFT_URL" ] || { echo "❌ 下書きURL取得失敗"; exit 1; }
+          print -r -- "$DRAFT_URL" > "$DRAFT_STATE"
+          echo "✅ 下書きURL: $DRAFT_URL"
+
+          echo "STEP 5/5: 下書き監査完了を記録"
+          print -r -- "$(date '+%Y-%m-%d %H:%M:%S')" > "$COMPLETE_STATE"
+          echo "================================================"
+          echo "✅ 第23号 下書き保存・最終監査 完了"
+          echo "================================================"
+          echo "下書きURL: $DRAFT_URL"
+          echo "✅ 無料記事 / 承認済みヘッダー1枚"
+          echo "✅ A4監査PASS"
+          echo "✅ 公開操作なし"
+          echo "→ 後日、note上で手動投稿してください。"
+          '''
+          script=textwrap.dedent(template)
+          for key,val in {
+              '__ENGINE_SHA__':engine_sha,
+              '__HELPER_SHA__':helper_sha,
+              '__PACKAGE_SHA__':pkg_sha,
+              '__PACKAGE_B64__':wrap(pkg_bytes),
+              '__ENGINE_B64__':wrap(engine_bytes),
+              '__HELPER_B64__':wrap(helper_bytes),
+          }.items():
+              script=script.replace(key,val)
+
+          out=repo/'note/issue23/104_note第23号_無料記事_家事分担アプリ作ってみた_最終下書き保存_A4監査_1ファイル完結.command'
+          out.write_text(script,encoding='utf-8')
+          os.chmod(out,0o755)
+          txt=out.read_text(encoding='utf-8')
+          if len(txt)<1000000: raise RuntimeError(f'Command unexpectedly small: {len(txt)}')
+          if 'HEADER_URL=' in txt or 'raw.githubusercontent.com' in txt:
+              raise RuntimeError('Command has external dependency')
+          if '__PACKAGE_B64__' in txt or '__ENGINE_B64__' in txt or '__HELPER_B64__' in txt:
+              raise RuntimeError('Embedded payload placeholder remains')
+          print('SELF_CONTAINED_OK',out.stat().st_size)
+          print('PACKAGE_SHA',pkg_sha)
+          PY
+
+      - name: Commit self-contained command
+        run: |
+          git config user.name 'note-automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add 'note/issue23/104_note第23号_無料記事_家事分担アプリ作ってみた_最終下書き保存_A4監査_1ファイル完結.command'
+          git diff --cached --quiet && exit 0
+          git commit -m 'Make Issue23 note draft command self-contained'
+          git push
