@@ -1,0 +1,39 @@
+name: Production smoke check
+
+on:
+  push:
+    branches:
+      - feature/nisa-dmm-affiliate
+
+permissions:
+  contents: read
+
+jobs:
+  verify-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Verify production NISA bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const pageUrl = 'https://okinawamoneyguide.jp/simulators/nisa'
+          const page = await fetch(pageUrl, { redirect: 'follow' })
+          if (!page.ok) throw new Error(`NISA page HTTP ${page.status}`)
+          const html = await page.text()
+          const match = html.match(/<script[^>]+src="([^"]+\.js)"/)
+          if (!match) throw new Error('Production JS bundle not found')
+          const bundleUrl = new URL(match[1], pageUrl)
+          const bundleResponse = await fetch(bundleUrl)
+          if (!bundleResponse.ok) throw new Error(`Bundle HTTP ${bundleResponse.status}`)
+          const bundle = await bundleResponse.text()
+          for (const expected of ['DMM 株', 'px.a8.net', '15Q22P']) {
+            if (!bundle.includes(expected)) {
+              throw new Error(`Expected production marker missing: ${expected}`)
+            }
+          }
+          console.log(`NISA page HTTP: ${page.status}`)
+          console.log(`Production bundle: ${bundleUrl}`)
+          console.log('DMM 株 production markers: PASS')
+          NODE
