@@ -19,6 +19,10 @@ const enabledProgram: AffiliateProgramConfig = {
   title: 'テスト用サービス',
   description: '表示条件を確認するためのテストデータです。',
   ctaLabel: 'サービスを確認する',
+  disclosureLabel: 'PR',
+  riskDisclosure: '投資には価格変動リスクがあります。',
+  riskUrl: 'https://example.com/risk',
+  trackingPixelUrl: 'https://example.com/pixel.gif',
 }
 
 describe('AffiliateCard', () => {
@@ -29,8 +33,11 @@ describe('AffiliateCard', () => {
 
   it('keeps every production program disabled by default', () => {
     expect(Object.values(affiliatePrograms).every((program) => (
-      !program.enabled && program.url === ''
+      !program.enabled
     ))).toBe(true)
+    expect(affiliatePrograms.nisa.provider).toBe('DMM 株')
+    expect(affiliatePrograms.nisa.url).toContain('px.a8.net')
+    expect(affiliatePrograms.nisa.disclosureLabel).toBe('PR')
   })
 
   it('does not render when the program is disabled', () => {
@@ -62,16 +69,40 @@ describe('AffiliateCard', () => {
     expect(container.innerHTML).toBe('')
   })
 
-  it('starts with RELATED SERVICE and uses safe external-link attributes', () => {
-    render(<AffiliateCard program={enabledProgram} />)
+  it('shows PR, disclosure details, and safe external-link attributes', () => {
+    const { container } = render(<AffiliateCard program={enabledProgram} />)
 
     expect(screen.getByText('RELATED SERVICE')).toBeTruthy()
+    expect(screen.getByText('PR')).toBeTruthy()
     expect(screen.getByText(/テスト提供者/)).toBeTruthy()
-    expect(screen.queryByText('広告・PR')).toBeNull()
+    expect(screen.getByText(/価格変動リスク/)).toBeTruthy()
+
+    const riskLink = screen.getByRole('link', { name: '公式情報' })
+    expect(riskLink.getAttribute('href')).toBe(enabledProgram.riskUrl)
+    expect(riskLink.getAttribute('rel')).toBe('noopener noreferrer')
+
     const link = screen.getByRole('link', { name: /サービスを確認する/ })
     expect(link.getAttribute('href')).toBe(enabledProgram.url)
     expect(link.getAttribute('target')).toBe('_blank')
     expect(link.getAttribute('rel')).toBe('sponsored noopener noreferrer')
+
+    const pixel = container.querySelector('.affiliate-card__tracking-pixel')
+    expect(pixel?.getAttribute('src')).toBe(enabledProgram.trackingPixelUrl)
+  })
+
+  it('does not render an insecure tracking pixel or risk link', () => {
+    const { container } = render(
+      <AffiliateCard
+        program={{
+          ...enabledProgram,
+          riskUrl: 'http://example.com/risk',
+          trackingPixelUrl: 'http://example.com/pixel.gif',
+        }}
+      />,
+    )
+
+    expect(screen.queryByRole('link', { name: '公式情報' })).toBeNull()
+    expect(container.querySelector('.affiliate-card__tracking-pixel')).toBeNull()
   })
 
   it('tracks affiliate_click with provider, category, and placement only', () => {
@@ -98,14 +129,26 @@ describe('AffiliateCard', () => {
     expect(() => fireEvent.click(link)).not.toThrow()
   })
 
-  it('supports a development-only visual preview without an active link', () => {
+  it('supports a development-only generic preview without an active link', () => {
     render(<AffiliatePreviewCard category="ideco" />)
 
     expect(screen.getByText('RELATED SERVICE')).toBeTruthy()
-    expect(screen.queryByText('広告・PR')).toBeNull()
-    expect(screen.queryByText('表示確認用・申込不可')).toBeNull()
+    expect(screen.queryByText('PR')).toBeNull()
     expect(screen.queryByRole('link')).toBeNull()
     expect(screen.getByText('リンク準備中').getAttribute('aria-disabled'))
       .toBe('true')
+  })
+
+  it('shows the configured DMM NISA card in preview without firing live tracking', () => {
+    const { container } = render(<AffiliatePreviewCard category="nisa" />)
+
+    expect(screen.getByText('NISA口座を検討している方へ')).toBeTruthy()
+    expect(screen.getByText('PR')).toBeTruthy()
+    expect(screen.getByText(/DMM 株/)).toBeTruthy()
+    expect(screen.queryByRole('link', { name: /DMM 株の詳細を見る/ }))
+      .toBeNull()
+    expect(screen.getByText('DMM 株の詳細を見る').getAttribute('aria-disabled'))
+      .toBe('true')
+    expect(container.querySelector('.affiliate-card__tracking-pixel')).toBeNull()
   })
 })
