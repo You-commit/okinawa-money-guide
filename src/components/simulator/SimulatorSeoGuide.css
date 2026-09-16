@@ -1,0 +1,128 @@
+.simulator-seo-guide {
+  margin-top: 34px;
+  padding: 34px;
+  border: 1px solid #dce8ef;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(8, 43, 80, 0.07);
+}
+
+.simulator-seo-guide__heading {
+  max-width: 880px;
+}
+
+.simulator-seo-guide__eyebrow {
+  margin: 0 0 8px;
+  color: var(--page-accent);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+}
+
+.simulator-seo-guide__heading h2 {
+  margin: 0;
+  color: var(--page-navy);
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.45;
+}
+
+.simulator-seo-guide__heading > p:last-child {
+  margin: 13px 0 0;
+  color: #4e6577;
+  font-size: 0.94rem;
+  line-height: 1.85;
+}
+
+.simulator-seo-guide__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.simulator-seo-guide__grid article {
+  padding: 20px;
+  border: 1px solid color-mix(in srgb, var(--page-accent) 15%, #dce8ef);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--page-accent-soft) 44%, #ffffff);
+}
+
+.simulator-seo-guide__grid h3 {
+  margin: 0;
+  color: #17314f;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.simulator-seo-guide__grid p {
+  margin: 9px 0 0;
+  color: #536a7c;
+  font-size: 0.84rem;
+  line-height: 1.78;
+}
+
+.simulator-seo-guide__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #e5edf2;
+}
+
+.simulator-seo-guide__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--page-accent);
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.simulator-seo-guide__links a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.simulator-seo-guide__links a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--page-accent) 28%, transparent);
+  outline-offset: 4px;
+  border-radius: 5px;
+}
+
+@media (max-width: 900px) {
+  .simulator-seo-guide__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .simulator-seo-guide {
+    margin-top: 24px;
+    padding: 24px 18px;
+    border-radius: 15px;
+  }
+
+  .simulator-seo-guide__heading h2 {
+    font-size: 1.35rem;
+  }
+
+  .simulator-seo-guide__grid {
+    margin-top: 18px;
+  }
+
+  .simulator-seo-guide__grid article {
+    padding: 17px;
+  }
+
+  .simulator-seo-guide__links {
+    display: grid;
+  }
+}
+
+@media print {
+  .simulator-seo-guide {
+    box-shadow: none;
+  }
+}
