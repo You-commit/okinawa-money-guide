@@ -8,6 +8,7 @@ import {
 } from '../../affiliate/affiliateConfig'
 import AffiliateCard from './AffiliateCard'
 import AffiliatePreviewCard from './AffiliatePreviewCard'
+import AffiliateProgramPlacement from './AffiliateProgramPlacement'
 
 const enabledProgram: AffiliateProgramConfig = {
   id: 'test-program',
@@ -43,6 +44,7 @@ describe('AffiliateCard', () => {
   afterEach(() => {
     cleanup()
     Reflect.deleteProperty(window, 'gtag')
+    window.history.pushState({}, '', '/')
   })
 
   it('keeps every production program disabled by default', () => {
@@ -51,6 +53,7 @@ describe('AffiliateCard', () => {
     ))).toBe(true)
     expect(affiliatePrograms.nisa.provider).toBe('DMM 株')
     expect(affiliatePrograms.nisa.creativeType).toBe('banner')
+    expect(affiliatePrograms.nisa.placement).toBe('nisa-before-simulation')
     expect(affiliatePrograms.nisa.url).toContain('px.a8.net')
     expect(affiliatePrograms.nisa.bannerImageUrl).toContain('a8.net')
     expect(affiliatePrograms.nisa.disclosureLabel).toBe('PR')
@@ -188,8 +191,20 @@ describe('AffiliateCard', () => {
       .toBe('true')
   })
 
-  it('shows the configured DMM NISA banner in preview without live click tracking', () => {
+  it('suppresses the old post-result NISA preview slot', () => {
     const { container } = render(<AffiliatePreviewCard category="nisa" />)
+    expect(container.innerHTML).toBe('')
+  })
+
+  it('shows the configured DMM NISA banner before simulation in preview without live tracking', () => {
+    window.history.pushState({}, '', '/?affiliate-preview=1')
+
+    const { container } = render(
+      <AffiliateProgramPlacement
+        program={affiliatePrograms.nisa}
+        placement="nisa-before-simulation"
+      />,
+    )
 
     expect(screen.getByText('PR')).toBeTruthy()
     const banner = screen.getByRole('img', { name: 'DMM 株' })
