@@ -196,6 +196,26 @@
   white-space: nowrap;
 }
 
+/* NISA result flow: result -> affiliate banner -> consultation summary. */
+.nisa-calculator {
+  display: flex;
+  flex-direction: column;
+}
+
+.nisa-calculator > .affiliate-card,
+.nisa-calculator > .affiliate-banner,
+.nisa-calculator > .affiliate-card__tracking-pixel {
+  order: 1;
+}
+
+.nisa-calculator > .nisa-consultation-summary {
+  order: 2;
+}
+
+.nisa-calculator > .calculator-note {
+  order: 3;
+}
+
 @media (max-width: 620px) {
   .affiliate-card,
   .affiliate-banner {
