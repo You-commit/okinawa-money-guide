@@ -191,14 +191,17 @@ describe('AffiliateCard', () => {
       .toBe('true')
   })
 
-  it('shows the configured DMM NISA banner in preview without live tracking', () => {
-    const { container } = render(<AffiliatePreviewCard category="nisa" />)
+  it('suppresses the legacy NISA slot reserved for dynamic placement', () => {
+    const { container, rerender } = render(
+      <AffiliatePreviewCard category="nisa" />,
+    )
+    expect(container.innerHTML).toBe('')
 
-    expect(screen.getByText('PR')).toBeTruthy()
-    const banner = screen.getByRole('img', { name: 'DMM 株' })
-    expect(banner.getAttribute('src')).toBe(affiliatePrograms.nisa.bannerImageUrl)
-    expect(screen.queryByRole('link', { name: 'DMM 株の詳細を見る' })).toBeNull()
-    expect(container.querySelector('.affiliate-card__tracking-pixel')).toBeNull()
-    expect(screen.queryByText('RELATED SERVICE')).toBeNull()
+    rerender(
+      <AffiliateCard
+        program={{ ...affiliatePrograms.nisa, enabled: true }}
+      />,
+    )
+    expect(container.innerHTML).toBe('')
   })
 })
