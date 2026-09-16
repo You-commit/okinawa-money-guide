@@ -9,6 +9,7 @@ import {
   canonicalOrigin,
   getRouteSeo,
   getRouteStructuredData,
+  knowledgeArticleSeoDefinitions,
   notFoundSeo,
   routeSeoEntries,
   siteName,
@@ -20,6 +21,10 @@ const expectedRoutes = [
   ...Object.values(routes),
   ...knowledgeArticles.map(({ path }) => path),
 ]
+
+const articlePaths = new Set(
+  knowledgeArticleSeoDefinitions.map(({ path }) => path),
+)
 
 describe('technical SEO source of truth', () => {
   it('defines complete, indexable metadata for every formal route and published article', () => {
@@ -37,7 +42,7 @@ describe('technical SEO source of truth', () => {
         title: metadata.title,
         description: metadata.description,
         url: metadata.canonical,
-        type: 'website',
+        type: articlePaths.has(metadata.path) ? 'article' : 'website',
         siteName,
         locale: 'ja_JP',
       }))
@@ -46,6 +51,20 @@ describe('technical SEO source of truth', () => {
         title: metadata.title,
         description: metadata.description,
       })
+    }
+  })
+
+  it('keeps article SEO definitions synchronized with the published article source', () => {
+    expect(knowledgeArticleSeoDefinitions.map(({ path }) => path))
+      .toEqual(knowledgeArticles.map(({ path }) => path))
+
+    for (const definition of knowledgeArticleSeoDefinitions) {
+      const article = knowledgeArticles.find(({ path }) => path === definition.path)
+      expect(article).toBeTruthy()
+      expect(definition.headline).toBe(article?.title)
+      expect(definition.description).toBe(article?.description)
+      expect(definition.datePublished).toBe(article?.publishedAt)
+      expect(definition.dateModified).toBe(article?.updatedAt)
     }
   })
 
@@ -76,6 +95,7 @@ describe('technical SEO source of truth', () => {
       expect(html).toContain(`rel="canonical" href="${metadata.canonical}"`)
       expect(html).toContain(`property="og:title" content="${metadata.title}"`)
       expect(html).toContain(`property="og:url" content="${metadata.canonical}"`)
+      expect(html).toContain(`property="og:type" content="${metadata.openGraph.type}"`)
       expect(html).toContain('name="twitter:card" content="summary"')
       expect(html.match(/rel="canonical"/g)).toHaveLength(1)
     }
@@ -91,16 +111,33 @@ describe('technical SEO source of truth', () => {
     expect(html).not.toContain('name="twitter:')
   })
 
-  it('uses only factual WebSite structured data on the homepage', () => {
+  it('uses only factual structured data for the homepage and published articles', () => {
     expect(getRouteStructuredData(routes.home)).toEqual(websiteStructuredData)
     expect(getRouteStructuredData(routes.mortgage)).toBeUndefined()
-    expect(getRouteStructuredData(knowledgeArticles[0].path)).toBeUndefined()
     expect(websiteStructuredData).toEqual({
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: siteName,
       url: `${canonicalOrigin}/`,
     })
+
+    for (const article of knowledgeArticleSeoDefinitions) {
+      expect(getRouteStructuredData(article.path)).toEqual({
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: article.headline,
+        description: article.description,
+        datePublished: article.datePublished,
+        dateModified: article.dateModified,
+        inLanguage: 'ja-JP',
+        mainEntityOfPage: `${canonicalOrigin}${article.path}`,
+        publisher: {
+          '@type': 'Organization',
+          name: siteName,
+          url: `${canonicalOrigin}/`,
+        },
+      })
+    }
   })
 
   it('keeps sitemap URLs synchronized with every indexable route', () => {
