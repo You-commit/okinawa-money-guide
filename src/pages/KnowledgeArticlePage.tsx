@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { routes } from '../app/routes'
 import { knowledgeArticleBySlug } from '../content/knowledgeArticles'
 import SiteLayout from '../layouts/SiteLayout'
+import KnowledgeArticleVisual from './KnowledgeArticleVisual'
 import NotFoundPage from './NotFoundPage'
 import './KnowledgeArticlePage.css'
 
@@ -38,30 +39,40 @@ function KnowledgeArticlePage() {
             </div>
           </header>
 
+          <KnowledgeArticleVisual slug={article.slug} />
+
           <div className="knowledge-article__body">
-            {article.sections.map((section) => (
-              <section key={section.heading}>
-                <h2>{section.heading}</h2>
-                {section.paragraphs.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-                {section.bullets ? (
-                  <ul>
-                    {section.bullets.map((item) => <li key={item}>{item}</li>)}
-                  </ul>
-                ) : null}
+            {article.sections.map((section, index) => (
+              <section key={section.heading} className={section.bullets ? 'knowledge-article__section knowledge-article__section--data' : 'knowledge-article__section'}>
+                <div className="knowledge-article__section-index" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </div>
+                <div className="knowledge-article__section-content">
+                  <h2>{section.heading}</h2>
+                  {section.paragraphs.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+                  {section.bullets ? (
+                    <ul className="knowledge-article__fact-grid">
+                      {section.bullets.map((item) => <li key={item}>{item}</li>)}
+                    </ul>
+                  ) : null}
+                </div>
               </section>
             ))}
           </div>
 
           <aside className="knowledge-article__simulator" aria-label="関連シミュレーター">
-            <p className="knowledge-article__label">SIMULATOR</p>
-            <h2>自分の条件で数字を確認する</h2>
-            <p>{article.simulator.description}</p>
-            <Link to={article.simulator.path}>
-              {article.simulator.label}
-              <span aria-hidden="true">→</span>
-            </Link>
+            <div className="knowledge-article__simulator-mark" aria-hidden="true">↗</div>
+            <div>
+              <p className="knowledge-article__label">SIMULATOR</p>
+              <h2>自分の条件で数字を確認する</h2>
+              <p>{article.simulator.description}</p>
+              <Link to={article.simulator.path}>
+                {article.simulator.label}
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
           </aside>
 
           <section className="knowledge-article__sources" aria-labelledby="article-sources-title">
