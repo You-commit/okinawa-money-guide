@@ -12,8 +12,6 @@ type AffiliatePreviewCardProps = {
 }
 
 function AffiliatePreviewCard({ category }: AffiliatePreviewCardProps) {
-  if (!import.meta.env.DEV) return null
-
   const program = affiliatePrograms[category]
 
   if (
