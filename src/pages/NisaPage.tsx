@@ -1,4 +1,5 @@
 import NisaCalculator from '../NisaCalculator'
+import NisaAffiliatePlacementController from '../components/affiliate/NisaAffiliatePlacementController'
 import SimulatorNotes from '../components/simulator/SimulatorNotes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
 
@@ -15,16 +16,19 @@ function NisaPage() {
         { title: 'NISA枠も確認', description: '年間投資枠や非課税保有限度額との関係を確認' },
       ]}
       notes={(
-        <SimulatorNotes
-          knowledgeTitle="NISAの基礎知識を学ぶ"
-          knowledgeItems={['NISA制度の基本', '長期・分散・積立', '元本割れリスク']}
-          warningItems={[
-            '手数料、価格変動、商品ごとの条件を完全に反映した試算ではありません。',
-            '制度変更などにより、実際の結果や利用可能なNISA枠と異なる場合があります。',
-            '重要な判断は一次資料や金融機関等でも確認してください。',
-          ]}
-          accent="nisa"
-        />
+        <>
+          <NisaAffiliatePlacementController />
+          <SimulatorNotes
+            knowledgeTitle="NISAの基礎知識を学ぶ"
+            knowledgeItems={['NISA制度の基本', '長期・分散・積立', '元本割れリスク']}
+            warningItems={[
+              '手数料、価格変動、商品ごとの条件を完全に反映した試算ではありません。',
+              '制度変更などにより、実際の結果や利用可能なNISA枠と異なる場合があります。',
+              '重要な判断は一次資料や金融機関等でも確認してください。',
+            ]}
+            accent="nisa"
+          />
+        </>
       )}
     >
       <NisaCalculator />
