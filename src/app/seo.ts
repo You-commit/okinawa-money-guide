@@ -1,4 +1,3 @@
-import { knowledgeArticles } from '../content/knowledgeArticles.ts'
 import { routes } from './routes.ts'
 
 export const siteName = '沖縄マネーガイド'
@@ -30,6 +29,19 @@ type RouteSeoInput = {
   title: string
   description: string
 }
+
+export const knowledgeArticleSeoInputs: RouteSeoInput[] = [
+  {
+    path: '/knowledge/nisa-basics',
+    title: `NISAの基本｜非課税枠と始める前に確認したいこと | ${siteName}`,
+    description: 'NISAのつみたて投資枠・成長投資枠・非課税保有限度額の基本と、積立額や金融機関を決める前に確認したいポイントを整理します。',
+  },
+  {
+    path: '/knowledge/mortgage-repayment-methods',
+    title: `元利均等返済と元金均等返済の違い｜住宅ローンの返済方法を比較 | ${siteName}`,
+    description: '住宅ローンの元利均等返済と元金均等返済の違いを、毎月返済額・元金の減り方・総返済額の観点から整理します。',
+  },
+]
 
 const routeSeoInputs: RouteSeoInput[] = [
   {
@@ -77,11 +89,7 @@ const routeSeoInputs: RouteSeoInput[] = [
     title: `信頼情報 | ${siteName}`,
     description: '情報源、基準時点、更新・訂正、計算方針、データ、広告・提携に関する運営方針です。',
   },
-  ...knowledgeArticles.map((article) => ({
-    path: article.path,
-    title: `${article.title} | ${siteName}`,
-    description: article.description,
-  })),
+  ...knowledgeArticleSeoInputs,
 ]
 
 function createRouteSeo({ path, title, description }: RouteSeoInput): RouteSeo {
