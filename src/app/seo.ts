@@ -3,6 +3,8 @@ import { routes } from './routes.ts'
 export const siteName = '沖縄マネーガイド'
 export const canonicalOrigin = 'https://okinawamoneyguide.jp'
 
+type OpenGraphType = 'website' | 'article'
+
 export type RouteSeo = {
   path: string
   title: string
@@ -13,7 +15,7 @@ export type RouteSeo = {
     title: string
     description: string
     url: string
-    type: 'website'
+    type: OpenGraphType
     siteName: string
     locale: 'ja_JP'
   }
@@ -28,20 +30,41 @@ type RouteSeoInput = {
   path: string
   title: string
   description: string
+  openGraphType?: OpenGraphType
 }
 
-export const knowledgeArticleSeoInputs: RouteSeoInput[] = [
+type KnowledgeArticleSeoDefinition = {
+  path: string
+  headline: string
+  description: string
+  datePublished: string
+  dateModified: string
+}
+
+export const knowledgeArticleSeoDefinitions: KnowledgeArticleSeoDefinition[] = [
   {
     path: '/knowledge/nisa-basics',
-    title: `NISAの基本｜非課税枠と始める前に確認したいこと | ${siteName}`,
+    headline: 'NISAの基本｜非課税枠と始める前に確認したいこと',
     description: 'NISAのつみたて投資枠・成長投資枠・非課税保有限度額の基本と、積立額や金融機関を決める前に確認したいポイントを整理します。',
+    datePublished: '2026-09-16',
+    dateModified: '2026-09-16',
   },
   {
     path: '/knowledge/mortgage-repayment-methods',
-    title: `元利均等返済と元金均等返済の違い｜住宅ローンの返済方法を比較 | ${siteName}`,
+    headline: '元利均等返済と元金均等返済の違い｜住宅ローンの返済方法を比較',
     description: '住宅ローンの元利均等返済と元金均等返済の違いを、毎月返済額・元金の減り方・総返済額の観点から整理します。',
+    datePublished: '2026-09-16',
+    dateModified: '2026-09-16',
   },
 ]
+
+export const knowledgeArticleSeoInputs: RouteSeoInput[] =
+  knowledgeArticleSeoDefinitions.map((article) => ({
+    path: article.path,
+    title: `${article.headline} | ${siteName}`,
+    description: article.description,
+    openGraphType: 'article',
+  }))
 
 const routeSeoInputs: RouteSeoInput[] = [
   {
@@ -92,7 +115,12 @@ const routeSeoInputs: RouteSeoInput[] = [
   ...knowledgeArticleSeoInputs,
 ]
 
-function createRouteSeo({ path, title, description }: RouteSeoInput): RouteSeo {
+function createRouteSeo({
+  path,
+  title,
+  description,
+  openGraphType = 'website',
+}: RouteSeoInput): RouteSeo {
   const canonical = `${canonicalOrigin}${path}`
 
   return {
@@ -105,7 +133,7 @@ function createRouteSeo({ path, title, description }: RouteSeoInput): RouteSeo {
       title,
       description,
       url: canonical,
-      type: 'website',
+      type: openGraphType,
       siteName,
       locale: 'ja_JP',
     },
@@ -136,6 +164,27 @@ export const websiteStructuredData = {
   url: `${canonicalOrigin}/`,
 } as const
 
+const articleStructuredDataByPath = new Map(
+  knowledgeArticleSeoDefinitions.map((article) => [
+    article.path,
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: article.headline,
+      description: article.description,
+      datePublished: article.datePublished,
+      dateModified: article.dateModified,
+      inLanguage: 'ja-JP',
+      mainEntityOfPage: `${canonicalOrigin}${article.path}`,
+      publisher: {
+        '@type': 'Organization',
+        name: siteName,
+        url: `${canonicalOrigin}/`,
+      },
+    },
+  ]),
+)
+
 export function normalizePathname(value: string) {
   const pathname = value.split(/[?#]/, 1)[0] || routes.home
 
@@ -149,7 +198,9 @@ export function getRouteSeo(value: string) {
 }
 
 export function getRouteStructuredData(value: string) {
-  return normalizePathname(value) === routes.home
-    ? websiteStructuredData
-    : undefined
+  const pathname = normalizePathname(value)
+
+  if (pathname === routes.home) return websiteStructuredData
+
+  return articleStructuredDataByPath.get(pathname)
 }
