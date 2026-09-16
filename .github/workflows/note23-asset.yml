@@ -1,0 +1,31 @@
+name: note23-asset
+
+on:
+  push:
+    branches:
+      - note-issue23-family-chore-app-20260916
+    paths:
+      - .github/workflows/note23-asset.yml
+
+permissions:
+  contents: write
+
+jobs:
+  save-approved-header:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: note-issue23-family-chore-app-20260916
+      - name: Download approved header
+        run: |
+          mkdir -p note/issue23
+          curl -fL 'https://lh7-us.googleusercontent.com/docsdf/AFQj2d6AiDUS18jpr5iPeB_bLxEHeAZh6ejdRmHpN3lRTnkhbIt-gunwwFrJTnE9jCKWNXBtGz2l5J0LEc9vJoyDNfDkSBsbvG3G0aTbLIU2wxnPlBWQ8zB07QJXReG8CVccF8MGDIla9snu6yetqmQAYLjFvq_wvNRSZl0JIPrJ6FPtPAN-=s1600' -o note/issue23/approved_header.png
+          test -s note/issue23/approved_header.png
+      - name: Commit approved header
+        run: |
+          git config user.name 'note-automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add note/issue23/approved_header.png
+          git commit -m 'Add approved issue 23 header asset'
+          git push
