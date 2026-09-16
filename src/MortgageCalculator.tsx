@@ -36,6 +36,12 @@ import {
   type MortgageTrajectoryPoint,
   type RepaymentMethod,
 } from './mortgage'
+import {
+  affiliatePrograms,
+  isAffiliateVisualPreviewEnabled,
+} from './affiliate/affiliateConfig'
+import AffiliateCard from './components/affiliate/AffiliateCard'
+import AffiliatePreviewCard from './components/affiliate/AffiliatePreviewCard'
 
 type TouchedFields = Record<MortgageFieldName, boolean>
 
@@ -1743,6 +1749,12 @@ function MortgageCalculator() {
           </p>
         )}
       </section>
+
+      {activeCalculation && (
+        isAffiliateVisualPreviewEnabled()
+          ? <AffiliatePreviewCard category="mortgage" />
+          : <AffiliateCard program={affiliatePrograms.mortgage} />
+      )}
     </section>
   )
 }

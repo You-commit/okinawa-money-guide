@@ -40,6 +40,12 @@ import {
   type NisaConsultationRecord as NisaConsultationSummaryRecord,
   type NisaConsultationInputSnapshot,
 } from './nisaConsultationSummary'
+import {
+  affiliatePrograms,
+  isAffiliateVisualPreviewEnabled,
+} from './affiliate/affiliateConfig'
+import AffiliateCard from './components/affiliate/AffiliateCard'
+import AffiliatePreviewCard from './components/affiliate/AffiliatePreviewCard'
 import './NisaCalculator.css'
 
 type NisaField =
@@ -1668,6 +1674,12 @@ function NisaCalculator() {
 
           <NisaConsultationSummaryContent record={consultationRecord} />
         </section>
+      )}
+
+      {consultationRecord && (
+        isAffiliateVisualPreviewEnabled()
+          ? <AffiliatePreviewCard category="nisa" />
+          : <AffiliateCard program={affiliatePrograms.nisa} />
       )}
 
       <p className="calculator-note">
