@@ -196,24 +196,21 @@
   white-space: nowrap;
 }
 
-/* NISA result flow: result -> affiliate banner -> consultation summary. */
-.nisa-calculator {
-  display: flex;
-  flex-direction: column;
+.nisa-affiliate-placement--pre-simulation {
+  grid-column: 1 / -1;
+  min-width: 0;
 }
 
-.nisa-calculator > .affiliate-card,
-.nisa-calculator > .affiliate-banner,
-.nisa-calculator > .affiliate-card__tracking-pixel {
-  order: 1;
+.nisa-affiliate-placement--pre-simulation .affiliate-banner {
+  margin: 0 auto;
 }
 
-.nisa-calculator > .nisa-consultation-summary {
-  order: 2;
+.nisa-affiliate-placement--post-simulation {
+  min-width: 0;
 }
 
-.nisa-calculator > .calculator-note {
-  order: 3;
+.nisa-affiliate-placement--post-simulation .affiliate-banner {
+  margin: 28px auto 24px;
 }
 
 @media (max-width: 620px) {
@@ -249,12 +246,17 @@
   .affiliate-banner__creative {
     padding-inline: 0;
   }
+
+  .nisa-affiliate-placement--pre-simulation .affiliate-banner {
+    margin-top: 0;
+  }
 }
 
 @media print {
   .affiliate-card,
   .affiliate-banner,
-  .affiliate-card__tracking-pixel {
+  .affiliate-card__tracking-pixel,
+  .nisa-affiliate-placement {
     display: none !important;
   }
 }
