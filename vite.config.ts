@@ -46,7 +46,11 @@ function staticSeoPages(): Plugin {
           await mkdir(dirname(outputPath), { recursive: true })
           await writeFile(
             outputPath,
-            injectSeoHead(htmlTemplate, metadata),
+            injectSeoHead(
+              htmlTemplate,
+              metadata,
+              getRouteStructuredData(metadata.path),
+            ),
             'utf8',
           )
         }))
