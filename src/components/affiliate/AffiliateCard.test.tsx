@@ -15,6 +15,7 @@ const enabledProgram: AffiliateProgramConfig = {
   provider: 'テスト提供者',
   category: 'nisa',
   placement: 'nisa-after-consultation-summary',
+  creativeType: 'text',
   url: 'https://example.com/application',
   title: 'テスト用サービス',
   description: '表示条件を確認するためのテストデータです。',
@@ -23,6 +24,19 @@ const enabledProgram: AffiliateProgramConfig = {
   riskDisclosure: '投資には価格変動リスクがあります。',
   riskUrl: 'https://example.com/risk',
   trackingPixelUrl: 'https://example.com/pixel.gif',
+}
+
+const bannerProgram: AffiliateProgramConfig = {
+  ...enabledProgram,
+  id: 'test-banner',
+  creativeType: 'banner',
+  title: 'バナー広告',
+  description: '',
+  ctaLabel: '',
+  bannerImageUrl: 'https://example.com/banner.png',
+  bannerAlt: 'テストバナー',
+  bannerWidth: 468,
+  bannerHeight: 60,
 }
 
 describe('AffiliateCard', () => {
@@ -36,7 +50,9 @@ describe('AffiliateCard', () => {
       !program.enabled
     ))).toBe(true)
     expect(affiliatePrograms.nisa.provider).toBe('DMM 株')
+    expect(affiliatePrograms.nisa.creativeType).toBe('banner')
     expect(affiliatePrograms.nisa.url).toContain('px.a8.net')
+    expect(affiliatePrograms.nisa.bannerImageUrl).toContain('a8.net')
     expect(affiliatePrograms.nisa.disclosureLabel).toBe('PR')
   })
 
@@ -69,7 +85,7 @@ describe('AffiliateCard', () => {
     expect(container.innerHTML).toBe('')
   })
 
-  it('shows PR, disclosure details, and safe external-link attributes', () => {
+  it('shows PR, disclosure details, and safe external-link attributes for text creatives', () => {
     const { container } = render(<AffiliateCard program={enabledProgram} />)
 
     expect(screen.getByText('RELATED SERVICE')).toBeTruthy()
@@ -88,6 +104,39 @@ describe('AffiliateCard', () => {
 
     const pixel = container.querySelector('.affiliate-card__tracking-pixel')
     expect(pixel?.getAttribute('src')).toBe(enabledProgram.trackingPixelUrl)
+  })
+
+  it('renders a banner creative as the clickable ad surface', () => {
+    const { container } = render(<AffiliateCard program={bannerProgram} />)
+
+    expect(screen.getByText('PR')).toBeTruthy()
+    const banner = screen.getByRole('img', { name: 'テストバナー' })
+    expect(banner.getAttribute('src')).toBe(bannerProgram.bannerImageUrl)
+    expect(banner.getAttribute('width')).toBe('468')
+    expect(banner.getAttribute('height')).toBe('60')
+
+    const link = screen.getByRole('link', { name: 'テスト提供者の詳細を見る' })
+    expect(link.getAttribute('href')).toBe(bannerProgram.url)
+    expect(link.getAttribute('rel')).toBe('sponsored noopener noreferrer')
+    expect(container.querySelector('.affiliate-card__tracking-pixel')).toBeTruthy()
+    expect(screen.queryByText('RELATED SERVICE')).toBeNull()
+  })
+
+  it('does not render a banner with a missing or insecure creative URL', () => {
+    const { container, rerender } = render(
+      <AffiliateCard program={{ ...bannerProgram, bannerImageUrl: '' }} />,
+    )
+    expect(container.innerHTML).toBe('')
+
+    rerender(
+      <AffiliateCard
+        program={{
+          ...bannerProgram,
+          bannerImageUrl: 'http://example.com/banner.png',
+        }}
+      />,
+    )
+    expect(container.innerHTML).toBe('')
   })
 
   it('does not render an insecure tracking pixel or risk link', () => {
@@ -111,9 +160,9 @@ describe('AffiliateCard', () => {
       configurable: true,
       value: gtag,
     })
-    render(<AffiliateCard program={enabledProgram} />)
+    render(<AffiliateCard program={bannerProgram} />)
 
-    fireEvent.click(screen.getByRole('link', { name: /サービスを確認する/ }))
+    fireEvent.click(screen.getByRole('link', { name: 'テスト提供者の詳細を見る' }))
 
     expect(gtag).toHaveBeenCalledWith('event', 'affiliate_click', {
       provider: 'テスト提供者',
@@ -123,8 +172,8 @@ describe('AffiliateCard', () => {
   })
 
   it('does not throw when GA4 has not loaded', () => {
-    render(<AffiliateCard program={enabledProgram} />)
-    const link = screen.getByRole('link', { name: /サービスを確認する/ })
+    render(<AffiliateCard program={bannerProgram} />)
+    const link = screen.getByRole('link', { name: 'テスト提供者の詳細を見る' })
 
     expect(() => fireEvent.click(link)).not.toThrow()
   })
@@ -139,16 +188,14 @@ describe('AffiliateCard', () => {
       .toBe('true')
   })
 
-  it('shows the configured DMM NISA card in preview without firing live tracking', () => {
+  it('shows the configured DMM NISA banner in preview without live click tracking', () => {
     const { container } = render(<AffiliatePreviewCard category="nisa" />)
 
-    expect(screen.getByText('NISA口座を検討している方へ')).toBeTruthy()
     expect(screen.getByText('PR')).toBeTruthy()
-    expect(screen.getByText(/DMM 株/)).toBeTruthy()
-    expect(screen.queryByRole('link', { name: /DMM 株の詳細を見る/ }))
-      .toBeNull()
-    expect(screen.getByText('DMM 株の詳細を見る').getAttribute('aria-disabled'))
-      .toBe('true')
+    const banner = screen.getByRole('img', { name: 'DMM 株' })
+    expect(banner.getAttribute('src')).toBe(affiliatePrograms.nisa.bannerImageUrl)
+    expect(screen.queryByRole('link', { name: 'DMM 株の詳細を見る' })).toBeNull()
     expect(container.querySelector('.affiliate-card__tracking-pixel')).toBeNull()
+    expect(screen.queryByText('RELATED SERVICE')).toBeNull()
   })
 })
