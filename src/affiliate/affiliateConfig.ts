@@ -1,4 +1,5 @@
 export type AffiliateCategory = 'nisa' | 'ideco' | 'mortgage'
+export type AffiliateCreativeType = 'text' | 'banner'
 
 export type AffiliatePlacement =
   | 'nisa-after-consultation-summary'
@@ -11,6 +12,7 @@ export type AffiliateProgramConfig = {
   provider: string
   category: AffiliateCategory
   placement: AffiliatePlacement
+  creativeType?: AffiliateCreativeType
   url: string
   title: string
   description: string
@@ -19,6 +21,10 @@ export type AffiliateProgramConfig = {
   riskDisclosure?: string
   riskUrl?: string
   trackingPixelUrl?: string
+  bannerImageUrl?: string
+  bannerAlt?: string
+  bannerWidth?: number
+  bannerHeight?: number
 }
 
 export const affiliatePrograms: Record<
@@ -31,17 +37,22 @@ export const affiliatePrograms: Record<
     provider: 'DMM 株',
     category: 'nisa',
     placement: 'nisa-after-consultation-summary',
-    url: 'https://px.a8.net/svt/ejp?a8mat=4BCCJF+FUDB2Y+1WP2+15RK36',
-    title: 'NISA口座を検討している方へ',
-    description:
-      'NISAを含む資産形成の選択肢として、DMM 株のサービス内容や取引条件を確認できます。',
-    ctaLabel: 'DMM 株の詳細を見る',
+    creativeType: 'banner',
+    url: 'https://px.a8.net/svt/ejp?a8mat=4BCCJF+FUDB2Y+1WP2+15Q22P',
+    title: 'DMM 株',
+    description: '',
+    ctaLabel: '',
     disclosureLabel: 'PR',
     riskDisclosure:
       '投資には価格変動等による元本割れのリスクがあります。手数料・リスク等は公式情報をご確認ください。',
     riskUrl: 'https://kabu.dmm.com/',
     trackingPixelUrl:
-      'https://www16.a8.net/0.gif?a8mat=4BCCJF+FUDB2Y+1WP2+15RK36',
+      'https://www17.a8.net/0.gif?a8mat=4BCCJF+FUDB2Y+1WP2+15Q22P',
+    bannerImageUrl:
+      'https://www22.a8.net/svt/bgt?aid=260916603958&wid=002&eno=01&mid=s00000008903007008000&mc=1',
+    bannerAlt: 'DMM 株',
+    bannerWidth: 468,
+    bannerHeight: 60,
   },
   ideco: {
     id: 'ideco-primary',
@@ -49,6 +60,7 @@ export const affiliatePrograms: Record<
     provider: '',
     category: 'ideco',
     placement: 'ideco-after-consultation-summary',
+    creativeType: 'text',
     url: '',
     title: '',
     description: '',
@@ -60,6 +72,7 @@ export const affiliatePrograms: Record<
     provider: '',
     category: 'mortgage',
     placement: 'mortgage-after-consultation-summary',
+    creativeType: 'text',
     url: '',
     title: '',
     description: '',
@@ -81,14 +94,20 @@ export const isAffiliateProgramVisible = (
   if (
     !program.enabled ||
     !program.provider.trim() ||
-    !program.title.trim() ||
-    !program.ctaLabel.trim() ||
-    !program.url.trim()
+    !program.url.trim() ||
+    !isHttpsUrl(program.url)
   ) {
     return false
   }
 
-  return isHttpsUrl(program.url)
+  if (program.creativeType === 'banner') {
+    return Boolean(
+      program.bannerImageUrl &&
+      isHttpsUrl(program.bannerImageUrl),
+    )
+  }
+
+  return Boolean(program.title.trim() && program.ctaLabel.trim())
 }
 
 export const isAffiliateVisualPreviewEnabled = () =>
