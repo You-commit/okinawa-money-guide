@@ -1,0 +1,20 @@
+{
+  "issue": 23,
+  "status": "approved_for_draft",
+  "approval_scope": "images_only",
+  "image_approval_received": true,
+  "image_approval_date": "2026-09-16",
+  "article_type": "free",
+  "title": "家事分担アプリ作ってみた。",
+  "price": null,
+  "refund": null,
+  "header_file": "02_アイキャッチ_第23号無料_家事分担アプリ作ってみた.png",
+  "header_size": [1280, 670],
+  "body_image_count": 0,
+  "tags": ["家事", "家族", "暮らし", "アプリ開発", "Webアプリ", "生活"],
+  "paywall_marker_required": false,
+  "paid_body_image_policy": null,
+  "paid_start_heading": null,
+  "free_url_placeholder": null,
+  "demo_url": "https://raw.githack.com/You-commit/okinawa-money-guide/note-issue23-family-chore-app-20260916/demos/ouchi-buntan/index.html"
+}
