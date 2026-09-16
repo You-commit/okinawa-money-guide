@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { routes } from '../../app/routes'
 import SiteLayout from '../../layouts/SiteLayout'
+import SimulatorSeoGuide from './SimulatorSeoGuide'
 
 export type SimulatorTheme = 'military' | 'mortgage' | 'nisa' | 'ideco' | 'taxable'
 
@@ -57,6 +58,7 @@ function SimulatorPageShell({
         <div className="simulator-page__main">
           <div className="simulator-page__calculator">{children}</div>
           {notes ? <div className="simulator-page__notes">{notes}</div> : null}
+          <SimulatorSeoGuide theme={theme} />
         </div>
       </main>
     </SiteLayout>
