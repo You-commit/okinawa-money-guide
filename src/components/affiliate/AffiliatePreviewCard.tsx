@@ -14,6 +14,8 @@ type AffiliatePreviewCardProps = {
 function AffiliatePreviewCard({ category }: AffiliatePreviewCardProps) {
   const program = affiliatePrograms[category]
 
+  if (program.placement === 'nisa-before-simulation') return null
+
   if (
     program.creativeType === 'banner' &&
     program.provider.trim() &&
