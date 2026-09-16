@@ -3,6 +3,7 @@ import RouteEffects from './RouteEffects'
 import AboutPage from '../pages/AboutPage'
 import HomePage from '../pages/HomePage'
 import IdecoPage from '../pages/IdecoPage'
+import KnowledgeArticlePage from '../pages/KnowledgeArticlePage'
 import KnowledgePage from '../pages/KnowledgePage'
 import MilitaryLandPage from '../pages/MilitaryLandPage'
 import MortgagePage from '../pages/MortgagePage'
@@ -24,6 +25,7 @@ function AppRouter() {
         <Route path={routes.ideco} element={<IdecoPage />} />
         <Route path={routes.taxableIncome} element={<TaxableIncomePage />} />
         <Route path={routes.knowledge} element={<KnowledgePage />} />
+        <Route path={`${routes.knowledge}/:slug`} element={<KnowledgeArticlePage />} />
         <Route path={routes.about} element={<AboutPage />} />
         <Route path={routes.trust} element={<TrustPage />} />
         <Route path="*" element={<NotFoundPage />} />
