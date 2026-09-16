@@ -161,10 +161,15 @@ function SimulatorSeoGuide({ theme }: { theme: SimulatorTheme }) {
       </div>
 
       <div className="simulator-seo-guide__grid">
-        {guide.sections.map((section) => (
+        {guide.sections.map((section, index) => (
           <article key={section.title}>
-            <h3>{section.title}</h3>
-            <p>{section.body}</p>
+            <div className="simulator-seo-guide__number" aria-hidden="true">
+              {String(index + 1).padStart(2, '0')}
+            </div>
+            <div className="simulator-seo-guide__card-content">
+              <h3>{section.title}</h3>
+              <p>{section.body}</p>
+            </div>
           </article>
         ))}
       </div>
