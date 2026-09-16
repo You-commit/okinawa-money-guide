@@ -34,7 +34,7 @@ export const affiliatePrograms: Record<
 > = {
   nisa: {
     id: 'nisa-dmm-kabu-a8',
-    enabled: false,
+    enabled: true,
     provider: 'DMM 株',
     category: 'nisa',
     placement: 'nisa-before-consultation-summary',
