@@ -15,6 +15,13 @@ function AffiliatePreviewCard({ category }: AffiliatePreviewCardProps) {
   const program = affiliatePrograms[category]
 
   if (
+    category === 'nisa' &&
+    program.placement === 'nisa-before-consultation-summary'
+  ) {
+    return null
+  }
+
+  if (
     program.creativeType === 'banner' &&
     program.provider.trim() &&
     program.bannerImageUrl
