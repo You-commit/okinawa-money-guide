@@ -110,7 +110,19 @@ export const isAffiliateProgramVisible = (
   return Boolean(program.title.trim() && program.ctaLabel.trim())
 }
 
-export const isAffiliateVisualPreviewEnabled = () =>
-  import.meta.env.DEV &&
-  typeof window !== 'undefined' &&
-  new URLSearchParams(window.location.search).get('affiliate-preview') === '1'
+const isAffiliateBranchPreviewHost = (hostname: string) =>
+  hostname.startsWith('feature-') &&
+  hostname.endsWith('.okinawa-money-guide.pages.dev')
+
+export const isAffiliateVisualPreviewEnabled = () => {
+  if (typeof window === 'undefined') return false
+
+  const previewRequested =
+    new URLSearchParams(window.location.search).get('affiliate-preview') === '1'
+
+  if (!previewRequested) return false
+
+  return import.meta.env.DEV || isAffiliateBranchPreviewHost(
+    window.location.hostname.toLowerCase(),
+  )
+}
