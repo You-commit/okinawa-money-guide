@@ -2,8 +2,10 @@
   margin-top: 34px;
   padding: 34px;
   border: 1px solid #dce8ef;
-  border-radius: 18px;
-  background: #ffffff;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--page-accent) 10%, transparent), transparent 28%),
+    #ffffff;
   box-shadow: 0 14px 34px rgba(8, 43, 80, 0.07);
 }
 
@@ -41,21 +43,56 @@
 }
 
 .simulator-seo-guide__grid article {
-  padding: 20px;
-  border: 1px solid color-mix(in srgb, var(--page-accent) 15%, #dce8ef);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--page-accent-soft) 44%, #ffffff);
+  position: relative;
+  overflow: hidden;
+  min-height: 210px;
+  padding: 22px;
+  border: 1px solid color-mix(in srgb, var(--page-accent) 17%, #dce8ef);
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, #ffffff 0%, color-mix(in srgb, var(--page-accent-soft) 48%, #ffffff) 100%);
+}
+
+.simulator-seo-guide__grid article::after {
+  content: '';
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  right: -48px;
+  bottom: -56px;
+  border: 18px solid color-mix(in srgb, var(--page-accent) 10%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.simulator-seo-guide__number {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: var(--page-accent);
+  color: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 950;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--page-accent) 22%, transparent);
+}
+
+.simulator-seo-guide__card-content {
+  position: relative;
+  z-index: 1;
 }
 
 .simulator-seo-guide__grid h3 {
   margin: 0;
   color: #17314f;
-  font-size: 0.98rem;
+  font-size: 1rem;
   line-height: 1.55;
 }
 
 .simulator-seo-guide__grid p {
-  margin: 9px 0 0;
+  margin: 10px 0 0;
   color: #536a7c;
   font-size: 0.84rem;
   line-height: 1.78;
@@ -74,6 +111,9 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--page-accent-soft) 55%, #ffffff);
   color: var(--page-accent);
   font-size: 0.84rem;
   font-weight: 800;
@@ -95,6 +135,10 @@
   .simulator-seo-guide__grid {
     grid-template-columns: 1fr;
   }
+
+  .simulator-seo-guide__grid article {
+    min-height: auto;
+  }
 }
 
 @media (max-width: 620px) {
@@ -113,7 +157,7 @@
   }
 
   .simulator-seo-guide__grid article {
-    padding: 17px;
+    padding: 18px;
   }
 
   .simulator-seo-guide__links {
