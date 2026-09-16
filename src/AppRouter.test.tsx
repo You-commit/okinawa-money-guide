@@ -71,6 +71,21 @@ describe('dedicated page routing', () => {
     expect(within(trustConsole).queryByText('06')).toBeNull()
   })
 
+  it('explains the affiliate policy without weakening result independence', () => {
+    renderAt('/trust')
+
+    expect(screen.getByText(
+      '沖縄マネーガイドでは、一部のページでアフィリエイト広告を利用する場合があります。リンクを経由して申込み等が行われると運営者が報酬を受け取ることがありますが、広告報酬の有無によってシミュレーション結果や制度説明を変更することはありません。',
+    )).toBeTruthy()
+  })
+
+  it('links the common footer directly to the operating and partnership policy', () => {
+    renderAt('/simulators/nisa')
+
+    expect(screen.getByRole('link', { name: '運営・提携方針' })
+      .getAttribute('href')).toBe('/trust#ads')
+  })
+
   it.each([
     ['/', 'https://okinawamoneyguide.jp/'],
     ['/simulators/military-land', 'https://okinawamoneyguide.jp/simulators/military-land'],

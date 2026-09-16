@@ -44,6 +44,12 @@ import {
   getMoneyInputDigits,
   normalizeMoneyInputCharacters,
 } from './utils/moneyInput'
+import {
+  affiliatePrograms,
+  isAffiliateVisualPreviewEnabled,
+} from './affiliate/affiliateConfig'
+import AffiliateCard from './components/affiliate/AffiliateCard'
+import AffiliatePreviewCard from './components/affiliate/AffiliatePreviewCard'
 
 type DisplayedIdecoResult = {
   annualContribution: number | null
@@ -1773,6 +1779,12 @@ function IdecoCalculator({
 
           <IdecoConsultationSummaryContent record={consultationRecord} />
         </section>
+      )}
+
+      {consultationRecord && (
+        isAffiliateVisualPreviewEnabled()
+          ? <AffiliatePreviewCard category="ideco" />
+          : <AffiliateCard program={affiliatePrograms.ideco} />
       )}
 
       <p className="calculator-note">

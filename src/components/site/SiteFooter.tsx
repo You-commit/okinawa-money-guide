@@ -13,6 +13,7 @@ function SiteFooter() {
           <Link to={routes.knowledge}>お金の知識</Link>
           <Link to={routes.about}>このサイトについて</Link>
           <Link to={routes.trust}>信頼情報</Link>
+          <Link to={`${routes.trust}#ads`}>運営・提携方針</Link>
         </nav>
       </div>
     </footer>

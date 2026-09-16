@@ -1,0 +1,125 @@
+.affiliate-card {
+  --affiliate-accent: #176b91;
+  --affiliate-accent-soft: #e8f5fa;
+  width: min(100%, 1080px);
+  margin: 28px auto 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--affiliate-accent) 22%, #dfe8ed);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, #ffffff 0%, var(--affiliate-accent-soft) 100%);
+  color: #102f3e;
+}
+
+.affiliate-card[data-category="nisa"] {
+  --affiliate-accent: #16845b;
+  --affiliate-accent-soft: #ebf8f1;
+}
+
+.affiliate-card[data-category="ideco"] {
+  --affiliate-accent: #6d50a5;
+  --affiliate-accent-soft: #f1edfa;
+}
+
+.affiliate-card[data-category="mortgage"] {
+  --affiliate-accent: #176b91;
+  --affiliate-accent-soft: #e8f5fa;
+}
+
+.affiliate-card__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px;
+  padding: 24px 22px;
+}
+
+.affiliate-card__eyebrow {
+  margin: 0 0 5px;
+  color: var(--affiliate-accent);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+}
+
+.affiliate-card__content h3 {
+  margin: 0;
+  color: #102f3e;
+  font-size: clamp(1.08rem, 1.8vw, 1.35rem);
+  line-height: 1.45;
+}
+
+.affiliate-card__content p:not(.affiliate-card__eyebrow) {
+  max-width: 680px;
+  margin: 8px 0 0;
+  color: #46616e;
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.affiliate-card__provider {
+  display: block;
+  margin-top: 10px;
+  color: #60737c;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.affiliate-card__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 18px;
+  border: 1px solid var(--affiliate-accent);
+  border-radius: 12px;
+  background: var(--affiliate-accent);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.affiliate-card__link:hover {
+  filter: brightness(0.94);
+  transform: translateY(-1px);
+}
+
+.affiliate-card__link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--affiliate-accent) 35%, transparent);
+  outline-offset: 3px;
+}
+
+.affiliate-card__link--preview {
+  border-color: #9cabb2;
+  background: #eef2f4;
+  color: #60737c;
+  cursor: not-allowed;
+}
+
+@media (max-width: 620px) {
+  .affiliate-card {
+    margin-top: 20px;
+    border-radius: 15px;
+  }
+
+  .affiliate-card__content {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 16px;
+  }
+
+  .affiliate-card__link {
+    width: 100%;
+  }
+
+}
+
+@media print {
+  .affiliate-card {
+    display: none !important;
+  }
+}
