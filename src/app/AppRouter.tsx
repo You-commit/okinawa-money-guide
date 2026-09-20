@@ -4,6 +4,8 @@ import AboutPage from '../pages/AboutPage'
 import HomePage from '../pages/HomePage'
 import IdecoPage from '../pages/IdecoPage'
 import KnowledgePage from '../pages/KnowledgePage'
+import MortgageComparisonArticlePage from '../pages/knowledge/MortgageComparisonArticlePage'
+import NisaLimitsArticlePage from '../pages/knowledge/NisaLimitsArticlePage'
 import MilitaryLandPage from '../pages/MilitaryLandPage'
 import MortgagePage from '../pages/MortgagePage'
 import NisaPage from '../pages/NisaPage'
@@ -24,6 +26,8 @@ function AppRouter() {
         <Route path={routes.ideco} element={<IdecoPage />} />
         <Route path={routes.taxableIncome} element={<TaxableIncomePage />} />
         <Route path={routes.knowledge} element={<KnowledgePage />} />
+        <Route path={routes.knowledgeNisaLimits} element={<NisaLimitsArticlePage />} />
+        <Route path={routes.knowledgeMortgageComparison} element={<MortgageComparisonArticlePage />} />
         <Route path={routes.about} element={<AboutPage />} />
         <Route path={routes.trust} element={<TrustPage />} />
         <Route path="*" element={<NotFoundPage />} />

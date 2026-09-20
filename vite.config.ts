@@ -8,6 +8,11 @@ import {
   routeSeoEntries,
 } from './src/app/seo.ts'
 import { injectSeoHead } from './src/app/seoMarkup.ts'
+import { injectStaticPageContent } from './src/app/seoMarkup.ts'
+import {
+  notFoundStaticPageContent,
+  staticPageContentByPath,
+} from './src/app/staticPageContent.ts'
 
 function staticSeoPages(): Plugin {
   let resolvedConfig: ResolvedConfig
@@ -22,11 +27,11 @@ function staticSeoPages(): Plugin {
       const homeMetadata = routeSeoEntries.find(({ path }) => path === '/')
       if (!homeMetadata) throw new Error('Home SEO metadata is missing')
 
-      return injectSeoHead(
+      return injectStaticPageContent(injectSeoHead(
         html,
         homeMetadata,
         getRouteStructuredData(homeMetadata.path),
-      )
+      ), staticPageContentByPath[homeMetadata.path])
     },
     async closeBundle() {
       const outputDirectory = resolve(
@@ -46,14 +51,24 @@ function staticSeoPages(): Plugin {
           await mkdir(dirname(outputPath), { recursive: true })
           await writeFile(
             outputPath,
-            injectSeoHead(htmlTemplate, metadata),
+            injectStaticPageContent(
+              injectSeoHead(
+                htmlTemplate,
+                metadata,
+                getRouteStructuredData(metadata.path),
+              ),
+              staticPageContentByPath[metadata.path],
+            ),
             'utf8',
           )
         }))
 
       await writeFile(
         resolve(outputDirectory, '404.html'),
-        injectSeoHead(htmlTemplate, notFoundSeo),
+        injectStaticPageContent(
+          injectSeoHead(htmlTemplate, notFoundSeo),
+          notFoundStaticPageContent,
+        ),
         'utf8',
       )
     },

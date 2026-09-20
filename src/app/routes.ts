@@ -6,6 +6,8 @@ export const routes = {
   ideco: '/simulators/ideco',
   taxableIncome: '/simulators/taxable-income',
   knowledge: '/knowledge',
+  knowledgeNisaLimits: '/knowledge/nisa-limits-and-future-value',
+  knowledgeMortgageComparison: '/knowledge/mortgage-comparison',
   about: '/about',
   trust: '/trust',
 } as const

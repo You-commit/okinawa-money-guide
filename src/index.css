@@ -53,6 +53,47 @@ body {
   min-height: 100svh;
 }
 
+.seo-static-page {
+  width: min(100% - 40px, 900px);
+  margin: 0 auto;
+  padding: 64px 0;
+}
+
+.seo-static-page__brand {
+  margin-bottom: 24px;
+  color: var(--omg-color-brand);
+  font-weight: 800;
+}
+
+.seo-static-page h1 {
+  margin: 0 0 18px;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.3;
+}
+
+.seo-static-page h2 {
+  margin: 40px 0 10px;
+  font-size: 1.35rem;
+}
+
+.seo-static-page p {
+  max-width: 760px;
+  color: var(--omg-color-muted);
+  line-height: 1.9;
+}
+
+.seo-static-page nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 36px;
+}
+
+.seo-static-page a {
+  color: var(--omg-color-brand-strong);
+  font-weight: 800;
+}
+
 button,
 input,
 select,

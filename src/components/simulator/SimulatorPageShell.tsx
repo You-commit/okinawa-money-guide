@@ -13,6 +13,7 @@ type SimulatorPageShellProps = {
   benefits: Array<{ title: string; description: string }>
   children: ReactNode
   notes?: ReactNode
+  guide?: ReactNode
 }
 
 function SimulatorPageShell({
@@ -23,6 +24,7 @@ function SimulatorPageShell({
   benefits,
   children,
   notes,
+  guide,
 }: SimulatorPageShellProps) {
   return (
     <SiteLayout className={`dedicated-page simulator-page simulator-page--${theme}`}>
@@ -33,7 +35,7 @@ function SimulatorPageShell({
               <nav className="breadcrumb" aria-label="パンくずリスト">
                 <Link to={routes.home}>ホーム</Link>
                 <span aria-hidden="true">›</span>
-                <span>シミュレーター</span>
+                <span aria-current="page">{title}</span>
               </nav>
               <p className="simulator-page__eyebrow">{eyebrow}</p>
               <h1>{title}</h1>
@@ -57,6 +59,7 @@ function SimulatorPageShell({
         <div className="simulator-page__main">
           <div className="simulator-page__calculator">{children}</div>
           {notes ? <div className="simulator-page__notes">{notes}</div> : null}
+          {guide ? <div className="simulator-page__editorial">{guide}</div> : null}
         </div>
       </main>
     </SiteLayout>

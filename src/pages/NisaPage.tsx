@@ -2,6 +2,7 @@ import NisaCalculator from '../NisaCalculator'
 import NisaAffiliatePlacementController from '../components/affiliate/NisaAffiliatePlacementController'
 import SimulatorNotes from '../components/simulator/SimulatorNotes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
+import { NisaEditorialGuide } from '../components/simulator/SimulatorEditorialGuides'
 
 function NisaPage() {
   return (
@@ -30,6 +31,7 @@ function NisaPage() {
           />
         </>
       )}
+      guide={<NisaEditorialGuide />}
     >
       <NisaCalculator />
     </SimulatorPageShell>
