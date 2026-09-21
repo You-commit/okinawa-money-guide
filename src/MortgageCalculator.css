@@ -1669,26 +1669,60 @@
         padding: 12px;
     }
 
+    .mortgage-trajectories-section > header,
     .mortgage-trajectory-card > header {
         align-items: flex-start;
         flex-direction: column;
         gap: 6px;
     }
 
+    .mortgage-trajectories-section > header span,
     .mortgage-trajectory-card > header span {
         width: 100%;
+    }
+
+    .mortgage-trajectory-card {
+        overflow: hidden;
+    }
+
+    .mortgage-trajectory-card > header span {
         flex-wrap: wrap;
         gap: 5px;
     }
 
     .mortgage-trajectory {
+        align-items: stretch;
         gap: 1px;
+        height: 174px;
+        min-height: 174px;
         margin-top: 12px;
-        padding-top: 10px;
+        padding-top: 8px;
+        overflow: hidden;
+    }
+
+    .mortgage-trajectory__point {
+        height: 100%;
+        grid-template-rows: 144px 22px;
+        align-items: stretch;
     }
 
     .mortgage-trajectory__point > span {
         display: none;
+    }
+
+    .mortgage-trajectory__plot {
+        height: 144px;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .mortgage-trajectory__plot > i {
+        max-height: 100%;
+    }
+
+    .mortgage-trajectory__point > small {
+        align-self: end;
+        line-height: 1.2;
     }
 }
 
