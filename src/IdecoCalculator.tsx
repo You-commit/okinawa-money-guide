@@ -139,6 +139,21 @@ const formatYen = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value)
 
+const formatIdecoGraphAxisYen = (value: number) => {
+  if (value === 0) return '0'
+
+  if (Math.abs(value) >= 100_000_000) {
+    const oku = roundHalfUp(value / 10_000_000) / 10
+    return `${oku.toLocaleString('ja-JP', { maximumFractionDigits: 1 })}億円`
+  }
+
+  if (Math.abs(value) >= 10_000) {
+    return `${roundHalfUp(value / 10_000).toLocaleString('ja-JP')}万円`
+  }
+
+  return `${roundHalfUp(value).toLocaleString('ja-JP')}円`
+}
+
 const parseMoneyValue = (value: string) => {
   const digits = getMoneyInputDigits(value)
   return digits === '' ? null : Number(digits)
@@ -494,6 +509,9 @@ function IdecoCalculator({
       contributionLine: contributionPoints.join(' '),
       savingArea: `0,${bottom} ${savingPoints.join(' ')} ${width},${bottom}`,
       savingLine: savingPoints.join(' '),
+      yAxisValues: [1, 0.75, 0.5, 0.25, 0].map(
+        (ratio) => longTermDisplayMax * ratio,
+      ),
     }
   }, [idecoTrajectory, longTermDisplayMax])
 
@@ -1676,23 +1694,33 @@ function IdecoCalculator({
                     <span><i />掛金累計</span>
                     <span><i />節税額累計</span>
                   </div>
-                  <div className="ideco-area-graph" aria-label="掛金累計と期間中の節税額推移グラフ">
-                    <svg viewBox="0 0 600 200" role="img" aria-hidden="true" preserveAspectRatio="none">
-                      <g className="ideco-area-graph__grid">
-                        <line x1="0" y1="30" x2="600" y2="30" />
-                        <line x1="0" y1="80" x2="600" y2="80" />
-                        <line x1="0" y1="130" x2="600" y2="130" />
-                        <line x1="0" y1="180" x2="600" y2="180" />
-                      </g>
-                      <polygon className="ideco-area-graph__contribution" points={idecoAreaGraph.contributionArea} />
-                      <polygon className="ideco-area-graph__saving" points={idecoAreaGraph.savingArea} />
-                      <polyline className="ideco-area-graph__contribution-line" points={idecoAreaGraph.contributionLine} />
-                      <polyline className="ideco-area-graph__saving-line" points={idecoAreaGraph.savingLine} />
-                    </svg>
-                    <div className="ideco-area-graph__labels" aria-hidden="true">
-                      {idecoTrajectory.map((point) => (
-                        <span key={point.ratio}>{point.label}</span>
-                      ))}
+                  <div className="ideco-area-graph" aria-label="掛金累計と期間中の節税額推移グラフ。縦軸は金額。">
+                    <div className="ideco-area-graph__canvas">
+                      <div className="ideco-area-graph__y-axis" aria-hidden="true">
+                        {idecoAreaGraph.yAxisValues.map((value, index) => (
+                          <span key={`${index}-${value}`}>{formatIdecoGraphAxisYen(value)}</span>
+                        ))}
+                      </div>
+                      <div className="ideco-area-graph__plot">
+                        <svg viewBox="0 0 600 200" role="img" aria-hidden="true" preserveAspectRatio="none">
+                          <g className="ideco-area-graph__grid">
+                            <line x1="0" y1="30" x2="600" y2="30" />
+                            <line x1="0" y1="67.5" x2="600" y2="67.5" />
+                            <line x1="0" y1="105" x2="600" y2="105" />
+                            <line x1="0" y1="142.5" x2="600" y2="142.5" />
+                            <line x1="0" y1="180" x2="600" y2="180" />
+                          </g>
+                          <polygon className="ideco-area-graph__contribution" points={idecoAreaGraph.contributionArea} />
+                          <polygon className="ideco-area-graph__saving" points={idecoAreaGraph.savingArea} />
+                          <polyline className="ideco-area-graph__contribution-line" points={idecoAreaGraph.contributionLine} />
+                          <polyline className="ideco-area-graph__saving-line" points={idecoAreaGraph.savingLine} />
+                        </svg>
+                        <div className="ideco-area-graph__labels" aria-hidden="true">
+                          {idecoTrajectory.map((point) => (
+                            <span key={point.ratio}>{point.label}</span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <p className="ideco-trajectory-note">掛金累計には運用益を含みません。</p>
