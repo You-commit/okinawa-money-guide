@@ -1669,8 +1669,22 @@
         padding: 12px;
     }
 
+    .mortgage-trajectory-card > header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .mortgage-trajectory-card > header span {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
     .mortgage-trajectory {
         gap: 1px;
+        margin-top: 12px;
+        padding-top: 10px;
     }
 
     .mortgage-trajectory__point > span {
