@@ -76,10 +76,52 @@ type MortgageTrajectoryChartProps = {
   tone: 'blue' | 'green'
   points: MortgageTrajectoryPoint[]
   paymentCount: number
+  scaleMax: number
+  scaleTicks: number[]
 }
 
 const formatMortgageChartYen = (value: number) =>
   `${Math.round(value / 10_000).toLocaleString('ja-JP')}万円`
+
+const getMortgageTrajectoryTotal = (point: MortgageTrajectoryPoint) =>
+  point.cumulativePrincipal + point.cumulativeInterest
+
+const createMortgageTrajectoryScale = (
+  trajectories: MortgageTrajectoryPoint[][],
+) => {
+  const maxTotal = Math.max(
+    1,
+    ...trajectories.flatMap((points) =>
+      points.map(getMortgageTrajectoryTotal),
+    ),
+  )
+  const maxManYen = maxTotal / 10_000
+  const rawStep = Math.max(1, maxManYen / 4)
+  const magnitude = 10 ** Math.floor(Math.log10(rawStep))
+  const normalized = rawStep / magnitude
+  const niceMultiplier =
+    normalized <= 1
+      ? 1
+      : normalized <= 2
+        ? 2
+        : normalized <= 5
+          ? 5
+          : 10
+  const stepManYen = niceMultiplier * magnitude
+  const intervalCount = Math.max(
+    1,
+    Math.ceil(maxManYen / stepManYen),
+  )
+  const scaleMaxManYen = intervalCount * stepManYen
+  const scaleMax = scaleMaxManYen * 10_000
+  const scaleTicks = Array.from(
+    { length: intervalCount + 1 },
+    (_, index) =>
+      (scaleMaxManYen - stepManYen * index) * 10_000,
+  )
+
+  return { scaleMax, scaleTicks }
+}
 
 const formatMortgageDifferenceYen = (value: number) => {
   const absoluteDifference = Math.abs(value)
@@ -94,14 +136,15 @@ function MortgageTrajectoryChart({
   tone,
   points,
   paymentCount,
+  scaleMax,
+  scaleTicks,
 }: MortgageTrajectoryChartProps) {
-  const maxTotal = Math.max(
-    1,
-    ...points.map(
-      (point) =>
-        point.cumulativePrincipal + point.cumulativeInterest,
-    ),
+  const finalPoint = points.find(
+    (point) => point.paymentNumber === paymentCount,
   )
+  const finalTotal = finalPoint
+    ? getMortgageTrajectoryTotal(finalPoint)
+    : 0
 
   return (
     <article
@@ -116,16 +159,23 @@ function MortgageTrajectoryChart({
           <i className="mortgage-trajectory-legend__interest" />
           利息
         </span>
+        <strong className="mortgage-trajectory-card__total">
+          完済時 {formatMortgageChartYen(finalTotal)}
+        </strong>
       </header>
-      <div
-        className="mortgage-trajectory"
-        aria-label={`${title}の元金と利息の累計推移`}
-      >
+      <div className="mortgage-trajectory-frame">
+        <div className="mortgage-trajectory__axis" aria-hidden="true">
+          {scaleTicks.map((tick) => (
+            <span key={tick}>{formatMortgageChartYen(tick)}</span>
+          ))}
+        </div>
+        <div
+          className="mortgage-trajectory"
+          aria-label={`${title}の元金と利息の累計推移。縦軸は累計返済額。`}
+        >
         {points.map((point) => {
-          const total =
-            point.cumulativePrincipal +
-            point.cumulativeInterest
-          const totalHeight = total / maxTotal * 100
+          const total = getMortgageTrajectoryTotal(point)
+          const totalHeight = total / scaleMax * 100
           const interestRatio =
             total > 0
               ? point.cumulativeInterest / total * 100
@@ -156,6 +206,7 @@ function MortgageTrajectoryChart({
             </div>
           )
         })}
+        </div>
       </div>
     </article>
   )
@@ -696,9 +747,16 @@ function MortgageCalculator() {
       return null
     }
 
+    const scale = createMortgageTrajectoryScale([
+      equalPayment.points,
+      equalPrincipal.points,
+    ])
+
     return {
       equalPayment: equalPayment.points,
       equalPrincipal: equalPrincipal.points,
+      scaleMax: scale.scaleMax,
+      scaleTicks: scale.scaleTicks,
     }
   }, [activeCalculation])
 
@@ -1616,12 +1674,16 @@ function MortgageCalculator() {
                       tone="blue"
                       points={mortgageTrajectories.equalPayment}
                       paymentCount={activeCalculation.input.paymentCount}
+                      scaleMax={mortgageTrajectories.scaleMax}
+                      scaleTicks={mortgageTrajectories.scaleTicks}
                     />
                     <MortgageTrajectoryChart
                       title="元金均等返済"
                       tone="green"
                       points={mortgageTrajectories.equalPrincipal}
                       paymentCount={activeCalculation.input.paymentCount}
+                      scaleMax={mortgageTrajectories.scaleMax}
+                      scaleTicks={mortgageTrajectories.scaleTicks}
                     />
                   </div>
                   <aside
@@ -1630,9 +1692,9 @@ function MortgageCalculator() {
                   >
                     <strong>グラフの見方</strong>
                     <p>
-                      濃色は累計元金、淡色は累計利息です。
-                      各時点までの返済内訳の積み上がりを示し、
-                      元利均等と元金均等の違いを比較できます。
+                      縦軸は累計返済額、濃色は累計元金、淡色は累計利息です。
+                      2つの返済方式は同じ金額スケールで表示しているため、
+                      各時点までの返済総額と内訳を比較できます。
                       金融機関固有の端数処理などを
                       完全に再現するものではありません。
                     </p>
