@@ -980,6 +980,18 @@
         grid-template-columns: 1fr;
     }
 
+    .mortgage-consultation-summary__section dl > div {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .mortgage-consultation-summary__section dd {
+        max-width: 100%;
+        text-align: left;
+        overflow-wrap: normal;
+        word-break: normal;
+    }
+
     .mortgage-consultation-summary__section ul {
         columns: 1;
     }
