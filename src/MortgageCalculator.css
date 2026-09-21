@@ -2139,17 +2139,17 @@
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-trajectory {
-        min-height: 156px;
+        min-height: 400px;
         margin-top: 6px;
         padding-top: 7px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-trajectory__point {
-        grid-template-rows: 14px 116px 15px;
+        grid-template-rows: 18px 360px 18px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-trajectory__plot {
-        height: 116px;
+        height: 360px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-results__condition-heading--compact {
