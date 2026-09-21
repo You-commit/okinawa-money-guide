@@ -2162,7 +2162,8 @@
   font-size: 0.76rem;
   font-weight: 850;
   font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .ideco-detailed-tax-breakdown > p {
@@ -2522,6 +2523,18 @@
   .ideco-detailed-tax-breakdown dl,
   .ideco-consultation-summary__section dl {
     grid-template-columns: 1fr;
+  }
+
+  .ideco-consultation-summary__section dl > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .ideco-consultation-summary__section dd {
+    max-width: 100%;
+    text-align: left;
+    overflow-wrap: normal;
+    word-break: normal;
   }
 
   .ideco-consultation-summary {
@@ -4643,11 +4656,18 @@
 
   .simulator-page--military .simulator-page__hero-copy h1 {
     font-size: clamp(1.55rem, 7vw, 1.9rem);
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
   .military-loan-choice {
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .military-loan-choice legend {
+    grid-column: 1 / -1;
+    float: none;
+    width: 100%;
   }
 
   .military-income-breakdown,

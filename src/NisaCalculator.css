@@ -83,7 +83,8 @@
 }
 
 .nisa-mode-selector button strong {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
   font-size: 0.84rem;
   line-height: 1.45;
 }
@@ -433,8 +434,9 @@
 }
 
 .nisa-result-grid .result-card strong {
-  overflow-wrap: anywhere;
-  white-space: normal;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  white-space: nowrap;
 }
 
 .nisa-inflation-card {
@@ -847,7 +849,9 @@
   font-size: 0.68rem;
   font-weight: 800;
   text-align: right;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1363,6 +1367,18 @@
 
   .nisa-consultation-summary__section dl {
     grid-template-columns: 1fr;
+  }
+
+  .nisa-consultation-summary__section dl > div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .nisa-consultation-summary__section dd {
+    max-width: 100%;
+    text-align: left;
+    overflow-wrap: normal;
+    word-break: normal;
   }
 
   .nisa-consultation-summary__section ul {
