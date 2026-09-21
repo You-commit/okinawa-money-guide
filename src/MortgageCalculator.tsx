@@ -102,6 +102,12 @@ function MortgageTrajectoryChart({
         point.cumulativePrincipal + point.cumulativeInterest,
     ),
   )
+  const finalPoint = points.find(
+    (point) => point.paymentNumber === paymentCount,
+  )
+  const finalTotal = finalPoint
+    ? finalPoint.cumulativePrincipal + finalPoint.cumulativeInterest
+    : 0
 
   return (
     <article
@@ -116,6 +122,9 @@ function MortgageTrajectoryChart({
           <i className="mortgage-trajectory-legend__interest" />
           利息
         </span>
+        <strong className="mortgage-trajectory-card__total">
+          完済時 {formatMortgageChartBarYen(finalTotal)}
+        </strong>
       </header>
       <div
         className="mortgage-trajectory"
