@@ -1544,9 +1544,9 @@
 
 .mortgage-trajectory-card > header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .mortgage-trajectory-card h4 {
@@ -1564,6 +1564,13 @@
     gap: 4px;
     color: #65798d;
     font-size: 0.58rem;
+}
+
+.mortgage-trajectory-card__total {
+    color: #405b70;
+    font-size: 0.64rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
 }
 
 .mortgage-trajectory-card > header i {
@@ -1673,8 +1680,7 @@
         padding: 12px;
     }
 
-    .mortgage-trajectories-section > header,
-    .mortgage-trajectory-card > header {
+    .mortgage-trajectories-section > header {
         align-items: flex-start;
         flex-direction: column;
         gap: 6px;
