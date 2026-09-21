@@ -1594,12 +1594,20 @@
     font-variant-numeric: tabular-nums;
 }
 
+.mortgage-trajectory-unit {
+    margin-top: 8px;
+    color: #718393;
+    font-size: 0.52rem;
+    font-weight: 750;
+    text-align: right;
+}
+
 .mortgage-trajectory-frame {
     display: grid;
     grid-template-columns: 48px minmax(0, 1fr);
     align-items: stretch;
     gap: 6px;
-    margin-top: 9px;
+    margin-top: 3px;
 }
 
 .mortgage-trajectory__axis {
@@ -1646,6 +1654,12 @@
     font-size: 0.52rem;
     font-weight: 700;
     white-space: nowrap;
+}
+
+.mortgage-trajectory__value {
+    align-self: end;
+    color: #405b70;
+    font-variant-numeric: tabular-nums;
 }
 
 .mortgage-trajectory__plot {
@@ -1725,10 +1739,15 @@
         gap: 5px;
     }
 
+    .mortgage-trajectory-unit {
+        margin-top: 7px;
+        font-size: 0.48rem;
+    }
+
     .mortgage-trajectory-frame {
         grid-template-columns: 43px minmax(0, 1fr);
         gap: 5px;
-        margin-top: 12px;
+        margin-top: 3px;
     }
 
     .mortgage-trajectory__axis {
@@ -1751,16 +1770,21 @@
 
     .mortgage-trajectory__point {
         height: 100%;
-        grid-template-rows: 144px 22px;
+        grid-template-rows: 18px 126px 22px;
         align-items: stretch;
     }
 
-    .mortgage-trajectory__point > span {
-        display: none;
+    .mortgage-trajectory__value {
+        display: block;
+        align-self: end;
+        overflow: visible;
+        font-size: 0.43rem;
+        line-height: 1;
+        letter-spacing: -0.02em;
     }
 
     .mortgage-trajectory__plot {
-        height: 144px;
+        height: 126px;
         min-height: 0;
         overflow: hidden;
     }
