@@ -1597,7 +1597,7 @@
     grid-template-columns: repeat(7, minmax(0, 1fr));
     align-items: end;
     gap: 3px;
-    min-height: 400px;
+    min-height: 230px;
     margin-top: 9px;
     padding-top: 12px;
     background: repeating-linear-gradient(to bottom, transparent 0 38px, #e8eef5 39px 40px);
@@ -1605,7 +1605,7 @@
 
 .mortgage-trajectory__point {
     display: grid;
-    grid-template-rows: 18px 360px 18px;
+    grid-template-rows: 18px 190px 18px;
     align-items: end;
     min-width: 0;
     text-align: center;
@@ -1628,7 +1628,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    height: 360px;
+    height: 190px;
 }
 
 .mortgage-trajectory__plot > i {
@@ -1704,8 +1704,8 @@
     .mortgage-trajectory {
         align-items: stretch;
         gap: 1px;
-        height: 408px;
-        min-height: 408px;
+        height: 252px;
+        min-height: 252px;
         margin-top: 12px;
         padding-top: 8px;
         overflow: hidden;
@@ -1713,7 +1713,7 @@
 
     .mortgage-trajectory__point {
         height: 100%;
-        grid-template-rows: 18px 364px 24px;
+        grid-template-rows: 18px 210px 24px;
         align-items: stretch;
     }
 
@@ -1727,7 +1727,7 @@
     }
 
     .mortgage-trajectory__plot {
-        height: 364px;
+        height: 210px;
         min-height: 0;
         overflow: hidden;
     }
@@ -2139,17 +2139,17 @@
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-trajectory {
-        min-height: 400px;
+        min-height: 230px;
         margin-top: 6px;
         padding-top: 7px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-trajectory__point {
-        grid-template-rows: 18px 360px 18px;
+        grid-template-rows: 18px 190px 18px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-trajectory__plot {
-        height: 360px;
+        height: 190px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-results__condition-heading--compact {
