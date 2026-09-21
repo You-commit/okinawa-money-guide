@@ -78,6 +78,9 @@ type MortgageTrajectoryChartProps = {
   paymentCount: number
 }
 
+const formatMortgageChartYen = (value: number) =>
+  `${Math.round(value / 10_000).toLocaleString('ja-JP')}万円`
+
 const formatMortgageChartBarYen = (value: number) =>
   `${Math.round(value / 10_000).toLocaleString('ja-JP')}万`
 
@@ -123,7 +126,7 @@ function MortgageTrajectoryChart({
           利息
         </span>
         <strong className="mortgage-trajectory-card__total">
-          完済時 {formatMortgageChartBarYen(finalTotal)}
+          完済時 {formatMortgageChartYen(finalTotal)}
         </strong>
       </header>
       <div
