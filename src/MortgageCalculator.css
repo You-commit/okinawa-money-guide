@@ -1544,9 +1544,9 @@
 
 .mortgage-trajectory-card > header {
     display: flex;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 5px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 .mortgage-trajectory-card h4 {
@@ -1680,7 +1680,8 @@
         padding: 12px;
     }
 
-    .mortgage-trajectories-section > header {
+    .mortgage-trajectories-section > header,
+    .mortgage-trajectory-card > header {
         align-items: flex-start;
         flex-direction: column;
         gap: 6px;
