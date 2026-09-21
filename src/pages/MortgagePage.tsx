@@ -1,6 +1,7 @@
 import MortgageCalculator from '../MortgageCalculator'
 import SimulatorNotes from '../components/simulator/SimulatorNotes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
+import { MortgageEditorialGuide } from '../components/simulator/SimulatorEditorialGuides'
 
 function MortgagePage() {
   return (
@@ -15,6 +16,7 @@ function MortgagePage() {
         { title: '結果をグラフで確認', description: '返済総額や差額を一目で把握' },
       ]}
       notes={<SimulatorNotes knowledgeTitle="住宅ローンの基本を知る" knowledgeItems={['返済方式の違い', '金利と返済期間', '無理のない借入条件']} />}
+      guide={<MortgageEditorialGuide />}
     >
       <MortgageCalculator />
     </SimulatorPageShell>

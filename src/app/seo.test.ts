@@ -14,14 +14,16 @@ import {
   websiteStructuredData,
 } from './seo'
 import { injectSeoHead } from './seoMarkup'
+import { injectStaticPageContent } from './seoMarkup'
+import { staticPageContentByPath } from './staticPageContent'
 
 const expectedRoutes = Object.values(routes)
 
 describe('technical SEO source of truth', () => {
-  it('defines complete, indexable metadata for exactly the nine formal routes', () => {
-    expect(routeSeoEntries).toHaveLength(9)
+  it('defines complete, indexable metadata for the formal routes and articles', () => {
+    expect(routeSeoEntries).toHaveLength(11)
     expect(routeSeoEntries.map(({ path }) => path)).toEqual(expectedRoutes)
-    expect(new Set(routeSeoEntries.map(({ path }) => path)).size).toBe(9)
+    expect(new Set(routeSeoEntries.map(({ path }) => path)).size).toBe(11)
 
     for (const metadata of routeSeoEntries) {
       expect(metadata.title).not.toBe('')
@@ -32,7 +34,7 @@ describe('technical SEO source of truth', () => {
         title: metadata.title,
         description: metadata.description,
         url: metadata.canonical,
-        type: 'website',
+        type: metadata.article ? 'article' : 'website',
         siteName,
         locale: 'ja_JP',
       }))
@@ -73,6 +75,39 @@ describe('technical SEO source of truth', () => {
     }
   })
 
+  it('does not publish article dates before the articles are released', () => {
+    for (const path of [
+      routes.knowledgeNisaLimits,
+      routes.knowledgeMortgageComparison,
+    ]) {
+      const metadata = getRouteSeo(path)!
+      const html = injectSeoHead(
+        indexTemplate,
+        metadata,
+        getRouteStructuredData(path),
+      )
+
+      expect(metadata.article).toEqual({})
+      expect(html).not.toContain('article:published_time')
+      expect(html).not.toContain('article:modified_time')
+      expect(html).not.toContain('datePublished')
+      expect(html).not.toContain('dateModified')
+    }
+
+    expect(sitemapXml).not.toContain('<lastmod>')
+  })
+
+  it('renders truthful visible fallback content for JavaScript-disabled access', () => {
+    for (const metadata of routeSeoEntries) {
+      const content = staticPageContentByPath[metadata.path]
+      const html = injectStaticPageContent(indexTemplate, content)
+
+      expect(html).toContain('data-static-page')
+      expect(html).toContain(`<h1>${content.heading}</h1>`)
+      expect(html).toContain(content.intro)
+    }
+  })
+
   it('renders a noindex 404 document without canonical or social metadata', () => {
     const html = injectSeoHead(indexTemplate, notFoundSeo)
 
@@ -83,9 +118,30 @@ describe('technical SEO source of truth', () => {
     expect(html).not.toContain('name="twitter:')
   })
 
-  it('uses only factual WebSite structured data on the homepage', () => {
+  it('uses factual WebSite, WebPage, Article, and breadcrumb structured data', () => {
     expect(getRouteStructuredData(routes.home)).toEqual(websiteStructuredData)
-    expect(getRouteStructuredData(routes.mortgage)).toBeUndefined()
+    expect(getRouteStructuredData(routes.mortgage)).toEqual(expect.objectContaining({
+      '@context': 'https://schema.org',
+      '@graph': expect.arrayContaining([
+        expect.objectContaining({ '@type': 'WebPage' }),
+        expect.objectContaining({ '@type': 'BreadcrumbList' }),
+      ]),
+    }))
+    expect(getRouteStructuredData(routes.knowledgeNisaLimits)).toEqual(expect.objectContaining({
+      '@graph': expect.arrayContaining([
+        expect.objectContaining({
+          '@type': 'Article',
+        }),
+        expect.objectContaining({ '@type': 'BreadcrumbList' }),
+      ]),
+    }))
+    const articleStructuredData = getRouteStructuredData(routes.knowledgeNisaLimits)
+    if (!articleStructuredData || !('@graph' in articleStructuredData)) {
+      throw new Error('Article structured data is missing')
+    }
+    const article = articleStructuredData['@graph'][0]
+    expect(article).not.toHaveProperty('datePublished')
+    expect(article).not.toHaveProperty('dateModified')
     expect(websiteStructuredData).toEqual({
       '@context': 'https://schema.org',
       '@type': 'WebSite',
@@ -101,7 +157,7 @@ describe('technical SEO source of truth', () => {
     expect(sitemapUrls).toEqual(
       routeSeoEntries.map(({ canonical }) => canonical),
     )
-    expect(new Set(sitemapUrls).size).toBe(9)
+    expect(new Set(sitemapUrls).size).toBe(11)
   })
 
   it('keeps robots.txt indexable and points to the canonical sitemap', () => {

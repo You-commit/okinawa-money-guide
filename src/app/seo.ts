@@ -13,7 +13,7 @@ export type RouteSeo = {
     title: string
     description: string
     url: string
-    type: 'website'
+    type: 'website' | 'article'
     siteName: string
     locale: 'ja_JP'
   }
@@ -22,12 +22,17 @@ export type RouteSeo = {
     title: string
     description: string
   }
+  article?: {
+    publishedAt?: string
+    modifiedAt?: string
+  }
 }
 
 type RouteSeoInput = {
   path: string
   title: string
   description: string
+  article?: RouteSeo['article']
 }
 
 const routeSeoInputs: RouteSeoInput[] = [
@@ -67,6 +72,18 @@ const routeSeoInputs: RouteSeoInput[] = [
     description: '借りる・貯める・増やす・備えるの目的から、基礎知識と無料シミュレーターを探せます。',
   },
   {
+    path: routes.knowledgeNisaLimits,
+    title: `NISAの非課税枠と積立額・将来額の考え方 | ${siteName}`,
+    description: 'NISAの年間投資枠、非課税保有限度額、毎月の積立額、将来資産額の違いを、金融庁の一次資料を基に分かりやすく整理します。',
+    article: {},
+  },
+  {
+    path: routes.knowledgeMortgageComparison,
+    title: `住宅ローン比較で見るべき項目 | ${siteName}`,
+    description: '元利均等・元金均等、金利、総返済額、事務手数料、保証料、登記費用、団信など、住宅ローン比較の確認順序を整理します。',
+    article: {},
+  },
+  {
     path: routes.about,
     title: `このサイトについて | ${siteName}`,
     description: '沖縄マネーガイドの目的、対象、情報とシミュレーターの読み方をご案内します。',
@@ -78,7 +95,7 @@ const routeSeoInputs: RouteSeoInput[] = [
   },
 ]
 
-function createRouteSeo({ path, title, description }: RouteSeoInput): RouteSeo {
+function createRouteSeo({ path, title, description, article }: RouteSeoInput): RouteSeo {
   const canonical = `${canonicalOrigin}${path}`
 
   return {
@@ -91,7 +108,7 @@ function createRouteSeo({ path, title, description }: RouteSeoInput): RouteSeo {
       title,
       description,
       url: canonical,
-      type: 'website',
+      type: article ? 'article' : 'website',
       siteName,
       locale: 'ja_JP',
     },
@@ -100,6 +117,7 @@ function createRouteSeo({ path, title, description }: RouteSeoInput): RouteSeo {
       title,
       description,
     },
+    article,
   }
 }
 
@@ -135,7 +153,52 @@ export function getRouteSeo(value: string) {
 }
 
 export function getRouteStructuredData(value: string) {
-  return normalizePathname(value) === routes.home
-    ? websiteStructuredData
-    : undefined
+  const pathname = normalizePathname(value)
+  if (pathname === routes.home) return websiteStructuredData
+
+  const metadata = routeSeoByPath.get(pathname)
+  if (!metadata) return undefined
+
+  const pageName = metadata.title.replace(` | ${siteName}`, '')
+  const webPage = {
+    '@type': metadata.article ? 'Article' : 'WebPage',
+    name: pageName,
+    description: metadata.description,
+    url: metadata.canonical,
+    ...(metadata.article
+      ? {
+          headline: pageName,
+          mainEntityOfPage: metadata.canonical,
+          ...(metadata.article.publishedAt
+            ? { datePublished: metadata.article.publishedAt }
+            : {}),
+          ...(metadata.article.modifiedAt
+            ? { dateModified: metadata.article.modifiedAt }
+            : {}),
+        }
+      : {}),
+  }
+
+  const isBreadcrumbPage = pathname.startsWith('/simulators/')
+    || pathname.startsWith('/knowledge/')
+  const breadcrumbItems = pathname.startsWith('/knowledge/')
+    ? [
+        { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${canonicalOrigin}/` },
+        { '@type': 'ListItem', position: 2, name: 'お金の知識', item: `${canonicalOrigin}${routes.knowledge}` },
+        { '@type': 'ListItem', position: 3, name: pageName, item: metadata.canonical },
+      ]
+    : [
+        { '@type': 'ListItem', position: 1, name: 'ホーム', item: `${canonicalOrigin}/` },
+        { '@type': 'ListItem', position: 2, name: pageName, item: metadata.canonical },
+      ]
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      webPage,
+      ...(isBreadcrumbPage
+        ? [{ '@type': 'BreadcrumbList', itemListElement: breadcrumbItems }]
+        : []),
+    ],
+  }
 }

@@ -82,6 +82,16 @@ function RouteEffects() {
       updateMeta('twitter:card', current.twitter.card)
       updateMeta('twitter:title', current.twitter.title)
       updateMeta('twitter:description', current.twitter.description)
+      if (current.article?.publishedAt) {
+        updatePropertyMeta('article:published_time', current.article.publishedAt)
+      } else {
+        removeMeta('meta[property="article:published_time"]')
+      }
+      if (current.article?.modifiedAt) {
+        updatePropertyMeta('article:modified_time', current.article.modifiedAt)
+      } else {
+        removeMeta('meta[property="article:modified_time"]')
+      }
     } else {
       for (const property of [
         'og:title',
@@ -90,6 +100,8 @@ function RouteEffects() {
         'og:type',
         'og:site_name',
         'og:locale',
+        'article:published_time',
+        'article:modified_time',
       ]) {
         removeMeta(`meta[property="${property}"]`)
       }

@@ -44,12 +44,52 @@ describe('dedicated page routing', () => {
     ['/simulators/ideco', 'iDeCo節税シミュレーター'],
     ['/simulators/taxable-income', '課税所得・所得税率シミュレーター'],
     ['/knowledge', '今の目的から、知るべきお金のことへ'],
+    ['/knowledge/nisa-limits-and-future-value', 'NISAの非課税枠と、積立額・将来額の考え方'],
+    ['/knowledge/mortgage-comparison', '住宅ローン比較で見るべき項目'],
     ['/about', '沖縄のお金の判断を、落ち着いて整理できる場所へ'],
     ['/trust', '判断材料を届けるための、情報と運営の方針'],
   ])('renders %s as a dedicated route', (path, heading) => {
     renderAt(path)
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeTruthy()
     expect(document.querySelectorAll('h1')).toHaveLength(1)
+  })
+
+  it('connects the knowledge hub, articles, and simulators in both directions', () => {
+    renderAt('/knowledge')
+    expect(screen.getAllByRole('link', {
+      name: /NISAの非課税枠と、積立額・将来額の考え方|NISAの非課税枠と積立額/,
+    }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', {
+      name: /住宅ローン比較で見るべき項目/,
+    }).length).toBeGreaterThan(0)
+
+    cleanup()
+    renderAt('/knowledge/nisa-limits-and-future-value')
+    expect(screen.getByRole('link', {
+      name: /NISAシミュレーターで積立額と期間を試算する/,
+    }).getAttribute('href')).toBe('/simulators/nisa')
+
+    cleanup()
+    renderAt('/simulators/mortgage')
+    expect(screen.getByRole('link', {
+      name: /住宅ローン比較の記事を読む/,
+    }).getAttribute('href')).toBe('/knowledge/mortgage-comparison')
+  })
+
+  it('renders article-specific takeaways and primary-source links without unpublished dates', () => {
+    renderAt('/knowledge/nisa-limits-and-future-value')
+    expect(screen.getByRole('heading', { name: 'この記事で分かること' })).toBeTruthy()
+    expect(screen.queryByText('公開日')).toBeNull()
+    expect(screen.queryByText('更新日')).toBeNull()
+    expect(screen.queryByText('制度・情報の基準日')).toBeNull()
+    expect(screen.getAllByRole('link', { name: /NISAを知る|NISAに関するよくある質問/ })).toHaveLength(2)
+
+    cleanup()
+    renderAt('/knowledge/mortgage-comparison')
+    expect(screen.getByRole('heading', { name: 'この記事で分かること' })).toBeTruthy()
+    expect(screen.queryByText('公開日')).toBeNull()
+    expect(screen.getByRole('region', { name: '住宅ローン返済方式の比較' })).toBeTruthy()
+    expect(screen.getAllByRole('link', { name: /元利均等返済・元金均等返済|借入希望金額から返済額を計算|住宅ローンの基礎知識・資料/ })).toHaveLength(3)
   })
 
   it('renders a 404 page for an unknown URL', () => {
@@ -94,6 +134,8 @@ describe('dedicated page routing', () => {
     ['/simulators/ideco?incomeTaxRate=10', 'https://okinawamoneyguide.jp/simulators/ideco'],
     ['/simulators/taxable-income', 'https://okinawamoneyguide.jp/simulators/taxable-income'],
     ['/knowledge', 'https://okinawamoneyguide.jp/knowledge'],
+    ['/knowledge/nisa-limits-and-future-value', 'https://okinawamoneyguide.jp/knowledge/nisa-limits-and-future-value'],
+    ['/knowledge/mortgage-comparison', 'https://okinawamoneyguide.jp/knowledge/mortgage-comparison'],
     ['/about', 'https://okinawamoneyguide.jp/about'],
     ['/trust', 'https://okinawamoneyguide.jp/trust'],
   ])('applies complete runtime metadata on %s', (path, canonical) => {

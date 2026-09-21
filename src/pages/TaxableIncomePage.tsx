@@ -2,6 +2,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import TaxableIncomeCalculator from '../TaxableIncomeCalculator'
 import { routes } from '../app/routes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
+import { TaxableIncomeEditorialGuide } from '../components/simulator/SimulatorEditorialGuides'
 import { taxRules2026 } from '../taxRules/2026'
 
 function TaxableIncomePage() {
@@ -60,6 +61,7 @@ function TaxableIncomePage() {
           </p>
         </>
       }
+      guide={<TaxableIncomeEditorialGuide />}
     >
       {shouldReturnToIdeco ? <p className="tax-return-context">計算した所得税率をiDeCoへ反映できます。</p> : null}
       <TaxableIncomeCalculator onApplyIncomeTaxRate={applyRate} />

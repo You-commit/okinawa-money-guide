@@ -6,6 +6,7 @@ import IdecoCalculator, {
 import { routes } from '../app/routes'
 import SimulatorNotes from '../components/simulator/SimulatorNotes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
+import { IdecoEditorialGuide } from '../components/simulator/SimulatorEditorialGuides'
 
 const allowedIncomeTaxRates = [0, 5, 10, 20, 23, 33, 40, 45] as const
 
@@ -60,6 +61,7 @@ function IdecoPage() {
         { title: '長期効果を整理', description: '積立期間の合計額を表示' },
       ]}
       notes={<SimulatorNotes knowledgeTitle="iDeCoの基礎知識を学ぶ" knowledgeItems={['所得控除の仕組み', '掛金と加入期間', '受取時の税制']} accent="ideco" />}
+      guide={<IdecoEditorialGuide />}
     >
       <IdecoCalculator
         initialIncomeTaxRate={initialIncomeTaxRate}

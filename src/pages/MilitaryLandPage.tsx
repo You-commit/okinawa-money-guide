@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import MilitaryLandCalculator from '../MilitaryLandCalculator'
 import { routes } from '../app/routes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
+import { MilitaryLandEditorialGuide } from '../components/simulator/SimulatorEditorialGuides'
 
 function MilitaryLandPage() {
   return (
@@ -51,6 +52,7 @@ function MilitaryLandPage() {
           </article>
         </>
       )}
+      guide={<MilitaryLandEditorialGuide />}
     >
       <MilitaryLandCalculator />
     </SimulatorPageShell>
