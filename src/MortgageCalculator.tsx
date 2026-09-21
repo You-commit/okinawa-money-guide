@@ -78,9 +78,6 @@ type MortgageTrajectoryChartProps = {
   paymentCount: number
 }
 
-const formatMortgageChartYen = (value: number) =>
-  `${Math.round(value / 10_000).toLocaleString('ja-JP')}万円`
-
 const formatMortgageChartBarYen = (value: number) =>
   `${Math.round(value / 10_000).toLocaleString('ja-JP')}万`
 
