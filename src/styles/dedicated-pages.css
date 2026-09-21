@@ -3641,7 +3641,8 @@
   padding: 5px 4px 0;
 }
 
-.nisa-area-graph__canvas {
+.nisa-area-graph__canvas,
+.ideco-area-graph__canvas {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   align-items: start;
@@ -3649,7 +3650,8 @@
   min-width: 0;
 }
 
-.nisa-area-graph__y-axis {
+.nisa-area-graph__y-axis,
+.ideco-area-graph__y-axis {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -3665,7 +3667,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-.nisa-area-graph__plot {
+.nisa-area-graph__plot,
+.ideco-area-graph__plot {
   position: relative;
   min-width: 0;
 }
@@ -3815,7 +3818,8 @@
     height: 190px;
   }
 
-  .nisa-area-graph__y-axis {
+  .nisa-area-graph__y-axis,
+  .ideco-area-graph__y-axis {
     height: 190px;
     padding-top: 25px;
     font-size: 0.5rem;
