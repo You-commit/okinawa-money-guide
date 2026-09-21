@@ -76,6 +76,7 @@ type MortgageTrajectoryChartProps = {
   tone: 'blue' | 'green'
   points: MortgageTrajectoryPoint[]
   paymentCount: number
+  scaleMax: number
 }
 
 const formatMortgageChartYen = (value: number) =>
@@ -97,14 +98,8 @@ function MortgageTrajectoryChart({
   tone,
   points,
   paymentCount,
+  scaleMax,
 }: MortgageTrajectoryChartProps) {
-  const maxTotal = Math.max(
-    1,
-    ...points.map(
-      (point) =>
-        point.cumulativePrincipal + point.cumulativeInterest,
-    ),
-  )
   const finalPoint = points.find(
     (point) => point.paymentNumber === paymentCount,
   )
@@ -137,7 +132,7 @@ function MortgageTrajectoryChart({
           const total =
             point.cumulativePrincipal +
             point.cumulativeInterest
-          const totalHeight = total / maxTotal * 100
+          const totalHeight = total / scaleMax * 100
           const interestRatio =
             total > 0
               ? point.cumulativeInterest / total * 100
@@ -706,9 +701,20 @@ function MortgageCalculator() {
       return null
     }
 
+    const scaleMax = Math.max(
+      1,
+      ...equalPayment.points.map(
+        (point) => point.cumulativePrincipal + point.cumulativeInterest,
+      ),
+      ...equalPrincipal.points.map(
+        (point) => point.cumulativePrincipal + point.cumulativeInterest,
+      ),
+    )
+
     return {
       equalPayment: equalPayment.points,
       equalPrincipal: equalPrincipal.points,
+      scaleMax,
     }
   }, [activeCalculation])
 
@@ -1626,12 +1632,14 @@ function MortgageCalculator() {
                       tone="blue"
                       points={mortgageTrajectories.equalPayment}
                       paymentCount={activeCalculation.input.paymentCount}
+                      scaleMax={mortgageTrajectories.scaleMax}
                     />
                     <MortgageTrajectoryChart
                       title="元金均等返済"
                       tone="green"
                       points={mortgageTrajectories.equalPrincipal}
                       paymentCount={activeCalculation.input.paymentCount}
+                      scaleMax={mortgageTrajectories.scaleMax}
                     />
                   </div>
                   <aside
