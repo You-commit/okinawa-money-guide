@@ -83,6 +83,9 @@ type MortgageTrajectoryChartProps = {
 const formatMortgageChartYen = (value: number) =>
   `${Math.round(value / 10_000).toLocaleString('ja-JP')}万円`
 
+const formatMortgageChartBarValue = (value: number) =>
+  Math.round(value / 10_000).toLocaleString('ja-JP')
+
 const getMortgageTrajectoryTotal = (point: MortgageTrajectoryPoint) =>
   point.cumulativePrincipal + point.cumulativeInterest
 
@@ -163,6 +166,7 @@ function MortgageTrajectoryChart({
           完済時 {formatMortgageChartYen(finalTotal)}
         </strong>
       </header>
+      <div className="mortgage-trajectory-unit" aria-hidden="true">単位：万円</div>
       <div className="mortgage-trajectory-frame">
         <div className="mortgage-trajectory__axis" aria-hidden="true">
           {scaleTicks.map((tick) => (
@@ -186,10 +190,8 @@ function MortgageTrajectoryChart({
               className="mortgage-trajectory__point"
               key={point.paymentNumber}
             >
-              <span>
-                {point.paymentNumber === paymentCount
-                  ? formatMortgageChartYen(total)
-                  : ''}
+              <span className="mortgage-trajectory__value">
+                {formatMortgageChartBarValue(total)}
               </span>
               <div className="mortgage-trajectory__plot">
                 <i style={{ height: `${totalHeight}%` }}>
