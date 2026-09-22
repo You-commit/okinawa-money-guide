@@ -85,6 +85,28 @@ const formatMortgageChartYen = (value: number) =>
 const formatMortgageChartBarYen = (value: number) =>
   `${Math.round(value / 10_000).toLocaleString('ja-JP')}万`
 
+const formatMortgageChartBarMobileYen = (value: number) =>
+  Math.round(value / 10_000).toLocaleString('ja-JP')
+
+const formatMortgageDifferenceMobileYen = (value: number) => {
+  if (Math.round(value) === 0) {
+    return '0'
+  }
+
+  const sign = value > 0 ? '+' : '−'
+  const absoluteValue = Math.abs(value)
+  const manYen = absoluteValue / 10_000
+  const formatted =
+    manYen < 10
+      ? manYen.toLocaleString('ja-JP', {
+          maximumFractionDigits: 1,
+          minimumFractionDigits: 1,
+        })
+      : Math.round(manYen).toLocaleString('ja-JP')
+
+  return `${sign}${formatted}万`
+}
+
 const createMortgageTrajectoryAxisMax = (value: number) => {
   if (!Number.isFinite(value) || value <= 0) {
     return 10_000
@@ -204,7 +226,7 @@ function MortgageTrajectoryChart({
               <i key={value} />
             ))}
           </div>
-          {points.map((point) => {
+          {points.map((point, index) => {
           const total =
             point.cumulativePrincipal +
             point.cumulativeInterest
@@ -217,9 +239,13 @@ function MortgageTrajectoryChart({
           return (
             <div
               className="mortgage-trajectory__point"
+              data-mobile-label-row={index % 2 === 0 ? 'high' : 'low'}
               key={point.paymentNumber}
             >
-              <span className="mortgage-trajectory__value">
+              <span
+                className="mortgage-trajectory__value"
+                data-mobile-label={formatMortgageChartBarMobileYen(total)}
+              >
                 {formatMortgageChartBarYen(total)}
               </span>
               <div className="mortgage-trajectory__plot">
@@ -289,6 +315,29 @@ function MortgageTrajectoryDifferenceChart({
     -summary.axisMax / 2,
     -summary.axisMax,
   ]
+  const displayedPeakPoint = points.reduce(
+    (currentMax, point) =>
+      point.difference > currentMax.difference ? point : currentMax,
+    points[0],
+  )
+  const lastPositiveBeforeCrossover = summary.crossoverMonth === null
+    ? null
+    : [...points]
+        .reverse()
+        .find(
+          (point) =>
+            point.paymentNumber < summary.crossoverMonth! &&
+            point.difference > 0,
+        ) ?? null
+  const firstNegativePoint = points.find((point) => point.difference < 0) ?? null
+  const nextNegativePoint = firstNegativePoint
+    ? points.find(
+        (point) =>
+          point.paymentNumber > firstNegativePoint.paymentNumber &&
+          point.difference < 0 &&
+          point.paymentNumber < summary.paymentCount,
+      ) ?? null
+    : null
 
   return (
     <article
@@ -389,14 +438,30 @@ function MortgageTrajectoryDifferenceChart({
                   : point.difference < 0
                     ? 'lower'
                     : 'same'
+              const isMobileValueKey =
+                point.paymentNumber === displayedPeakPoint.paymentNumber ||
+                point.paymentNumber === firstNegativePoint?.paymentNumber ||
+                point.paymentNumber === summary.paymentCount
+              const isMobileAxisKey =
+                point.paymentNumber === 0 ||
+                point.paymentNumber === displayedPeakPoint.paymentNumber ||
+                point.paymentNumber === lastPositiveBeforeCrossover?.paymentNumber ||
+                point.paymentNumber === firstNegativePoint?.paymentNumber ||
+                point.paymentNumber === nextNegativePoint?.paymentNumber ||
+                point.paymentNumber === summary.paymentCount
 
               return (
                 <div
                   className="mortgage-trajectory-difference__point"
                   data-direction={direction}
+                  data-mobile-value={isMobileValueKey ? 'show' : 'hide'}
+                  data-mobile-axis={isMobileAxisKey ? 'show' : 'hide'}
                   key={point.paymentNumber}
                 >
-                  <span className="mortgage-trajectory-difference__value">
+                  <span
+                    className="mortgage-trajectory-difference__value"
+                    data-mobile-label={formatMortgageDifferenceMobileYen(point.difference)}
+                  >
                     {formatMortgageDifferenceAxisYen(point.difference)}
                   </span>
                   <div className="mortgage-trajectory-difference__plot" aria-hidden="true">
