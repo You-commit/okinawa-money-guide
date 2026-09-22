@@ -260,12 +260,12 @@ function MortgageTrajectoryDifferenceChart({
           <p>DIFFERENCE</p>
           <h5 id="mortgage-trajectory-difference-title">2方式の累計返済額の差</h5>
         </div>
-        <span>元金均等 − 元利均等</span>
+        <span>赤：元金均等の方が多い ／ 緑：元金均等の方が少ない</span>
       </header>
 
       <div className="mortgage-trajectory-difference__summary">
         <div>
-          <span>最大プラス差</span>
+          <span>最大差（元金均等の方が多い）</span>
           <strong>{maxPositiveLabel}</strong>
           <small>
             {summary.maxPositiveMonth === null
@@ -274,7 +274,7 @@ function MortgageTrajectoryDifferenceChart({
           </small>
         </div>
         <div>
-          <span>逆転時期</span>
+          <span>元金均等の方が少なくなる時期</span>
           <strong>
             {summary.crossoverMonth === null
               ? '期間内になし'
@@ -282,8 +282,8 @@ function MortgageTrajectoryDifferenceChart({
           </strong>
           <small>
             {summary.crossoverMonth === null
-              ? '累計支払額の大小は逆転しません'
-              : 'ここから元金均等の累計支払額が少なくなります'}
+              ? '返済期間中は元金均等の累計支払額が下回りません'
+              : 'この月から元金均等の累計支払額が元利均等を下回ります'}
           </small>
         </div>
         <div>
@@ -318,17 +318,6 @@ function MortgageTrajectoryDifferenceChart({
               />
             ))}
           </div>
-
-          {crossoverPosition !== null && (
-            <div
-              className="mortgage-trajectory-difference__crossover"
-              style={{ left: `${crossoverPosition}%` }}
-              aria-label={`累計返済額が逆転する時期: ${formatMortgageTermMonth(summary.crossoverMonth!)}`}
-            >
-              <span>逆転<br />{formatMortgageTermMonth(summary.crossoverMonth!)}</span>
-              <i aria-hidden="true" />
-            </div>
-          )}
 
           <div className="mortgage-trajectory-difference__columns">
             {points.map((point) => {
@@ -365,12 +354,27 @@ function MortgageTrajectoryDifferenceChart({
         </div>
       </div>
 
+      {crossoverPosition !== null && (
+        <div
+          className="mortgage-trajectory-difference__transition"
+          aria-label={`元金均等返済の累計支払額が少なくなる時期: ${formatMortgageTermMonth(summary.crossoverMonth!)}`}
+        >
+          <div className="mortgage-trajectory-difference__transition-track">
+            <i style={{ left: `${crossoverPosition}%` }} aria-hidden="true" />
+          </div>
+          <strong>
+            {formatMortgageTermMonth(summary.crossoverMonth!)}から
+            元金均等の累計支払額が少ない
+          </strong>
+        </div>
+      )}
+
       <div className="mortgage-trajectory-difference__legend">
         <span data-tone="higher">＋ 元金均等の累計支払額が多い</span>
         <span data-tone="lower">− 元金均等の累計支払額が少ない</span>
       </div>
       <p className="mortgage-trajectory-difference__note">
-        棒の高さは差額に比例します。逆転時期は固定月次モデルの毎月の累計返済額から判定しています。
+        棒の高さは差額に比例します。元金均等の方が少なくなる時期は、固定月次モデルの毎月の累計返済額から判定しています。
       </p>
     </article>
   )
