@@ -85,6 +85,29 @@ const formatMortgageChartYen = (value: number) =>
 const formatMortgageChartBarYen = (value: number) =>
   `${Math.round(value / 10_000).toLocaleString('ja-JP')}万`
 
+const createMortgageTrajectoryAxisMax = (value: number) => {
+  if (!Number.isFinite(value) || value <= 0) {
+    return 10_000
+  }
+
+  const targetStep = value / 4
+  const magnitude = 10 ** Math.floor(Math.log10(targetStep))
+  const normalized = targetStep / magnitude
+  const stepFactor =
+    normalized <= 1
+      ? 1
+      : normalized <= 2
+        ? 2
+        : normalized <= 2.5
+          ? 2.5
+          : normalized <= 5
+            ? 5
+            : 10
+  const step = stepFactor * magnitude
+
+  return Math.ceil(value / step) * step
+}
+
 const formatMortgageDifferenceYen = (value: number) => {
   const absoluteDifference = Math.abs(value)
 
@@ -141,6 +164,13 @@ function MortgageTrajectoryChart({
   const finalTotal = finalPoint
     ? finalPoint.cumulativePrincipal + finalPoint.cumulativeInterest
     : 0
+  const axisValues = [
+    scaleMax,
+    scaleMax * 0.75,
+    scaleMax * 0.5,
+    scaleMax * 0.25,
+    0,
+  ]
 
   return (
     <article
@@ -159,11 +189,22 @@ function MortgageTrajectoryChart({
           完済時 {formatMortgageChartYen(finalTotal)}
         </strong>
       </header>
-      <div
-        className="mortgage-trajectory"
-        aria-label={`${title}の元金と利息の累計推移`}
-      >
-        {points.map((point) => {
+      <div className="mortgage-trajectory-frame">
+        <div className="mortgage-trajectory__axis" aria-hidden="true">
+          {axisValues.map((value) => (
+            <span key={value}>{formatMortgageChartYen(value)}</span>
+          ))}
+        </div>
+        <div
+          className="mortgage-trajectory"
+          aria-label={`${title}の元金と利息の累計推移`}
+        >
+          <div className="mortgage-trajectory__gridlines" aria-hidden="true">
+            {axisValues.map((value) => (
+              <i key={value} />
+            ))}
+          </div>
+          {points.map((point) => {
           const total =
             point.cumulativePrincipal +
             point.cumulativeInterest
@@ -195,7 +236,8 @@ function MortgageTrajectoryChart({
               </small>
             </div>
           )
-        })}
+          })}
+        </div>
       </div>
     </article>
   )
@@ -910,7 +952,7 @@ function MortgageCalculator() {
       return null
     }
 
-    const scaleMax = Math.max(
+    const rawScaleMax = Math.max(
       1,
       ...equalPayment.points.map(
         (point) => point.cumulativePrincipal + point.cumulativeInterest,
@@ -919,6 +961,7 @@ function MortgageCalculator() {
         (point) => point.cumulativePrincipal + point.cumulativeInterest,
       ),
     )
+    const scaleMax = createMortgageTrajectoryAxisMax(rawScaleMax)
 
     const monthlyEqualPayment = calculateMortgageTrajectory(
       activeCalculation.input,
