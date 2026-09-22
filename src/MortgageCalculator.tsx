@@ -258,7 +258,10 @@ function MortgageTrajectoryDifferenceChart({
           <p>DIFFERENCE</p>
           <h5 id="mortgage-trajectory-difference-title">2方式の累計返済額の差</h5>
         </div>
-        <span>赤：元金均等の方が多い ／ 緑：元金均等の方が少ない</span>
+        <span className="mortgage-trajectory-difference__meaning">
+          <b data-tone="higher">＋ 元金均等の累計支払額が多い</b>
+          <b data-tone="lower">− 元金均等の累計支払額が少ない</b>
+        </span>
       </header>
 
       <div className="mortgage-trajectory-difference__summary">
@@ -365,10 +368,6 @@ function MortgageTrajectoryDifferenceChart({
         </div>
       </div>
 
-      <div className="mortgage-trajectory-difference__legend">
-        <span data-tone="higher">＋ 元金均等の累計支払額が多い</span>
-        <span data-tone="lower">− 元金均等の累計支払額が少ない</span>
-      </div>
       <p className="mortgage-trajectory-difference__note">
         棒の高さは差額に比例します。元金均等の方が少なくなる時期は、固定月次モデルの毎月の累計返済額から判定しています。
       </p>
