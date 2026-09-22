@@ -674,6 +674,20 @@ describe('MortgageCalculator', () => {
             '金融機関固有の端数処理',
         )
         expect(
+            screen.getByRole('heading', {
+                name: '2方式の累計返済額の差',
+            }),
+        ).toBeTruthy()
+        expect(screen.getByText('最大プラス差')).toBeTruthy()
+        expect(screen.getByText('逆転時期')).toBeTruthy()
+        expect(screen.getByText('完済時差額')).toBeTruthy()
+        expect(screen.getByText('33年目')).toBeTruthy()
+        expect(screen.getByText('+約1,164,194円')).toBeTruthy()
+        expect(screen.getByText('−約305,498円')).toBeTruthy()
+        expect(screen.getByText(
+            'ここから元金均等の累計支払額が少なくなります',
+        )).toBeTruthy()
+        expect(
             screen
                 .getByText('概算結果を更新しました。')
                 .closest('.mortgage-status')
