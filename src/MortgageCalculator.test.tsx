@@ -673,6 +673,16 @@ describe('MortgageCalculator', () => {
             '4,000万円3,000万円2,000万円1,000万円0万円',
             '4,000万円3,000万円2,000万円1,000万円0万円',
         ])
+        expect(
+            trajectoryAxes.map((axis) =>
+                Array.from(axis.querySelectorAll('span')).map((tick) =>
+                    tick.getAttribute('data-mobile-label'),
+                ),
+            ),
+        ).toEqual([
+            ['4,000', '3,000', '2,000', '1,000', '0'],
+            ['4,000', '3,000', '2,000', '1,000', '0'],
+        ])
         const mobileTrajectoryValues = Array.from(
             document.querySelectorAll('.mortgage-trajectory__value'),
         ).map((value) => value.getAttribute('data-mobile-label'))
