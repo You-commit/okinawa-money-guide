@@ -166,6 +166,75 @@ function MortgageTrajectoryChart({
   )
 }
 
+type MortgageTrajectoryDifferencePoint = {
+  paymentNumber: number
+  label: string
+  difference: number
+}
+
+function MortgageTrajectoryDifferenceChart({
+  points,
+}: {
+  points: MortgageTrajectoryDifferencePoint[]
+}) {
+  const maxDifference = Math.max(
+    1,
+    ...points.map((point) => Math.abs(point.difference)),
+  )
+
+  return (
+    <article
+      className="mortgage-trajectory-difference"
+      aria-labelledby="mortgage-trajectory-difference-title"
+    >
+      <header>
+        <div>
+          <p>DIFFERENCE</p>
+          <h5 id="mortgage-trajectory-difference-title">2方式の累計返済額の差</h5>
+        </div>
+        <span>元金均等 − 元利均等</span>
+      </header>
+
+      <div
+        className="mortgage-trajectory-difference__chart"
+        aria-label="元金均等返済と元利均等返済の累計返済額の差額推移"
+      >
+        <div className="mortgage-trajectory-difference__zero" aria-hidden="true" />
+        {points.map((point) => {
+          const magnitude = Math.abs(point.difference) / maxDifference * 100
+          const direction =
+            point.difference > 0
+              ? 'higher'
+              : point.difference < 0
+                ? 'lower'
+                : 'same'
+
+          return (
+            <div
+              className="mortgage-trajectory-difference__point"
+              data-direction={direction}
+              key={point.paymentNumber}
+            >
+              <span className="mortgage-trajectory-difference__value">
+                {point.difference === 0
+                  ? '0円'
+                  : `${point.difference > 0 ? '+' : '−'}${formatMortgageDifferenceYen(point.difference)}`}
+              </span>
+              <div className="mortgage-trajectory-difference__plot" aria-hidden="true">
+                <i style={{ height: `${magnitude}%` }} />
+              </div>
+              <small>{point.label}</small>
+            </div>
+          )
+        })}
+      </div>
+
+      <p className="mortgage-trajectory-difference__note">
+        プラスはその時点で元金均等返済の累計支払額が多く、マイナスは少ないことを示します。
+      </p>
+    </article>
+  )
+}
 function MortgageEmptyResults() {
   const emptyMethods = [
     { title: '元利均等返済', tone: 'blue' as const },
@@ -711,10 +780,37 @@ function MortgageCalculator() {
       ),
     )
 
+    const principalPointsByPaymentNumber = new Map(
+      equalPrincipal.points.map((point) => [point.paymentNumber, point]),
+    )
+
+    const differencePoints = equalPayment.points.map((paymentPoint) => {
+      const principalPoint = principalPointsByPaymentNumber.get(
+        paymentPoint.paymentNumber,
+      )
+      const paymentTotal =
+        paymentPoint.cumulativePrincipal + paymentPoint.cumulativeInterest
+      const principalTotal = principalPoint
+        ? principalPoint.cumulativePrincipal + principalPoint.cumulativeInterest
+        : paymentTotal
+
+      return {
+        paymentNumber: paymentPoint.paymentNumber,
+        label:
+          paymentPoint.paymentNumber === 0
+            ? '開始'
+            : paymentPoint.paymentNumber === activeCalculation.input.paymentCount
+              ? '完済'
+              : `${Math.round(paymentPoint.paymentNumber / 12)}年`,
+        difference: principalTotal - paymentTotal,
+      }
+    })
+
     return {
       equalPayment: equalPayment.points,
       equalPrincipal: equalPrincipal.points,
       scaleMax,
+      differencePoints,
     }
   }, [activeCalculation])
 
@@ -1642,6 +1738,9 @@ function MortgageCalculator() {
                       scaleMax={mortgageTrajectories.scaleMax}
                     />
                   </div>
+                  <MortgageTrajectoryDifferenceChart
+                    points={mortgageTrajectories.differencePoints}
+                  />
                   <aside
                     className="mortgage-trajectory-guide"
                     aria-label="グラフの見方"
@@ -1650,7 +1749,7 @@ function MortgageCalculator() {
                     <p>
                       濃色は累計元金、淡色は累計利息です。
                       各時点までの返済内訳の積み上がりを示し、
-                      元利均等と元金均等の違いを比較できます。
+                      下の差額グラフでは2方式の累計返済額の差を拡大して確認できます。
                       金融機関固有の端数処理などを
                       完全に再現するものではありません。
                     </p>
