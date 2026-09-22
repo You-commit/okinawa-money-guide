@@ -214,7 +214,12 @@ function MortgageTrajectoryChart({
       <div className="mortgage-trajectory-frame">
         <div className="mortgage-trajectory__axis" aria-hidden="true">
           {axisValues.map((value) => (
-            <span key={value}>{formatMortgageChartYen(value)}</span>
+            <span
+              data-mobile-label={Math.round(value / 10_000).toLocaleString('ja-JP')}
+              key={value}
+            >
+              {formatMortgageChartYen(value)}
+            </span>
           ))}
         </div>
         <div
