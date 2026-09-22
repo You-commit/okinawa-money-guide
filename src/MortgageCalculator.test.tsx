@@ -720,6 +720,14 @@ describe('MortgageCalculator', () => {
         )).toBeTruthy()
         expect(screen.getByText('完済時差額')).toBeTruthy()
         expect(screen.getAllByText('33年目').length).toBeGreaterThan(0)
+        expect(document.querySelector(
+            '.mortgage-trajectory-difference__visual',
+        )?.getAttribute('data-mobile-crossover-label')).toBe(
+            '33年目からマイナス（破線）',
+        )
+        expect(document.querySelector(
+            '.mortgage-trajectory-difference__visual',
+        )?.getAttribute('data-mobile-axis-layout')).toBe('years')
         expect(screen.getByText('+約1,164,194円')).toBeTruthy()
         expect(screen.getByText('−約305,498円')).toBeTruthy()
         expect(screen.getByText(
@@ -794,6 +802,33 @@ describe('MortgageCalculator', () => {
         expect(comparison.textContent).not.toMatch(
             /0円(?:高い|低い|多い|少ない)/,
         )
+        expect(document.querySelector(
+            '.mortgage-trajectory-difference__visual',
+        )?.getAttribute('data-mobile-crossover-label')).toBe(
+            '期間内のマイナス転換なし',
+        )
+        expect(document.querySelector(
+            '.mortgage-trajectory-difference__crossover',
+        )).toBeNull()
+    })
+
+    it('uses additional mobile label rows for a monthly crossover without changing the reported month', async () => {
+        const user = userEvent.setup()
+        render(<MortgageCalculator />)
+
+        await user.type(screen.getByLabelText('借入金額'), '1000000000')
+        await user.type(screen.getByLabelText('年利'), '20')
+        await user.type(screen.getByLabelText('返済期間'), '50')
+        await user.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+        const visual = document.querySelector('.mortgage-trajectory-difference__visual')
+        expect(visual?.getAttribute('data-mobile-axis-layout')).toBe('months')
+        expect(visual?.getAttribute('data-mobile-crossover-label')).toBe(
+            '10年1か月目からマイナス（破線）',
+        )
+        expect(screen.getByText('10年1か月目')).toBeTruthy()
+        expect(document.querySelector('.mortgage-trajectory-difference__crossover')
+            ?.getAttribute('aria-label')).toContain('10年1か月目')
     })
 
     it('calculates when the focused simulate button is activated with Enter', async () => {
