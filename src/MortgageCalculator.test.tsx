@@ -691,9 +691,20 @@ describe('MortgageCalculator', () => {
         expect(screen.getByText(
             'この月から元金均等の累計支払額が元利均等を下回ります',
         )).toBeTruthy()
-        expect(screen.getByText(
+        const higherDifferenceBars = document.querySelectorAll(
+            '.mortgage-trajectory-difference__point[data-direction="higher"]',
+        )
+        const lowerDifferenceBars = document.querySelectorAll(
+            '.mortgage-trajectory-difference__point[data-direction="lower"]',
+        )
+        expect(higherDifferenceBars.length).toBeGreaterThan(1)
+        expect(lowerDifferenceBars.length).toBeGreaterThan(1)
+        expect(document.querySelector(
+            '.mortgage-trajectory-difference__crossover',
+        )).not.toBeNull()
+        expect(screen.queryByText(
             /33年目から元金均等の累計支払額が少ない/,
-        )).toBeTruthy()
+        )).toBeNull()
         expect(screen.queryByText('逆転時期')).toBeNull()
         expect(
             screen
