@@ -678,15 +678,23 @@ describe('MortgageCalculator', () => {
                 name: '2方式の累計返済額の差',
             }),
         ).toBeTruthy()
-        expect(screen.getByText('最大プラス差')).toBeTruthy()
-        expect(screen.getByText('逆転時期')).toBeTruthy()
+        expect(screen.getByText(
+            '最大差（元金均等の方が多い）',
+        )).toBeTruthy()
+        expect(screen.getByText(
+            '元金均等の方が少なくなる時期',
+        )).toBeTruthy()
         expect(screen.getByText('完済時差額')).toBeTruthy()
-        expect(screen.getByText('33年目')).toBeTruthy()
+        expect(screen.getAllByText('33年目').length).toBeGreaterThan(0)
         expect(screen.getByText('+約1,164,194円')).toBeTruthy()
         expect(screen.getByText('−約305,498円')).toBeTruthy()
         expect(screen.getByText(
-            'ここから元金均等の累計支払額が少なくなります',
+            'この月から元金均等の累計支払額が元利均等を下回ります',
         )).toBeTruthy()
+        expect(screen.getByText(
+            /33年目から元金均等の累計支払額が少ない/,
+        )).toBeTruthy()
+        expect(screen.queryByText('逆転時期')).toBeNull()
         expect(
             screen
                 .getByText('概算結果を更新しました。')
