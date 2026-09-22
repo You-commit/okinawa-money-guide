@@ -663,6 +663,16 @@ describe('MortgageCalculator', () => {
                 name: '累計返済額の推移',
             }),
         ).toBeTruthy()
+        const trajectoryAxes = Array.from(
+            document.querySelectorAll('.mortgage-trajectory__axis'),
+        )
+        expect(trajectoryAxes).toHaveLength(2)
+        expect(
+            trajectoryAxes.map((axis) => axis.textContent),
+        ).toEqual([
+            '4,000万円3,000万円2,000万円1,000万円0万円',
+            '4,000万円3,000万円2,000万円1,000万円0万円',
+        ])
         const graphGuide = screen.getByRole(
             'complementary',
             { name: 'グラフの見方' },
