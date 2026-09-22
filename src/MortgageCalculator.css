@@ -1797,7 +1797,7 @@
 .mortgage-trajectory-difference__value {
     align-self: center;
     color: #596f80;
-    font-size: 0.5rem;
+    font-size: 0.46rem;
     font-weight: 800;
     line-height: 1;
     white-space: nowrap;
@@ -1820,7 +1820,7 @@
 .mortgage-trajectory-difference__plot > i {
     position: absolute;
     left: 50%;
-    width: min(20px, 72%);
+    width: min(16px, 66%);
     min-height: 2px;
     transform: translateX(-50%);
     background: #a9b8c5;
@@ -1853,41 +1853,21 @@
     white-space: nowrap;
 }
 
-.mortgage-trajectory-difference__transition {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 10px;
-    margin-top: 8px;
-    padding-left: 50px;
-}
-
-.mortgage-trajectory-difference__transition-track {
-    position: relative;
-    height: 8px;
-    border-radius: 999px;
-    background: #edf1f6;
-}
-
-.mortgage-trajectory-difference__transition-track > i {
+.mortgage-trajectory-difference__crossover {
     position: absolute;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    transform: translate(-50%, -50%);
-    border: 2px solid #ffffff;
-    border-radius: 50%;
-    background: #6c5aa8;
-    box-shadow: 0 0 0 1px #6c5aa8;
+    z-index: 3;
+    top: 24px;
+    bottom: 20px;
+    width: 0;
+    pointer-events: none;
 }
 
-.mortgage-trajectory-difference__transition strong {
-    max-width: 250px;
-    color: #5f4a92;
-    font-size: 0.52rem;
-    font-weight: 850;
-    line-height: 1.35;
-    text-align: right;
+.mortgage-trajectory-difference__crossover > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-left: 1px dashed #6c5aa8;
 }
 
 .mortgage-trajectory-difference__legend {
@@ -2048,24 +2028,18 @@
     }
 
     .mortgage-trajectory-difference__value {
-        font-size: 0.4rem;
-        letter-spacing: -0.035em;
+        font-size: 0.36rem;
+        letter-spacing: -0.04em;
     }
 
     .mortgage-trajectory-difference__point small {
-        font-size: 0.46rem;
+        font-size: 0.42rem;
+        letter-spacing: -0.02em;
     }
 
-    .mortgage-trajectory-difference__transition {
-        grid-template-columns: 1fr;
-        gap: 6px;
-        padding-left: 44px;
-    }
-
-    .mortgage-trajectory-difference__transition strong {
-        max-width: none;
-        font-size: 0.46rem;
-        text-align: left;
+    .mortgage-trajectory-difference__crossover {
+        top: 24px;
+        bottom: 20px;
     }
 
     .mortgage-trajectory-difference__legend {
