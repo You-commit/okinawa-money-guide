@@ -1592,7 +1592,31 @@
     background: #a8e4be;
 }
 
+.mortgage-trajectory-frame {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 6px;
+    min-width: 0;
+}
+
+.mortgage-trajectory__axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    height: 190px;
+    margin-top: 39px;
+    color: #6f8090;
+    font-size: 0.48rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
 .mortgage-trajectory {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     align-items: end;
@@ -1600,10 +1624,30 @@
     min-height: 230px;
     margin-top: 9px;
     padding-top: 12px;
-    background: repeating-linear-gradient(to bottom, transparent 0 38px, #e8eef5 39px 40px);
+}
+
+.mortgage-trajectory__gridlines {
+    position: absolute;
+    z-index: 0;
+    top: 30px;
+    right: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 190px;
+    pointer-events: none;
+}
+
+.mortgage-trajectory__gridlines i {
+    display: block;
+    height: 1px;
+    background: #e8eef5;
 }
 
 .mortgage-trajectory__point {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-rows: 18px 190px 18px;
     align-items: end;
@@ -1943,6 +1987,16 @@
         gap: 5px;
     }
 
+    .mortgage-trajectory-frame {
+        gap: 4px;
+    }
+
+    .mortgage-trajectory__axis {
+        height: 210px;
+        margin-top: 38px;
+        font-size: 0.42rem;
+    }
+
     .mortgage-trajectory {
         align-items: stretch;
         gap: 1px;
@@ -1951,6 +2005,11 @@
         margin-top: 12px;
         padding-top: 8px;
         overflow: hidden;
+    }
+
+    .mortgage-trajectory__gridlines {
+        top: 26px;
+        height: 210px;
     }
 
     .mortgage-trajectory__point {
@@ -2449,10 +2508,20 @@
         border-radius: 7px;
     }
 
+    .simulator-page.simulator-page--mortgage .mortgage-trajectory__axis {
+        height: 190px;
+        margin-top: 31px;
+    }
+
     .simulator-page.simulator-page--mortgage .mortgage-trajectory {
         min-height: 230px;
         margin-top: 6px;
         padding-top: 7px;
+    }
+
+    .simulator-page.simulator-page--mortgage .mortgage-trajectory__gridlines {
+        top: 25px;
+        height: 190px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-trajectory__point {
