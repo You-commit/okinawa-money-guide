@@ -93,6 +93,41 @@ const formatMortgageDifferenceYen = (value: number) => {
     : formatApproxMortgageYen(absoluteDifference)
 }
 
+const formatMortgageDifferenceAxisYen = (value: number) => {
+  if (Math.round(value) === 0) {
+    return '0円'
+  }
+
+  const sign = value > 0 ? '+' : '−'
+  const absoluteValue = Math.abs(value)
+
+  return absoluteValue >= 10_000
+    ? `${sign}${Math.round(absoluteValue / 10_000).toLocaleString('ja-JP')}万円`
+    : `${sign}${Math.round(absoluteValue).toLocaleString('ja-JP')}円`
+}
+
+const formatMortgageTermMonth = (paymentNumber: number) => {
+  const years = Math.floor(paymentNumber / 12)
+  const months = paymentNumber % 12
+
+  if (months === 0) {
+    return `${years}年目`
+  }
+
+  return `${years}年${months}か月目`
+}
+
+const createMortgageDifferenceAxisMax = (value: number) => {
+  if (!Number.isFinite(value) || value <= 0) {
+    return 1
+  }
+
+  const magnitude = 10 ** Math.floor(Math.log10(value))
+  const step = magnitude / 5
+
+  return Math.ceil(value / step) * step
+}
+
 function MortgageTrajectoryChart({
   title,
   tone,
@@ -172,15 +207,48 @@ type MortgageTrajectoryDifferencePoint = {
   difference: number
 }
 
+type MortgageTrajectoryDifferenceSummary = {
+  axisMax: number
+  maxPositiveDifference: number
+  maxPositiveMonth: number | null
+  crossoverMonth: number | null
+  finalDifference: number
+  paymentCount: number
+}
+
 function MortgageTrajectoryDifferenceChart({
   points,
+  summary,
 }: {
   points: MortgageTrajectoryDifferencePoint[]
+  summary: MortgageTrajectoryDifferenceSummary
 }) {
-  const maxDifference = Math.max(
-    1,
-    ...points.map((point) => Math.abs(point.difference)),
-  )
+  const crossoverPosition = summary.crossoverMonth === null
+    ? null
+    : (
+        (
+          0.5 +
+          (summary.crossoverMonth / summary.paymentCount) *
+            (points.length - 1)
+        ) /
+        points.length
+      ) * 100
+  const maxPositiveLabel =
+    summary.maxPositiveDifference > 0 &&
+    summary.maxPositiveMonth !== null
+      ? `+${formatMortgageDifferenceYen(summary.maxPositiveDifference)}`
+      : '0円'
+  const finalDifferenceLabel =
+    Math.round(summary.finalDifference) === 0
+      ? '0円'
+      : `${summary.finalDifference > 0 ? '+' : '−'}${formatMortgageDifferenceYen(summary.finalDifference)}`
+  const axisValues = [
+    summary.axisMax,
+    summary.axisMax / 2,
+    0,
+    -summary.axisMax / 2,
+    -summary.axisMax,
+  ]
 
   return (
     <article
@@ -195,46 +263,119 @@ function MortgageTrajectoryDifferenceChart({
         <span>元金均等 − 元利均等</span>
       </header>
 
-      <div
-        className="mortgage-trajectory-difference__chart"
-        aria-label="元金均等返済と元利均等返済の累計返済額の差額推移"
-      >
-        <div className="mortgage-trajectory-difference__zero" aria-hidden="true" />
-        {points.map((point) => {
-          const magnitude = Math.abs(point.difference) / maxDifference * 100
-          const direction =
-            point.difference > 0
-              ? 'higher'
-              : point.difference < 0
-                ? 'lower'
-                : 'same'
-
-          return (
-            <div
-              className="mortgage-trajectory-difference__point"
-              data-direction={direction}
-              key={point.paymentNumber}
-            >
-              <span className="mortgage-trajectory-difference__value">
-                {point.difference === 0
-                  ? '0円'
-                  : `${point.difference > 0 ? '+' : '−'}${formatMortgageDifferenceYen(point.difference)}`}
-              </span>
-              <div className="mortgage-trajectory-difference__plot" aria-hidden="true">
-                <i style={{ height: `${magnitude}%` }} />
-              </div>
-              <small>{point.label}</small>
-            </div>
-          )
-        })}
+      <div className="mortgage-trajectory-difference__summary">
+        <div>
+          <span>最大プラス差</span>
+          <strong>{maxPositiveLabel}</strong>
+          <small>
+            {summary.maxPositiveMonth === null
+              ? '差なし'
+              : `${formatMortgageTermMonth(summary.maxPositiveMonth)}時点`}
+          </small>
+        </div>
+        <div>
+          <span>逆転時期</span>
+          <strong>
+            {summary.crossoverMonth === null
+              ? '期間内になし'
+              : formatMortgageTermMonth(summary.crossoverMonth)}
+          </strong>
+          <small>
+            {summary.crossoverMonth === null
+              ? '累計支払額の大小は逆転しません'
+              : 'ここから元金均等の累計支払額が少なくなります'}
+          </small>
+        </div>
+        <div>
+          <span>完済時差額</span>
+          <strong>{finalDifferenceLabel}</strong>
+          <small>
+            {summary.finalDifference < 0
+              ? '元金均等の累計支払額が少ない'
+              : summary.finalDifference > 0
+                ? '元金均等の累計支払額が多い'
+                : '2方式の累計支払額は同じ'}
+          </small>
+        </div>
       </div>
 
+      <div
+        className="mortgage-trajectory-difference__visual"
+        aria-label="元金均等返済と元利均等返済の累計返済額の差額推移"
+      >
+        <div className="mortgage-trajectory-difference__axis" aria-hidden="true">
+          {axisValues.map((value) => (
+            <span key={value}>{formatMortgageDifferenceAxisYen(value)}</span>
+          ))}
+        </div>
+
+        <div className="mortgage-trajectory-difference__chart">
+          <div className="mortgage-trajectory-difference__gridlines" aria-hidden="true">
+            {axisValues.map((value, index) => (
+              <i
+                className={index === 2 ? 'is-zero' : undefined}
+                key={value}
+              />
+            ))}
+          </div>
+
+          {crossoverPosition !== null && (
+            <div
+              className="mortgage-trajectory-difference__crossover"
+              style={{ left: `${crossoverPosition}%` }}
+              aria-label={`累計返済額が逆転する時期: ${formatMortgageTermMonth(summary.crossoverMonth!)}`}
+            >
+              <span>逆転<br />{formatMortgageTermMonth(summary.crossoverMonth!)}</span>
+              <i aria-hidden="true" />
+            </div>
+          )}
+
+          <div className="mortgage-trajectory-difference__columns">
+            {points.map((point) => {
+              const magnitude = Math.min(
+                1,
+                Math.abs(point.difference) / summary.axisMax,
+              )
+              const direction =
+                point.difference > 0
+                  ? 'higher'
+                  : point.difference < 0
+                    ? 'lower'
+                    : 'same'
+
+              return (
+                <div
+                  className="mortgage-trajectory-difference__point"
+                  data-direction={direction}
+                  key={point.paymentNumber}
+                >
+                  <span className="mortgage-trajectory-difference__value">
+                    {point.difference === 0
+                      ? '0円'
+                      : `${point.difference > 0 ? '+' : '−'}${formatMortgageDifferenceYen(point.difference)}`}
+                  </span>
+                  <div className="mortgage-trajectory-difference__plot" aria-hidden="true">
+                    <i style={{ height: `${magnitude * 50}%` }} />
+                  </div>
+                  <small>{point.label}</small>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="mortgage-trajectory-difference__legend">
+        <span data-tone="higher">＋ 元金均等の累計支払額が多い</span>
+        <span data-tone="lower">− 元金均等の累計支払額が少ない</span>
+      </div>
       <p className="mortgage-trajectory-difference__note">
-        プラスはその時点で元金均等返済の累計支払額が多く、マイナスは少ないことを示します。
+        棒の高さは差額に比例します。逆転時期は固定月次モデルの毎月の累計返済額から判定しています。
       </p>
     </article>
   )
 }
+
 function MortgageEmptyResults() {
   const emptyMethods = [
     { title: '元利均等返済', tone: 'blue' as const },
@@ -806,11 +947,84 @@ function MortgageCalculator() {
       }
     })
 
+    const monthlyEqualPayment = calculateMortgageTrajectory(
+      activeCalculation.input,
+      'equal-payment',
+      activeCalculation.input.paymentCount,
+    )
+    const monthlyEqualPrincipal = calculateMortgageTrajectory(
+      activeCalculation.input,
+      'equal-principal',
+      activeCalculation.input.paymentCount,
+    )
+
+    if (!monthlyEqualPayment.ok || !monthlyEqualPrincipal.ok) {
+      return null
+    }
+
+    const monthlyPrincipalByPaymentNumber = new Map(
+      monthlyEqualPrincipal.points.map((point) => [point.paymentNumber, point]),
+    )
+    const monthlyDifferences = monthlyEqualPayment.points.map((paymentPoint) => {
+      const principalPoint = monthlyPrincipalByPaymentNumber.get(
+        paymentPoint.paymentNumber,
+      )
+      const paymentTotal =
+        paymentPoint.cumulativePrincipal + paymentPoint.cumulativeInterest
+      const principalTotal = principalPoint
+        ? principalPoint.cumulativePrincipal + principalPoint.cumulativeInterest
+        : paymentTotal
+
+      return {
+        paymentNumber: paymentPoint.paymentNumber,
+        difference: principalTotal - paymentTotal,
+      }
+    })
+
+    const maxPositivePoint = monthlyDifferences.reduce(
+      (currentMax, point) =>
+        point.difference > currentMax.difference ? point : currentMax,
+      { paymentNumber: 0, difference: 0 },
+    )
+
+    let sawPositiveDifference = false
+    let crossoverMonth: number | null = null
+
+    for (const point of monthlyDifferences) {
+      if (point.difference > 0) {
+        sawPositiveDifference = true
+        continue
+      }
+
+      if (sawPositiveDifference && point.difference < 0) {
+        crossoverMonth = point.paymentNumber
+        break
+      }
+    }
+
+    const maxAbsoluteDifference = Math.max(
+      1,
+      ...monthlyDifferences.map((point) => Math.abs(point.difference)),
+    )
+    const finalDifference =
+      monthlyDifferences.at(-1)?.difference ?? 0
+
     return {
       equalPayment: equalPayment.points,
       equalPrincipal: equalPrincipal.points,
       scaleMax,
       differencePoints,
+      differenceSummary: {
+        axisMax: createMortgageDifferenceAxisMax(maxAbsoluteDifference),
+        maxPositiveDifference: maxPositivePoint.difference,
+        maxPositiveMonth:
+          maxPositivePoint.difference > 0
+            ? maxPositivePoint.paymentNumber
+            : null,
+        crossoverMonth,
+        finalDifference,
+        paymentCount: activeCalculation.input.paymentCount,
+      },
     }
   }, [activeCalculation])
 
@@ -1740,6 +1954,7 @@ function MortgageCalculator() {
                   </div>
                   <MortgageTrajectoryDifferenceChart
                     points={mortgageTrajectories.differencePoints}
+                    summary={mortgageTrajectories.differenceSummary}
                   />
                   <aside
                     className="mortgage-trajectory-guide"
