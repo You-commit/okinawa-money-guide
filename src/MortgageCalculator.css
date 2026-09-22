@@ -2018,7 +2018,7 @@
         align-items: stretch;
     }
 
-    .mortgage-trajectory__value {
+    .mortgage-trajectory__point > .mortgage-trajectory__value {
         display: block;
         position: relative;
         align-self: end;
