@@ -673,6 +673,20 @@ describe('MortgageCalculator', () => {
             '4,000万円3,000万円2,000万円1,000万円0万円',
             '4,000万円3,000万円2,000万円1,000万円0万円',
         ])
+        const mobileTrajectoryValues = Array.from(
+            document.querySelectorAll('.mortgage-trajectory__value'),
+        ).map((value) => value.getAttribute('data-mobile-label'))
+        expect(mobileTrajectoryValues).toHaveLength(14)
+        expect(mobileTrajectoryValues.every(Boolean)).toBe(true)
+
+        const mobileDifferenceValuePoints = document.querySelectorAll(
+            '.mortgage-trajectory-difference__point[data-mobile-value="show"]',
+        )
+        const mobileDifferenceAxisPoints = document.querySelectorAll(
+            '.mortgage-trajectory-difference__point[data-mobile-axis="show"]',
+        )
+        expect(mobileDifferenceValuePoints.length).toBeGreaterThanOrEqual(3)
+        expect(mobileDifferenceAxisPoints.length).toBeGreaterThanOrEqual(5)
         const graphGuide = screen.getByRole(
             'complementary',
             { name: 'グラフの見方' },
