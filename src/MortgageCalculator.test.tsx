@@ -723,11 +723,11 @@ describe('MortgageCalculator', () => {
         expect(document.querySelector(
             '.mortgage-trajectory-difference__visual',
         )?.getAttribute('data-mobile-crossover-label')).toBe(
-            '33年目からマイナス（破線）',
+            '33年目から元金均等の累計支払額が少ない',
         )
         expect(document.querySelector(
             '.mortgage-trajectory-difference__visual',
-        )?.getAttribute('data-mobile-axis-layout')).toBe('years')
+        )?.hasAttribute('data-mobile-axis-layout')).toBe(false)
         expect(screen.getByText('+約1,164,194円')).toBeTruthy()
         expect(screen.getByText('−約305,498円')).toBeTruthy()
         expect(screen.getByText(
