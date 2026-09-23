@@ -697,6 +697,14 @@ function TaxableIncomeCalculator({
         </div>
       </div>
 
+      {displayedResult.taxableIncome !== null && (
+        <div
+          id="taxable-affiliate-after-results"
+          className="taxable-affiliate-placement taxable-affiliate-placement--post-simulation"
+          aria-label="関連サービス"
+        />
+      )}
+
     </section>
   )
 }
