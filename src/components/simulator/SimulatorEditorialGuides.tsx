@@ -33,16 +33,52 @@ export function MortgageEditorialGuide() {
   return (
     <section className="simulator-guide simulator-guide--mortgage" aria-labelledby="mortgage-guide-title">
       <header>
-        <p>HOW TO COMPARE</p>
-        <h2 id="mortgage-guide-title">月額の小ささだけで決めない</h2>
-        <span>初回の負担、支払利息、借入期間全体の費用を同じ条件で比較します。</span>
+        <p>HOW TO READ</p>
+        <h2 id="mortgage-guide-title">返済額は「毎月・利息・総額」の順で確認する</h2>
+        <span>月々の負担だけでなく、支払利息と返済期間全体の総負担まで同じ条件で並べて確認すると、返済方式の違いを整理しやすくなります。</span>
       </header>
-      <div className="simulator-guide__comparison">
-        <div><strong>元利均等</strong><span>毎月返済額が原則一定で、家計の見通しを立てやすい方式。</span></div>
-        <div><strong>元金均等</strong><span>当初負担は大きい一方、元金の減りが早い方式。</span></div>
+
+      <dl className="simulator-guide__definitions" aria-label="住宅ローン結果を見る3つのポイント">
+        <div>
+          <dt>1. 毎月の返済額</dt>
+          <dd>家計から無理なく支払い続けられる水準かを確認します。</dd>
+        </div>
+        <div>
+          <dt>2. 支払利息</dt>
+          <dd>借入期間を通じて、元金以外にどれだけ負担するかを確認します。</dd>
+        </div>
+        <div>
+          <dt>3. 総返済額</dt>
+          <dd>元金と利息を合わせた返済全体の大きさを比較します。</dd>
+        </div>
+      </dl>
+
+      <div className="simulator-guide__comparison" aria-label="元利均等返済と元金均等返済の比較">
+        <div>
+          <strong>元利均等返済</strong>
+          <span>毎月返済額が原則一定で、家計管理をしやすい一方、元金の減り方は比較的ゆるやかです。</span>
+        </div>
+        <div>
+          <strong>元金均等返済</strong>
+          <span>当初の返済額は大きくなりますが、元金の減りが早く、条件によっては支払利息を抑えやすい方式です。</span>
+        </div>
       </div>
+
+      <div className="simulator-guide__body">
+        <div>
+          <h3>この試算に含まれない主な費用</h3>
+          <p>事務手数料、保証料、登記費用、火災・地震保険、団信の上乗せ金利などは金融機関や商品によって異なるため、返済額とは分けて確認します。</p>
+        </div>
+        <ul>
+          <li>変動金利の場合の将来の金利変動</li>
+          <li>繰上返済による返済額・返済期間の変化</li>
+          <li>金融機関ごとの端数処理や返済日の扱い</li>
+          <li>諸費用を含めた借入時の総負担</li>
+        </ul>
+      </div>
+
       <p className="simulator-guide__decision-link">
-        返済方式の違いに加え、事務手数料・保証料・登記費用・団信まで確認すると、比較の抜けを減らせます。
+        シミュレーション結果を候補条件の整理に使い、最後は金利タイプ・諸費用・団信・繰上返済条件まで金融機関ごとに確認してください。
         <Link to={routes.knowledgeMortgageComparison}>住宅ローン比較の記事を読む <span aria-hidden="true">→</span></Link>
       </p>
     </section>

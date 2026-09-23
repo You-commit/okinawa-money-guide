@@ -980,6 +980,18 @@
         grid-template-columns: 1fr;
     }
 
+    .mortgage-consultation-summary__section dl > div {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .mortgage-consultation-summary__section dd {
+        max-width: 100%;
+        text-align: left;
+        overflow-wrap: normal;
+        word-break: normal;
+    }
+
     .mortgage-consultation-summary__section ul {
         columns: 1;
     }
@@ -1554,6 +1566,13 @@
     font-size: 0.58rem;
 }
 
+.mortgage-trajectory-card__total {
+    color: #405b70;
+    font-size: 0.64rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
 .mortgage-trajectory-card > header i {
     width: 8px;
     height: 8px;
@@ -1573,20 +1592,64 @@
     background: #a8e4be;
 }
 
+.mortgage-trajectory-frame {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 6px;
+    min-width: 0;
+}
+
+.mortgage-trajectory__axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    height: 190px;
+    margin-top: 39px;
+    color: #6f8090;
+    font-size: 0.48rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
 .mortgage-trajectory {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     align-items: end;
     gap: 3px;
-    min-height: 148px;
+    min-height: 230px;
     margin-top: 9px;
     padding-top: 12px;
-    background: repeating-linear-gradient(to bottom, transparent 0 38px, #e8eef5 39px 40px);
+}
+
+.mortgage-trajectory__gridlines {
+    position: absolute;
+    z-index: 0;
+    top: 30px;
+    right: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 190px;
+    pointer-events: none;
+}
+
+.mortgage-trajectory__gridlines i {
+    display: block;
+    height: 1px;
+    background: #e8eef5;
 }
 
 .mortgage-trajectory__point {
+    position: relative;
+    z-index: 1;
     display: grid;
-    grid-template-rows: 16px 108px 16px;
+    grid-template-rows: 18px 190px 18px;
     align-items: end;
     min-width: 0;
     text-align: center;
@@ -1601,11 +1664,15 @@
     white-space: nowrap;
 }
 
+.mortgage-trajectory__value {
+    font-variant-numeric: tabular-nums;
+}
+
 .mortgage-trajectory__plot {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    height: 108px;
+    height: 190px;
 }
 
 .mortgage-trajectory__plot > i {
@@ -1633,6 +1700,252 @@
     background: #a8e4be;
 }
 
+
+.mortgage-trajectory-difference {
+    padding: 12px;
+    border: 1px solid #d8e2eb;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.mortgage-trajectory-difference > header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.mortgage-trajectory-difference > header p {
+    margin: 0 0 2px;
+    color: #d14a5a;
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+}
+
+.mortgage-trajectory-difference > header h5 {
+    margin: 0;
+    color: #18364f;
+    font-size: 0.78rem;
+}
+
+.mortgage-trajectory-difference > header > span {
+    color: #64798b;
+    font-size: 0.58rem;
+    font-weight: 750;
+}
+
+.mortgage-trajectory-difference__meaning {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 5px 12px;
+}
+
+.mortgage-trajectory-difference__meaning b {
+    font: inherit;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.mortgage-trajectory-difference__meaning b[data-tone="higher"] {
+    color: #b8424e;
+}
+
+.mortgage-trajectory-difference__meaning b[data-tone="lower"] {
+    color: #147e50;
+}
+
+.mortgage-trajectory-difference__summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.mortgage-trajectory-difference__summary > div {
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid #e1e8ee;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.mortgage-trajectory-difference__summary span,
+.mortgage-trajectory-difference__summary small {
+    display: block;
+    color: #718393;
+    font-size: 0.52rem;
+    line-height: 1.35;
+}
+
+.mortgage-trajectory-difference__summary strong {
+    display: block;
+    margin: 3px 0 2px;
+    color: #203d56;
+    font-size: 0.72rem;
+    font-weight: 850;
+    line-height: 1.25;
+    overflow-wrap: break-word;
+    font-variant-numeric: tabular-nums;
+}
+
+.mortgage-trajectory-difference__visual {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.mortgage-trajectory-difference__axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    height: 184px;
+    padding: 24px 0 20px;
+    color: #6a7e90;
+    font-size: 0.5rem;
+    font-weight: 750;
+    line-height: 1;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.mortgage-trajectory-difference__chart {
+    position: relative;
+    min-width: 0;
+    height: 184px;
+}
+
+.mortgage-trajectory-difference__gridlines {
+    position: absolute;
+    z-index: 0;
+    top: 24px;
+    right: 0;
+    bottom: 20px;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.mortgage-trajectory-difference__gridlines i {
+    display: block;
+    height: 1px;
+    background: #e4ebf1;
+}
+
+.mortgage-trajectory-difference__gridlines i.is-zero {
+    height: 2px;
+    background: #95a6b4;
+}
+
+.mortgage-trajectory-difference__columns {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    height: 184px;
+}
+
+.mortgage-trajectory-difference__point {
+    display: grid;
+    grid-template-rows: 24px 140px 20px;
+    min-width: 0;
+    text-align: center;
+}
+
+.mortgage-trajectory-difference__value {
+    align-self: center;
+    color: #596f80;
+    font-size: 0.46rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.mortgage-trajectory-difference__point[data-direction="higher"] .mortgage-trajectory-difference__value {
+    color: #c84452;
+}
+
+.mortgage-trajectory-difference__point[data-direction="lower"] .mortgage-trajectory-difference__value {
+    color: #148552;
+}
+
+.mortgage-trajectory-difference__plot {
+    position: relative;
+    height: 140px;
+}
+
+.mortgage-trajectory-difference__plot > i {
+    position: absolute;
+    left: 50%;
+    width: min(16px, 66%);
+    min-height: 2px;
+    transform: translateX(-50%);
+    background: #a9b8c5;
+}
+
+.mortgage-trajectory-difference__point[data-direction="higher"] .mortgage-trajectory-difference__plot > i {
+    bottom: 50%;
+    background: #ef8791;
+    border-radius: 3px 3px 0 0;
+}
+
+.mortgage-trajectory-difference__point[data-direction="lower"] .mortgage-trajectory-difference__plot > i {
+    top: 50%;
+    background: #65c995;
+    border-radius: 0 0 3px 3px;
+}
+
+.mortgage-trajectory-difference__point[data-direction="same"] .mortgage-trajectory-difference__plot > i {
+    top: calc(50% - 1px);
+    height: 2px !important;
+    border-radius: 999px;
+}
+
+.mortgage-trajectory-difference__point small {
+    align-self: end;
+    color: #6f8090;
+    font-size: 0.52rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.mortgage-trajectory-difference__crossover {
+    position: absolute;
+    z-index: 3;
+    top: 24px;
+    bottom: 20px;
+    width: 0;
+    pointer-events: none;
+}
+
+.mortgage-trajectory-difference__crossover > span {
+    display: none;
+}
+
+.mortgage-trajectory-difference__crossover > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-left: 1px dashed #6c5aa8;
+}
+
+.mortgage-trajectory-difference__note {
+    margin: 14px 0 0;
+    color: #687d8e;
+    font-size: 0.56rem;
+    line-height: 1.5;
+}
+
 .mortgage-results__condition-heading--compact {
     margin-top: 1px;
     padding-top: 9px;
@@ -1657,13 +1970,397 @@
         padding: 12px;
     }
 
+    .mortgage-trajectories-section > header,
+    .mortgage-trajectory-card > header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .mortgage-trajectories-section > header span,
+    .mortgage-trajectory-card > header span {
+        width: 100%;
+    }
+
+    .mortgage-trajectory-card {
+        --mortgage-mobile-value-height: 28px;
+        --mortgage-mobile-plot-height: 210px;
+        --mortgage-mobile-label-height: 28px;
+        --mortgage-mobile-chart-height: calc(
+            var(--mortgage-mobile-value-height) +
+            var(--mortgage-mobile-plot-height) +
+            var(--mortgage-mobile-label-height)
+        );
+    }
+
+    .mortgage-trajectory-card > header {
+        position: relative;
+    }
+
+    .mortgage-trajectory-card > header h4 {
+        max-width: calc(100% - 68px);
+    }
+
+    .mortgage-trajectory-card > header::after,
+    .mortgage-trajectory-difference > header::after {
+        content: "単位：万円";
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #6f8090;
+        font-size: 0.625rem;
+        font-weight: 700;
+        line-height: 1.4;
+        white-space: nowrap;
+    }
+
+    .mortgage-trajectory-card > header span {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .mortgage-trajectory-frame {
+        position: relative;
+        grid-template-columns: 36px minmax(0, 1fr);
+        gap: 6px;
+        margin-top: 12px;
+    }
+
+    .mortgage-trajectory__axis {
+        position: relative;
+        height: var(--mortgage-mobile-plot-height);
+        margin-top: var(--mortgage-mobile-value-height);
+        font-size: 0;
+    }
+
+    .mortgage-trajectory__axis > span {
+        position: absolute;
+        right: 0;
+        font-size: 0;
+        transform: translateY(-50%);
+    }
+
+    .mortgage-trajectory__axis > span:nth-child(1) { top: 0; }
+    .mortgage-trajectory__axis > span:nth-child(2) { top: 25%; }
+    .mortgage-trajectory__axis > span:nth-child(3) { top: 50%; }
+    .mortgage-trajectory__axis > span:nth-child(4) { top: 75%; }
+    .mortgage-trajectory__axis > span:nth-child(5) { top: 100%; }
+
+    .mortgage-trajectory__axis > span::after {
+        content: attr(data-mobile-label);
+        color: #6f8090;
+        font-size: 0.5625rem;
+        font-weight: 700;
+        line-height: 1;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
     .mortgage-trajectory {
+        align-items: stretch;
+        gap: 1px;
+        height: var(--mortgage-mobile-chart-height);
+        min-height: var(--mortgage-mobile-chart-height);
+        margin-top: 0;
+        padding-top: 0;
+        overflow: visible;
+    }
+
+    .mortgage-trajectory__gridlines {
+        top: var(--mortgage-mobile-value-height);
+        height: var(--mortgage-mobile-plot-height);
+    }
+
+    .mortgage-trajectory__point {
+        height: var(--mortgage-mobile-chart-height);
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: var(--mortgage-mobile-value-height) var(--mortgage-mobile-plot-height) var(--mortgage-mobile-label-height);
+        align-items: stretch;
+    }
+
+    .mortgage-trajectory__point > .mortgage-trajectory__value {
+        display: block;
+        position: relative;
+        align-self: center;
+        overflow: visible;
+        font-size: 0;
+        line-height: 1;
+        white-space: nowrap;
+        transform: none;
+    }
+
+    .mortgage-trajectory__value::after {
+        content: attr(data-mobile-label);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: inline-block;
+        color: #6f8090;
+        font-size: 0.5rem;
+        font-weight: 700;
+        line-height: 1;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .mortgage-trajectory__plot {
+        height: var(--mortgage-mobile-plot-height);
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .mortgage-trajectory__plot > i {
+        max-height: 100%;
+    }
+
+    .mortgage-trajectory__point > small {
+        align-self: center;
+        justify-self: center;
+        width: max-content;
+        max-width: none;
+        margin-top: 0;
+        overflow: visible;
+        font-size: 0.48rem;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 380px) {
+        .mortgage-trajectory__value::after {
+            font-size: 0.46rem;
+        }
+
+        .mortgage-trajectory__point > small {
+            font-size: 0.44rem;
+        }
+    }
+
+    .mortgage-trajectory-difference {
+        padding: 10px 8px;
+        --mortgage-mobile-difference-value-height: 28px;
+        --mortgage-mobile-difference-plot-height: 160px;
+        --mortgage-mobile-difference-label-height: 30px;
+        --mortgage-mobile-difference-height: calc(
+            var(--mortgage-mobile-difference-value-height) +
+            var(--mortgage-mobile-difference-plot-height) +
+            var(--mortgage-mobile-difference-label-height)
+        );
+    }
+
+    .mortgage-trajectory-difference > header {
+        position: relative;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .mortgage-trajectory-difference > header p {
+        min-height: 14px;
+        margin-bottom: 6px;
+    }
+
+    .mortgage-trajectory-difference__meaning {
+        display: grid;
+        justify-content: flex-start;
+        gap: 4px 10px;
+        font-size: 0.625rem;
+        line-height: 1.5;
+    }
+
+    .mortgage-trajectory-difference__meaning b {
+        white-space: normal;
+    }
+
+    .mortgage-trajectory-difference__summary {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .mortgage-trajectory-difference__summary > div {
+        padding: 8px 9px;
+    }
+
+    .mortgage-trajectory-difference__summary > div:nth-child(2) {
+        border-left: 3px solid #6c5aa8;
+    }
+
+    .mortgage-trajectory-difference__summary span,
+    .mortgage-trajectory-difference__summary small {
+        font-size: 0.625rem;
+        line-height: 1.5;
+    }
+
+    .mortgage-trajectory-difference__summary strong {
+        font-size: 0.8125rem;
+        line-height: 1.4;
+    }
+
+    .mortgage-trajectory-difference__visual {
+        position: relative;
+        grid-template-columns: max-content minmax(0, 1fr);
+        gap: 8px;
+        margin-top: 18px;
+        padding-top: 4px;
+    }
+
+    .mortgage-trajectory-difference__axis,
+    .mortgage-trajectory-difference__chart,
+    .mortgage-trajectory-difference__columns {
+        height: var(--mortgage-mobile-difference-height);
+    }
+
+    .mortgage-trajectory-difference__axis {
+        position: relative;
+        height: var(--mortgage-mobile-difference-plot-height);
+        margin-top: var(--mortgage-mobile-difference-value-height);
+        padding: 0;
+        font-size: 0.5625rem;
+    }
+
+    .mortgage-trajectory-difference__axis > span {
+        position: relative;
+        height: 0;
+        line-height: 0;
+    }
+
+    .mortgage-trajectory-difference__gridlines {
+        top: var(--mortgage-mobile-difference-value-height);
+        bottom: var(--mortgage-mobile-difference-label-height);
+    }
+
+    .mortgage-trajectory-difference__gridlines i.is-zero {
+        height: 2px;
+        background: #596f80;
+    }
+
+    .mortgage-trajectory-difference__point {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: var(--mortgage-mobile-difference-value-height) var(--mortgage-mobile-difference-plot-height) var(--mortgage-mobile-difference-label-height);
+    }
+
+    .mortgage-trajectory-difference__plot {
+        height: var(--mortgage-mobile-difference-plot-height);
+    }
+
+    .mortgage-trajectory-difference__columns {
         gap: 1px;
     }
 
-    .mortgage-trajectory__point > span {
+    .mortgage-trajectory-difference__value {
+        position: relative;
+        align-self: start;
+        min-width: 0;
+        width: 100%;
+        font-size: 0;
+        letter-spacing: 0;
+    }
+
+    .mortgage-trajectory-difference__point:last-child .mortgage-trajectory-difference__value {
+        text-align: right;
+    }
+
+    .mortgage-trajectory-difference__value::after {
+        content: attr(data-mobile-label);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: inline-block;
+        color: inherit;
+        font-size: 0.5rem;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .mortgage-trajectory-difference__point[data-mobile-value="hide"]
+        .mortgage-trajectory-difference__value::after {
+        content: "";
+    }
+
+    .mortgage-trajectory-difference__point small {
+        align-self: center;
+        justify-self: center;
+        width: max-content;
+        max-width: none;
+        margin-top: 0;
+        font-size: 0.48rem;
+        line-height: 1;
+        letter-spacing: 0;
+        white-space: nowrap;
+    }
+
+    .mortgage-trajectory-difference__point[data-mobile-axis="hide"] small {
         display: none;
     }
+
+    .mortgage-trajectory-difference__crossover {
+        top: var(--mortgage-mobile-difference-value-height);
+        bottom: var(--mortgage-mobile-difference-label-height);
+    }
+
+    .mortgage-trajectory-difference__crossover > span {
+        display: grid;
+        position: absolute;
+        z-index: 5;
+        top: -24px;
+        width: max-content;
+        max-width: 142px;
+        gap: 1px;
+        padding: 3px 5px;
+        border: 1px solid #d8d1ef;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.97);
+        color: #66539a;
+        font-size: 0.47rem;
+        font-weight: 700;
+        line-height: 1.25;
+        white-space: normal;
+        box-shadow: 0 2px 6px rgba(49, 42, 75, 0.08);
+    }
+
+    .mortgage-trajectory-difference__crossover > span b {
+        font: inherit;
+        font-weight: 850;
+    }
+
+    .mortgage-trajectory-difference__crossover[data-label-side="left"] > span {
+        right: 6px;
+        text-align: right;
+    }
+
+    .mortgage-trajectory-difference__crossover[data-label-side="right"] > span {
+        left: 6px;
+        text-align: left;
+    }
+
+    .mortgage-trajectory-difference__crossover > i {
+        border-left-width: 2px;
+    }
+
+    .mortgage-trajectory-difference__crossover::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 6px;
+        height: 6px;
+        border: 1px solid #6c5aa8;
+        border-radius: 50%;
+        background: #fff;
+        transform: translate(-50%, -50%);
+    }
+
+    .mortgage-trajectory-difference__note {
+        margin-top: 24px;
+        padding-top: 12px;
+        border-top: 1px solid #e4ebf1;
+        font-size: 0.625rem;
+        line-height: 1.8;
+    }
+
 }
 
 @media (max-width: 620px) {
@@ -2062,18 +2759,28 @@
         border-radius: 7px;
     }
 
+    .simulator-page.simulator-page--mortgage .mortgage-trajectory__axis {
+        height: 190px;
+        margin-top: 31px;
+    }
+
     .simulator-page.simulator-page--mortgage .mortgage-trajectory {
-        min-height: 156px;
+        min-height: 230px;
         margin-top: 6px;
         padding-top: 7px;
     }
 
+    .simulator-page.simulator-page--mortgage .mortgage-trajectory__gridlines {
+        top: 25px;
+        height: 190px;
+    }
+
     .simulator-page.simulator-page--mortgage .mortgage-trajectory__point {
-        grid-template-rows: 14px 116px 15px;
+        grid-template-rows: 18px 190px 18px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-trajectory__plot {
-        height: 116px;
+        height: 190px;
     }
 
     .simulator-page.simulator-page--mortgage .mortgage-results__condition-heading--compact {

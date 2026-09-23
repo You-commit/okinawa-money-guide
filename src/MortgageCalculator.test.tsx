@@ -663,6 +663,40 @@ describe('MortgageCalculator', () => {
                 name: '累計返済額の推移',
             }),
         ).toBeTruthy()
+        const trajectoryAxes = Array.from(
+            document.querySelectorAll('.mortgage-trajectory__axis'),
+        )
+        expect(trajectoryAxes).toHaveLength(2)
+        expect(
+            trajectoryAxes.map((axis) => axis.textContent),
+        ).toEqual([
+            '4,000万円3,000万円2,000万円1,000万円0万円',
+            '4,000万円3,000万円2,000万円1,000万円0万円',
+        ])
+        expect(
+            trajectoryAxes.map((axis) =>
+                Array.from(axis.querySelectorAll('span')).map((tick) =>
+                    tick.getAttribute('data-mobile-label'),
+                ),
+            ),
+        ).toEqual([
+            ['4,000', '3,000', '2,000', '1,000', '0'],
+            ['4,000', '3,000', '2,000', '1,000', '0'],
+        ])
+        const mobileTrajectoryValues = Array.from(
+            document.querySelectorAll('.mortgage-trajectory__value'),
+        ).map((value) => value.getAttribute('data-mobile-label'))
+        expect(mobileTrajectoryValues).toHaveLength(14)
+        expect(mobileTrajectoryValues.every(Boolean)).toBe(true)
+
+        const mobileDifferenceValuePoints = document.querySelectorAll(
+            '.mortgage-trajectory-difference__point[data-mobile-value="show"]',
+        )
+        const mobileDifferenceAxisPoints = document.querySelectorAll(
+            '.mortgage-trajectory-difference__point[data-mobile-axis="show"]',
+        )
+        expect(mobileDifferenceValuePoints.length).toBeGreaterThanOrEqual(2)
+        expect(mobileDifferenceAxisPoints.length).toBeGreaterThanOrEqual(4)
         const graphGuide = screen.getByRole(
             'complementary',
             { name: 'グラフの見方' },
@@ -673,6 +707,46 @@ describe('MortgageCalculator', () => {
         expect(graphGuide.textContent).toContain(
             '金融機関固有の端数処理',
         )
+        expect(
+            screen.getByRole('heading', {
+                name: '2方式の累計返済額の差',
+            }),
+        ).toBeTruthy()
+        expect(screen.getByText(
+            '最大差（元金均等の方が多い）',
+        )).toBeTruthy()
+        expect(screen.getByText(
+            '元金均等の方が少なくなる時期',
+        )).toBeTruthy()
+        expect(screen.getByText('完済時差額')).toBeTruthy()
+        expect(screen.getAllByText('33年目').length).toBeGreaterThan(0)
+        const crossoverMarker = document.querySelector(
+            '.mortgage-trajectory-difference__crossover',
+        )
+        expect(crossoverMarker?.textContent).toContain(
+            '33年目から元金均等の累計支払額が少ない',
+        )
+        expect(crossoverMarker?.getAttribute('data-label-side')).toBeTruthy()
+        expect(screen.getByText('+約1,164,194円')).toBeTruthy()
+        expect(screen.getByText('−約305,498円')).toBeTruthy()
+        expect(screen.getByText(
+            'この月から元金均等の累計支払額が元利均等を下回ります',
+        )).toBeTruthy()
+        const higherDifferenceBars = document.querySelectorAll(
+            '.mortgage-trajectory-difference__point[data-direction="higher"]',
+        )
+        const lowerDifferenceBars = document.querySelectorAll(
+            '.mortgage-trajectory-difference__point[data-direction="lower"]',
+        )
+        expect(higherDifferenceBars.length).toBeGreaterThan(1)
+        expect(lowerDifferenceBars.length).toBeGreaterThan(1)
+        expect(document.querySelector(
+            '.mortgage-trajectory-difference__crossover',
+        )).not.toBeNull()
+        expect(screen.queryByText(
+            /33年目から元金均等の累計支払額が少ない/,
+        )).toBeNull()
+        expect(screen.queryByText('逆転時期')).toBeNull()
         expect(
             screen
                 .getByText('概算結果を更新しました。')
@@ -727,6 +801,33 @@ describe('MortgageCalculator', () => {
         expect(comparison.textContent).not.toMatch(
             /0円(?:高い|低い|多い|少ない)/,
         )
+        expect(document.querySelector(
+            '.mortgage-trajectory-difference__visual',
+        )?.getAttribute('data-mobile-crossover-label')).toBe(
+            '期間内のマイナス転換なし',
+        )
+        expect(document.querySelector(
+            '.mortgage-trajectory-difference__crossover',
+        )).toBeNull()
+    })
+
+    it('uses additional mobile label rows for a monthly crossover without changing the reported month', async () => {
+        const user = userEvent.setup()
+        render(<MortgageCalculator />)
+
+        await user.type(screen.getByLabelText('借入金額'), '1000000000')
+        await user.type(screen.getByLabelText('年利'), '20')
+        await user.type(screen.getByLabelText('返済期間'), '50')
+        await user.click(screen.getByRole('button', { name: 'シミュレートする' }))
+
+        const visual = document.querySelector('.mortgage-trajectory-difference__visual')
+        expect(visual?.getAttribute('data-mobile-axis-layout')).toBe('months')
+        expect(visual?.getAttribute('data-mobile-crossover-label')).toBe(
+            '10年1か月目からマイナス（破線）',
+        )
+        expect(screen.getByText('10年1か月目')).toBeTruthy()
+        expect(document.querySelector('.mortgage-trajectory-difference__crossover')
+            ?.getAttribute('aria-label')).toContain('10年1か月目')
     })
 
     it('calculates when the focused simulate button is activated with Enter', async () => {
