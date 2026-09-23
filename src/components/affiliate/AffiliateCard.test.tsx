@@ -46,10 +46,12 @@ describe('AffiliateCard', () => {
     window.history.pushState({}, '', '/')
   })
 
-  it('enables the approved NISA program while keeping unapproved programs disabled', () => {
+  it('enables approved NISA and taxable-income programs while reserving iDeCo for SBI', () => {
     expect(affiliatePrograms.nisa.enabled).toBe(true)
     expect(affiliatePrograms.ideco.enabled).toBe(false)
+    expect(affiliatePrograms.taxable.enabled).toBe(true)
     expect(affiliatePrograms.mortgage.enabled).toBe(false)
+
     expect(affiliatePrograms.nisa.provider).toBe('DMM 株')
     expect(affiliatePrograms.nisa.creativeType).toBe('banner')
     expect(affiliatePrograms.nisa.placement)
@@ -57,6 +59,21 @@ describe('AffiliateCard', () => {
     expect(affiliatePrograms.nisa.url).toContain('px.a8.net')
     expect(affiliatePrograms.nisa.bannerImageUrl).toContain('a8.net')
     expect(affiliatePrograms.nisa.disclosureLabel).toBe('PR')
+
+    expect(affiliatePrograms.ideco.id).toBe('ideco-sbi-pending')
+
+    expect(affiliatePrograms.taxable.provider).toBe('松井証券 iDeCo')
+    expect(affiliatePrograms.taxable.creativeType).toBe('banner')
+    expect(affiliatePrograms.taxable.placement).toBe('taxable-after-results')
+    expect(affiliatePrograms.taxable.url)
+      .toBe('https://px.a8.net/svt/ejp?a8mat=4BCBRI+4J4SJ6+3XCC+BY641')
+    expect(affiliatePrograms.taxable.bannerImageUrl)
+      .toContain('s00000018318002007000')
+    expect(affiliatePrograms.taxable.trackingPixelUrl)
+      .toContain('4BCBRI+4J4SJ6+3XCC+BY641')
+    expect(affiliatePrograms.taxable.bannerWidth).toBe(468)
+    expect(affiliatePrograms.taxable.bannerHeight).toBe(60)
+    expect(affiliatePrograms.taxable.disclosureLabel).toBe('PR')
   })
 
   it('does not render when the program is disabled', () => {
