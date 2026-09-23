@@ -1,5 +1,6 @@
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import TaxableIncomeCalculator from '../TaxableIncomeCalculator'
+import TaxableAffiliatePlacementController from '../components/affiliate/TaxableAffiliatePlacementController'
 import { routes } from '../app/routes'
 import SimulatorPageShell from '../components/simulator/SimulatorPageShell'
 import { TaxableIncomeEditorialGuide } from '../components/simulator/SimulatorEditorialGuides'
@@ -29,6 +30,7 @@ function TaxableIncomePage() {
       ]}
       notes={
         <>
+          <TaxableAffiliatePlacementController />
           <article className="simulator-note-card simulator-note-card--warning">
             <h2>計算に含まれないもの</h2>
             <p>住宅ローン控除などの税額控除、所得金額調整控除、給与以外の所得、個別の事情は含みません。</p>
