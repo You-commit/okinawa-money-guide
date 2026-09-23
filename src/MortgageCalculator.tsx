@@ -325,14 +325,7 @@ function MortgageTrajectoryDifferenceChart({
     points[0],
   )
   const firstNegativePoint = points.find((point) => point.difference < 0) ?? null
-  const nextNegativePoint = firstNegativePoint
-    ? points.find(
-        (point) =>
-          point.paymentNumber > firstNegativePoint.paymentNumber &&
-          point.difference < 0 &&
-          point.paymentNumber < summary.paymentCount,
-      ) ?? null
-    : null
+
 
   return (
     <article
@@ -389,9 +382,6 @@ function MortgageTrajectoryDifferenceChart({
       <div
         className="mortgage-trajectory-difference__visual"
         aria-label="元金均等返済と元利均等返済の累計返済額の差額推移"
-        data-mobile-crossover-label={summary.crossoverMonth === null
-          ? '期間内に元金均等の累計支払額は下回りません'
-          : `${formatMortgageTermMonth(summary.crossoverMonth)}から元金均等の累計支払額が少ない`}
       >
         <div className="mortgage-trajectory-difference__axis" aria-hidden="true">
           {axisValues.map((value) => (
@@ -412,9 +402,14 @@ function MortgageTrajectoryDifferenceChart({
           {crossoverPosition !== null && (
             <div
               className="mortgage-trajectory-difference__crossover"
+              data-label-side={crossoverPosition >= 58 ? 'left' : 'right'}
               style={{ left: `${crossoverPosition}%` }}
               aria-label={`元金均等返済の累計支払額が少なくなる時期: ${formatMortgageTermMonth(summary.crossoverMonth!)}`}
             >
+              <span>
+                <b>{formatMortgageTermMonth(summary.crossoverMonth!)}から</b>
+                元金均等の累計支払額が少ない
+              </span>
               <i aria-hidden="true" />
             </div>
           )}
@@ -438,13 +433,11 @@ function MortgageTrajectoryDifferenceChart({
                     : 'same'
               const isMobileValueKey =
                 point.paymentNumber === displayedPeakPoint.paymentNumber ||
-                point.paymentNumber === firstNegativePoint?.paymentNumber ||
                 point.paymentNumber === summary.paymentCount
               const isMobileAxisKey =
                 point.paymentNumber === 0 ||
                 point.paymentNumber === displayedPeakPoint.paymentNumber ||
                 point.paymentNumber === firstNegativePoint?.paymentNumber ||
-                point.paymentNumber === nextNegativePoint?.paymentNumber ||
                 point.paymentNumber === summary.paymentCount
 
               return (
