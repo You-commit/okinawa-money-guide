@@ -55,6 +55,8 @@ describe('TaxableIncomeCalculator public UX', () => {
       name: 'シミュレートする',
     })
     expect((simulateButton as HTMLButtonElement).disabled).toBe(true)
+    expect(document.getElementById('taxable-affiliate-after-results')).toBeNull()
+
     fireEvent.click(simulateButton)
     expect(scrollIntoView).not.toHaveBeenCalled()
 
@@ -68,6 +70,7 @@ describe('TaxableIncomeCalculator public UX', () => {
     })
     expect(scrollIntoView.mock.instances[0]).toBe(results)
     expect(document.activeElement).toBe(results)
+    expect(document.getElementById('taxable-affiliate-after-results')).toBeTruthy()
   })
 
   it('does not move during automatic calculation', () => {
