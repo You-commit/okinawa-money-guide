@@ -22,7 +22,9 @@
 }
 
 .affiliate-card[data-category="ideco"],
-.affiliate-banner[data-category="ideco"] {
+.affiliate-banner[data-category="ideco"],
+.affiliate-card[data-category="taxable"],
+.affiliate-banner[data-category="taxable"] {
   --affiliate-accent: #6d50a5;
   --affiliate-accent-soft: #f1edfa;
 }
@@ -196,20 +198,24 @@
   white-space: nowrap;
 }
 
-.nisa-affiliate-placement--pre-simulation {
+.nisa-affiliate-placement--pre-simulation,
+.taxable-affiliate-placement--pre-simulation {
   grid-column: 1 / -1;
   min-width: 0;
 }
 
-.nisa-affiliate-placement--pre-simulation .affiliate-banner {
+.nisa-affiliate-placement--pre-simulation .affiliate-banner,
+.taxable-affiliate-placement--pre-simulation .affiliate-banner {
   margin: 0 auto;
 }
 
-.nisa-affiliate-placement--post-simulation {
+.nisa-affiliate-placement--post-simulation,
+.taxable-affiliate-placement--post-simulation {
   min-width: 0;
 }
 
-.nisa-affiliate-placement--post-simulation .affiliate-banner {
+.nisa-affiliate-placement--post-simulation .affiliate-banner,
+.taxable-affiliate-placement--post-simulation .affiliate-banner {
   margin: 28px auto 24px;
 }
 
@@ -247,7 +253,8 @@
     padding-inline: 0;
   }
 
-  .nisa-affiliate-placement--pre-simulation .affiliate-banner {
+  .nisa-affiliate-placement--pre-simulation .affiliate-banner,
+  .taxable-affiliate-placement--pre-simulation .affiliate-banner {
     margin-top: 0;
   }
 }
@@ -256,7 +263,8 @@
   .affiliate-card,
   .affiliate-banner,
   .affiliate-card__tracking-pixel,
-  .nisa-affiliate-placement {
+  .nisa-affiliate-placement,
+  .taxable-affiliate-placement {
     display: none !important;
   }
 }
