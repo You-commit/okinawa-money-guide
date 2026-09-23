@@ -231,7 +231,7 @@ function MortgageTrajectoryChart({
               <i key={value} />
             ))}
           </div>
-          {points.map((point, index) => {
+          {points.map((point) => {
           const total =
             point.cumulativePrincipal +
             point.cumulativeInterest
