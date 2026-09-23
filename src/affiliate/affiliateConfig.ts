@@ -56,16 +56,27 @@ export const affiliatePrograms: Record<
     bannerHeight: 60,
   },
   ideco: {
-    id: 'ideco-primary',
-    enabled: false,
-    provider: '',
+    id: 'ideco-matsui-a8',
+    enabled: true,
+    provider: '松井証券 iDeCo',
     category: 'ideco',
     placement: 'ideco-after-consultation-summary',
-    creativeType: 'text',
-    url: '',
-    title: '',
+    creativeType: 'banner',
+    url: 'https://px.a8.net/svt/ejp?a8mat=4BCBRI+4J4SJ6+3XCC+BY641',
+    title: '松井証券 iDeCo',
     description: '',
     ctaLabel: '',
+    disclosureLabel: 'PR',
+    riskDisclosure:
+      'iDeCoは原則60歳まで資産を引き出せず、投資信託には価格変動等による元本割れのリスクがあります。手数料・リスク等は公式情報をご確認ください。',
+    riskUrl: 'https://www.matsui.co.jp/disclaimer/ideco.html',
+    trackingPixelUrl:
+      'https://www14.a8.net/0.gif?a8mat=4BCBRI+4J4SJ6+3XCC+BY641',
+    bannerImageUrl:
+      'https://www28.a8.net/svt/bgt?aid=260915598274&wid=001&eno=01&mid=s00000018318002007000&mc=1',
+    bannerAlt: '松井証券 iDeCo',
+    bannerWidth: 468,
+    bannerHeight: 60,
   },
   mortgage: {
     id: 'mortgage-primary',
