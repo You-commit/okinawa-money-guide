@@ -219,6 +219,35 @@
   margin: 28px auto 24px;
 }
 
+@media (min-width: 821px) {
+  .taxable-affiliate-placement .affiliate-banner {
+    display: grid;
+    grid-template-columns: 468px minmax(240px, 1fr);
+    grid-template-areas:
+      "header header"
+      "creative risk";
+    align-items: center;
+    column-gap: 26px;
+    width: min(100%, 860px);
+    padding: 14px 18px;
+  }
+
+  .taxable-affiliate-placement .affiliate-banner__header {
+    grid-area: header;
+    width: 100%;
+  }
+
+  .taxable-affiliate-placement .affiliate-banner__creative {
+    grid-area: creative;
+  }
+
+  .taxable-affiliate-placement .affiliate-banner .affiliate-card__risk {
+    grid-area: risk;
+    width: 100%;
+    margin: 0;
+  }
+}
+
 @media (max-width: 620px) {
   .affiliate-card,
   .affiliate-banner {
