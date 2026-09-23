@@ -1927,6 +1927,10 @@
     pointer-events: none;
 }
 
+.mortgage-trajectory-difference__crossover > span {
+    display: none;
+}
+
 .mortgage-trajectory-difference__crossover > i {
     position: absolute;
     top: 0;
@@ -2197,26 +2201,7 @@
         grid-template-columns: max-content minmax(0, 1fr);
         gap: 8px;
         margin-top: 18px;
-        padding-top: 32px;
-    }
-
-    .mortgage-trajectory-difference__visual::before {
-        content: attr(data-mobile-crossover-label);
-        position: absolute;
-        top: 0;
-        right: 0;
-        max-width: 100%;
-        padding: 3px 6px;
-        border-left: 2px dashed #6c5aa8;
-        color: #6c5aa8;
-        font-size: 0.625rem;
-        font-weight: 750;
-        line-height: 1.5;
-    }
-
-    .mortgage-trajectory-difference__visual:not(:has(.mortgage-trajectory-difference__crossover))::before {
-        border-left: 0;
-        color: #6f8090;
+        padding-top: 4px;
     }
 
     .mortgage-trajectory-difference__axis,
@@ -2314,6 +2299,41 @@
     .mortgage-trajectory-difference__crossover {
         top: var(--mortgage-mobile-difference-value-height);
         bottom: var(--mortgage-mobile-difference-label-height);
+    }
+
+    .mortgage-trajectory-difference__crossover > span {
+        display: grid;
+        position: absolute;
+        z-index: 5;
+        top: -24px;
+        width: max-content;
+        max-width: 142px;
+        gap: 1px;
+        padding: 3px 5px;
+        border: 1px solid #d8d1ef;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.97);
+        color: #66539a;
+        font-size: 0.47rem;
+        font-weight: 700;
+        line-height: 1.25;
+        white-space: normal;
+        box-shadow: 0 2px 6px rgba(49, 42, 75, 0.08);
+    }
+
+    .mortgage-trajectory-difference__crossover > span b {
+        font: inherit;
+        font-weight: 850;
+    }
+
+    .mortgage-trajectory-difference__crossover[data-label-side="left"] > span {
+        right: 6px;
+        text-align: right;
+    }
+
+    .mortgage-trajectory-difference__crossover[data-label-side="right"] > span {
+        left: 6px;
+        text-align: left;
     }
 
     .mortgage-trajectory-difference__crossover > i {
