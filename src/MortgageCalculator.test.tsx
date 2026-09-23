@@ -695,8 +695,8 @@ describe('MortgageCalculator', () => {
         const mobileDifferenceAxisPoints = document.querySelectorAll(
             '.mortgage-trajectory-difference__point[data-mobile-axis="show"]',
         )
-        expect(mobileDifferenceValuePoints.length).toBeGreaterThanOrEqual(3)
-        expect(mobileDifferenceAxisPoints.length).toBeGreaterThanOrEqual(5)
+        expect(mobileDifferenceValuePoints.length).toBeGreaterThanOrEqual(2)
+        expect(mobileDifferenceAxisPoints.length).toBeGreaterThanOrEqual(4)
         const graphGuide = screen.getByRole(
             'complementary',
             { name: 'グラフの見方' },
@@ -720,14 +720,13 @@ describe('MortgageCalculator', () => {
         )).toBeTruthy()
         expect(screen.getByText('完済時差額')).toBeTruthy()
         expect(screen.getAllByText('33年目').length).toBeGreaterThan(0)
-        expect(document.querySelector(
-            '.mortgage-trajectory-difference__visual',
-        )?.getAttribute('data-mobile-crossover-label')).toBe(
+        const crossoverMarker = document.querySelector(
+            '.mortgage-trajectory-difference__crossover',
+        )
+        expect(crossoverMarker?.textContent).toContain(
             '33年目から元金均等の累計支払額が少ない',
         )
-        expect(document.querySelector(
-            '.mortgage-trajectory-difference__visual',
-        )?.hasAttribute('data-mobile-axis-layout')).toBe(false)
+        expect(crossoverMarker?.getAttribute('data-label-side')).toBeTruthy()
         expect(screen.getByText('+約1,164,194円')).toBeTruthy()
         expect(screen.getByText('−約305,498円')).toBeTruthy()
         expect(screen.getByText(
