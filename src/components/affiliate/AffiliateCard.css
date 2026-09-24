@@ -29,8 +29,8 @@
 
 .affiliate-card[data-category="taxable"],
 .affiliate-banner[data-category="taxable"] {
-  --affiliate-accent: #934655;
-  --affiliate-accent-soft: #f4e6e8;
+  --affiliate-accent: #16845b;
+  --affiliate-accent-soft: #ebf8f1;
 }
 
 .affiliate-card[data-category="mortgage"],
