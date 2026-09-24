@@ -22,17 +22,27 @@
 }
 
 .affiliate-card[data-category="ideco"],
-.affiliate-banner[data-category="ideco"],
-.affiliate-card[data-category="taxable"],
-.affiliate-banner[data-category="taxable"] {
+.affiliate-banner[data-category="ideco"] {
   --affiliate-accent: #6d50a5;
   --affiliate-accent-soft: #f1edfa;
+}
+
+.affiliate-card[data-category="taxable"],
+.affiliate-banner[data-category="taxable"] {
+  --affiliate-accent: #934655;
+  --affiliate-accent-soft: #f4e6e8;
 }
 
 .affiliate-card[data-category="mortgage"],
 .affiliate-banner[data-category="mortgage"] {
   --affiliate-accent: #176b91;
   --affiliate-accent-soft: #e8f5fa;
+}
+
+.simulator-page .affiliate-card,
+.simulator-page .affiliate-banner {
+  --affiliate-accent: var(--page-accent, #176b91);
+  --affiliate-accent-soft: var(--page-accent-soft, #e8f5fa);
 }
 
 .affiliate-card__content {
