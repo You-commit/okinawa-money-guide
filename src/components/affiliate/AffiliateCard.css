@@ -147,9 +147,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 14px 18px 12px;
-  border-top: 1px solid #e3ece8;
-  border-bottom: 1px solid #e3ece8;
+  padding: 18px 20px 16px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--affiliate-accent) 22%, #dfe8ed);
+  border-radius: 18px;
+  background:
+    color-mix(in srgb, var(--affiliate-accent-soft) 46%, #ffffff);
+  box-shadow: 0 10px 26px rgba(28, 59, 83, 0.07);
 }
 
 .affiliate-banner__header {
@@ -240,7 +244,8 @@
   }
 
   .affiliate-banner {
-    padding: 12px 0 10px;
+    padding: 14px 0 12px;
+    border-radius: 15px;
   }
 
   .affiliate-banner__header,
