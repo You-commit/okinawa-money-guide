@@ -21,6 +21,8 @@ function NisaLimitsArticlePage() {
       eyebrow="NISA PLANNING"
       title="NISAの非課税枠と、積立額・将来額の考え方"
       lead="年間の投資枠と将来の資産額は、同じ数字ではありません。制度上の上限と、運用結果の試算を分けて読むための基礎を整理します。"
+      publishedAt="2026-09-21"
+      basisDate="2026-10-04"
       sources={[...sources]}
       related={(
         <>
