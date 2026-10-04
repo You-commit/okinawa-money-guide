@@ -20,7 +20,6 @@ type KnowledgeArticleLayoutProps = {
   sources: ArticleSource[]
   related: ReactNode
   pageClassName?: string
-  heroAside?: ReactNode
 }
 
 function KnowledgeArticleLayout({
@@ -34,30 +33,7 @@ function KnowledgeArticleLayout({
   sources,
   related,
   pageClassName,
-  heroAside,
 }: KnowledgeArticleLayoutProps) {
-  const heroContent = (
-    <>
-      <nav className="knowledge-article-breadcrumb" aria-label="パンくずリスト">
-        <Link to={routes.home}>ホーム</Link>
-        <span aria-hidden="true">›</span>
-        <Link to={routes.knowledge}>お金の知識</Link>
-        <span aria-hidden="true">›</span>
-        <span aria-current="page">{title}</span>
-      </nav>
-      <p className="info-eyebrow">{eyebrow}</p>
-      <h1>{title}</h1>
-      <p className="knowledge-article-hero__lead">{lead}</p>
-      {publishedAt || updatedAt || basisDate ? (
-        <dl className="knowledge-article-meta">
-          {publishedAt ? <div><dt>公開日</dt><dd><time dateTime={publishedAt}>{publishedAt.replaceAll('-', '.')}</time></dd></div> : null}
-          {updatedAt ? <div><dt>更新日</dt><dd><time dateTime={updatedAt}>{updatedAt.replaceAll('-', '.')}</time></dd></div> : null}
-          {basisDate ? <div><dt>制度・情報の基準日</dt><dd><time dateTime={basisDate}>{basisDate.replaceAll('-', '.')}</time></dd></div> : null}
-        </dl>
-      ) : null}
-    </>
-  )
-
   const pageClass = ['dedicated-page', 'knowledge-article-page', pageClassName].filter(Boolean).join(' ')
 
   return (
@@ -65,12 +41,23 @@ function KnowledgeArticleLayout({
       <main id="main-content">
         <header className="knowledge-article-hero">
           <div className="knowledge-article-hero__inner">
-            {heroAside ? (
-              <div className="knowledge-article-hero__editorial-grid">
-                <div className="knowledge-article-hero__copy">{heroContent}</div>
-                <div className="knowledge-article-hero__aside">{heroAside}</div>
-              </div>
-            ) : heroContent}
+            <nav className="knowledge-article-breadcrumb" aria-label="パンくずリスト">
+              <Link to={routes.home}>ホーム</Link>
+              <span aria-hidden="true">›</span>
+              <Link to={routes.knowledge}>お金の知識</Link>
+              <span aria-hidden="true">›</span>
+              <span aria-current="page">{title}</span>
+            </nav>
+            <p className="info-eyebrow">{eyebrow}</p>
+            <h1>{title}</h1>
+            <p className="knowledge-article-hero__lead">{lead}</p>
+            {publishedAt || updatedAt || basisDate ? (
+              <dl className="knowledge-article-meta">
+                {publishedAt ? <div><dt>公開日</dt><dd><time dateTime={publishedAt}>{publishedAt.replaceAll('-', '.')}</time></dd></div> : null}
+                {updatedAt ? <div><dt>更新日</dt><dd><time dateTime={updatedAt}>{updatedAt.replaceAll('-', '.')}</time></dd></div> : null}
+                {basisDate ? <div><dt>制度・情報の基準日</dt><dd><time dateTime={basisDate}>{basisDate.replaceAll('-', '.')}</time></dd></div> : null}
+              </dl>
+            ) : null}
           </div>
         </header>
 
