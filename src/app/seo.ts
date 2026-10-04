@@ -75,13 +75,13 @@ const routeSeoInputs: RouteSeoInput[] = [
     path: routes.knowledgeNisaLimits,
     title: `NISAの非課税枠と積立額・将来額の考え方 | ${siteName}`,
     description: 'NISAの年間投資枠、非課税保有限度額、毎月の積立額、将来資産額の違いを、金融庁の一次資料を基に分かりやすく整理します。',
-    article: {},
+    article: { publishedAt: '2026-09-21' },
   },
   {
     path: routes.knowledgeMortgageComparison,
     title: `住宅ローン比較で見るべき項目 | ${siteName}`,
     description: '元利均等・元金均等、金利、総返済額、事務手数料、保証料、登記費用、団信など、住宅ローン比較の確認順序を整理します。',
-    article: {},
+    article: { publishedAt: '2026-09-21' },
   },
   {
     path: routes.about,
