@@ -26,6 +26,8 @@ function MortgageComparisonArticlePage() {
       eyebrow="MORTGAGE BASICS"
       title="住宅ローン比較で見るべき項目"
       lead="返済方式、金利、総返済額、諸費用、保証、団信。月々の返済額だけでは見えにくい比較の順序を整理します。"
+      publishedAt="2026-09-21"
+      basisDate="2026-10-04"
       sources={[...sources]}
       related={(
         <>
