@@ -195,7 +195,7 @@ function NisaLimitsArticlePage() {
             <span>毎月額</span><b>→</b><span>期間</span><b>→</b><span>将来額</span>
           </div>
           <Link className="nisa-simulator-bridge__cta" to={routes.nisa}>
-            NISAシミュレーターで試算する <span aria-hidden="true">→</span>
+            NISAシミュレーターで積立額と期間を試算する <span aria-hidden="true">→</span>
           </Link>
         </div>
       </section>
