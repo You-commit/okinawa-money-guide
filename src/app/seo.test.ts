@@ -75,7 +75,7 @@ describe('technical SEO source of truth', () => {
     }
   })
 
-  it('does not publish article dates before the articles are released', () => {
+  it('publishes factual article dates without inventing modified dates', () => {
     for (const path of [
       routes.knowledgeNisaLimits,
       routes.knowledgeMortgageComparison,
@@ -87,10 +87,10 @@ describe('technical SEO source of truth', () => {
         getRouteStructuredData(path),
       )
 
-      expect(metadata.article).toEqual({})
-      expect(html).not.toContain('article:published_time')
+      expect(metadata.article).toEqual({ publishedAt: '2026-09-21' })
+      expect(html).toContain('article:published_time')
       expect(html).not.toContain('article:modified_time')
-      expect(html).not.toContain('datePublished')
+      expect(html).toContain('datePublished')
       expect(html).not.toContain('dateModified')
     }
 
@@ -110,7 +110,6 @@ describe('technical SEO source of truth', () => {
 
   it('renders a noindex 404 document without canonical or social metadata', () => {
     const html = injectSeoHead(indexTemplate, notFoundSeo)
-
     expect(html).toContain(`<title>${notFoundSeo.title}</title>`)
     expect(html).toContain('name="robots" content="noindex, follow"')
     expect(html).not.toContain('rel="canonical"')
@@ -140,7 +139,7 @@ describe('technical SEO source of truth', () => {
       throw new Error('Article structured data is missing')
     }
     const article = articleStructuredData['@graph'][0]
-    expect(article).not.toHaveProperty('datePublished')
+    expect(article).toHaveProperty('datePublished', '2026-09-21')
     expect(article).not.toHaveProperty('dateModified')
     expect(websiteStructuredData).toEqual({
       '@context': 'https://schema.org',
