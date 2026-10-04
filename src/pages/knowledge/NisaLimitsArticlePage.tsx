@@ -17,50 +17,21 @@ const sources = [
 ] as const
 
 const contributionExamples = [
-  { monthly: '1万円', annual: '12万円', progress: '3.4%', note: '年間360万円の約3%' },
-  { monthly: '5万円', annual: '60万円', progress: '16.7%', note: '年間360万円の約17%' },
-  { monthly: '10万円', annual: '120万円', progress: '33.3%', note: 'つみたて投資枠の年間上限' },
-  { monthly: '30万円', annual: '360万円', progress: '100%', note: '2枠を併用した年間上限' },
+  { monthly: '1万円', annual: '12万円', note: '年間360万円の約3%' },
+  { monthly: '5万円', annual: '60万円', note: '年間360万円の約17%' },
+  { monthly: '10万円', annual: '120万円', note: 'つみたて投資枠の年間上限' },
+  { monthly: '30万円', annual: '360万円', note: '2つの枠を併用した年間上限' },
 ] as const
 
 function NisaLimitsArticlePage() {
   return (
     <KnowledgeArticleLayout
-      pageClassName="nisa-article-v2"
+      pageClassName="nisa-article-v3"
       eyebrow="NISA / DECISION GUIDE"
       title="NISAの非課税枠と、積立額・将来額の考え方"
       lead="年間の投資枠と将来の資産額は、同じ数字ではありません。制度の数字を整理し、自分の積立額へ置き換え、最後に将来額を試算する順番で見ていきます。"
       publishedAt="2026-09-21"
       basisDate="2026-10-04"
-      heroAside={(
-        <div className="nisa-hero-map" aria-label="NISAで最初に押さえる制度の数字">
-          <div className="nisa-hero-map__heading">
-            <span>NISA MAP</span>
-            <small>最初に押さえる4つの数字</small>
-          </div>
-          <div className="nisa-hero-map__formula" aria-label="120万円と240万円を合わせて年間360万円">
-            <div>
-              <strong>120</strong><span>万円</span>
-              <small>つみたて投資枠 / 年</small>
-            </div>
-            <b aria-hidden="true">＋</b>
-            <div>
-              <strong>240</strong><span>万円</span>
-              <small>成長投資枠 / 年</small>
-            </div>
-            <b aria-hidden="true">＝</b>
-            <div className="nisa-hero-map__annual">
-              <strong>360</strong><span>万円</span>
-              <small>年間投資枠 / 最大</small>
-            </div>
-          </div>
-          <div className="nisa-hero-map__lifetime">
-            <span>LIFETIME LIMIT</span>
-            <strong>1,800万円</strong>
-            <small>非課税保有限度額（総枠）</small>
-          </div>
-        </div>
-      )}
       sources={[...sources]}
       related={(
         <>
@@ -69,73 +40,68 @@ function NisaLimitsArticlePage() {
         </>
       )}
     >
-      <section className="nisa-editorial-opening" aria-labelledby="nisa-article-takeaways">
-        <div className="nisa-editorial-opening__lead">
-          <span className="nisa-kicker">START HERE</span>
-          <h2 id="nisa-article-takeaways">この記事で分かること</h2>
-          <p>
-            NISAは「非課税になる制度」ですが、制度の枠内なら利益が約束されるわけではありません。
-            まず制度上の上限を整理し、そのあとに毎月の積立額と将来額を分けて考えます。
-          </p>
-        </div>
-        <nav className="nisa-reading-index" aria-label="この記事の読み順">
-          <a href="#limits"><span>01</span><strong>制度の枠</strong><small>120・240・360・1,800</small></a>
-          <a href="#contribution"><span>02</span><strong>毎月額</strong><small>月額 → 年間額</small></a>
-          <a href="#future-value"><span>03</span><strong>将来額</strong><small>制度 ≠ 運用結果</small></a>
-        </nav>
+      <section className="nisa-opening" aria-labelledby="nisa-article-takeaways">
+        <p className="nisa-opening__eyebrow">最初に、結論から</p>
+        <h2 id="nisa-article-takeaways">この記事で分かること</h2>
+        <p className="nisa-opening__lead">
+          NISAは「非課税になる制度」ですが、制度の枠内なら利益が約束されるわけではありません。
+          読み違えを防ぐために、まず制度の上限、次に毎月の積立額、最後に将来額という順番で整理します。
+        </p>
+        <ol className="nisa-opening__index" aria-label="この記事の読み順">
+          <li><span>01</span><div><strong>制度の枠を知る</strong><small>120万円・240万円・360万円・1,800万円</small></div></li>
+          <li><span>02</span><div><strong>毎月の積立額へ置き換える</strong><small>月額から年間の買付額へ</small></div></li>
+          <li><span>03</span><div><strong>将来額は別の数字として考える</strong><small>制度上限と運用結果を分ける</small></div></li>
+        </ol>
       </section>
 
-      <section id="limits" className="nisa-chapter">
-        <header className="nisa-chapter__header">
-          <span className="nisa-chapter__number" aria-hidden="true">01</span>
-          <div>
-            <span className="nisa-kicker">LIMITS</span>
-            <h2>年間の投資枠と、生涯の総枠を分ける</h2>
-            <p>同じ「枠」でも、1年間に使える金額と、生涯を通じて保有できる総枠は別です。</p>
-          </div>
+      <section id="limits" className="nisa-section">
+        <header className="nisa-section__header">
+          <p><span>01</span> 制度を読む</p>
+          <h2>まず押さえたい、4つの数字</h2>
+          <div className="nisa-section__rule" aria-hidden="true" />
+          <p className="nisa-section__summary">年間の投資上限と、生涯を通じた総枠は別に管理されます。</p>
         </header>
 
-        <div className="nisa-equation" aria-label="NISAの年間投資枠の関係">
-          <div className="nisa-equation__term">
-            <span>つみたて投資枠</span>
-            <strong>120<small>万円</small></strong>
-            <p>年間の上限</p>
+        <figure className="nisa-number-figure" aria-labelledby="nisa-number-caption">
+          <div className="nisa-number-figure__annual">
+            <div>
+              <span>つみたて投資枠</span>
+              <strong>120<small>万円</small></strong>
+              <em>1年間</em>
+            </div>
+            <b aria-hidden="true">＋</b>
+            <div>
+              <span>成長投資枠</span>
+              <strong>240<small>万円</small></strong>
+              <em>1年間</em>
+            </div>
+            <b aria-hidden="true">＝</b>
+            <div className="nisa-number-figure__result">
+              <span>年間投資枠</span>
+              <strong>360<small>万円</small></strong>
+              <em>2つの枠を併用した場合</em>
+            </div>
           </div>
-          <b className="nisa-equation__operator" aria-hidden="true">＋</b>
-          <div className="nisa-equation__term">
-            <span>成長投資枠</span>
-            <strong>240<small>万円</small></strong>
-            <p>年間の上限</p>
+          <div className="nisa-number-figure__lifetime">
+            <div>
+              <span>生涯を通じた非課税保有限度額</span>
+              <strong>1,800<small>万円</small></strong>
+            </div>
+            <p>年間360万円とは別の総枠です。成長投資枠は、この1,800万円の内数で1,200万円までです。</p>
           </div>
-          <b className="nisa-equation__operator" aria-hidden="true">＝</b>
-          <div className="nisa-equation__term nisa-equation__term--result">
-            <span>年間投資枠</span>
-            <strong>360<small>万円</small></strong>
-            <p>2つの枠を併用した場合</p>
-          </div>
-        </div>
+          <figcaption id="nisa-number-caption">年間の枠と、生涯の総枠を同じものとして見ないことが最初のポイントです。</figcaption>
+        </figure>
 
-        <div className="nisa-lifetime-rule">
-          <div>
-            <span>生涯を通じた非課税保有限度額</span>
-            <strong>1,800万円</strong>
-          </div>
-          <p>年間360万円とは別に管理される総枠です。成長投資枠は、この1,800万円の内数で1,200万円までです。</p>
-        </div>
-
-        <div className="nisa-frame-compare" aria-label="つみたて投資枠と成長投資枠の比較">
+        <div className="nisa-prose-grid">
           <article>
-            <span className="nisa-frame-compare__label">積立を中心に使う</span>
-            <h3>つみたて投資枠</h3>
-            <strong>年間120万円</strong>
+            <p className="nisa-prose-grid__label">つみたて投資枠</p>
+            <h3>積立を中心に使う、年間120万円の枠</h3>
             <p>対象商品と買付方法に条件があります。長期・積立・分散投資に適した一定の商品が対象です。</p>
           </article>
-          <div className="nisa-frame-compare__axis" aria-hidden="true"><span>併用可</span></div>
           <article>
-            <span className="nisa-frame-compare__label">選択肢を広げる</span>
-            <h3>成長投資枠</h3>
-            <strong>年間240万円</strong>
-            <p>つみたて投資枠と併用できます。非課税保有限度額のうち、成長投資枠で利用できるのは1,200万円までです。</p>
+            <p className="nisa-prose-grid__label">成長投資枠</p>
+            <h3>選択肢を広げる、年間240万円の枠</h3>
+            <p>つみたて投資枠と併用できます。成長投資枠で利用できる非課税保有限度額は1,200万円までです。</p>
           </article>
         </div>
 
@@ -154,115 +120,98 @@ function NisaLimitsArticlePage() {
           </div>
         </details>
 
-        <div className="nisa-reuse-story">
-          <div className="nisa-reuse-story__heading">
-            <span className="nisa-kicker">IF YOU SELL</span>
-            <h3>売却した分の総枠は、翌年以降に再利用できます</h3>
-            <p>ただし、売却した年の年間投資枠が増えるわけではありません。</p>
-          </div>
-          <ol className="nisa-reuse-timeline">
-            <li><span>01</span><strong>商品を売却</strong><small>売却した商品の簿価を確認</small></li>
-            <li><span>02</span><strong>その年は戻らない</strong><small>年間投資枠はそのまま</small></li>
-            <li><span>03</span><strong>翌年以降</strong><small>簿価分の総枠を再利用</small></li>
+        <aside className="nisa-editor-note" aria-label="売却した場合のポイント">
+          <p className="nisa-editor-note__label">売却したらどうなる？</p>
+          <h3>売却した商品の簿価分は、翌年以降に総枠として再利用できます。</h3>
+          <p>ただし、売却した年の年間投資枠が増えるわけではありません。</p>
+          <ol>
+            <li><span>1</span><div><strong>商品を売却</strong><small>売却した商品の簿価を確認</small></div></li>
+            <li><span>2</span><div><strong>その年は戻らない</strong><small>年間投資枠はそのまま</small></div></li>
+            <li><span>3</span><div><strong>翌年以降</strong><small>簿価分の総枠を再利用</small></div></li>
           </ol>
-        </div>
+        </aside>
       </section>
 
-      <section id="contribution" className="nisa-chapter nisa-chapter--mist">
-        <header className="nisa-chapter__header">
-          <span className="nisa-chapter__number" aria-hidden="true">02</span>
-          <div>
-            <span className="nisa-kicker">CONTRIBUTION</span>
-            <h2>「毎月いくら」を、年間額へ置き換える</h2>
-            <p>制度枠と比べるときは、毎月額だけでなく12か月分の買付額で見ます。</p>
-          </div>
+      <section id="contribution" className="nisa-section nisa-section--tint">
+        <header className="nisa-section__header">
+          <p><span>02</span> 自分の金額へ置き換える</p>
+          <h2>「毎月いくら」を、年間額へ直してみる</h2>
+          <div className="nisa-section__rule" aria-hidden="true" />
+          <p className="nisa-section__summary">制度枠と比べるときは、毎月額ではなく12か月分の買付額で見ます。</p>
         </header>
 
-        <div className="nisa-scale" aria-label="毎月の積立額を年間360万円に対して比較した目安">
-          <div className="nisa-scale__axis" aria-hidden="true">
-            <span>0</span>
-            <span className="nisa-scale__threshold">120万円<br /><small>つみたて投資枠</small></span>
-            <span>360万円</span>
+        <div className="nisa-contribution-table" role="region" aria-label="毎月の積立額と年間額の例" tabIndex={0}>
+          <div className="nisa-contribution-table__head" aria-hidden="true">
+            <span>毎月の積立額</span><span>年間の買付額</span><span>制度枠との関係</span>
           </div>
           {contributionExamples.map((item) => (
-            <div className="nisa-scale__row" key={item.monthly}>
-              <div className="nisa-scale__label"><span>毎月</span><strong>{item.monthly}</strong></div>
-              <div className="nisa-scale__track" aria-hidden="true"><span style={{ width: item.progress }} /></div>
-              <div className="nisa-scale__value"><span>年間</span><strong>{item.annual}</strong><small>{item.note}</small></div>
+            <div className="nisa-contribution-table__row" key={item.monthly}>
+              <strong>{item.monthly}</strong>
+              <span className="nisa-contribution-table__arrow" aria-hidden="true">→</span>
+              <strong>{item.annual}</strong>
+              <small>{item.note}</small>
             </div>
           ))}
         </div>
 
-        <blockquote className="nisa-editorial-quote">
-          <strong>制度枠との比較は「買付額」で行います。</strong>
-          <span>運用益を足した時価と、非課税保有限度額を混同しないことが大切です。</span>
+        <blockquote className="nisa-quote">
+          <p>制度枠との比較は「買付額」で行います。</p>
+          <cite>運用益を足した時価と、非課税保有限度額を混同しないことが大切です。</cite>
         </blockquote>
 
-        <p>積立期間も含めて確認したい場合は、毎月額と期間を入力して元本の合計を確かめます。既に利用した枠や売却後の再利用は個別に異なるため、金融機関の画面でも残り枠を確認してください。</p>
+        <p className="nisa-body-copy">積立期間も含めて確認したい場合は、毎月額と期間を入力して元本の合計を確かめます。既に利用した枠や売却後の再利用は個別に異なるため、金融機関の画面でも残り枠を確認してください。</p>
       </section>
 
-      <section id="future-value" className="nisa-chapter">
-        <header className="nisa-chapter__header">
-          <span className="nisa-chapter__number" aria-hidden="true">03</span>
-          <div>
-            <span className="nisa-kicker">LIMIT ≠ RESULT</span>
-            <h2>制度の上限と、運用後の将来額は別の数字</h2>
-            <p>同じNISA枠を使っても、積立額・期間・想定利回り・商品の値動きで結果は変わります。</p>
-          </div>
+      <section id="future-value" className="nisa-section">
+        <header className="nisa-section__header">
+          <p><span>03</span> 将来額を考える</p>
+          <h2>制度の上限と、運用後の将来額は別の数字</h2>
+          <div className="nisa-section__rule" aria-hidden="true" />
+          <p className="nisa-section__summary">同じNISA枠を使っても、積立額・期間・想定利回り・商品の値動きで結果は変わります。</p>
         </header>
 
-        <div className="nisa-limit-result" aria-label="制度枠と将来額は同じではありません">
+        <div className="nisa-contrast" aria-label="制度枠と将来額は同じではありません">
           <div>
-            <span>LIMIT</span>
-            <strong>いくら買えるか</strong>
-            <p>制度で決まる投資上限。買付額を基準に管理します。</p>
+            <p>制度で決まるもの</p>
+            <h3>いくら買えるか</h3>
+            <span>年間投資枠・非課税保有限度額</span>
           </div>
           <b aria-hidden="true">≠</b>
           <div>
-            <span>RESULT</span>
-            <strong>将来いくらになるか</strong>
-            <p>運用結果。元本保証ではなく、条件によって増減します。</p>
+            <p>運用によって変わるもの</p>
+            <h3>将来いくらになるか</h3>
+            <span>元本・期間・利回り・値動き</span>
           </div>
         </div>
 
-        <dl className="nisa-term-lines">
-          <div><dt><span>01</span>元本</dt><dd>自分が積み立てた金額の合計。制度枠との比較では、この買付額を基準にします。</dd></div>
-          <div><dt><span>02</span>運用収益</dt><dd>試算上の将来額から元本を引いた差。マイナスになる可能性もあります。</dd></div>
-          <div><dt><span>03</span>想定利回り</dt><dd>試算のために置く仮定で、将来の成果を示す約束ではありません。</dd></div>
+        <dl className="nisa-term-list">
+          <div><dt>元本</dt><dd>自分が積み立てた金額の合計。制度枠との比較では、この買付額を基準にします。</dd></div>
+          <div><dt>運用収益</dt><dd>試算上の将来額から元本を引いた差。マイナスになる可能性もあります。</dd></div>
+          <div><dt>想定利回り</dt><dd>試算のために置く仮定で、将来の成果を示す約束ではありません。</dd></div>
         </dl>
 
         <div className="nisa-simulator-bridge">
-          <div className="nisa-simulator-bridge__copy">
-            <span className="nisa-kicker">FROM KNOWLEDGE TO YOUR NUMBERS</span>
-            <h3>ここからは、自分の毎月額・期間で確かめる</h3>
-            <p>制度を理解したあとに、自分の条件へ置き換えるのが沖縄マネーガイドの使い方です。</p>
+          <div>
+            <p className="nisa-simulator-bridge__eyebrow">数字を、自分の場合に置き換える</p>
+            <h3>毎月額・期間・想定利回りを変えて、将来額を確かめる</h3>
+            <p>制度を理解したら、次は自分の条件で試します。結果は将来を保証するものではありません。</p>
           </div>
-          <div className="nisa-simulator-bridge__flow" aria-hidden="true">
-            <span>毎月額</span><i>→</i><span>期間</span><i>→</i><span>将来額</span>
-          </div>
-          <Link className="nisa-simulator-bridge__cta" to={routes.nisa}>
-            NISAシミュレーターで積立額と期間を試算する <span aria-hidden="true">↗</span>
-          </Link>
+          <Link to={routes.nisa}>NISAシミュレーターで積立額と期間を試算する <span aria-hidden="true">→</span></Link>
         </div>
       </section>
 
-      <section id="checklist" className="nisa-chapter nisa-before-start">
-        <header className="nisa-chapter__header">
-          <span className="nisa-chapter__number" aria-hidden="true">04</span>
-          <div>
-            <span className="nisa-kicker">BEFORE YOU START</span>
-            <h2>始める前に、制度より先に確認したいこと</h2>
-          </div>
-        </header>
-        <ol className="nisa-check-lines">
-          <li><span>01</span><p>生活費や近い将来に使うお金を、投資資金と分ける</p></li>
-          <li><span>02</span><p>商品の値動き、手数料、つみたて投資枠の対象可否を確認する</p></li>
-          <li><span>03</span><p>年間枠だけでなく、現在の非課税保有限度額の利用状況を確認する</p></li>
-          <li><span>04</span><p>利回りを1つに決めつけず、複数の条件で試算する</p></li>
-        </ol>
+      <section className="nisa-check-section" aria-labelledby="nisa-before-start">
+        <p className="nisa-check-section__eyebrow">Before you start</p>
+        <h2 id="nisa-before-start">実際に始める前に、確認しておきたいこと</h2>
+        <ul>
+          <li>生活費や近い将来に使うお金を、投資資金と分ける</li>
+          <li>商品の値動き、手数料、つみたて投資枠の対象可否を確認する</li>
+          <li>年間枠だけでなく、現在の非課税保有限度額の利用状況を確認する</li>
+          <li>利回りを1つに決めつけず、複数の条件で試算する</li>
+        </ul>
       </section>
 
-      <p className="knowledge-article-disclaimer nisa-article-disclaimer">この記事は制度の一般的な整理を目的としたもので、特定商品の推奨や将来の運用成果を保証するものではありません。</p>
+      <p className="knowledge-article-disclaimer nisa-disclaimer">この記事は制度の一般的な整理を目的としたもので、特定商品の推奨や将来の運用成果を保証するものではありません。</p>
     </KnowledgeArticleLayout>
   )
 }
