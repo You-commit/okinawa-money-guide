@@ -44,7 +44,7 @@ describe('dedicated page routing', () => {
     ['/simulators/ideco', 'iDeCo節税シミュレーター'],
     ['/simulators/taxable-income', '課税所得・所得税率シミュレーター'],
     ['/knowledge', '今の目的から、知るべきお金のことへ'],
-    ['/knowledge/nisa-limits-and-future-value', 'NISAの非課税枠と、積立額・将来額の考え方'],
+    ['/knowledge/nisa-limits-and-future-value', 'NISA（少額投資非課税制度）'],
     ['/knowledge/mortgage-comparison', '住宅ローン比較で見るべき項目'],
     ['/about', '沖縄のお金の判断を、落ち着いて整理できる場所へ'],
     ['/trust', '判断材料を届けるための、情報と運営の方針'],
@@ -66,7 +66,7 @@ describe('dedicated page routing', () => {
     cleanup()
     renderAt('/knowledge/nisa-limits-and-future-value')
     expect(screen.getByRole('link', {
-      name: /NISAシミュレーターで積立額と期間を試算する/,
+      name: /NISAシミュレーターで試算する/,
     }).getAttribute('href')).toBe('/simulators/nisa')
 
     cleanup()
@@ -78,10 +78,10 @@ describe('dedicated page routing', () => {
 
   it('renders factual article dates, takeaways, and primary-source links', () => {
     renderAt('/knowledge/nisa-limits-and-future-value')
-    expect(screen.getByRole('heading', { name: 'この記事で分かること' })).toBeTruthy()
-    expect(screen.getByText('公開日')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'NISAとは' })).toBeTruthy()
+    expect(screen.getByText(/公開日：/)).toBeTruthy()
     expect(screen.queryByText('更新日')).toBeNull()
-    expect(screen.getByText('制度・情報の基準日')).toBeTruthy()
+    expect(screen.getByText(/制度・情報の基準日：/)).toBeTruthy()
     const nisaPublished = screen.getByText('2026.09.21')
     const nisaBasis = screen.getByText('2026.10.04')
     expect(nisaPublished.getAttribute('datetime')).toBe('2026-09-21')
@@ -592,4 +592,36 @@ describe('dedicated page routing', () => {
     window.history.back()
     await waitFor(() => expect(window.location.pathname).toBe('/'))
   })
+
+  it('renders the approved NISA high-fidelity structure without chart overlap layers', () => {
+    const { container } = renderAt('/knowledge/nisa-limits-and-future-value')
+
+    expect(screen.getByRole('heading', {
+      level: 1,
+      name: 'NISA（少額投資非課税制度）',
+    })).toBeTruthy()
+    expect(screen.getByRole('img', {
+      name: /通常の課税口座とNISA口座の税負担比較/,
+    })).toBeTruthy()
+    expect(screen.getByRole('img', {
+      name: /毎月5万円を積み立てる期間別イメージ/,
+    })).toBeTruthy()
+    expect(screen.getByRole('img', {
+      name: /積立に加えて追加投資する期間別イメージ/,
+    })).toBeTruthy()
+    expect(container.querySelectorAll('.n8-case-chart')).toHaveLength(2)
+    expect(container.querySelectorAll('.n8-chart-note')).toHaveLength(2)
+    expect(container.querySelectorAll('.n8-step')).toHaveLength(5)
+    expect(container.querySelectorAll('.n8-faq details')).toHaveLength(4)
+    expect(screen.getByText('20.315%')).toBeTruthy()
+    expect(screen.getByText('0%')).toBeTruthy()
+  })
+
+  it('keeps the operating and partnership policy reachable from the NISA article footer', () => {
+    renderAt('/knowledge/nisa-limits-and-future-value')
+
+    expect(screen.getByRole('link', { name: '運営・提携方針' })
+      .getAttribute('href')).toBe('/trust#ads')
+  })
+
 })
