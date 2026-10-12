@@ -281,7 +281,13 @@
 .n8-sticky a{width:384px;height:60px;border-radius:999px;display:grid;place-items:center;font-size:14px;font-weight:700}
 .n8-sticky .n8-primary{background:var(--teal);color:white}
 .n8-sticky .n8-secondary{background:#fff;color:var(--navy);border:1px solid #c7d2da}
-.n8-page > footer{background:#102943;color:#dfe8ee;text-align:center;padding:46px 20px 120px;font-size:11px}
+.n8-page > footer{background:#102943;color:#dfe8ee;padding:46px 20px 120px;font-size:11px}
+.n8-footer-inner{display:flex;align-items:center;justify-content:space-between;gap:28px;width:min(100%,960px);margin:0 auto}
+.n8-footer-inner p{margin:0}
+.n8-footer-name{margin-bottom:5px!important;font-size:13px;font-weight:700;color:#fff}
+.n8-footer nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px 22px}
+.n8-footer nav a{color:#dfe8ee;text-decoration:none}
+.n8-footer nav a:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* Mobile intentionally follows MUFG reflow */
 @media(max-width:900px){
@@ -350,6 +356,8 @@
   .n8-learning-grid{grid-template-columns:1fr}
   .n8-sticky{height:65px;padding:0 10px;gap:8px}
   .n8-sticky a{width:auto;flex:1;height:46px;font-size:10.5px;padding:0 4px}
+  .n8-footer-inner{display:grid;justify-items:start}
+  .n8-footer nav{justify-content:flex-start}
 }
 
 /* v0.5 typography calibration — MUFG visual reference */

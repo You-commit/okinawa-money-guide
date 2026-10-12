@@ -617,4 +617,11 @@ describe('dedicated page routing', () => {
     expect(screen.getByText('0%')).toBeTruthy()
   })
 
+  it('keeps the operating and partnership policy reachable from the NISA article footer', () => {
+    renderAt('/knowledge/nisa-limits-and-future-value')
+
+    expect(screen.getByRole('link', { name: '運営・提携方針' })
+      .getAttribute('href')).toBe('/trust#ads')
+  })
+
 })

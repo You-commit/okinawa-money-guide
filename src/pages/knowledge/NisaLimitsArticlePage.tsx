@@ -295,7 +295,20 @@ function NisaLimitsArticlePage() {
       <a className="n8-secondary" href="https://www.fsa.go.jp/policy/nisa2/know/" target="_blank" rel="noreferrer">金融庁のNISA公式情報を確認</a>
     </div>
     
-    <footer>沖縄マネーガイド｜NISA高精度デザインモック v0.8</footer>
+    <footer className="n8-footer">
+      <div className="n8-footer-inner">
+        <div>
+          <p className="n8-footer-name">沖縄マネーガイド</p>
+          <p>© 2026 Okinawa Money Guide</p>
+        </div>
+        <nav aria-label="フッターメニュー">
+          <a href="/knowledge">お金の知識</a>
+          <a href="/about">このサイトについて</a>
+          <a href="/trust">信頼情報</a>
+          <a href="/trust#ads">運営・提携方針</a>
+        </nav>
+      </div>
+    </footer>
     
     </div>
   )
