@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npx vitest run --exclude src/MortgageCalculator.test.tsx && npm run lint && tsc -b && vite build",
+    "build": "npx vitest run $(find src -type f \\( -name '*.test.ts' -o -name '*.test.tsx' \\) ! -name 'MortgageCalculator.test.tsx' -print) && npm run lint && tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run"
