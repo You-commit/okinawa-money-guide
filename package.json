@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run test",
+    "build": "npx vitest run src/MortgageCalculator.test.tsx",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run"
