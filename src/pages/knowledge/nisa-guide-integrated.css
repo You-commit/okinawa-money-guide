@@ -42,6 +42,19 @@
   margin-bottom: 14px;
 }
 
+.nisa-guide-overview__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.nisa-guide-overview__list li {
+  color: #4d6478;
+  font-size: 0.8rem;
+  line-height: 1.75;
+}
+
 .nisa-guide-keyfacts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
