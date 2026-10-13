@@ -143,12 +143,13 @@ function NisaLimitsArticlePage() {
           <article className="knowledge-article-body nisa-guide-body">
             <section className="nisa-guide-overview" aria-labelledby="nisa-guide-overview-title">
               <div>
-                <p className="nisa-guide-overview__eyebrow">まず確認する3つの数字</p>
-                <h2 id="nisa-guide-overview-title">制度の上限と、実際の積立額を混同しない</h2>
-                <p>
-                  NISAの枠は「使わなければならない金額」ではありません。
-                  家計に無理のない積立額を決めたうえで、制度の上限と照らし合わせます。
-                </p>
+                <p className="nisa-guide-overview__eyebrow">ARTICLE GUIDE</p>
+                <h2 id="nisa-guide-overview-title">この記事で分かること</h2>
+                <ul className="nisa-guide-overview__list">
+                  <li>NISAの年間投資枠と非課税保有限度額の違い</li>
+                  <li>つみたて投資枠と成長投資枠の使い分け</li>
+                  <li>制度上の上限と、自分が積み立てる金額・将来額の違い</li>
+                </ul>
               </div>
               <dl className="nisa-guide-keyfacts" aria-label="NISAの主な制度数値">
                 <div>
