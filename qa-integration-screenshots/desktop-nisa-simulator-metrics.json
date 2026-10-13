@@ -1,0 +1,16 @@
+{
+  "route": "/simulators/nisa",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "metrics": {
+    "innerWidth": 1440,
+    "scrollWidth": 1440,
+    "bodyScrollWidth": 1440,
+    "scrollHeight": 2230,
+    "headerCount": 1,
+    "footerCount": 1
+  },
+  "errors": []
+}

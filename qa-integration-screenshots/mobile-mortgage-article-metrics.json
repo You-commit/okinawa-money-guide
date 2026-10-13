@@ -1,0 +1,16 @@
+{
+  "route": "/knowledge/mortgage-comparison",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "metrics": {
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "bodyScrollWidth": 390,
+    "scrollHeight": 3836,
+    "headerCount": 1,
+    "footerCount": 1
+  },
+  "errors": []
+}
