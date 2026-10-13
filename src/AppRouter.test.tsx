@@ -116,6 +116,20 @@ describe('dedicated page routing', () => {
     expect(document.querySelector('.n8-globalnav')).toBeNull()
     expect(document.querySelector('.nisa-guide-page')).toBeTruthy()
 
+    const localNav = document.querySelector('.nisa-guide-local-nav-shell')!
+    const articleLayout = document.querySelector('.nisa-guide-layout')!
+    expect(localNav.compareDocumentPosition(articleLayout) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .toBeTruthy()
+
+    expect(screen.getByRole('navigation', { name: 'NISA制度メニュー' })).toBeTruthy()
+    expect(screen.getByRole('navigation', { name: 'ページ内メニュー' })).toBeTruthy()
+    expect(screen.getByRole('link', {
+      name: /NISAシミュレーターで試算する/,
+    }).getAttribute('href')).toBe('/simulators/nisa')
+    expect(screen.getByRole('link', {
+      name: /金融庁のNISA公式情報を確認/,
+    }).getAttribute('href')).toBe('https://www.fsa.go.jp/policy/nisa2/know/')
+
     expect(screen.getByRole('img', {
       name: '利益100万円のうち税金20万3150円、税引後79万6850円',
     })).toBeTruthy()
