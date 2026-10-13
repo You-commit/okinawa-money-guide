@@ -1,0 +1,155 @@
+name: NISA OMG Integration QA
+
+on:
+  push:
+    branches:
+      - qa/nisa-omg-integration-20261013-r2
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout QA branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: NISA route and integration tests
+        run: npm test -- src/AppRouter.test.tsx
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Diff check against metadata baseline
+        run: git diff --check 3ae18a9ddec6d71223b86285d7d190cb9d6355c0 9c421a73a295b42054426b8c11fdad19826d3f15
+
+      - name: Full test suite for baseline comparison
+        continue-on-error: true
+        run: npm test -- --reporter=verbose
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start built preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/omg-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/omg-preview.log
+          exit 1
+
+      - name: Capture cross-site design screenshots
+        run: |
+          mkdir -p qa-integration-screenshots
+          cat > qa-capture.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+
+          const base = 'http://127.0.0.1:4173';
+          const out = path.resolve('qa-integration-screenshots');
+          const routes = [
+            ['home', '/'],
+            ['nisa-simulator', '/simulators/nisa'],
+            ['mortgage-article', '/knowledge/mortgage-comparison'],
+            ['nisa-article', '/knowledge/nisa-limits-and-future-value'],
+          ];
+
+          async function run(mode, viewport, isMobile) {
+            const browser = await chromium.launch({ headless: true });
+            const context = await browser.newContext({
+              viewport,
+              isMobile,
+              hasTouch: isMobile,
+              deviceScaleFactor: 1,
+              locale: 'ja-JP',
+            });
+
+            for (const [name, route] of routes) {
+              const page = await context.newPage();
+              const errors = [];
+              page.on('pageerror', e => errors.push('pageerror: ' + e.message));
+              page.on('console', m => {
+                if (m.type() === 'error') errors.push('console: ' + m.text());
+              });
+
+              await page.goto(base + route, { waitUntil: 'networkidle', timeout: 120000 });
+              await page.waitForTimeout(1200);
+
+              const metrics = await page.evaluate(() => ({
+                innerWidth: window.innerWidth,
+                scrollWidth: document.documentElement.scrollWidth,
+                bodyScrollWidth: document.body.scrollWidth,
+                scrollHeight: document.documentElement.scrollHeight,
+                headerCount: document.querySelectorAll('.top-option02__header').length,
+                footerCount: document.querySelectorAll('.site-footer').length,
+              }));
+
+              await page.screenshot({
+                path: path.join(out, `${mode}-${name}-full.png`),
+                fullPage: true,
+                animations: 'disabled',
+              });
+
+              await page.evaluate(() => window.scrollTo(0, 0));
+              await page.waitForTimeout(150);
+              await page.screenshot({
+                path: path.join(out, `${mode}-${name}-top.png`),
+                fullPage: false,
+                animations: 'disabled',
+              });
+
+              fs.writeFileSync(
+                path.join(out, `${mode}-${name}-metrics.json`),
+                JSON.stringify({ route, viewport, metrics, errors }, null, 2)
+              );
+              await page.close();
+            }
+
+            await browser.close();
+          }
+
+          (async () => {
+            await run('desktop', { width: 1440, height: 900 }, false);
+            await run('mobile', { width: 390, height: 844 }, true);
+          })().catch(err => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
+          node qa-capture.cjs
+
+      - name: Commit QA screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qa-integration-screenshots
+          if git diff --cached --quiet; then
+            echo "No screenshot changes"
+            exit 0
+          fi
+          git commit -m "qa: capture OMG integration screenshots [skip ci]"
+          git push origin HEAD:qa/nisa-omg-integration-20261013-r2
