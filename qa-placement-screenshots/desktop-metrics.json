@@ -1,0 +1,24 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "metrics": {
+    "innerWidth": 1440,
+    "scrollWidth": 1440,
+    "bodyScrollWidth": 1440,
+    "scrollHeight": 5859,
+    "heroBottom": 544,
+    "navTop": 576,
+    "navBottom": 702,
+    "articleTop": 676,
+    "stickyTop": 831,
+    "stickyBottom": 900,
+    "viewportHeight": 900,
+    "headerCount": 1,
+    "footerCount": 1,
+    "primaryStickyCount": 1,
+    "secondaryStickyCount": 1
+  },
+  "errors": []
+}
