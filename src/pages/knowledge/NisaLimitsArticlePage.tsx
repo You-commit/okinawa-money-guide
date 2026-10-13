@@ -139,6 +139,21 @@ function NisaLimitsArticlePage() {
           </div>
         </header>
 
+        <div className="nisa-guide-local-nav-shell">
+          <nav className="nisa-guide-tabs" aria-label="NISA制度メニュー">
+            <a className="is-active" href="#basic">NISAトップ</a>
+            <a href="#tsumitate">つみたて投資枠</a>
+            <a href="#growth">成長投資枠</a>
+          </nav>
+
+          <nav className="nisa-guide-jump" aria-label="ページ内メニュー">
+            <a href="#caution">制度の注意点</a>
+            <a href="#compare">投資枠の違い</a>
+            <a href="#cases">活用例</a>
+            <a href="#faq">Q&amp;A</a>
+          </nav>
+        </div>
+
         <div className="knowledge-article-layout nisa-guide-layout">
           <article className="knowledge-article-body nisa-guide-body">
             <section className="nisa-guide-overview" aria-labelledby="nisa-guide-overview-title">
@@ -166,19 +181,6 @@ function NisaLimitsArticlePage() {
                 </div>
               </dl>
             </section>
-
-            <nav className="nisa-guide-tabs" aria-label="NISA制度メニュー">
-              <a className="is-active" href="#basic">NISAトップ</a>
-              <a href="#tsumitate">つみたて投資枠</a>
-              <a href="#growth">成長投資枠</a>
-            </nav>
-
-            <nav className="nisa-guide-jump" aria-label="ページ内メニュー">
-              <a href="#caution">制度の注意点</a>
-              <a href="#compare">投資枠の違い</a>
-              <a href="#cases">活用例</a>
-              <a href="#faq">Q&amp;A</a>
-            </nav>
 
             <section id="basic">
               <h2>NISAとは</h2>
@@ -430,20 +432,6 @@ function NisaLimitsArticlePage() {
               </div>
             </section>
 
-            <section className="nisa-guide-final">
-              <div>
-                <p className="nisa-guide-final__eyebrow">NEXT STEP</p>
-                <h2>自分の積立額で数字を確かめる</h2>
-                <p>
-                  月額・期間・想定利回りを変えて、元本と将来額の関係を確認できます。
-                </p>
-              </div>
-              <Link className="nisa-guide-primary-action" to={routes.nisa}>
-                NISAシミュレーターで試算する
-                <ArrowRightIcon className="nisa-guide-inline-arrow" />
-              </Link>
-            </section>
-
             <section>
               <h2>投資前に確認しておきたい重要事項</h2>
               <div className="nisa-guide-legal">
@@ -493,6 +481,24 @@ function NisaLimitsArticlePage() {
               </Link>
             </section>
           </aside>
+        </div>
+
+        <div className="nisa-guide-sticky-cta" aria-label="NISAの次のアクション">
+          <div className="nisa-guide-sticky-cta__inner">
+            <Link className="nisa-guide-primary-action" to={routes.nisa}>
+              NISAシミュレーターで試算する
+              <ArrowRightIcon className="nisa-guide-inline-arrow" />
+            </Link>
+            <a
+              className="nisa-guide-secondary-action"
+              href="https://www.fsa.go.jp/policy/nisa2/know/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              金融庁のNISA公式情報を確認
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
       </main>
     </SiteLayout>
