@@ -1,7 +1,11 @@
-.nisa-guide-page {
+.dedicated-page.knowledge-article-page.nisa-guide-page {
   padding-bottom: 76px;
   font-family: var(--omg-font-sans);
   color: var(--omg-color-text);
+  background: #fff;
+}
+
+.nisa-guide-page .knowledge-article-hero {
   background: #fff;
 }
 
@@ -168,7 +172,7 @@
   padding: 28px;
   border: 1px solid var(--omg-color-border);
   border-radius: 20px;
-  background: var(--omg-color-background);
+  background: #f6f9fb;
   box-shadow: 0 10px 24px rgba(28, 59, 83, 0.06);
 }
 
@@ -509,7 +513,7 @@
   padding: 18px;
   border: 1px solid var(--omg-color-border);
   border-radius: 14px;
-  background: var(--omg-color-background);
+  background: #f6f9fb;
 }
 
 .nisa-guide-chart figcaption {
@@ -828,7 +832,7 @@
 }
 
 @media (max-width: 760px) {
-  .nisa-guide-page {
+  .dedicated-page.knowledge-article-page.nisa-guide-page {
     padding-bottom: calc(74px + env(safe-area-inset-bottom));
   }
 
