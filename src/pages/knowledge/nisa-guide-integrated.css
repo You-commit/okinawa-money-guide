@@ -1,0 +1,1020 @@
+.dedicated-page.knowledge-article-page.nisa-guide-page {
+  padding-bottom: 76px;
+  font-family: var(--omg-font-sans);
+  color: var(--omg-color-text);
+  background: #fff;
+}
+
+.nisa-guide-page .knowledge-article-hero {
+  background: #fff;
+}
+
+.nisa-guide-layout {
+  grid-template-columns: minmax(0, 800px) minmax(240px, 280px);
+  gap: 56px;
+}
+
+.nisa-guide-body {
+  min-width: 0;
+}
+
+.nisa-guide-body > section {
+  scroll-margin-top: var(--omg-sticky-header-offset);
+}
+
+.nisa-guide-overview {
+  display: grid;
+  gap: 28px;
+  margin-bottom: 40px;
+  padding: 30px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 20px;
+  background: var(--omg-color-surface);
+  box-shadow: 0 10px 24px rgba(28, 59, 83, 0.06);
+}
+
+.nisa-guide-overview__eyebrow,
+.nisa-guide-final__eyebrow {
+  margin: 0 0 7px !important;
+  color: var(--omg-color-brand) !important;
+  font-size: 0.7rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.12em;
+}
+
+.nisa-guide-overview h2,
+.nisa-guide-final h2 {
+  margin-bottom: 14px;
+}
+
+.nisa-guide-overview__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.nisa-guide-overview__list li {
+  color: #4d6478;
+  font-size: 0.8rem;
+  line-height: 1.75;
+}
+
+.nisa-guide-keyfacts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-block: 1px solid var(--omg-color-border);
+}
+
+.nisa-guide-keyfacts > div {
+  min-width: 0;
+  padding: 18px 20px;
+  text-align: center;
+}
+
+.nisa-guide-keyfacts > div + div {
+  border-left: 1px solid var(--omg-color-border);
+}
+
+.nisa-guide-keyfacts dt {
+  color: var(--omg-color-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.nisa-guide-keyfacts dd {
+  margin: 7px 0 0;
+  color: var(--omg-color-brand);
+  font-size: 1.15rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.nisa-guide-keyfacts dd strong {
+  font-size: clamp(1.7rem, 3vw, 2.25rem);
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-guide-local-nav-shell {
+  width: min(100% - 64px, 1120px);
+  margin: 32px auto -26px;
+}
+
+.nisa-guide-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.nisa-guide-tabs a {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  padding: 10px 14px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 12px;
+  background: var(--omg-color-surface);
+  color: var(--omg-color-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(28, 59, 83, 0.04);
+}
+
+.nisa-guide-tabs a:hover,
+.nisa-guide-tabs a:focus-visible {
+  border-color: color-mix(in srgb, var(--omg-color-brand) 45%, var(--omg-color-border));
+  background: #f4faf8;
+}
+
+.nisa-guide-tabs a.is-active {
+  border-color: var(--omg-color-brand);
+  background: var(--omg-color-brand);
+  color: #fff;
+}
+
+.nisa-guide-jump {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 0;
+  border-block: 1px solid var(--omg-color-border);
+}
+
+.nisa-guide-jump a {
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  padding: 10px 12px;
+  color: #385268;
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1.45;
+  text-align: center;
+  text-decoration: none;
+}
+
+.nisa-guide-jump a + a {
+  border-left: 1px solid var(--omg-color-border);
+}
+
+.nisa-guide-jump a:hover,
+.nisa-guide-jump a:focus-visible {
+  color: var(--omg-color-brand-strong);
+  background: #f7fbfa;
+}
+
+.nisa-guide-tax-figure {
+  margin: 34px 0 0;
+  padding: 28px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 20px;
+  background: #f6f9fb;
+  box-shadow: 0 10px 24px rgba(28, 59, 83, 0.06);
+}
+
+.nisa-guide-tax-figure > figcaption {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 22px;
+  text-align: center;
+}
+
+.nisa-guide-tax-figure > figcaption strong {
+  color: var(--omg-color-text);
+  font-size: 1.25rem;
+  line-height: 1.45;
+}
+
+.nisa-guide-tax-figure > figcaption span {
+  color: var(--omg-color-muted);
+  font-size: 0.68rem;
+  line-height: 1.6;
+}
+
+.nisa-guide-tax-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.nisa-guide-tax-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 16px;
+  background: #f8fbfd;
+}
+
+.nisa-guide-tax-card.is-nisa {
+  border-color: color-mix(in srgb, var(--omg-color-brand) 32%, var(--omg-color-border));
+  background: #eef8f6;
+}
+
+.nisa-guide-tax-card header {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.nisa-guide-tax-card header span {
+  color: #385268;
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.nisa-guide-tax-card header strong {
+  color: var(--omg-color-text);
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.nisa-guide-tax-card.is-nisa header strong {
+  color: var(--omg-color-brand);
+}
+
+.nisa-guide-tax-stack {
+  display: grid;
+  min-height: 210px;
+  grid-template-rows: 64px 1fr;
+  overflow: hidden;
+  border: 1px solid #d5e1e7;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.nisa-guide-tax-card.is-nisa .nisa-guide-tax-stack {
+  grid-template-rows: 52px 1fr;
+  border-color: #b9d8d4;
+}
+
+.nisa-guide-tax-stack__tax,
+.nisa-guide-tax-stack__net {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.nisa-guide-tax-stack__tax {
+  border-bottom: 1px solid #d5e1e7;
+  background: #f4f7f9;
+  color: #546b7d;
+}
+
+.nisa-guide-tax-stack__tax.is-zero {
+  border-bottom-color: #b9d8d4;
+  background: #e4f4f0;
+  color: var(--omg-color-brand-strong);
+}
+
+.nisa-guide-tax-stack__net {
+  background: #173f62;
+  color: #fff;
+}
+
+.nisa-guide-tax-card.is-nisa .nisa-guide-tax-stack__net {
+  background: var(--omg-color-brand);
+}
+
+.nisa-guide-tax-stack span {
+  font-size: 0.66rem;
+  line-height: 1.4;
+}
+
+.nisa-guide-tax-stack strong {
+  font-size: 1.08rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.nisa-guide-figure-note {
+  margin-top: 16px !important;
+  color: var(--omg-color-muted) !important;
+  font-size: 0.68rem !important;
+  line-height: 1.7 !important;
+}
+
+.nisa-guide-accordion,
+.nisa-guide-faq {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.nisa-guide-accordion details,
+.nisa-guide-faq details {
+  overflow: hidden;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 12px;
+  background: var(--omg-color-surface);
+}
+
+.nisa-guide-accordion summary,
+.nisa-guide-faq summary {
+  position: relative;
+  padding: 17px 48px 17px 18px;
+  color: var(--omg-color-text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1.6;
+  cursor: pointer;
+  list-style: none;
+}
+
+.nisa-guide-accordion summary::-webkit-details-marker,
+.nisa-guide-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.nisa-guide-accordion summary::after,
+.nisa-guide-faq summary::after {
+  content: "+";
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  color: var(--omg-color-brand);
+  font-size: 1.25rem;
+  transform: translateY(-50%);
+}
+
+.nisa-guide-accordion details[open] summary::after,
+.nisa-guide-faq details[open] summary::after {
+  content: "−";
+}
+
+.nisa-guide-accordion details p,
+.nisa-guide-faq details p {
+  margin: 0 !important;
+  padding: 0 18px 18px;
+  color: var(--omg-color-muted) !important;
+  font-size: 0.78rem !important;
+  line-height: 1.8 !important;
+}
+
+.nisa-guide-frame-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.nisa-guide-frame-grid > article {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 16px;
+  background: var(--omg-color-surface);
+  box-shadow: 0 8px 20px rgba(28, 59, 83, 0.055);
+}
+
+.nisa-guide-frame-grid__icon,
+.nisa-guide-point-card__icon,
+.nisa-guide-steps__icon {
+  display: grid;
+  place-items: center;
+  color: var(--omg-color-brand);
+}
+
+.nisa-guide-frame-grid__icon {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  background: #eaf8f4;
+}
+
+.nisa-guide-frame-grid__icon > *,
+.nisa-guide-frame-grid__icon img {
+  width: 48px;
+  height: 48px;
+}
+
+.nisa-guide-frame-grid h3 {
+  margin: 0;
+  color: var(--omg-color-text);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.nisa-guide-frame-grid__amount {
+  display: block;
+  margin-top: 10px;
+  color: var(--omg-color-brand);
+  font-size: 1.55rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.nisa-guide-frame-grid dl {
+  margin: 22px 0 0;
+}
+
+.nisa-guide-frame-grid dl > div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--omg-color-border);
+}
+
+.nisa-guide-frame-grid dt {
+  color: var(--omg-color-muted);
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.nisa-guide-frame-grid dd {
+  margin: 0;
+  color: #385268;
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+
+.nisa-guide-total-limit {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 22px;
+  border-radius: 16px;
+  background: #edf7f5;
+  text-align: center;
+}
+
+.nisa-guide-total-limit span,
+.nisa-guide-total-limit small {
+  color: var(--omg-color-muted);
+  font-size: 0.7rem;
+}
+
+.nisa-guide-total-limit strong {
+  color: var(--omg-color-brand);
+  font-size: 1.55rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-guide-case-list {
+  display: grid;
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.nisa-guide-case {
+  padding: 24px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 18px;
+  background: var(--omg-color-surface);
+  box-shadow: 0 8px 20px rgba(28, 59, 83, 0.05);
+}
+
+.nisa-guide-case > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.nisa-guide-case > header > span {
+  display: inline-grid;
+  place-items: center;
+  min-height: 28px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #eaf8f4;
+  color: var(--omg-color-brand);
+  font-size: 0.64rem;
+  font-weight: 850;
+}
+
+.nisa-guide-case h3 {
+  margin: 0;
+  color: var(--omg-color-text);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.nisa-guide-case header p {
+  margin-top: 5px !important;
+  font-size: 0.76rem !important;
+  line-height: 1.7 !important;
+}
+
+.nisa-guide-chart {
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 14px;
+  background: #f6f9fb;
+}
+
+.nisa-guide-chart figcaption {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.nisa-guide-chart figcaption strong {
+  color: #24495d;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.nisa-guide-chart figcaption span,
+.nisa-guide-chart__unit {
+  color: var(--omg-color-muted);
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+.nisa-guide-chart__unit {
+  margin-bottom: 8px;
+  text-align: right;
+}
+
+.nisa-guide-chart__plot {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(42px, 1fr));
+  gap: 10px;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.nisa-guide-chart__column {
+  display: grid;
+  grid-template-rows: 22px 170px 22px;
+  align-items: end;
+  min-width: 0;
+}
+
+.nisa-guide-chart__value,
+.nisa-guide-chart__label {
+  color: #536a7d;
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.nisa-guide-chart__track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-bottom: 1px solid #b9c9d3;
+  background:
+    linear-gradient(to top, transparent 24%, #edf2f5 25%, transparent 26%),
+    linear-gradient(to top, transparent 49%, #edf2f5 50%, transparent 51%),
+    linear-gradient(to top, transparent 74%, #edf2f5 75%, transparent 76%);
+}
+
+.nisa-guide-chart__fill {
+  display: block;
+  width: 72%;
+  max-width: 46px;
+  min-height: 4px;
+  margin: 0 auto;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, #2da79a 0%, var(--omg-color-brand) 100%);
+}
+
+.nisa-guide-inline-arrow,
+.nisa-guide-primary-action .top-option02__mask-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.nisa-guide-point-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 26px;
+}
+
+.nisa-guide-point-card {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 14px;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 16px;
+  background: var(--omg-color-surface);
+  box-shadow: 0 8px 20px rgba(28, 59, 83, 0.055);
+}
+
+.nisa-guide-point-card__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #eef5ff;
+}
+
+.nisa-guide-point-card__icon > *,
+.nisa-guide-point-card__icon img {
+  width: 46px;
+  height: 46px;
+}
+
+.nisa-guide-point-card small {
+  display: block;
+  color: var(--omg-color-brand);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+}
+
+.nisa-guide-point-card h3 {
+  margin: 5px 0 7px;
+  color: var(--omg-color-text);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.nisa-guide-point-card p {
+  font-size: 0.74rem !important;
+  line-height: 1.75 !important;
+}
+
+.nisa-guide-steps {
+  display: grid;
+  gap: 0;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+  border-block: 1px solid var(--omg-color-border);
+}
+
+.nisa-guide-steps li {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px 0;
+}
+
+.nisa-guide-steps li + li {
+  border-top: 1px solid var(--omg-color-border);
+}
+
+.nisa-guide-steps__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #f4f8fb;
+}
+
+.nisa-guide-steps__icon > *,
+.nisa-guide-steps__icon img {
+  width: 46px;
+  height: 46px;
+}
+
+.nisa-guide-steps li > div {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: center;
+}
+
+.nisa-guide-steps b {
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--omg-color-brand);
+  color: #fff;
+  font-size: 0.68rem;
+}
+
+.nisa-guide-steps strong {
+  color: var(--omg-color-text);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.nisa-guide-steps small {
+  color: var(--omg-color-muted);
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
+.nisa-guide-primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: var(--omg-color-brand);
+  color: #fff !important;
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-decoration: none;
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
+}
+
+.nisa-guide-primary-action:hover,
+.nisa-guide-primary-action:focus-visible {
+  background: var(--omg-color-brand-strong);
+}
+
+.nisa-guide-sticky-cta {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 70;
+  padding: 10px 24px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(30, 76, 120, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -8px 24px rgba(15, 52, 90, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.nisa-guide-sticky-cta__inner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: min(100%, 820px);
+  margin: 0 auto;
+}
+
+.nisa-guide-sticky-cta .nisa-guide-primary-action,
+.nisa-guide-secondary-action {
+  min-height: 48px;
+  border-radius: 999px;
+}
+
+.nisa-guide-secondary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 1px solid var(--omg-color-border);
+  background: #fff;
+  color: var(--omg-color-text);
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+}
+
+.nisa-guide-secondary-action:hover,
+.nisa-guide-secondary-action:focus-visible {
+  border-color: color-mix(in srgb, var(--omg-color-brand) 42%, var(--omg-color-border));
+  color: var(--omg-color-brand-strong);
+  background: #f7fbfa;
+}
+
+.nisa-guide-legal {
+  padding: 20px 22px;
+  border: 1px solid #e8dec4;
+  border-radius: 12px;
+  background: #fffdf7;
+}
+
+.nisa-guide-legal ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.nisa-guide-legal li {
+  color: #655f53;
+  font-size: 0.72rem;
+  line-height: 1.75;
+}
+
+.nisa-guide-aside-nav {
+  display: grid;
+  margin-top: 12px;
+}
+
+.nisa-guide-aside-nav a {
+  padding: 8px 0;
+  border-bottom: 1px solid #e4ecef;
+  color: #385268;
+  font-size: 0.7rem;
+  font-weight: 720;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.nisa-guide-aside-nav a:hover,
+.nisa-guide-aside-nav a:focus-visible {
+  color: var(--omg-color-brand);
+}
+
+@media (max-width: 980px) {
+  .nisa-guide-layout {
+    grid-template-columns: minmax(0, 760px);
+    gap: 44px;
+  }
+}
+
+@media (max-width: 760px) {
+  .dedicated-page.knowledge-article-page.nisa-guide-page {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom));
+  }
+
+  .nisa-guide-local-nav-shell {
+    width: min(100% - 40px, 760px);
+    margin: 24px auto -20px;
+  }
+
+  .nisa-guide-overview {
+    padding: 22px 18px;
+    border-radius: 16px;
+  }
+
+  .nisa-guide-keyfacts {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-guide-keyfacts > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 2px;
+    text-align: left;
+  }
+
+  .nisa-guide-keyfacts > div + div {
+    border-top: 1px solid var(--omg-color-border);
+    border-left: 0;
+  }
+
+  .nisa-guide-keyfacts dd {
+    margin: 0;
+    text-align: right;
+  }
+
+  .nisa-guide-tabs {
+    gap: 7px;
+  }
+
+  .nisa-guide-tabs a {
+    min-height: 48px;
+    padding-inline: 8px;
+    font-size: 0.68rem;
+  }
+
+  .nisa-guide-jump {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 0;
+  }
+
+  .nisa-guide-jump a:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid var(--omg-color-border);
+  }
+
+  .nisa-guide-jump a:nth-child(4) {
+    border-top: 1px solid var(--omg-color-border);
+  }
+
+  .nisa-guide-tax-figure {
+    padding: 20px 14px;
+    border-radius: 16px;
+  }
+
+  .nisa-guide-tax-compare {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-guide-tax-stack {
+    min-height: 180px;
+  }
+
+  .nisa-guide-frame-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-guide-frame-grid > article {
+    padding: 20px;
+  }
+
+  .nisa-guide-case {
+    padding: 20px 14px;
+  }
+
+  .nisa-guide-case > header {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-guide-case > header > span {
+    justify-self: start;
+  }
+
+  .nisa-guide-chart__plot {
+    gap: 6px;
+  }
+
+  .nisa-guide-chart__column {
+    grid-template-rows: 20px 132px 20px;
+  }
+
+  .nisa-guide-chart__value,
+  .nisa-guide-chart__label {
+    font-size: 0.56rem;
+  }
+
+  .nisa-guide-chart__fill {
+    width: 68%;
+  }
+
+  .nisa-guide-point-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-guide-point-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+    padding: 18px;
+  }
+
+  .nisa-guide-point-card__icon,
+  .nisa-guide-steps__icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .nisa-guide-point-card__icon > *,
+  .nisa-guide-point-card__icon img,
+  .nisa-guide-steps__icon > *,
+  .nisa-guide-steps__icon img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .nisa-guide-steps li {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .nisa-guide-final {
+    grid-template-columns: 1fr;
+    padding: 24px 20px;
+  }
+
+  .nisa-guide-primary-action {
+    width: 100%;
+  }
+
+  .nisa-guide-sticky-cta {
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .nisa-guide-sticky-cta__inner {
+    gap: 8px;
+  }
+
+  .nisa-guide-sticky-cta .nisa-guide-primary-action,
+  .nisa-guide-secondary-action {
+    min-height: 50px;
+    padding: 9px 10px;
+    font-size: 0.68rem;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 420px) {
+  .nisa-guide-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-guide-tabs a {
+    min-height: 44px;
+  }
+
+  .nisa-guide-chart__plot {
+    grid-template-columns: repeat(6, minmax(38px, 1fr));
+  }
+
+  .nisa-guide-chart__column {
+    grid-template-rows: 20px 118px 20px;
+  }
+
+  .nisa-guide-frame-grid dl > div {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+}

@@ -102,6 +102,44 @@ describe('dedicated page routing', () => {
     expect(screen.getAllByRole('link', { name: /元利均等返済・元金均等返済|借入希望金額から返済額を計算|住宅ローンの基礎知識・資料/ })).toHaveLength(3)
   })
 
+  it('keeps the NISA guide inside the common OMG shell and structured charts', () => {
+    renderAt('/knowledge/nisa-limits-and-future-value')
+
+    expect(screen.getByRole('link', {
+      name: '沖縄マネーガイド トップへ戻る',
+    })).toBeTruthy()
+    expect(screen.getByRole('navigation', { name: 'メインメニュー' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: '運営・提携方針' })
+      .getAttribute('href')).toBe('/trust#ads')
+
+    expect(document.querySelector('.n8-masthead')).toBeNull()
+    expect(document.querySelector('.n8-globalnav')).toBeNull()
+    expect(document.querySelector('.nisa-guide-page')).toBeTruthy()
+
+    const localNav = document.querySelector('.nisa-guide-local-nav-shell')!
+    const articleLayout = document.querySelector('.nisa-guide-layout')!
+    expect(localNav.compareDocumentPosition(articleLayout) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .toBeTruthy()
+
+    expect(screen.getByRole('navigation', { name: 'NISA制度メニュー' })).toBeTruthy()
+    expect(screen.getByRole('navigation', { name: 'ページ内メニュー' })).toBeTruthy()
+    expect(screen.getByRole('link', {
+      name: /NISAシミュレーターで試算する/,
+    }).getAttribute('href')).toBe('/simulators/nisa')
+    expect(screen.getByRole('link', {
+      name: /金融庁のNISA公式情報を確認/,
+    }).getAttribute('href')).toBe('https://www.fsa.go.jp/policy/nisa2/know/')
+
+    expect(screen.getByRole('img', {
+      name: '利益100万円のうち税金20万3150円、税引後79万6850円',
+    })).toBeTruthy()
+    expect(screen.getByRole('img', {
+      name: '利益100万円が非課税で100万円',
+    })).toBeTruthy()
+    expect(document.querySelectorAll('.nisa-guide-chart')).toHaveLength(2)
+    expect(document.querySelectorAll('.nisa-guide-chart__column')).toHaveLength(12)
+  })
+
   it('renders a 404 page for an unknown URL', () => {
     renderAt('/missing-page')
     expect(screen.getByRole('heading', { level: 1, name: 'ページが見つかりません' })).toBeTruthy()
