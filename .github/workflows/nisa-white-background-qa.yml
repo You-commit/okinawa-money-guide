@@ -1,0 +1,126 @@
+name: NISA White Background QA
+
+on:
+  push:
+    branches:
+      - qa/nisa-white-background-20261014
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install
+        run: npm ci
+
+      - name: Tests
+        run: |
+          npm test -- src/AppRouter.test.tsx
+          npm test -- --reporter=verbose
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/omg-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/omg-preview.log
+          exit 1
+
+      - name: Capture screenshots
+        run: |
+          mkdir -p qa-white-bg
+          cat > qa-white-bg.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+          const out = path.resolve('qa-white-bg');
+          const base = 'http://127.0.0.1:4173/knowledge/nisa-limits-and-future-value';
+
+          async function capture(mode, viewport, isMobile) {
+            const browser = await chromium.launch({headless:true});
+            const context = await browser.newContext({
+              viewport, isMobile, hasTouch:isMobile, deviceScaleFactor:1, locale:'ja-JP'
+            });
+            const page = await context.newPage();
+            const errors=[];
+            page.on('pageerror', e=>errors.push('pageerror: '+e.message));
+            page.on('console', m=>{ if(m.type()==='error') errors.push('console: '+m.text()) });
+            await page.goto(base,{waitUntil:'networkidle',timeout:120000});
+            await page.waitForTimeout(900);
+
+            const metrics = await page.evaluate(() => {
+              const pageEl = document.querySelector('.nisa-guide-page');
+              const fig = document.querySelector('.nisa-guide-tax-figure');
+              const chart = document.querySelector('.nisa-guide-chart');
+              const cs = el => el ? getComputedStyle(el) : null;
+              return {
+                innerWidth: window.innerWidth,
+                scrollWidth: document.documentElement.scrollWidth,
+                bodyScrollWidth: document.body.scrollWidth,
+                pageBackground: cs(pageEl)?.backgroundColor ?? null,
+                taxFigureBackground: cs(fig)?.backgroundColor ?? null,
+                chartBackground: cs(chart)?.backgroundColor ?? null
+              };
+            });
+
+            await page.screenshot({path:path.join(out,mode+'-top.png'),fullPage:false,animations:'disabled'});
+            await page.screenshot({path:path.join(out,mode+'-full.png'),fullPage:true,animations:'disabled'});
+
+            const tax = page.getByText('100万円の利益が出た場合',{exact:false}).first();
+            if(await tax.count()) {
+              await tax.scrollIntoViewIfNeeded();
+              await page.waitForTimeout(250);
+              await page.screenshot({path:path.join(out,mode+'-tax.png'),fullPage:false,animations:'disabled'});
+            }
+
+            const cases = page.getByText('積立額を自分の家計に置き換えて考える',{exact:false}).first();
+            if(await cases.count()) {
+              await cases.scrollIntoViewIfNeeded();
+              await page.waitForTimeout(250);
+              await page.screenshot({path:path.join(out,mode+'-cases.png'),fullPage:false,animations:'disabled'});
+            }
+
+            fs.writeFileSync(path.join(out,mode+'-metrics.json'),JSON.stringify({metrics,errors},null,2));
+            await browser.close();
+          }
+
+          (async()=>{
+            await capture('desktop',{width:1440,height:900},false);
+            await capture('mobile',{width:390,height:844},true);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+          node qa-white-bg.cjs
+
+      - name: Commit screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qa-white-bg
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "qa: capture white background NISA screenshots [skip ci]"
+          git push origin HEAD:qa/nisa-white-background-20261014
