@@ -1,0 +1,125 @@
+name: NISA Navigation Depth QA r3
+
+on:
+  push:
+    branches:
+      - qa/nisa-nav-depth-20261014-r3
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+      - name: Target tests
+        run: |
+          npm test -- src/AppRouter.test.tsx
+          npm test -- src/app/seo.test.ts
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      - name: Full suite
+        continue-on-error: true
+        run: npm test -- --reporter=verbose
+      - name: Install Playwright
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/omg-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/omg-preview.log
+          exit 1
+      - name: Verify navigation clicks and capture
+        run: |
+          mkdir -p qa-nav-depth
+          cat > qa-nav-depth.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+          const base='http://127.0.0.1:4173/knowledge/nisa-limits-and-future-value';
+          const out=path.resolve('qa-nav-depth');
+
+          async function run(mode, viewport, isMobile){
+            const browser=await chromium.launch({headless:true});
+            const context=await browser.newContext({viewport,isMobile,hasTouch:isMobile,locale:'ja-JP'});
+            const page=await context.newPage();
+            const errors=[];
+            page.on('pageerror',e=>errors.push('pageerror: '+e.message));
+            page.on('console',m=>{if(m.type()==='error') errors.push('console: '+m.text())});
+            await page.goto(base,{waitUntil:'networkidle'});
+            await page.waitForTimeout(500);
+
+            const checks=[];
+            const items=[
+              ['NISAトップ','#basic','NISA制度メニュー'],
+              ['つみたて投資枠','#tsumitate','NISA制度メニュー'],
+              ['成長投資枠','#growth','NISA制度メニュー'],
+              ['NISAのメリット','#benefits','ページ内メニュー'],
+              ['投資枠の違い・活用例','#compare','ページ内メニュー'],
+              ['制度の注意点','#caution','ページ内メニュー'],
+              ['Q&A','#faq','ページ内メニュー'],
+            ];
+            for(const [label,hash,navName] of items){
+              await page.getByRole('navigation',{name:navName}).getByRole('link',{name:label,exact:true}).click();
+              await page.waitForTimeout(120);
+              const result=await page.evaluate((hash)=>{
+                const target=document.querySelector(hash);
+                const header=document.querySelector('.top-option02__header');
+                const tr=target?.getBoundingClientRect();
+                const hr=header?.getBoundingClientRect();
+                return {
+                  hash: location.hash,
+                  targetTop: tr?.top ?? null,
+                  headerBottom: hr?.bottom ?? null,
+                };
+              },hash);
+              checks.push({label,expectedHash:hash,...result});
+            }
+
+            const metrics=await page.evaluate(()=>({
+              innerWidth:innerWidth,
+              scrollWidth:document.documentElement.scrollWidth,
+              scrollHeight:document.documentElement.scrollHeight,
+              ids:['basic','benefits','compare','tsumitate','growth','cases','reuse','caution','faq','sources']
+                .reduce((a,id)=>({...a,[id]:document.querySelectorAll('#'+id).length}),{}),
+              activeTab:document.querySelector('.nisa-bank-tabs a[aria-current="page"]')?.textContent?.trim() ?? null,
+              faqCount:document.querySelectorAll('.nisa-bank-faq details').length,
+              sourceCount:document.querySelectorAll('.nisa-bank-sources li').length,
+              chartCount:document.querySelectorAll('.nisa-bank-chart').length,
+            }));
+
+            await page.goto(base,{waitUntil:'networkidle'});
+            await page.screenshot({path:path.join(out,mode+'-full.png'),fullPage:true,animations:'disabled'});
+            await page.screenshot({path:path.join(out,mode+'-top.png'),fullPage:false,animations:'disabled'});
+            fs.writeFileSync(path.join(out,mode+'-report.json'),JSON.stringify({checks,metrics,errors},null,2));
+            await browser.close();
+          }
+          (async()=>{
+            await run('desktop',{width:1440,height:900},false);
+            await run('mobile',{width:390,height:844},true);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+          node qa-nav-depth.cjs
+
+      - name: Commit QA
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qa-nav-depth
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "qa: capture NISA nav and depth [skip ci]"
+          git push origin HEAD:qa/nisa-nav-depth-20261014-r3
