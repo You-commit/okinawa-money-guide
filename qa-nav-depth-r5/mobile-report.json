@@ -1,0 +1,101 @@
+{
+  "checks": [
+    {
+      "label": "NISAトップ",
+      "expectedHash": "#basic",
+      "hashOk": true,
+      "topOk": true,
+      "hash": "#basic",
+      "targetTop": 111.625,
+      "targetBottom": 680.328125,
+      "headerBottom": 75,
+      "viewportHeight": 844,
+      "activeTab": "NISAトップ"
+    },
+    {
+      "label": "つみたて投資枠",
+      "expectedHash": "#tsumitate",
+      "hashOk": true,
+      "topOk": true,
+      "hash": "#tsumitate",
+      "targetTop": 116.140625,
+      "targetBottom": 383.390625,
+      "headerBottom": 75,
+      "viewportHeight": 844,
+      "activeTab": "つみたて投資枠"
+    },
+    {
+      "label": "成長投資枠",
+      "expectedHash": "#growth",
+      "hashOk": true,
+      "topOk": true,
+      "hash": "#growth",
+      "targetTop": 116.390625,
+      "targetBottom": 384.640625,
+      "headerBottom": 75,
+      "viewportHeight": 844,
+      "activeTab": "成長投資枠"
+    },
+    {
+      "label": "NISAのメリット",
+      "expectedHash": "#benefits",
+      "hashOk": true,
+      "topOk": true,
+      "hash": "#benefits",
+      "targetTop": 112.328125,
+      "targetBottom": 1477.96875,
+      "headerBottom": 75,
+      "viewportHeight": 844,
+      "activeTab": "NISAトップ"
+    },
+    {
+      "label": "投資枠の違い・活用例",
+      "expectedHash": "#compare",
+      "hashOk": true,
+      "topOk": true,
+      "hash": "#compare",
+      "targetTop": 111.96875,
+      "targetBottom": 1312.515625,
+      "headerBottom": 75,
+      "viewportHeight": 844,
+      "activeTab": "NISAトップ"
+    },
+    {
+      "label": "制度の注意点",
+      "expectedHash": "#caution",
+      "hashOk": true,
+      "topOk": true,
+      "hash": "#caution",
+      "targetTop": 112.421875,
+      "targetBottom": 559.359375,
+      "headerBottom": 75,
+      "viewportHeight": 844,
+      "activeTab": "NISAトップ"
+    },
+    {
+      "label": "Q&A",
+      "expectedHash": "#faq",
+      "hashOk": true,
+      "topOk": true,
+      "hash": "#faq",
+      "targetTop": 112.359375,
+      "targetBottom": 409.828125,
+      "headerBottom": 75,
+      "viewportHeight": 844,
+      "activeTab": "NISAトップ"
+    }
+  ],
+  "metrics": {
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "bodyScrollWidth": 390,
+    "scrollHeight": 8331,
+    "duplicateIds": [],
+    "faqCount": 5,
+    "sourceCount": 5,
+    "chartCount": 3,
+    "frameDetailCount": 2,
+    "sectionCount": 8
+  },
+  "errors": []
+}
