@@ -1,1020 +1,1151 @@
-.dedicated-page.knowledge-article-page.nisa-guide-page {
-  padding-bottom: 76px;
+.dedicated-page.knowledge-article-page.nisa-guide-page.nisa-bank-page {
+  padding-bottom: 80px;
   font-family: var(--omg-font-sans);
   color: var(--omg-color-text);
   background: #fff;
 }
 
-.nisa-guide-page .knowledge-article-hero {
+.nisa-bank-page .site-footer {
+  margin-top: 0;
+}
+
+.nisa-bank-hero {
+  background: #fff;
+  border-bottom: 1px solid #e6edf2;
+}
+
+.nisa-bank-hero__inner {
+  width: min(100% - 64px, 1120px);
+  margin: 0 auto;
+  padding: 36px 0 54px;
+}
+
+.nisa-bank-hero__copy {
+  max-width: 760px;
+  padding-top: 34px;
+}
+
+.nisa-bank-hero__eyebrow {
+  margin: 0 0 14px;
+  color: var(--omg-color-brand);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+}
+
+.nisa-bank-hero h1 {
+  margin: 0;
+  color: #0d2f63;
+  font-size: clamp(2.65rem, 4.4vw, 4.05rem);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1.2;
+}
+
+.nisa-bank-hero__lead {
+  max-width: 720px;
+  margin: 24px 0 0;
+  color: #476076;
+  font-size: 0.96rem;
+  line-height: 1.95;
+}
+
+.nisa-bank-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin: 30px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid #dfe8ee;
+}
+
+.nisa-bank-hero__meta > div {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.nisa-bank-hero__meta dt {
+  color: #81909b;
+  font-size: 0.68rem;
+}
+
+.nisa-bank-hero__meta dd {
+  margin: 0;
+  color: #163858;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.nisa-bank-nav-shell {
+  width: min(100% - 64px, 1120px);
+  margin: 0 auto;
   background: #fff;
 }
 
-.nisa-guide-layout {
-  grid-template-columns: minmax(0, 800px) minmax(240px, 280px);
-  gap: 56px;
-}
-
-.nisa-guide-body {
-  min-width: 0;
-}
-
-.nisa-guide-body > section {
-  scroll-margin-top: var(--omg-sticky-header-offset);
-}
-
-.nisa-guide-overview {
-  display: grid;
-  gap: 28px;
-  margin-bottom: 40px;
-  padding: 30px;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 20px;
-  background: var(--omg-color-surface);
-  box-shadow: 0 10px 24px rgba(28, 59, 83, 0.06);
-}
-
-.nisa-guide-overview__eyebrow,
-.nisa-guide-final__eyebrow {
-  margin: 0 0 7px !important;
-  color: var(--omg-color-brand) !important;
-  font-size: 0.7rem !important;
-  font-weight: 850 !important;
-  letter-spacing: 0.12em;
-}
-
-.nisa-guide-overview h2,
-.nisa-guide-final h2 {
-  margin-bottom: 14px;
-}
-
-.nisa-guide-overview__list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding-left: 1.15rem;
-}
-
-.nisa-guide-overview__list li {
-  color: #4d6478;
-  font-size: 0.8rem;
-  line-height: 1.75;
-}
-
-.nisa-guide-keyfacts {
+.nisa-bank-tabs {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 0;
-  border-block: 1px solid var(--omg-color-border);
+  margin-top: 0;
+  border-bottom: 3px solid #0d2f63;
 }
 
-.nisa-guide-keyfacts > div {
-  min-width: 0;
-  padding: 18px 20px;
-  text-align: center;
-}
-
-.nisa-guide-keyfacts > div + div {
-  border-left: 1px solid var(--omg-color-border);
-}
-
-.nisa-guide-keyfacts dt {
-  color: var(--omg-color-muted);
-  font-size: 0.7rem;
-  line-height: 1.5;
-}
-
-.nisa-guide-keyfacts dd {
-  margin: 7px 0 0;
-  color: var(--omg-color-brand);
-  font-size: 1.15rem;
-  font-weight: 850;
-  line-height: 1.25;
-}
-
-.nisa-guide-keyfacts dd strong {
-  font-size: clamp(1.7rem, 3vw, 2.25rem);
-  font-variant-numeric: tabular-nums;
-}
-
-.nisa-guide-local-nav-shell {
-  width: min(100% - 64px, 1120px);
-  margin: 32px auto -26px;
-}
-
-.nisa-guide-tabs {
+.nisa-bank-tabs a {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin: 0 0 14px;
-}
-
-.nisa-guide-tabs a {
-  display: grid;
+  min-height: 62px;
   place-items: center;
-  min-height: 52px;
-  padding: 10px 14px;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 12px;
-  background: var(--omg-color-surface);
-  color: var(--omg-color-text);
-  font-size: 0.78rem;
-  font-weight: 800;
-  line-height: 1.45;
+  border: 1px solid #d8e2e9;
+  border-bottom: 0;
+  background: #fff;
+  color: #17344f;
+  font-size: 0.88rem;
+  font-weight: 850;
+  line-height: 1.3;
   text-align: center;
   text-decoration: none;
-  box-shadow: 0 5px 15px rgba(28, 59, 83, 0.04);
 }
 
-.nisa-guide-tabs a:hover,
-.nisa-guide-tabs a:focus-visible {
-  border-color: color-mix(in srgb, var(--omg-color-brand) 45%, var(--omg-color-border));
-  background: #f4faf8;
+.nisa-bank-tabs a + a {
+  border-left: 0;
 }
 
-.nisa-guide-tabs a.is-active {
-  border-color: var(--omg-color-brand);
-  background: var(--omg-color-brand);
+.nisa-bank-tabs a.is-active {
+  border-color: #0d2f63;
+  background: #0d2f63;
   color: #fff;
 }
 
-.nisa-guide-jump {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-bottom: 0;
-  border-block: 1px solid var(--omg-color-border);
+.nisa-bank-tabs a.is-active::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: #0d2f63;
+  transform: translateX(-50%) rotate(45deg);
 }
 
-.nisa-guide-jump a {
+.nisa-bank-anchor-nav {
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-height: 54px;
+  align-items: center;
+  border-bottom: 1px solid #d8e2e9;
+}
+
+.nisa-bank-anchor-nav a {
+  position: relative;
+  display: grid;
+  min-height: 54px;
   place-items: center;
-  min-height: 58px;
-  padding: 10px 12px;
-  color: #385268;
-  font-size: 0.72rem;
-  font-weight: 750;
-  line-height: 1.45;
+  padding: 10px 14px;
+  color: #17344f;
+  font-size: 0.76rem;
+  font-weight: 780;
+  line-height: 1.35;
   text-align: center;
   text-decoration: none;
 }
 
-.nisa-guide-jump a + a {
-  border-left: 1px solid var(--omg-color-border);
+.nisa-bank-anchor-nav a + a::before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  bottom: 17px;
+  left: 0;
+  width: 1px;
+  background: #bccbd5;
 }
 
-.nisa-guide-jump a:hover,
-.nisa-guide-jump a:focus-visible {
-  color: var(--omg-color-brand-strong);
-  background: #f7fbfa;
+.nisa-bank-layout {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 34px;
+  width: min(100% - 64px, 1120px);
+  margin: 0 auto;
+  padding: 58px 0 110px;
 }
 
-.nisa-guide-tax-figure {
+.nisa-bank-sidebar {
+  align-self: start;
+  position: sticky;
+  top: calc(var(--omg-sticky-header-offset) + 20px);
+}
+
+.nisa-bank-sidebar section {
+  border: 1px solid #dce5eb;
+  background: #f7fafc;
+}
+
+.nisa-bank-sidebar section + section {
+  margin-top: 24px;
+}
+
+.nisa-bank-sidebar h2 {
+  margin: 0;
+  padding: 16px 16px 13px;
+  border-bottom: 1px solid #dce5eb;
+  color: #0d2f63;
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.4;
+}
+
+.nisa-bank-sidebar nav {
+  display: grid;
+}
+
+.nisa-bank-sidebar nav a {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 6px;
+  min-height: 44px;
+  align-items: center;
+  padding: 9px 14px;
+  border-left: 3px solid transparent;
+  color: #334e64;
+  font-size: 0.67rem;
+  font-weight: 680;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.nisa-bank-sidebar nav a:hover,
+.nisa-bank-sidebar nav a:focus-visible {
+  color: #0d2f63;
+  background: #eef5f8;
+}
+
+.nisa-bank-sidebar nav a.is-current {
+  border-left-color: var(--omg-color-brand);
+  background: #eaf4f7;
+  color: #0d2f63;
+}
+
+.nisa-bank-sidebar nav a span {
+  color: #0d2f63;
+  font-size: 0.64rem;
+  font-weight: 850;
+}
+
+.nisa-bank-sidebar__related a {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 62px;
+  padding: 11px 14px;
+  border-bottom: 1px solid #dce5eb;
+  color: #23475f;
+  text-decoration: none;
+}
+
+.nisa-bank-sidebar__related a:last-child {
+  border-bottom: 0;
+}
+
+.nisa-bank-sidebar__related a > *:first-child,
+.nisa-bank-sidebar__related a img:first-child {
+  width: 30px;
+  height: 30px;
+}
+
+.nisa-bank-sidebar__related a > *:first-child {
+  color: var(--omg-color-brand);
+}
+
+.nisa-bank-sidebar__related span {
+  display: grid;
+  gap: 2px;
+}
+
+.nisa-bank-sidebar__related strong {
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.nisa-bank-sidebar__related small {
+  color: #71818d;
+  font-size: 0.61rem;
+  line-height: 1.45;
+}
+
+.nisa-bank-article {
+  min-width: 0;
+}
+
+.nisa-bank-section {
+  scroll-margin-top: calc(var(--omg-sticky-header-offset) + 20px);
+}
+
+.nisa-bank-section + .nisa-bank-section,
+.nisa-bank-bottom-grid {
+  margin-top: 72px;
+}
+
+.nisa-bank-section__heading {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.nisa-bank-section__heading > span {
+  position: relative;
+  color: var(--omg-color-brand);
+  font-size: 0.98rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.nisa-bank-section__heading > span::after {
+  content: "";
+  display: block;
+  width: 22px;
+  height: 2px;
+  margin-top: 7px;
+  background: var(--omg-color-brand);
+}
+
+.nisa-bank-section__heading h2 {
+  margin: 0;
+  color: #0d2f63;
+  font-size: clamp(1.48rem, 2.5vw, 2rem);
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.nisa-bank-section__intro {
+  max-width: 820px;
+  margin: 0 0 30px;
+  color: #4b6276;
+  font-size: 0.87rem;
+  line-height: 1.9;
+}
+
+.nisa-bank-tax {
   margin: 34px 0 0;
-  padding: 28px;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 20px;
-  background: #f6f9fb;
-  box-shadow: 0 10px 24px rgba(28, 59, 83, 0.06);
+  padding: 28px 32px 24px;
+  border: 1px solid #dbe6ec;
+  background: #f2f8fb;
 }
 
-.nisa-guide-tax-figure > figcaption {
+.nisa-bank-tax > figcaption {
   display: grid;
   gap: 5px;
   margin-bottom: 22px;
   text-align: center;
 }
 
-.nisa-guide-tax-figure > figcaption strong {
-  color: var(--omg-color-text);
-  font-size: 1.25rem;
-  line-height: 1.45;
-}
-
-.nisa-guide-tax-figure > figcaption span {
-  color: var(--omg-color-muted);
-  font-size: 0.68rem;
-  line-height: 1.6;
-}
-
-.nisa-guide-tax-compare {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.nisa-guide-tax-card {
-  min-width: 0;
-  padding: 20px;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 16px;
-  background: #f8fbfd;
-}
-
-.nisa-guide-tax-card.is-nisa {
-  border-color: color-mix(in srgb, var(--omg-color-brand) 32%, var(--omg-color-border));
-  background: #eef8f6;
-}
-
-.nisa-guide-tax-card header {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 18px;
-}
-
-.nisa-guide-tax-card header span {
-  color: #385268;
-  font-size: 0.76rem;
-  font-weight: 750;
-}
-
-.nisa-guide-tax-card header strong {
-  color: var(--omg-color-text);
-  font-size: 1.6rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.2;
-}
-
-.nisa-guide-tax-card.is-nisa header strong {
-  color: var(--omg-color-brand);
-}
-
-.nisa-guide-tax-stack {
-  display: grid;
-  min-height: 210px;
-  grid-template-rows: 64px 1fr;
-  overflow: hidden;
-  border: 1px solid #d5e1e7;
-  border-radius: 12px;
-  background: #fff;
-}
-
-.nisa-guide-tax-card.is-nisa .nisa-guide-tax-stack {
-  grid-template-rows: 52px 1fr;
-  border-color: #b9d8d4;
-}
-
-.nisa-guide-tax-stack__tax,
-.nisa-guide-tax-stack__net {
-  display: grid;
-  place-items: center;
-  align-content: center;
-  gap: 3px;
-  min-width: 0;
-  padding: 10px 12px;
-  text-align: center;
-}
-
-.nisa-guide-tax-stack__tax {
-  border-bottom: 1px solid #d5e1e7;
-  background: #f4f7f9;
-  color: #546b7d;
-}
-
-.nisa-guide-tax-stack__tax.is-zero {
-  border-bottom-color: #b9d8d4;
-  background: #e4f4f0;
-  color: var(--omg-color-brand-strong);
-}
-
-.nisa-guide-tax-stack__net {
-  background: #173f62;
-  color: #fff;
-}
-
-.nisa-guide-tax-card.is-nisa .nisa-guide-tax-stack__net {
-  background: var(--omg-color-brand);
-}
-
-.nisa-guide-tax-stack span {
-  font-size: 0.66rem;
+.nisa-bank-tax > figcaption strong {
+  color: #0d2f63;
+  font-size: 1.28rem;
+  font-weight: 850;
   line-height: 1.4;
 }
 
-.nisa-guide-tax-stack strong {
-  font-size: 1.08rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.25;
+.nisa-bank-tax > figcaption span {
+  color: #71818d;
+  font-size: 0.65rem;
 }
 
-.nisa-guide-figure-note {
-  margin-top: 16px !important;
-  color: var(--omg-color-muted) !important;
-  font-size: 0.68rem !important;
-  line-height: 1.7 !important;
-}
-
-.nisa-guide-accordion,
-.nisa-guide-faq {
+.nisa-bank-tax__compare {
   display: grid;
-  gap: 10px;
-  margin-top: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 116px;
+  gap: 28px;
+  align-items: end;
 }
 
-.nisa-guide-accordion details,
-.nisa-guide-faq details {
-  overflow: hidden;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 12px;
-  background: var(--omg-color-surface);
+.nisa-bank-tax__account {
+  min-width: 0;
+  text-align: center;
 }
 
-.nisa-guide-accordion summary,
-.nisa-guide-faq summary {
-  position: relative;
-  padding: 17px 48px 17px 18px;
-  color: var(--omg-color-text);
-  font-size: 0.8rem;
-  font-weight: 800;
+.nisa-bank-tax__account h3 {
+  margin: 0;
+  padding: 10px 12px;
+  background: #d9e1e5;
+  color: #17344f;
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.3;
+}
+
+.nisa-bank-tax__account.is-nisa h3 {
+  background: #0fafa7;
+  color: #fff;
+}
+
+.nisa-bank-tax__account > p {
+  margin: 6px 0 0;
+  color: #6f7f89;
+  font-size: 0.62rem;
+}
+
+.nisa-bank-tax__rate {
+  display: block;
+  margin-top: 12px;
+  color: #0d2f63;
+  font-size: 1.45rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-bank-tax__account.is-nisa .nisa-bank-tax__rate {
+  color: var(--omg-color-brand);
+}
+
+.nisa-bank-tax__message {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 5px 8px;
+  border: 1px solid #cbd7de;
+  background: #fff;
+  color: #405a6f;
+  font-size: 0.62rem;
+  font-weight: 720;
+}
+
+.nisa-bank-tax__account.is-nisa .nisa-bank-tax__message {
+  border-color: #8fd6d0;
+  color: #0a837a;
+}
+
+.nisa-bank-tax__bar {
+  display: grid;
+  height: 182px;
+  margin: 18px auto 0;
+  border-bottom: 1px solid #9eb2bf;
+}
+
+.nisa-bank-tax__bar.is-taxable {
+  grid-template-rows: 44px 1fr;
+}
+
+.nisa-bank-tax__bar.is-nisa {
+  grid-template-rows: 1fr;
+}
+
+.nisa-bank-tax__tax,
+.nisa-bank-tax__net {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+}
+
+.nisa-bank-tax__tax {
+  border: 1px dashed #9caeb9;
+  border-bottom: 0;
+  background: rgba(255, 255, 255, 0.65);
+  color: #405a6f;
+}
+
+.nisa-bank-tax__net {
+  background: #0f3f68;
+  color: #fff;
+}
+
+.nisa-bank-tax__account.is-nisa .nisa-bank-tax__net {
+  background: #0eaaa1;
+}
+
+.nisa-bank-tax__tax small,
+.nisa-bank-tax__net small {
+  font-size: 0.64rem;
+}
+
+.nisa-bank-tax__tax strong,
+.nisa-bank-tax__net strong {
+  font-size: 1.16rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-bank-tax__difference {
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 108px;
+  height: 108px;
+  border: 2px solid var(--omg-color-brand);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--omg-color-brand);
+  text-align: center;
+}
+
+.nisa-bank-tax__difference small {
+  font-size: 0.62rem;
+}
+
+.nisa-bank-tax__difference strong {
+  font-size: 1.05rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.nisa-bank-note {
+  margin: 14px 0 0;
+  color: #7b8993;
+  font-size: 0.62rem;
+  line-height: 1.7;
+}
+
+.nisa-bank-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #cad9e2;
+  background: #fff;
+}
+
+.nisa-bank-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  color: #27465f;
+  font-size: 0.72rem;
   line-height: 1.6;
+}
+
+.nisa-bank-table th,
+.nisa-bank-table td {
+  padding: 12px 14px;
+  border-right: 1px solid #cad9e2;
+  border-bottom: 1px solid #cad9e2;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.nisa-bank-table th:last-child,
+.nisa-bank-table td:last-child {
+  border-right: 0;
+}
+
+.nisa-bank-table tr:last-child th,
+.nisa-bank-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.nisa-bank-table thead th {
+  background: #dbeef1;
+  color: #123c55;
+  font-weight: 850;
+}
+
+.nisa-bank-table thead th:first-child {
+  background: #e8eff3;
+}
+
+.nisa-bank-table tbody th {
+  width: 150px;
+  background: #f4f7f9;
+  color: #36546b;
+  font-weight: 780;
+}
+
+.nisa-bank-table td strong {
+  color: #0d2f63;
+  font-size: 0.82rem;
+}
+
+.nisa-bank-table td small {
+  color: #6f7f89;
+  font-size: 0.64rem;
+}
+
+.nisa-bank-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.nisa-bank-chart {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: 18px 16px 14px;
+  border: 1px solid #dbe6ec;
+  background: #f2f8fb;
+}
+
+.nisa-bank-chart figcaption {
+  display: grid;
+  gap: 8px;
+  min-height: 64px;
+}
+
+.nisa-bank-chart figcaption strong {
+  color: #0d2f63;
+  font-size: 0.86rem;
+  font-weight: 850;
+  line-height: 1.45;
+}
+
+.nisa-bank-chart figcaption > span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  color: #677987;
+  font-size: 0.56rem;
+  line-height: 1.45;
+}
+
+.nisa-bank-chart figcaption i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.nisa-bank-chart figcaption i.is-principal {
+  background: #bed5df;
+}
+
+.nisa-bank-chart figcaption i.is-growth {
+  background: #0e5d88;
+}
+
+.nisa-bank-chart__callout {
+  position: absolute;
+  top: 74px;
+  right: 14px;
+  z-index: 2;
+  display: grid;
+  min-width: 94px;
+  padding: 7px 9px;
+  border: 1px solid #0b8598;
+  border-radius: 4px;
+  background: #fff;
+  color: #0d2f63;
+  text-align: center;
+}
+
+.nisa-bank-chart__callout::after {
+  content: "";
+  position: absolute;
+  right: 24px;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  border-right: 1px solid #0b8598;
+  border-bottom: 1px solid #0b8598;
+  background: #fff;
+  transform: rotate(45deg);
+}
+
+.nisa-bank-chart__callout small {
+  font-size: 0.55rem;
+}
+
+.nisa-bank-chart__callout strong {
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.nisa-bank-chart__callout span {
+  font-size: 0.53rem;
+}
+
+.nisa-bank-chart__plot {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  height: 190px;
+  margin-top: 12px;
+  padding: 14px 4px 0;
+  border-left: 1px solid #9eb2bf;
+  border-bottom: 1px solid #9eb2bf;
+}
+
+.nisa-bank-chart__grid {
+  position: absolute;
+  inset: 14px 0 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, transparent 24%, rgba(161, 181, 194, 0.28) 25%, transparent 26%),
+    linear-gradient(to top, transparent 49%, rgba(161, 181, 194, 0.28) 50%, transparent 51%),
+    linear-gradient(to top, transparent 74%, rgba(161, 181, 194, 0.28) 75%, transparent 76%);
+}
+
+.nisa-bank-chart__column {
+  z-index: 1;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 22px;
+  min-width: 0;
+}
+
+.nisa-bank-chart__bar-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 0;
+}
+
+.nisa-bank-chart__bar {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  width: min(34px, 70%);
+  min-height: 3px;
+}
+
+.nisa-bank-chart__principal,
+.nisa-bank-chart__growth {
+  display: block;
+  width: 100%;
+}
+
+.nisa-bank-chart__principal {
+  background: #bed5df;
+}
+
+.nisa-bank-chart__growth {
+  flex: 1;
+  background: #0e5d88;
+}
+
+.nisa-bank-chart__year {
+  align-self: end;
+  color: #536a7c;
+  font-size: 0.56rem;
+  text-align: center;
+}
+
+.nisa-bank-chart__unit {
+  margin-top: 5px;
+  color: #6f7f89;
+  font-size: 0.54rem;
+}
+
+.nisa-bank-caution {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 22px;
+  border: 1px solid #dce5eb;
+  background: #f5f8fa;
+}
+
+.nisa-bank-caution__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: #0d6d7a;
+}
+
+.nisa-bank-caution__icon > *,
+.nisa-bank-caution__icon img {
+  width: 42px;
+  height: 42px;
+}
+
+.nisa-bank-caution ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 1.05rem;
+}
+
+.nisa-bank-caution li {
+  color: #536a7c;
+  font-size: 0.72rem;
+  line-height: 1.65;
+}
+
+.nisa-bank-bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.85fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.nisa-bank-bottom-grid .nisa-bank-section {
+  margin-top: 0;
+}
+
+.nisa-bank-faq details {
+  border-top: 1px solid #dce5eb;
+}
+
+.nisa-bank-faq details:last-child {
+  border-bottom: 1px solid #dce5eb;
+}
+
+.nisa-bank-faq summary {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 13px 2px;
+  color: #17344f;
+  font-size: 0.72rem;
+  font-weight: 780;
   cursor: pointer;
   list-style: none;
 }
 
-.nisa-guide-accordion summary::-webkit-details-marker,
-.nisa-guide-faq summary::-webkit-details-marker {
+.nisa-bank-faq summary::-webkit-details-marker {
   display: none;
 }
 
-.nisa-guide-accordion summary::after,
-.nisa-guide-faq summary::after {
-  content: "+";
-  position: absolute;
-  top: 50%;
-  right: 18px;
-  color: var(--omg-color-brand);
-  font-size: 1.25rem;
-  transform: translateY(-50%);
-}
-
-.nisa-guide-accordion details[open] summary::after,
-.nisa-guide-faq details[open] summary::after {
-  content: "−";
-}
-
-.nisa-guide-accordion details p,
-.nisa-guide-faq details p {
-  margin: 0 !important;
-  padding: 0 18px 18px;
-  color: var(--omg-color-muted) !important;
-  font-size: 0.78rem !important;
-  line-height: 1.8 !important;
-}
-
-.nisa-guide-frame-grid {
+.nisa-bank-faq summary span {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 28px;
-}
-
-.nisa-guide-frame-grid > article {
-  min-width: 0;
-  padding: 24px;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 16px;
-  background: var(--omg-color-surface);
-  box-shadow: 0 8px 20px rgba(28, 59, 83, 0.055);
-}
-
-.nisa-guide-frame-grid__icon,
-.nisa-guide-point-card__icon,
-.nisa-guide-steps__icon {
-  display: grid;
+  width: 20px;
+  height: 20px;
   place-items: center;
-  color: var(--omg-color-brand);
-}
-
-.nisa-guide-frame-grid__icon {
-  width: 54px;
-  height: 54px;
-  margin-bottom: 12px;
-  border-radius: 14px;
-  background: #eaf8f4;
-}
-
-.nisa-guide-frame-grid__icon > *,
-.nisa-guide-frame-grid__icon img {
-  width: 48px;
-  height: 48px;
-}
-
-.nisa-guide-frame-grid h3 {
-  margin: 0;
-  color: var(--omg-color-text);
-  font-size: 1rem;
-  line-height: 1.45;
-}
-
-.nisa-guide-frame-grid__amount {
-  display: block;
-  margin-top: 10px;
-  color: var(--omg-color-brand);
-  font-size: 1.55rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.2;
-}
-
-.nisa-guide-frame-grid dl {
-  margin: 22px 0 0;
-}
-
-.nisa-guide-frame-grid dl > div {
-  display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
-  gap: 14px;
-  padding: 12px 0;
-  border-top: 1px solid var(--omg-color-border);
-}
-
-.nisa-guide-frame-grid dt {
-  color: var(--omg-color-muted);
-  font-size: 0.68rem;
-  font-weight: 750;
-}
-
-.nisa-guide-frame-grid dd {
-  margin: 0;
-  color: #385268;
-  font-size: 0.72rem;
-  line-height: 1.7;
-}
-
-.nisa-guide-total-limit {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  margin-top: 16px;
-  padding: 22px;
-  border-radius: 16px;
-  background: #edf7f5;
-  text-align: center;
-}
-
-.nisa-guide-total-limit span,
-.nisa-guide-total-limit small {
-  color: var(--omg-color-muted);
-  font-size: 0.7rem;
-}
-
-.nisa-guide-total-limit strong {
-  color: var(--omg-color-brand);
-  font-size: 1.55rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.nisa-guide-case-list {
-  display: grid;
-  gap: 22px;
-  margin-top: 28px;
-}
-
-.nisa-guide-case {
-  padding: 24px;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 18px;
-  background: var(--omg-color-surface);
-  box-shadow: 0 8px 20px rgba(28, 59, 83, 0.05);
-}
-
-.nisa-guide-case > header {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
-  gap: 14px;
-  margin-bottom: 22px;
-}
-
-.nisa-guide-case > header > span {
-  display: inline-grid;
-  place-items: center;
-  min-height: 28px;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: #eaf8f4;
-  color: var(--omg-color-brand);
-  font-size: 0.64rem;
-  font-weight: 850;
-}
-
-.nisa-guide-case h3 {
-  margin: 0;
-  color: var(--omg-color-text);
-  font-size: 1rem;
-  line-height: 1.45;
-}
-
-.nisa-guide-case header p {
-  margin-top: 5px !important;
-  font-size: 0.76rem !important;
-  line-height: 1.7 !important;
-}
-
-.nisa-guide-chart {
-  margin: 0;
-  padding: 18px;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 14px;
-  background: #f6f9fb;
-}
-
-.nisa-guide-chart figcaption {
-  display: grid;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-
-.nisa-guide-chart figcaption strong {
-  color: #24495d;
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
-.nisa-guide-chart figcaption span,
-.nisa-guide-chart__unit {
-  color: var(--omg-color-muted);
-  font-size: 0.64rem;
-  line-height: 1.5;
-}
-
-.nisa-guide-chart__unit {
-  margin-bottom: 8px;
-  text-align: right;
-}
-
-.nisa-guide-chart__plot {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(42px, 1fr));
-  gap: 10px;
-  min-width: 0;
-  padding-top: 2px;
-}
-
-.nisa-guide-chart__column {
-  display: grid;
-  grid-template-rows: 22px 170px 22px;
-  align-items: end;
-  min-width: 0;
-}
-
-.nisa-guide-chart__value,
-.nisa-guide-chart__label {
-  color: #536a7d;
-  font-size: 0.62rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.3;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.nisa-guide-chart__track {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-bottom: 1px solid #b9c9d3;
-  background:
-    linear-gradient(to top, transparent 24%, #edf2f5 25%, transparent 26%),
-    linear-gradient(to top, transparent 49%, #edf2f5 50%, transparent 51%),
-    linear-gradient(to top, transparent 74%, #edf2f5 75%, transparent 76%);
-}
-
-.nisa-guide-chart__fill {
-  display: block;
-  width: 72%;
-  max-width: 46px;
-  min-height: 4px;
-  margin: 0 auto;
-  border-radius: 6px 6px 0 0;
-  background: linear-gradient(180deg, #2da79a 0%, var(--omg-color-brand) 100%);
-}
-
-.nisa-guide-inline-arrow,
-.nisa-guide-primary-action .top-option02__mask-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.nisa-guide-point-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 26px;
-}
-
-.nisa-guide-point-card {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 14px;
-  min-width: 0;
-  padding: 22px;
-  border: 1px solid var(--omg-color-border);
-  border-radius: 16px;
-  background: var(--omg-color-surface);
-  box-shadow: 0 8px 20px rgba(28, 59, 83, 0.055);
-}
-
-.nisa-guide-point-card__icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: #eef5ff;
-}
-
-.nisa-guide-point-card__icon > *,
-.nisa-guide-point-card__icon img {
-  width: 46px;
-  height: 46px;
-}
-
-.nisa-guide-point-card small {
-  display: block;
-  color: var(--omg-color-brand);
-  font-size: 0.62rem;
-  font-weight: 850;
-  letter-spacing: 0.06em;
-}
-
-.nisa-guide-point-card h3 {
-  margin: 5px 0 7px;
-  color: var(--omg-color-text);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.nisa-guide-point-card p {
-  font-size: 0.74rem !important;
-  line-height: 1.75 !important;
-}
-
-.nisa-guide-steps {
-  display: grid;
-  gap: 0;
-  margin: 26px 0 0;
-  padding: 0;
-  list-style: none;
-  border-block: 1px solid var(--omg-color-border);
-}
-
-.nisa-guide-steps li {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
-  align-items: center;
-  gap: 16px;
-  min-width: 0;
-  padding: 16px 0;
-}
-
-.nisa-guide-steps li + li {
-  border-top: 1px solid var(--omg-color-border);
-}
-
-.nisa-guide-steps__icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: #f4f8fb;
-}
-
-.nisa-guide-steps__icon > *,
-.nisa-guide-steps__icon img {
-  width: 46px;
-  height: 46px;
-}
-
-.nisa-guide-steps li > div {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 2px 10px;
-  align-items: center;
-}
-
-.nisa-guide-steps b {
-  grid-row: 1 / span 2;
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
   border-radius: 50%;
   background: var(--omg-color-brand);
   color: #fff;
-  font-size: 0.68rem;
+  font-size: 0.6rem;
 }
 
-.nisa-guide-steps strong {
-  color: var(--omg-color-text);
-  font-size: 0.82rem;
+.nisa-bank-faq details p {
+  margin: 0 0 14px 32px;
+  color: #5a6f80;
+  font-size: 0.7rem;
+  line-height: 1.7;
+}
+
+.nisa-bank-sources ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid #dce5eb;
+}
+
+.nisa-bank-sources li {
+  border-bottom: 1px solid #dce5eb;
+}
+
+.nisa-bank-sources a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 8px;
+  padding: 12px 2px;
+  color: #0d5e8b;
+  text-decoration: none;
+}
+
+.nisa-bank-sources a:hover,
+.nisa-bank-sources a:focus-visible {
+  color: var(--omg-color-brand);
+}
+
+.nisa-bank-sources a span {
+  font-size: 0.68rem;
+  font-weight: 760;
   line-height: 1.45;
 }
 
-.nisa-guide-steps small {
-  color: var(--omg-color-muted);
-  font-size: 0.68rem;
-  line-height: 1.55;
+.nisa-bank-sources a small {
+  grid-column: 1;
+  color: #81909b;
+  font-size: 0.56rem;
 }
 
-.nisa-guide-primary-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  min-height: 48px;
-  padding: 12px 20px;
-  border-radius: 12px;
-  background: var(--omg-color-brand);
-  color: #fff !important;
-  font-size: 0.78rem;
-  font-weight: 850;
-  text-decoration: none;
-  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
+.nisa-bank-sources a b {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: 0.72rem;
 }
 
-.nisa-guide-primary-action:hover,
-.nisa-guide-primary-action:focus-visible {
-  background: var(--omg-color-brand-strong);
-}
-
-.nisa-guide-sticky-cta {
+.nisa-bank-sticky-cta {
   position: fixed;
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 70;
-  padding: 10px 24px calc(10px + env(safe-area-inset-bottom));
-  border-top: 1px solid rgba(30, 76, 120, 0.12);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 -8px 24px rgba(15, 52, 90, 0.08);
-  backdrop-filter: blur(14px);
+  z-index: 80;
+  padding: 8px 24px calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid #d8e2e9;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 -7px 20px rgba(13, 47, 99, 0.06);
+  backdrop-filter: blur(12px);
 }
 
-.nisa-guide-sticky-cta__inner {
+.nisa-bank-sticky-cta__inner {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  width: min(100%, 820px);
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  width: min(100%, 720px);
   margin: 0 auto;
 }
 
-.nisa-guide-sticky-cta .nisa-guide-primary-action,
-.nisa-guide-secondary-action {
-  min-height: 48px;
-  border-radius: 999px;
-}
-
-.nisa-guide-secondary-action {
-  display: inline-flex;
+.nisa-bank-sticky-cta__primary,
+.nisa-bank-sticky-cta__secondary {
+  display: flex;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 20px;
-  border: 1px solid var(--omg-color-border);
-  background: #fff;
-  color: var(--omg-color-text);
-  font-size: 0.78rem;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.7rem;
   font-weight: 850;
-  line-height: 1.4;
+  line-height: 1.35;
   text-align: center;
   text-decoration: none;
 }
 
-.nisa-guide-secondary-action:hover,
-.nisa-guide-secondary-action:focus-visible {
-  border-color: color-mix(in srgb, var(--omg-color-brand) 42%, var(--omg-color-border));
-  color: var(--omg-color-brand-strong);
-  background: #f7fbfa;
+.nisa-bank-sticky-cta__primary {
+  border: 1px solid var(--omg-color-brand);
+  background: var(--omg-color-brand);
+  color: #fff;
 }
 
-.nisa-guide-legal {
-  padding: 20px 22px;
-  border: 1px solid #e8dec4;
-  border-radius: 12px;
-  background: #fffdf7;
+.nisa-bank-sticky-cta__secondary {
+  border: 1px solid #0874b7;
+  background: #fff;
+  color: #0d5e8b;
 }
 
-.nisa-guide-legal ul {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding-left: 1.2rem;
+.nisa-bank-sticky-cta__primary > *:first-child,
+.nisa-bank-sticky-cta__primary img:first-child {
+  width: 22px;
+  height: 22px;
 }
 
-.nisa-guide-legal li {
-  color: #655f53;
-  font-size: 0.72rem;
-  line-height: 1.75;
+.nisa-bank-sticky-cta__primary > *:last-child,
+.nisa-bank-sticky-cta__primary img:last-child {
+  width: 14px;
+  height: 14px;
 }
 
-.nisa-guide-aside-nav {
-  display: grid;
-  margin-top: 12px;
+.nisa-bank-sticky-cta__primary:hover,
+.nisa-bank-sticky-cta__primary:focus-visible {
+  background: var(--omg-color-brand-strong);
 }
 
-.nisa-guide-aside-nav a {
-  padding: 8px 0;
-  border-bottom: 1px solid #e4ecef;
-  color: #385268;
-  font-size: 0.7rem;
-  font-weight: 720;
-  line-height: 1.5;
-  text-decoration: none;
-}
-
-.nisa-guide-aside-nav a:hover,
-.nisa-guide-aside-nav a:focus-visible {
-  color: var(--omg-color-brand);
+.nisa-bank-sticky-cta__secondary:hover,
+.nisa-bank-sticky-cta__secondary:focus-visible {
+  background: #f5f9fc;
 }
 
 @media (max-width: 980px) {
-  .nisa-guide-layout {
-    grid-template-columns: minmax(0, 760px);
-    gap: 44px;
+  .nisa-bank-layout {
+    grid-template-columns: 165px minmax(0, 1fr);
+    gap: 26px;
+  }
+
+  .nisa-bank-tax__compare {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .nisa-bank-tax__difference {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 100%;
+    height: auto;
+    padding: 10px 16px;
+    border-radius: 0;
+  }
+
+  .nisa-bank-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-bank-chart {
+    min-height: 300px;
+  }
+
+  .nisa-bank-chart__plot {
+    height: 210px;
   }
 }
 
 @media (max-width: 760px) {
-  .dedicated-page.knowledge-article-page.nisa-guide-page {
-    padding-bottom: calc(74px + env(safe-area-inset-bottom));
+  .dedicated-page.knowledge-article-page.nisa-guide-page.nisa-bank-page {
+    padding-bottom: calc(78px + env(safe-area-inset-bottom));
   }
 
-  .nisa-guide-local-nav-shell {
-    width: min(100% - 40px, 760px);
-    margin: 24px auto -20px;
+  .nisa-bank-hero__inner {
+    width: min(100% - 40px, 720px);
+    padding: 22px 0 36px;
   }
 
-  .nisa-guide-overview {
-    padding: 22px 18px;
-    border-radius: 16px;
+  .nisa-bank-hero__copy {
+    max-width: none;
+    padding-top: 26px;
   }
 
-  .nisa-guide-keyfacts {
-    grid-template-columns: 1fr;
+  .nisa-bank-hero__eyebrow {
+    font-size: 0.64rem;
   }
 
-  .nisa-guide-keyfacts > div {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 2px;
-    text-align: left;
+  .nisa-bank-hero h1 {
+    font-size: clamp(2.25rem, 10vw, 3.2rem);
+    line-height: 1.25;
   }
 
-  .nisa-guide-keyfacts > div + div {
-    border-top: 1px solid var(--omg-color-border);
-    border-left: 0;
+  .nisa-bank-hero__lead {
+    margin-top: 20px;
+    font-size: 0.88rem;
+    line-height: 1.9;
   }
 
-  .nisa-guide-keyfacts dd {
-    margin: 0;
-    text-align: right;
+  .nisa-bank-hero__meta {
+    gap: 18px;
+    margin-top: 24px;
+    padding-top: 16px;
   }
 
-  .nisa-guide-tabs {
-    gap: 7px;
-  }
-
-  .nisa-guide-tabs a {
-    min-height: 48px;
-    padding-inline: 8px;
-    font-size: 0.68rem;
-  }
-
-  .nisa-guide-jump {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-bottom: 0;
-  }
-
-  .nisa-guide-jump a:nth-child(3) {
-    border-left: 0;
-    border-top: 1px solid var(--omg-color-border);
-  }
-
-  .nisa-guide-jump a:nth-child(4) {
-    border-top: 1px solid var(--omg-color-border);
-  }
-
-  .nisa-guide-tax-figure {
-    padding: 20px 14px;
-    border-radius: 16px;
-  }
-
-  .nisa-guide-tax-compare {
-    grid-template-columns: 1fr;
-  }
-
-  .nisa-guide-tax-stack {
-    min-height: 180px;
-  }
-
-  .nisa-guide-frame-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .nisa-guide-frame-grid > article {
-    padding: 20px;
-  }
-
-  .nisa-guide-case {
-    padding: 20px 14px;
-  }
-
-  .nisa-guide-case > header {
-    grid-template-columns: 1fr;
-  }
-
-  .nisa-guide-case > header > span {
-    justify-self: start;
-  }
-
-  .nisa-guide-chart__plot {
-    gap: 6px;
-  }
-
-  .nisa-guide-chart__column {
-    grid-template-rows: 20px 132px 20px;
-  }
-
-  .nisa-guide-chart__value,
-  .nisa-guide-chart__label {
-    font-size: 0.56rem;
-  }
-
-  .nisa-guide-chart__fill {
-    width: 68%;
-  }
-
-  .nisa-guide-point-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .nisa-guide-point-card {
-    grid-template-columns: 48px minmax(0, 1fr);
-    padding: 18px;
-  }
-
-  .nisa-guide-point-card__icon,
-  .nisa-guide-steps__icon {
-    width: 48px;
-    height: 48px;
-  }
-
-  .nisa-guide-point-card__icon > *,
-  .nisa-guide-point-card__icon img,
-  .nisa-guide-steps__icon > *,
-  .nisa-guide-steps__icon img {
-    width: 42px;
-    height: 42px;
-  }
-
-  .nisa-guide-steps li {
-    grid-template-columns: 48px minmax(0, 1fr);
-    gap: 12px;
-  }
-
-  .nisa-guide-final {
-    grid-template-columns: 1fr;
-    padding: 24px 20px;
-  }
-
-  .nisa-guide-primary-action {
+  .nisa-bank-nav-shell {
     width: 100%;
   }
 
-  .nisa-guide-sticky-cta {
-    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  .nisa-bank-tabs {
+    grid-template-columns: 1fr;
+    border-bottom-width: 2px;
   }
 
-  .nisa-guide-sticky-cta__inner {
+  .nisa-bank-tabs a {
+    min-height: 46px;
+    border-right: 0;
+    border-left: 0;
+  }
+
+  .nisa-bank-tabs a + a {
+    border-top: 0;
+  }
+
+  .nisa-bank-tabs a.is-active::after {
+    display: none;
+  }
+
+  .nisa-bank-anchor-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nisa-bank-anchor-nav a:nth-child(3),
+  .nisa-bank-anchor-nav a:nth-child(4) {
+    border-top: 1px solid #d8e2e9;
+  }
+
+  .nisa-bank-anchor-nav a:nth-child(3)::before {
+    display: none;
+  }
+
+  .nisa-bank-layout {
+    display: block;
+    width: min(100% - 40px, 720px);
+    padding: 46px 0 84px;
+  }
+
+  .nisa-bank-sidebar {
+    display: none;
+  }
+
+  .nisa-bank-section + .nisa-bank-section,
+  .nisa-bank-bottom-grid {
+    margin-top: 60px;
+  }
+
+  .nisa-bank-section__heading {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .nisa-bank-section__heading h2 {
+    font-size: 1.55rem;
+  }
+
+  .nisa-bank-section__intro {
+    font-size: 0.84rem;
+  }
+
+  .nisa-bank-tax {
+    padding: 22px 16px 20px;
+  }
+
+  .nisa-bank-tax__compare {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .nisa-bank-tax__difference {
+    grid-column: auto;
+    width: auto;
+  }
+
+  .nisa-bank-table {
+    min-width: 640px;
+  }
+
+  .nisa-bank-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nisa-bank-chart {
+    min-height: 290px;
+  }
+
+  .nisa-bank-chart__callout {
+    top: 74px;
+  }
+
+  .nisa-bank-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 56px;
+  }
+
+  .nisa-bank-caution {
+    grid-template-columns: 40px minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .nisa-bank-caution__icon,
+  .nisa-bank-caution__icon > *,
+  .nisa-bank-caution__icon img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nisa-bank-sticky-cta {
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
+  }
+
+  .nisa-bank-sticky-cta__inner {
     gap: 8px;
   }
 
-  .nisa-guide-sticky-cta .nisa-guide-primary-action,
-  .nisa-guide-secondary-action {
+  .nisa-bank-sticky-cta__primary,
+  .nisa-bank-sticky-cta__secondary {
     min-height: 50px;
-    padding: 9px 10px;
-    font-size: 0.68rem;
-    line-height: 1.35;
+    padding: 8px 10px;
+    font-size: 0.63rem;
+  }
+
+  .nisa-bank-sticky-cta__primary > *:first-child,
+  .nisa-bank-sticky-cta__primary img:first-child {
+    display: none;
   }
 }
 
 @media (max-width: 420px) {
-  .nisa-guide-tabs {
-    grid-template-columns: 1fr;
+  .nisa-bank-anchor-nav a {
+    min-height: 50px;
+    padding-inline: 8px;
+    font-size: 0.68rem;
   }
 
-  .nisa-guide-tabs a {
-    min-height: 44px;
+  .nisa-bank-chart {
+    padding-inline: 12px;
   }
 
-  .nisa-guide-chart__plot {
-    grid-template-columns: repeat(6, minmax(38px, 1fr));
+  .nisa-bank-chart__plot {
+    gap: 6px;
   }
 
-  .nisa-guide-chart__column {
-    grid-template-rows: 20px 118px 20px;
-  }
-
-  .nisa-guide-frame-grid dl > div {
-    grid-template-columns: 82px minmax(0, 1fr);
+  .nisa-bank-chart__callout {
+    right: 10px;
+    min-width: 88px;
   }
 }
