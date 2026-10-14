@@ -1,0 +1,75 @@
+{
+  "checks": [
+    {
+      "label": "NISAトップ",
+      "expectedHash": "#basic",
+      "hash": "#basic",
+      "targetTop": 742.625,
+      "headerBottom": 75
+    },
+    {
+      "label": "つみたて投資枠",
+      "expectedHash": "#tsumitate",
+      "hash": "#tsumitate",
+      "targetTop": 3151.140625,
+      "headerBottom": 75
+    },
+    {
+      "label": "成長投資枠",
+      "expectedHash": "#growth",
+      "hash": "#growth",
+      "targetTop": 3532.390625,
+      "headerBottom": 75
+    },
+    {
+      "label": "NISAのメリット",
+      "expectedHash": "#benefits",
+      "hash": "#benefits",
+      "targetTop": 1372.328125,
+      "headerBottom": 75
+    },
+    {
+      "label": "投資枠の違い・活用例",
+      "expectedHash": "#compare",
+      "hash": "#compare",
+      "targetTop": 2761.96875,
+      "headerBottom": 75
+    },
+    {
+      "label": "制度の注意点",
+      "expectedHash": "#caution",
+      "hash": "#caution",
+      "targetTop": 6375.421875,
+      "headerBottom": 75
+    },
+    {
+      "label": "Q&A",
+      "expectedHash": "#faq",
+      "hash": "#faq",
+      "targetTop": 6861.359375,
+      "headerBottom": 75
+    }
+  ],
+  "metrics": {
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 8331,
+    "ids": {
+      "basic": 1,
+      "benefits": 1,
+      "compare": 1,
+      "tsumitate": 1,
+      "growth": 1,
+      "cases": 1,
+      "reuse": 1,
+      "caution": 1,
+      "faq": 1,
+      "sources": 1
+    },
+    "activeTab": "NISAトップ",
+    "faqCount": 5,
+    "sourceCount": 5,
+    "chartCount": 3
+  },
+  "errors": []
+}
