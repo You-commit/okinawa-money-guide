@@ -1,0 +1,193 @@
+name: NISA Typography Balance QA
+
+on:
+  push:
+    branches:
+      - qa/nisa-typography-balance-20261014
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install
+        run: npm ci
+
+      - name: NISA route tests
+        run: npm test -- src/AppRouter.test.tsx
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Full suite
+        continue-on-error: true
+        run: npm test -- --reporter=verbose
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/omg-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/omg-preview.log
+          exit 1
+
+      - name: Capture screenshots and metrics
+        run: |
+          mkdir -p qa-typography
+          cat > qa-typography.cjs <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+
+          const base = 'http://127.0.0.1:4173/knowledge/nisa-limits-and-future-value';
+          const out = path.resolve('qa-typography');
+
+          async function capture(mode, viewport, isMobile) {
+            const browser = await chromium.launch({ headless: true });
+            const context = await browser.newContext({
+              viewport,
+              isMobile,
+              hasTouch: isMobile,
+              deviceScaleFactor: 1,
+              locale: 'ja-JP',
+            });
+            const page = await context.newPage();
+            const errors = [];
+            page.on('pageerror', e => errors.push('pageerror: ' + e.message));
+            page.on('console', m => {
+              if (m.type() === 'error') errors.push('console: ' + m.text());
+            });
+
+            await page.goto(base, { waitUntil: 'networkidle', timeout: 120000 });
+            await page.waitForTimeout(1200);
+
+            const metrics = await page.evaluate(() => {
+              const getFont = (selector) => {
+                const el = document.querySelector(selector);
+                if (!el) return null;
+                const s = getComputedStyle(el);
+                return { fontSize:s.fontSize, lineHeight:s.lineHeight, fontWeight:s.fontWeight };
+              };
+              const qs = s => document.querySelector(s);
+              const all = s => Array.from(document.querySelectorAll(s));
+              const rect = el => el ? el.getBoundingClientRect() : null;
+
+              const hero = qs('.nisa-bank-hero');
+              const tabs = qs('.nisa-bank-tabs');
+              const anchor = qs('.nisa-bank-anchor-nav');
+              const sidebar = qs('.nisa-bank-sidebar');
+              const tax = qs('.nisa-bank-tax');
+              const charts = all('.nisa-bank-chart').map(el => {
+                const r = rect(el);
+                return r ? { width:r.width, height:r.height } : null;
+              });
+
+              return {
+                innerWidth: window.innerWidth,
+                scrollWidth: document.documentElement.scrollWidth,
+                bodyScrollWidth: document.body.scrollWidth,
+                scrollHeight: document.documentElement.scrollHeight,
+                heroHeight: rect(hero)?.height ?? null,
+                heroImageCount: document.querySelectorAll('.nisa-bank-hero img').length,
+                tabHeight: rect(tabs)?.height ?? null,
+                anchorHeight: rect(anchor)?.height ?? null,
+                sidebarDisplay: sidebar ? getComputedStyle(sidebar).display : null,
+                sidebarWidth: rect(sidebar)?.width ?? null,
+                taxWidth: rect(tax)?.width ?? null,
+                chartCount: charts.length,
+                charts,
+                stickyCount: document.querySelectorAll('.nisa-bank-sticky-cta').length,
+                pageBackground: getComputedStyle(document.querySelector('.nisa-bank-page')).backgroundColor,
+                fonts: {
+                  heroH1: getFont('.nisa-bank-hero h1'),
+                  lead: getFont('.nisa-bank-hero__lead'),
+                  tabs: getFont('.nisa-bank-tabs a'),
+                  anchors: getFont('.nisa-bank-anchor-nav a'),
+                  sidebarHeading: getFont('.nisa-bank-sidebar h2'),
+                  sidebarLink: getFont('.nisa-bank-sidebar nav a'),
+                  sectionH2: getFont('.nisa-bank-section__heading h2'),
+                  body: getFont('.nisa-bank-section__intro'),
+                },
+              };
+            });
+
+            await page.screenshot({
+              path: path.join(out, mode + '-full.png'),
+              fullPage: true,
+              animations: 'disabled',
+            });
+
+            await page.evaluate(() => window.scrollTo(0, 0));
+            await page.waitForTimeout(200);
+            await page.screenshot({
+              path: path.join(out, mode + '-top.png'),
+              fullPage: false,
+              animations: 'disabled',
+            });
+
+            for (const [slug, selector] of [
+              ['tax','.nisa-bank-tax'],
+              ['table','#compare'],
+              ['charts','#cases'],
+              ['bottom','#caution'],
+            ]) {
+              const locator = page.locator(selector).first();
+              if (await locator.count()) {
+                await locator.scrollIntoViewIfNeeded();
+                await page.waitForTimeout(250);
+                await page.screenshot({
+                  path: path.join(out, mode + '-' + slug + '.png'),
+                  fullPage: false,
+                  animations: 'disabled',
+                });
+              }
+            }
+
+            fs.writeFileSync(
+              path.join(out, mode + '-metrics.json'),
+              JSON.stringify({ viewport, metrics, errors }, null, 2),
+            );
+
+            await browser.close();
+          }
+
+          (async () => {
+            await capture('desktop', { width:1440, height:900 }, false);
+            await capture('mobile', { width:390, height:844 }, true);
+          })().catch(err => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
+          node qa-typography.cjs
+
+      - name: Commit QA screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qa-typography
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "qa: capture NISA typography balance [skip ci]"
+          git push origin HEAD:qa/nisa-typography-balance-20261014
