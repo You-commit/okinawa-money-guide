@@ -75,24 +75,35 @@ describe('technical SEO source of truth', () => {
     }
   })
 
-  it('publishes factual article dates without inventing modified dates', () => {
-    for (const path of [
-      routes.knowledgeNisaLimits,
-      routes.knowledgeMortgageComparison,
-    ]) {
-      const metadata = getRouteSeo(path)!
-      const html = injectSeoHead(
-        indexTemplate,
-        metadata,
-        getRouteStructuredData(path),
-      )
+  it('publishes factual article dates and only marks materially updated articles', () => {
+    const nisaMetadata = getRouteSeo(routes.knowledgeNisaLimits)!
+    const nisaHtml = injectSeoHead(
+      indexTemplate,
+      nisaMetadata,
+      getRouteStructuredData(routes.knowledgeNisaLimits),
+    )
 
-      expect(metadata.article).toEqual({ publishedAt: '2026-09-21' })
-      expect(html).toContain('article:published_time')
-      expect(html).not.toContain('article:modified_time')
-      expect(html).toContain('datePublished')
-      expect(html).not.toContain('dateModified')
-    }
+    expect(nisaMetadata.article).toEqual({
+      publishedAt: '2026-09-21',
+      modifiedAt: '2026-10-14',
+    })
+    expect(nisaHtml).toContain('article:published_time')
+    expect(nisaHtml).toContain('article:modified_time')
+    expect(nisaHtml).toContain('datePublished')
+    expect(nisaHtml).toContain('dateModified')
+
+    const mortgageMetadata = getRouteSeo(routes.knowledgeMortgageComparison)!
+    const mortgageHtml = injectSeoHead(
+      indexTemplate,
+      mortgageMetadata,
+      getRouteStructuredData(routes.knowledgeMortgageComparison),
+    )
+
+    expect(mortgageMetadata.article).toEqual({ publishedAt: '2026-09-21' })
+    expect(mortgageHtml).toContain('article:published_time')
+    expect(mortgageHtml).not.toContain('article:modified_time')
+    expect(mortgageHtml).toContain('datePublished')
+    expect(mortgageHtml).not.toContain('dateModified')
 
     expect(sitemapXml).not.toContain('<lastmod>')
   })
@@ -140,7 +151,7 @@ describe('technical SEO source of truth', () => {
     }
     const article = articleStructuredData['@graph'][0]
     expect(article).toHaveProperty('datePublished', '2026-09-21')
-    expect(article).not.toHaveProperty('dateModified')
+    expect(article).toHaveProperty('dateModified', '2026-10-14')
     expect(websiteStructuredData).toEqual({
       '@context': 'https://schema.org',
       '@type': 'WebSite',
