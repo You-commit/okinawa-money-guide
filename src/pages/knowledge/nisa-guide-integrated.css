@@ -2,7 +2,7 @@
   padding-bottom: 76px;
   font-family: var(--omg-font-sans);
   color: var(--omg-color-text);
-  background: var(--omg-color-background);
+  background: #fff;
 }
 
 .nisa-guide-layout {
@@ -168,7 +168,7 @@
   padding: 28px;
   border: 1px solid var(--omg-color-border);
   border-radius: 20px;
-  background: var(--omg-color-surface);
+  background: var(--omg-color-background);
   box-shadow: 0 10px 24px rgba(28, 59, 83, 0.06);
 }
 
@@ -506,8 +506,10 @@
 
 .nisa-guide-chart {
   margin: 0;
-  padding-top: 20px;
-  border-top: 1px solid var(--omg-color-border);
+  padding: 18px;
+  border: 1px solid var(--omg-color-border);
+  border-radius: 14px;
+  background: var(--omg-color-background);
 }
 
 .nisa-guide-chart figcaption {
