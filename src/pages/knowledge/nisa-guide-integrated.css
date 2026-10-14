@@ -277,7 +277,7 @@
 }
 
 .nisa-bank-section {
-  scroll-margin-top: calc(var(--omg-sticky-header-offset) + 20px);
+  scroll-margin-top: 20px;
 }
 
 .nisa-bank-section + .nisa-bank-section,
@@ -406,7 +406,7 @@
 .nisa-bank-frame-details > section {
   min-width: 0;
   padding: 26px 28px 28px 0;
-  scroll-margin-top: calc(var(--omg-sticky-header-offset) + 24px);
+  scroll-margin-top: 24px;
 }
 
 .nisa-bank-frame-details > section + section {
