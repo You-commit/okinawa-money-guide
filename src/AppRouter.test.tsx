@@ -80,13 +80,18 @@ describe('dedicated page routing', () => {
     renderAt('/knowledge/nisa-limits-and-future-value')
     expect(screen.getByRole('heading', { name: 'この記事の内容' })).toBeTruthy()
     expect(screen.getByText('公開日')).toBeTruthy()
-    expect(screen.queryByText('更新日')).toBeNull()
+    expect(screen.getByText('更新日')).toBeTruthy()
     expect(screen.getByText('制度・情報の基準日')).toBeTruthy()
     const nisaPublished = screen.getByText('2026.09.21')
-    const nisaBasis = screen.getByText('2026.10.04')
+    const nisaCurrentDates = screen.getAllByText('2026.10.14')
     expect(nisaPublished.getAttribute('datetime')).toBe('2026-09-21')
-    expect(nisaBasis.getAttribute('datetime')).toBe('2026-10-04')
-    expect(screen.getAllByRole('link', { name: /NISAを知る|NISAに関するよくある質問/ })).toHaveLength(2)
+    expect(nisaCurrentDates).toHaveLength(2)
+    for (const date of nisaCurrentDates) {
+      expect(date.getAttribute('datetime')).toBe('2026-10-14')
+    }
+    expect(screen.getAllByRole('link', {
+      name: /NISAを知る|NISAに関するよくある質問|つみたて投資枠対象商品|NISAの活用事例|2027年からのNISA拡充/,
+    })).toHaveLength(5)
 
     cleanup()
     renderAt('/knowledge/mortgage-comparison')
@@ -140,7 +145,77 @@ describe('dedicated page routing', () => {
       name: '利益100万円が非課税で100万円',
     })).toBeTruthy()
     expect(document.querySelectorAll('.nisa-bank-chart')).toHaveLength(3)
-    expect(document.querySelectorAll('.nisa-bank-chart__column')).toHaveLength(12)
+    expect(document.querySelectorAll('.nisa-bank-chart__column')).toHaveLength(11)
+
+    const tabs = screen.getByRole('navigation', { name: 'NISA制度メニュー' })
+    const tabLinks = within(tabs).getAllByRole('link')
+    expect(tabLinks.map((link) => link.getAttribute('href'))).toEqual([
+      '#basic',
+      '#tsumitate',
+      '#growth',
+    ])
+
+    const anchors = screen.getByRole('navigation', { name: 'ページ内メニュー' })
+    const anchorLinks = within(anchors).getAllByRole('link')
+    expect(anchorLinks.map((link) => link.getAttribute('href'))).toEqual([
+      '#benefits',
+      '#compare',
+      '#caution',
+      '#faq',
+    ])
+
+    for (const id of [
+      'basic',
+      'benefits',
+      'compare',
+      'tsumitate',
+      'growth',
+      'cases',
+      'reuse',
+      'caution',
+      'faq',
+      'sources',
+    ]) {
+      expect(document.querySelectorAll(`#${id}`)).toHaveLength(1)
+    }
+
+    const orderedTargets = ['benefits', 'compare', 'caution', 'faq']
+      .map((id) => document.getElementById(id)!)
+    for (let index = 0; index < orderedTargets.length - 1; index += 1) {
+      expect(
+        orderedTargets[index].compareDocumentPosition(orderedTargets[index + 1])
+        & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+    }
+
+    expect(screen.getByText(/2027年1月から、つみたて投資枠は未成年にも拡大/)).toBeTruthy()
+    expect(screen.getByText(/株式数比例配分方式/)).toBeTruthy()
+    expect(screen.getByText(/NISA口座の損失は損益通算できません/)).toBeTruthy()
+    expect(screen.getByRole('region', {
+      name: 'NISA売却後の非課税保有限度額再利用例',
+    })).toBeTruthy()
+  })
+
+  it('updates the active NISA tab when a tab is clicked', async () => {
+    const user = userEvent.setup()
+    renderAt('/knowledge/nisa-limits-and-future-value')
+
+    const tabs = screen.getByRole('navigation', { name: 'NISA制度メニュー' })
+    const top = within(tabs).getByRole('link', { name: 'NISAトップ' })
+    const tsumitate = within(tabs).getByRole('link', { name: 'つみたて投資枠' })
+    const growth = within(tabs).getByRole('link', { name: '成長投資枠' })
+
+    expect(top.getAttribute('aria-current')).toBe('page')
+    expect(tsumitate.getAttribute('aria-current')).toBeNull()
+    expect(growth.getAttribute('aria-current')).toBeNull()
+
+    await user.click(tsumitate)
+    expect(tsumitate.getAttribute('aria-current')).toBe('page')
+    expect(top.getAttribute('aria-current')).toBeNull()
+
+    await user.click(growth)
+    expect(growth.getAttribute('aria-current')).toBe('page')
+    expect(tsumitate.getAttribute('aria-current')).toBeNull()
   })
 
   it('renders a 404 page for an unknown URL', () => {
