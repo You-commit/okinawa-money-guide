@@ -116,13 +116,16 @@ describe('dedicated page routing', () => {
     expect(document.querySelector('.n8-globalnav')).toBeNull()
     expect(document.querySelector('.nisa-guide-page')).toBeTruthy()
 
-    const localNav = document.querySelector('.nisa-guide-local-nav-shell')!
-    const articleLayout = document.querySelector('.nisa-guide-layout')!
+    const localNav = document.querySelector('.nisa-bank-nav-shell')!
+    const articleLayout = document.querySelector('.nisa-bank-layout')!
     expect(localNav.compareDocumentPosition(articleLayout) & Node.DOCUMENT_POSITION_FOLLOWING)
       .toBeTruthy()
 
     expect(screen.getByRole('navigation', { name: 'NISA制度メニュー' })).toBeTruthy()
     expect(screen.getByRole('navigation', { name: 'ページ内メニュー' })).toBeTruthy()
+    expect(document.querySelector('.nisa-bank-sidebar')).toBeTruthy()
+    expect(document.querySelector('.nisa-bank-hero img')).toBeNull()
+
     expect(screen.getByRole('link', {
       name: /NISAシミュレーターで試算する/,
     }).getAttribute('href')).toBe('/simulators/nisa')
@@ -136,8 +139,8 @@ describe('dedicated page routing', () => {
     expect(screen.getByRole('img', {
       name: '利益100万円が非課税で100万円',
     })).toBeTruthy()
-    expect(document.querySelectorAll('.nisa-guide-chart')).toHaveLength(2)
-    expect(document.querySelectorAll('.nisa-guide-chart__column')).toHaveLength(12)
+    expect(document.querySelectorAll('.nisa-bank-chart')).toHaveLength(3)
+    expect(document.querySelectorAll('.nisa-bank-chart__column')).toHaveLength(12)
   })
 
   it('renders a 404 page for an unknown URL', () => {
