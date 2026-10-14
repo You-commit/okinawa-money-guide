@@ -189,7 +189,7 @@ describe('dedicated page routing', () => {
     }
 
     expect(screen.getByText(/2027年1月から、つみたて投資枠は未成年にも拡大/)).toBeTruthy()
-    expect(screen.getByText(/株式数比例配分方式/)).toBeTruthy()
+    expect(screen.getAllByText(/株式数比例配分方式/)).toHaveLength(2)
     expect(screen.getByText(/NISA口座の損失は損益通算できません/)).toBeTruthy()
     expect(screen.getByRole('region', {
       name: 'NISA売却後の非課税保有限度額再利用例',
