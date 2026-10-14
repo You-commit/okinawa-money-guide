@@ -17,12 +17,12 @@
 .nisa-bank-hero__inner {
   width: min(100% - 64px, 1120px);
   margin: 0 auto;
-  padding: 36px 0 54px;
+  padding: 30px 0 46px;
 }
 
 .nisa-bank-hero__copy {
   max-width: 760px;
-  padding-top: 34px;
+  padding-top: 28px;
 }
 
 .nisa-bank-hero__eyebrow {
@@ -36,7 +36,7 @@
 .nisa-bank-hero h1 {
   margin: 0;
   color: #0d2f63;
-  font-size: clamp(2.65rem, 4.4vw, 4.05rem);
+  font-size: clamp(2.4rem, 3.6vw, 3.45rem);
   font-weight: 900;
   letter-spacing: -0.045em;
   line-height: 1.2;
@@ -46,7 +46,7 @@
   max-width: 720px;
   margin: 24px 0 0;
   color: #476076;
-  font-size: 0.96rem;
+  font-size: 1rem;
   line-height: 1.95;
 }
 
@@ -99,7 +99,7 @@
   border-bottom: 0;
   background: #fff;
   color: #17344f;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 850;
   line-height: 1.3;
   text-align: center;
@@ -142,7 +142,7 @@
   place-items: center;
   padding: 10px 14px;
   color: #17344f;
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   font-weight: 780;
   line-height: 1.35;
   text-align: center;
@@ -188,7 +188,7 @@
   padding: 16px 16px 13px;
   border-bottom: 1px solid #dce5eb;
   color: #0d2f63;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 850;
   line-height: 1.4;
 }
@@ -206,7 +206,7 @@
   padding: 9px 14px;
   border-left: 3px solid transparent;
   color: #334e64;
-  font-size: 0.67rem;
+  font-size: 0.78rem;
   font-weight: 680;
   line-height: 1.45;
   text-decoration: none;
@@ -226,7 +226,7 @@
 
 .nisa-bank-sidebar nav a span {
   color: #0d2f63;
-  font-size: 0.64rem;
+  font-size: 0.7rem;
   font-weight: 850;
 }
 
@@ -262,13 +262,13 @@
 }
 
 .nisa-bank-sidebar__related strong {
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   line-height: 1.35;
 }
 
 .nisa-bank-sidebar__related small {
   color: #71818d;
-  font-size: 0.61rem;
+  font-size: 0.68rem;
   line-height: 1.45;
 }
 
@@ -968,12 +968,12 @@
 
   .nisa-bank-hero__inner {
     width: min(100% - 40px, 720px);
-    padding: 22px 0 36px;
+    padding: 20px 0 30px;
   }
 
   .nisa-bank-hero__copy {
     max-width: none;
-    padding-top: 26px;
+    padding-top: 22px;
   }
 
   .nisa-bank-hero__eyebrow {
@@ -981,13 +981,13 @@
   }
 
   .nisa-bank-hero h1 {
-    font-size: clamp(2.25rem, 10vw, 3.2rem);
+    font-size: clamp(2.05rem, 8.6vw, 2.5rem);
     line-height: 1.25;
   }
 
   .nisa-bank-hero__lead {
     margin-top: 20px;
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     line-height: 1.9;
   }
 
@@ -1133,7 +1133,7 @@
   .nisa-bank-anchor-nav a {
     min-height: 50px;
     padding-inline: 8px;
-    font-size: 0.68rem;
+    font-size: 0.76rem;
   }
 
   .nisa-bank-chart {
