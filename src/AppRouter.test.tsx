@@ -209,13 +209,30 @@ describe('dedicated page routing', () => {
     expect(tsumitate.getAttribute('aria-current')).toBeNull()
     expect(growth.getAttribute('aria-current')).toBeNull()
 
+    const tsumitateTarget = document.getElementById('tsumitate')!
+    const growthTarget = document.getElementById('growth')!
+    const scrollIntoView = vi.mocked(HTMLElement.prototype.scrollIntoView)
+    scrollIntoView.mockClear()
+
     await user.click(tsumitate)
+    expect(window.location.hash).toBe('#tsumitate')
     expect(tsumitate.getAttribute('aria-current')).toBe('page')
     expect(top.getAttribute('aria-current')).toBeNull()
+    expect(scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    })
+    expect(tsumitateTarget).toBeTruthy()
 
     await user.click(growth)
+    expect(window.location.hash).toBe('#growth')
     expect(growth.getAttribute('aria-current')).toBe('page')
     expect(tsumitate.getAttribute('aria-current')).toBeNull()
+    expect(scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    })
+    expect(growthTarget).toBeTruthy()
   })
 
   it('renders a 404 page for an unknown URL', () => {
