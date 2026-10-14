@@ -1,0 +1,11 @@
+{
+  "metrics": {
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "bodyScrollWidth": 390,
+    "pageBackground": "rgb(246, 249, 251)",
+    "taxFigureBackground": "rgb(247, 250, 252)",
+    "chartBackground": "rgb(247, 250, 252)"
+  },
+  "errors": []
+}
