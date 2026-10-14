@@ -66,7 +66,7 @@ describe('dedicated page routing', () => {
     cleanup()
     renderAt('/knowledge/nisa-limits-and-future-value')
     expect(screen.getByRole('link', {
-      name: /NISAシミュレーターで積立額と期間を試算する/,
+      name: /NISAシミュレーターで試算する/,
     }).getAttribute('href')).toBe('/simulators/nisa')
 
     cleanup()
@@ -76,9 +76,9 @@ describe('dedicated page routing', () => {
     }).getAttribute('href')).toBe('/knowledge/mortgage-comparison')
   })
 
-  it('renders factual article dates, takeaways, and primary-source links', () => {
+  it('renders factual article dates, article navigation, and primary-source links', () => {
     renderAt('/knowledge/nisa-limits-and-future-value')
-    expect(screen.getByRole('heading', { name: 'この記事で分かること' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'この記事の内容' })).toBeTruthy()
     expect(screen.getByText('公開日')).toBeTruthy()
     expect(screen.queryByText('更新日')).toBeNull()
     expect(screen.getByText('制度・情報の基準日')).toBeTruthy()
