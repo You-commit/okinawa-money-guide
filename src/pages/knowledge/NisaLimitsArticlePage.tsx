@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { type MouseEvent as ReactMouseEvent, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { routes } from '../../app/routes'
 import {
@@ -161,8 +161,49 @@ function NisaLimitsArticlePage() {
   useEffect(() => {
     const syncTab = () => setActiveTab(tabFromHash(window.location.hash))
     window.addEventListener('hashchange', syncTab)
-    return () => window.removeEventListener('hashchange', syncTab)
+    window.addEventListener('popstate', syncTab)
+
+    if (window.location.hash) {
+      requestAnimationFrame(() => {
+        const target = document.querySelector<HTMLElement>(window.location.hash)
+        target?.scrollIntoView({ behavior: 'auto', block: 'start' })
+      })
+    }
+
+    return () => {
+      window.removeEventListener('hashchange', syncTab)
+      window.removeEventListener('popstate', syncTab)
+    }
   }, [])
+
+  const navigateToSection = (
+    event: ReactMouseEvent<HTMLAnchorElement>,
+    sectionId: string,
+  ) => {
+    if (
+      event.button !== 0
+      || event.metaKey
+      || event.ctrlKey
+      || event.shiftKey
+      || event.altKey
+    ) {
+      return
+    }
+
+    const target = document.getElementById(sectionId)
+    if (!target) return
+
+    event.preventDefault()
+    const nextHash = `#${sectionId}`
+    window.history.pushState({}, '', nextHash)
+    setActiveTab(tabFromHash(nextHash))
+
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    target.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    })
+  }
 
   return (
     <SiteLayout className="dedicated-page knowledge-article-page nisa-guide-page nisa-bank-page">
@@ -209,7 +250,7 @@ function NisaLimitsArticlePage() {
               className={activeTab === 'basic' ? 'is-active' : undefined}
               aria-current={activeTab === 'basic' ? 'page' : undefined}
               href="#basic"
-              onClick={() => setActiveTab('basic')}
+              onClick={(event) => navigateToSection(event, 'basic')}
             >
               NISAトップ
             </a>
@@ -217,7 +258,7 @@ function NisaLimitsArticlePage() {
               className={activeTab === 'tsumitate' ? 'is-active' : undefined}
               aria-current={activeTab === 'tsumitate' ? 'page' : undefined}
               href="#tsumitate"
-              onClick={() => setActiveTab('tsumitate')}
+              onClick={(event) => navigateToSection(event, 'tsumitate')}
             >
               つみたて投資枠
             </a>
@@ -225,17 +266,17 @@ function NisaLimitsArticlePage() {
               className={activeTab === 'growth' ? 'is-active' : undefined}
               aria-current={activeTab === 'growth' ? 'page' : undefined}
               href="#growth"
-              onClick={() => setActiveTab('growth')}
+              onClick={(event) => navigateToSection(event, 'growth')}
             >
               成長投資枠
             </a>
           </nav>
 
           <nav className="nisa-bank-anchor-nav" aria-label="ページ内メニュー">
-            <a href="#benefits">NISAのメリット</a>
-            <a href="#compare">投資枠の違い・活用例</a>
-            <a href="#caution">制度の注意点</a>
-            <a href="#faq">Q&amp;A</a>
+            <a href="#benefits" onClick={(event) => navigateToSection(event, 'benefits')}>NISAのメリット</a>
+            <a href="#compare" onClick={(event) => navigateToSection(event, 'compare')}>投資枠の違い・活用例</a>
+            <a href="#caution" onClick={(event) => navigateToSection(event, 'caution')}>制度の注意点</a>
+            <a href="#faq" onClick={(event) => navigateToSection(event, 'faq')}>Q&amp;A</a>
           </nav>
         </div>
 
@@ -244,14 +285,14 @@ function NisaLimitsArticlePage() {
             <section>
               <h2>この記事の内容</h2>
               <nav>
-                <a className="is-current" href="#basic"><span>01</span>NISAとは</a>
-                <a href="#benefits"><span>02</span>NISAのメリット</a>
-                <a href="#compare"><span>03</span>投資枠と使い分け</a>
-                <a href="#cases"><span>04</span>積立額と将来額</a>
-                <a href="#reuse"><span>05</span>売却と枠の再利用</a>
-                <a href="#caution"><span>06</span>制度の注意点</a>
-                <a href="#faq"><span>07</span>よくある質問</a>
-                <a href="#sources"><span>08</span>参考・一次資料</a>
+                <a className="is-current" href="#basic" onClick={(event) => navigateToSection(event, 'basic')}><span>01</span>NISAとは</a>
+                <a href="#benefits" onClick={(event) => navigateToSection(event, 'benefits')}><span>02</span>NISAのメリット</a>
+                <a href="#compare" onClick={(event) => navigateToSection(event, 'compare')}><span>03</span>投資枠と使い分け</a>
+                <a href="#cases" onClick={(event) => navigateToSection(event, 'cases')}><span>04</span>積立額と将来額</a>
+                <a href="#reuse" onClick={(event) => navigateToSection(event, 'reuse')}><span>05</span>売却と枠の再利用</a>
+                <a href="#caution" onClick={(event) => navigateToSection(event, 'caution')}><span>06</span>制度の注意点</a>
+                <a href="#faq" onClick={(event) => navigateToSection(event, 'faq')}><span>07</span>よくある質問</a>
+                <a href="#sources" onClick={(event) => navigateToSection(event, 'sources')}><span>08</span>参考・一次資料</a>
               </nav>
             </section>
 
