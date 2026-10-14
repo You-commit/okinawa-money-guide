@@ -1,0 +1,79 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "metrics": {
+    "innerWidth": 1440,
+    "scrollWidth": 1440,
+    "bodyScrollWidth": 1440,
+    "scrollHeight": 3204,
+    "heroHeight": 454.78125,
+    "heroImageCount": 0,
+    "tabHeight": 65,
+    "anchorHeight": 55,
+    "sidebarDisplay": "block",
+    "sidebarWidth": 190,
+    "taxWidth": 896,
+    "chartCount": 3,
+    "charts": [
+      {
+        "width": 289.328125,
+        "height": 317
+      },
+      {
+        "width": 289.328125,
+        "height": 317
+      },
+      {
+        "width": 289.34375,
+        "height": 317
+      }
+    ],
+    "stickyCount": 1,
+    "pageBackground": "rgb(255, 255, 255)",
+    "fonts": {
+      "heroH1": {
+        "fontSize": "51.84px",
+        "lineHeight": "62.208px",
+        "fontWeight": "900"
+      },
+      "lead": {
+        "fontSize": "16px",
+        "lineHeight": "31.2px",
+        "fontWeight": "400"
+      },
+      "tabs": {
+        "fontSize": "14.4px",
+        "lineHeight": "18.72px",
+        "fontWeight": "850"
+      },
+      "anchors": {
+        "fontSize": "13.12px",
+        "lineHeight": "17.712px",
+        "fontWeight": "780"
+      },
+      "sidebarHeading": {
+        "fontSize": "13.76px",
+        "lineHeight": "19.264px",
+        "fontWeight": "850"
+      },
+      "sidebarLink": {
+        "fontSize": "12.48px",
+        "lineHeight": "18.096px",
+        "fontWeight": "680"
+      },
+      "sectionH2": {
+        "fontSize": "32px",
+        "lineHeight": "43.2px",
+        "fontWeight": "850"
+      },
+      "body": {
+        "fontSize": "13.92px",
+        "lineHeight": "26.448px",
+        "fontWeight": "400"
+      }
+    }
+  },
+  "errors": []
+}
