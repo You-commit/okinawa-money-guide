@@ -1,0 +1,37 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "metrics": {
+    "innerWidth": 1440,
+    "scrollWidth": 1440,
+    "bodyScrollWidth": 1440,
+    "scrollHeight": 3249,
+    "heroHeight": 499.9375,
+    "heroImageCount": 0,
+    "tabHeight": 65,
+    "anchorHeight": 55,
+    "sidebarDisplay": "block",
+    "sidebarWidth": 190,
+    "taxWidth": 896,
+    "chartCount": 3,
+    "charts": [
+      {
+        "width": 289.328125,
+        "height": 317
+      },
+      {
+        "width": 289.328125,
+        "height": 317
+      },
+      {
+        "width": 289.34375,
+        "height": 317
+      }
+    ],
+    "stickyCount": 1,
+    "pageBackground": "rgb(255, 255, 255)"
+  },
+  "errors": []
+}
