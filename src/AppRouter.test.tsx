@@ -66,7 +66,7 @@ describe('dedicated page routing', () => {
     cleanup()
     renderAt('/knowledge/nisa-limits-and-future-value')
     expect(screen.getByRole('link', {
-      name: /NISAシミュレーターで積立額と期間を試算する/,
+      name: /NISAシミュレーターで試算する/,
     }).getAttribute('href')).toBe('/simulators/nisa')
 
     cleanup()
@@ -76,17 +76,22 @@ describe('dedicated page routing', () => {
     }).getAttribute('href')).toBe('/knowledge/mortgage-comparison')
   })
 
-  it('renders factual article dates, takeaways, and primary-source links', () => {
+  it('renders factual article dates, article navigation, and primary-source links', () => {
     renderAt('/knowledge/nisa-limits-and-future-value')
-    expect(screen.getByRole('heading', { name: 'この記事で分かること' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'この記事の内容' })).toBeTruthy()
     expect(screen.getByText('公開日')).toBeTruthy()
-    expect(screen.queryByText('更新日')).toBeNull()
+    expect(screen.getByText('更新日')).toBeTruthy()
     expect(screen.getByText('制度・情報の基準日')).toBeTruthy()
     const nisaPublished = screen.getByText('2026.09.21')
-    const nisaBasis = screen.getByText('2026.10.04')
+    const nisaCurrentDates = screen.getAllByText('2026.10.14')
     expect(nisaPublished.getAttribute('datetime')).toBe('2026-09-21')
-    expect(nisaBasis.getAttribute('datetime')).toBe('2026-10-04')
-    expect(screen.getAllByRole('link', { name: /NISAを知る|NISAに関するよくある質問/ })).toHaveLength(2)
+    expect(nisaCurrentDates).toHaveLength(2)
+    for (const date of nisaCurrentDates) {
+      expect(date.getAttribute('datetime')).toBe('2026-10-14')
+    }
+    expect(screen.getAllByRole('link', {
+      name: /NISAを知る|NISAに関するよくある質問|つみたて投資枠対象商品|NISAの活用事例|2027年からのNISA拡充/,
+    })).toHaveLength(5)
 
     cleanup()
     renderAt('/knowledge/mortgage-comparison')
@@ -100,6 +105,134 @@ describe('dedicated page routing', () => {
     expect(mortgageBasis.getAttribute('datetime')).toBe('2026-10-04')
     expect(screen.getByRole('region', { name: '住宅ローン返済方式の比較' })).toBeTruthy()
     expect(screen.getAllByRole('link', { name: /元利均等返済・元金均等返済|借入希望金額から返済額を計算|住宅ローンの基礎知識・資料/ })).toHaveLength(3)
+  })
+
+  it('keeps the NISA guide inside the common OMG shell and structured charts', () => {
+    renderAt('/knowledge/nisa-limits-and-future-value')
+
+    expect(screen.getByRole('link', {
+      name: '沖縄マネーガイド トップへ戻る',
+    })).toBeTruthy()
+    expect(screen.getByRole('navigation', { name: 'メインメニュー' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: '運営・提携方針' })
+      .getAttribute('href')).toBe('/trust#ads')
+
+    expect(document.querySelector('.n8-masthead')).toBeNull()
+    expect(document.querySelector('.n8-globalnav')).toBeNull()
+    expect(document.querySelector('.nisa-guide-page')).toBeTruthy()
+
+    const localNav = document.querySelector('.nisa-bank-nav-shell')!
+    const articleLayout = document.querySelector('.nisa-bank-layout')!
+    expect(localNav.compareDocumentPosition(articleLayout) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .toBeTruthy()
+
+    expect(screen.getByRole('navigation', { name: 'NISA制度メニュー' })).toBeTruthy()
+    expect(screen.getByRole('navigation', { name: 'ページ内メニュー' })).toBeTruthy()
+    expect(document.querySelector('.nisa-bank-sidebar')).toBeTruthy()
+    expect(document.querySelector('.nisa-bank-hero img')).toBeNull()
+
+    expect(screen.getByRole('link', {
+      name: /NISAシミュレーターで試算する/,
+    }).getAttribute('href')).toBe('/simulators/nisa')
+    expect(screen.getByRole('link', {
+      name: /金融庁のNISA公式情報を確認/,
+    }).getAttribute('href')).toBe('https://www.fsa.go.jp/policy/nisa2/know/')
+
+    expect(screen.getByRole('img', {
+      name: '利益100万円のうち税金20万3150円、税引後79万6850円',
+    })).toBeTruthy()
+    expect(screen.getByRole('img', {
+      name: '利益100万円が非課税で100万円',
+    })).toBeTruthy()
+    expect(document.querySelectorAll('.nisa-bank-chart')).toHaveLength(3)
+    expect(document.querySelectorAll('.nisa-bank-chart__column')).toHaveLength(11)
+
+    const tabs = screen.getByRole('navigation', { name: 'NISA制度メニュー' })
+    const tabLinks = within(tabs).getAllByRole('link')
+    expect(tabLinks.map((link) => link.getAttribute('href'))).toEqual([
+      '#basic',
+      '#tsumitate',
+      '#growth',
+    ])
+
+    const anchors = screen.getByRole('navigation', { name: 'ページ内メニュー' })
+    const anchorLinks = within(anchors).getAllByRole('link')
+    expect(anchorLinks.map((link) => link.getAttribute('href'))).toEqual([
+      '#benefits',
+      '#compare',
+      '#caution',
+      '#faq',
+    ])
+
+    for (const id of [
+      'basic',
+      'benefits',
+      'compare',
+      'tsumitate',
+      'growth',
+      'cases',
+      'reuse',
+      'caution',
+      'faq',
+      'sources',
+    ]) {
+      expect(document.querySelectorAll(`#${id}`)).toHaveLength(1)
+    }
+
+    const orderedTargets = ['benefits', 'compare', 'caution', 'faq']
+      .map((id) => document.getElementById(id)!)
+    for (let index = 0; index < orderedTargets.length - 1; index += 1) {
+      expect(
+        orderedTargets[index].compareDocumentPosition(orderedTargets[index + 1])
+        & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+    }
+
+    expect(screen.getByText(/2027年1月から、つみたて投資枠は未成年にも拡大/)).toBeTruthy()
+    expect(screen.getAllByText(/株式数比例配分方式/)).toHaveLength(2)
+    expect(screen.getByText(/NISA口座の損失は損益通算できません/)).toBeTruthy()
+    expect(screen.getByRole('region', {
+      name: 'NISA売却後の非課税保有限度額再利用例',
+    })).toBeTruthy()
+  })
+
+  it('updates the active NISA tab when a tab is clicked', async () => {
+    const user = userEvent.setup()
+    renderAt('/knowledge/nisa-limits-and-future-value')
+
+    const tabs = screen.getByRole('navigation', { name: 'NISA制度メニュー' })
+    const top = within(tabs).getByRole('link', { name: 'NISAトップ' })
+    const tsumitate = within(tabs).getByRole('link', { name: 'つみたて投資枠' })
+    const growth = within(tabs).getByRole('link', { name: '成長投資枠' })
+
+    expect(top.getAttribute('aria-current')).toBe('page')
+    expect(tsumitate.getAttribute('aria-current')).toBeNull()
+    expect(growth.getAttribute('aria-current')).toBeNull()
+
+    const tsumitateTarget = document.getElementById('tsumitate')!
+    const growthTarget = document.getElementById('growth')!
+    const scrollIntoView = vi.mocked(HTMLElement.prototype.scrollIntoView)
+    scrollIntoView.mockClear()
+
+    await user.click(tsumitate)
+    expect(window.location.hash).toBe('#tsumitate')
+    expect(tsumitate.getAttribute('aria-current')).toBe('page')
+    expect(top.getAttribute('aria-current')).toBeNull()
+    expect(scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    })
+    expect(tsumitateTarget).toBeTruthy()
+
+    await user.click(growth)
+    expect(window.location.hash).toBe('#growth')
+    expect(growth.getAttribute('aria-current')).toBe('page')
+    expect(tsumitate.getAttribute('aria-current')).toBeNull()
+    expect(scrollIntoView).toHaveBeenLastCalledWith({
+      behavior: 'smooth',
+      block: 'start',
+    })
+    expect(growthTarget).toBeTruthy()
   })
 
   it('renders a 404 page for an unknown URL', () => {

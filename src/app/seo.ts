@@ -75,7 +75,7 @@ const routeSeoInputs: RouteSeoInput[] = [
     path: routes.knowledgeNisaLimits,
     title: `NISAの非課税枠と積立額・将来額の考え方 | ${siteName}`,
     description: 'NISAの年間投資枠、非課税保有限度額、毎月の積立額、将来資産額の違いを、金融庁の一次資料を基に分かりやすく整理します。',
-    article: { publishedAt: '2026-09-21' },
+    article: { publishedAt: '2026-09-21', modifiedAt: '2026-10-14' },
   },
   {
     path: routes.knowledgeMortgageComparison,
