@@ -147,11 +147,24 @@
 .site.info-page--trust .trust-hero h1 { color: #fff; }
 .site.info-page--trust .trust-hero .info-hero__lead { color: #bfd3e2; }
 
-/* Article hero and section hierarchy, no calculator CSS selectors. */
+/* Brand editorial signature: restrained 4px navy → turquoise → sea-green line,
+ * not a decorative full-screen gradient. Shared article pages only. */
 .site.knowledge-article-page .knowledge-article-hero,
 .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero {
-  background: #fff;
+  background:
+    linear-gradient(90deg, #0c3264 0%, #0d75a3 54%, #0d9282 100%)
+      top / 100% 4px no-repeat,
+    #fff;
   border-bottom: 1px solid var(--editorial-line);
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-body h2 {
+  padding-left: 15px;
+  border-left: 3px solid #0d9282;
+}
+.site.info-page .info-section-heading h2 {
+  text-decoration-color: #0d9282;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 10px;
 }
 
 /* PR #14 integration: retains structure; reduces weight and graph-label scale. */
