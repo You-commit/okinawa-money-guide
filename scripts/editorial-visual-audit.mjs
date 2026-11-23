@@ -1,4 +1,4 @@
-import { chromium } from 'playwright';
+const { chromium } = await import(process.env.OMG_PLAYWRIGHT_MODULE || 'playwright');
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
