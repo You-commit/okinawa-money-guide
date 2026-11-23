@@ -36,4 +36,4 @@ jobs:
         run: npm test
       - name: Full suite result summary
         if: always()
-        run: echo "Full suite result = \${{ steps.full_suite.outcome }}" >> "$GITHUB_STEP_SUMMARY"
+        run: echo "Full suite result = ${{ steps.full_suite.outcome }}" >> "$GITHUB_STEP_SUMMARY"
