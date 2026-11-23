@@ -147,15 +147,33 @@
 .site.info-page--trust .trust-hero h1 { color: #fff; }
 .site.info-page--trust .trust-hero .info-hero__lead { color: #bfd3e2; }
 
-/* Brand editorial signature: restrained 4px navy → turquoise → sea-green line,
- * not a decorative full-screen gradient. Shared article pages only. */
+/* Shared editorial hero v0.4 — for every knowledge article, not NISA-specific.
+ * Quiet stone-blue to sea-glass surface plus one slender OMG brand signature.
+ * No category photos, decorative blobs, moving waves, or homepage/simulator edits. */
 .site.knowledge-article-page .knowledge-article-hero,
 .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero {
+  position: relative;
   background:
     linear-gradient(90deg, #0c3264 0%, #0d75a3 54%, #0d9282 100%)
       top / 100% 4px no-repeat,
-    #fff;
-  border-bottom: 1px solid var(--editorial-line);
+    linear-gradient(115deg, #e8f0f5 0%, #f2f6f8 53%, #e9f3ef 100%);
+  border-bottom: 1px solid #cedee4;
+}
+.site.knowledge-article-page .knowledge-article-hero .info-eyebrow,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__eyebrow {
+  display: inline-block;
+  padding-left: 12px;
+  border-left: 3px solid #0d9282;
+  color: #096f6b;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.site.knowledge-article-page .knowledge-article-hero .knowledge-article-meta,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__meta {
+  border-top-color: #cbdce4;
+}
+.site.knowledge-article-page .knowledge-article-hero .knowledge-article-breadcrumb {
+  color: #526c7c;
 }
 .site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-body h2 {
   padding-left: 15px;
