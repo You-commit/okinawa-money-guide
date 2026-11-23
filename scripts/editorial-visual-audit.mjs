@@ -84,6 +84,14 @@ async function inspect(page, type, label, pathname, layout) {
         tiny,
         spills,
         tabRows: Math.round(tabs[0]?.getBoundingClientRect().top ?? 0) === Math.round(tabs[1]?.getBoundingClientRect().top ?? 0),
+        tableFitsWidth: (() => {
+          const wrap=document.querySelector('.nisa-bank-table-wrap');
+          return wrap ? wrap.scrollWidth <= wrap.clientWidth + 1 : null;
+        })(),
+        mobileTableStacked: (() => {
+          const body=document.querySelector('.nisa-bank-table tbody');
+          return body ? getComputedStyle(body).display === 'grid' : null;
+        })(),
       };
     })() : null;
     return {
@@ -136,6 +144,8 @@ try {
           if (q.tiny.length) failures.push('NISA '+layout+': text under 12px '+JSON.stringify(q.tiny));
           if (q.spills.length) failures.push('NISA '+layout+': clipped comparison labels '+JSON.stringify(q.spills));
           if (layout === 'mobile' && !q.tabRows) failures.push('NISA mobile tabs must stay on one row');
+          if (layout === 'mobile' && (!q.tableFitsWidth || !q.mobileTableStacked))
+            failures.push('NISA mobile investment comparison must remain completely visible without horizontal scrolling');
         }
         if(protectedNames.has(label)){
           if(before.textHash!==after.textHash) failures.push(label+' '+layout+': protected visible text differs');
