@@ -76,6 +76,31 @@ describe('dedicated page routing', () => {
     }).getAttribute('href')).toBe('/knowledge/mortgage-comparison')
   })
 
+  it('uses plain Japanese article copy rather than redundant decorative English', () => {
+    renderAt('/knowledge/nisa-limits-and-future-value')
+
+    expect(screen.getByRole('heading', {
+      level: 1,
+      name: 'NISAの非課税枠と、積立額・将来額の考え方',
+    })).toBeTruthy()
+    expect(document.querySelector('.nisa-bank-hero__eyebrow')).toBeNull()
+    expect(document.querySelectorAll('.nisa-bank-frame-details__label')).toHaveLength(0)
+    expect(screen.queryByText('NISA / DECISION GUIDE')).toBeNull()
+    expect(screen.queryByText('TSUMITATE')).toBeNull()
+    expect(screen.queryByText('GROWTH')).toBeNull()
+    expect(screen.getByRole('link', { name: 'よくある質問' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'よくある質問' })).toBeTruthy()
+
+    cleanup()
+    renderAt('/knowledge/mortgage-comparison')
+    expect(screen.getByRole('heading', {
+      level: 1,
+      name: '住宅ローン比較で見るべき項目',
+    })).toBeTruthy()
+    expect(screen.queryByText('MORTGAGE BASICS')).toBeNull()
+    expect(document.querySelector('.knowledge-article-hero .info-eyebrow')).toBeNull()
+  })
+
   it('renders factual article dates, article navigation, and primary-source links', () => {
     renderAt('/knowledge/nisa-limits-and-future-value')
     expect(screen.getByRole('heading', { name: 'この記事の内容' })).toBeTruthy()
