@@ -39,7 +39,7 @@ const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] }
 const rows = [];
 const failures = [];
 
-async function inspect(page, type, label, pathname, layout, viewport) {
+async function inspect(page, type, label, pathname, layout) {
   const faults = [];
   page.on('pageerror', error => faults.push(error.message));
   page.on('console', msg => { if(msg.type()==='error') faults.push(msg.text()); });
@@ -81,8 +81,8 @@ try {
     const feature = await browser.newPage({viewport, deviceScaleFactor:1, reducedMotion:'reduce'});
     for (const [label,pathname] of targets) {
       try {
-        const before=await inspect(baseline,'baseline',label,pathname,layout,viewport);
-        const after=await inspect(feature,'feature',label,pathname,layout,viewport);
+        const before=await inspect(baseline,'baseline',label,pathname,layout);
+        const after=await inspect(feature,'feature',label,pathname,layout);
         rows.push({label,layout,pathname,before,after});
         if(after.scrollWidth>after.width+1 || after.bodyScrollWidth>after.width+1)
           failures.push(label+' '+layout+': horizontal overflow');
