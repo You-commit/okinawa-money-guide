@@ -49,8 +49,46 @@ async function inspect(page, type, label, pathname, layout) {
   await page.evaluate(async () => { await document.fonts.ready; window.scrollTo(0,0); });
   const details = await page.evaluate(() => {
     const sample = Array.from(document.querySelectorAll('#main-content h1, #main-content h2, #main-content button, #main-content input, #main-content select, #main-content .result-card')).slice(0,40);
+    const taxFigure = document.querySelector('.nisa-bank-tax');
+    const taxAudit = taxFigure ? (() => {
+      const difference = taxFigure.querySelector('.nisa-bank-tax__difference');
+      const figureRect = taxFigure.getBoundingClientRect();
+      const differenceRect = difference?.getBoundingClientRect();
+      const footer = document.querySelector('.site-footer');
+      const root = document.querySelector('.dedicated-page.knowledge-article-page.nisa-guide-page.nisa-bank-page');
+      const captions = Array.from(taxFigure.querySelectorAll(
+        '.nisa-bank-tax__tax small, .nisa-bank-tax__net small, .nisa-bank-tax__tax strong, .nisa-bank-tax__net strong, .nisa-bank-tax__difference strong, .nisa-bank-tax__difference span'
+      ));
+      const spills = captions.filter(el => {
+        const parent = el.closest('.nisa-bank-tax__tax, .nisa-bank-tax__net, .nisa-bank-tax__difference');
+        if (!parent) return true;
+        const a = el.getBoundingClientRect();
+        const b = parent.getBoundingClientRect();
+        return a.left < b.left - 1 || a.right > b.right + 1 ||
+               a.top < b.top - 1 || a.bottom > b.bottom + 1;
+      }).map(el => el.textContent?.trim());
+      const tiny = captions.filter(el => parseFloat(getComputedStyle(el).fontSize) < 12)
+        .map(el => ({label:el.textContent?.trim(),size:getComputedStyle(el).fontSize}));
+      const footerBottom = footer ? footer.getBoundingClientRect().bottom + scrollY : null;
+      const tabs = Array.from(document.querySelectorAll('.nisa-bank-tabs a'));
+      const rootPadding = root ? parseFloat(getComputedStyle(root).paddingBottom) : null;
+      const note = taxFigure.querySelector('.nisa-bank-tax__difference span');
+      return {
+        rootPadding,
+        footerGap: footerBottom === null ? null : Math.max(0,Math.round(document.documentElement.scrollHeight-footerBottom)),
+        diffWidth: differenceRect?.width ?? null,
+        diffBorderRadius: difference ? getComputedStyle(difference).borderRadius : null,
+        diffFitsFigure: Boolean(differenceRect && differenceRect.left >= figureRect.left - 1 && differenceRect.right <= figureRect.right + 1),
+        containsExplanatoryText: Boolean(note?.textContent?.includes('同じ100万円')),
+        captions: captions.length,
+        tiny,
+        spills,
+        tabRows: Math.round(tabs[0]?.getBoundingClientRect().top ?? 0) === Math.round(tabs[1]?.getBoundingClientRect().top ?? 0),
+      };
+    })() : null;
     return {
       title: document.title,
+      taxAudit,
       width: innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
       bodyScrollWidth: document.body.scrollWidth,
@@ -88,6 +126,17 @@ try {
           failures.push(label+' '+layout+': horizontal overflow');
         if(after.faults.length>before.faults.length)
           failures.push(label+' '+layout+': new console/page error '+after.faults.join(';'));
+        if (label === 'nisa-article' && after.taxAudit) {
+          const q = after.taxAudit;
+          if (q.rootPadding !== 0) failures.push('NISA '+layout+': trailing white padding '+q.rootPadding+'px');
+          if (q.footerGap > 2) failures.push('NISA '+layout+': footer bottom gap '+q.footerGap+'px');
+          if (!q.diffFitsFigure || q.diffWidth < 160)
+            failures.push('NISA '+layout+': tax-difference box improperly sized');
+          if (!q.containsExplanatoryText) failures.push('NISA '+layout+': tax-difference explanation missing');
+          if (q.tiny.length) failures.push('NISA '+layout+': text under 12px '+JSON.stringify(q.tiny));
+          if (q.spills.length) failures.push('NISA '+layout+': clipped comparison labels '+JSON.stringify(q.spills));
+          if (layout === 'mobile' && !q.tabRows) failures.push('NISA mobile tabs must stay on one row');
+        }
         if(protectedNames.has(label)){
           if(before.textHash!==after.textHash) failures.push(label+' '+layout+': protected visible text differs');
           if(JSON.stringify(before.computed)!==JSON.stringify(after.computed))
