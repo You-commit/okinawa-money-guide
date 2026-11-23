@@ -10,7 +10,7 @@ type ArticleSource = {
 }
 
 type KnowledgeArticleLayoutProps = {
-  eyebrow: string
+  eyebrow?: string
   title: string
   lead: string
   publishedAt?: string
@@ -44,7 +44,7 @@ function KnowledgeArticleLayout({
               <span aria-hidden="true">›</span>
               <span aria-current="page">{title}</span>
             </nav>
-            <p className="info-eyebrow">{eyebrow}</p>
+            {eyebrow ? <p className="info-eyebrow">{eyebrow}</p> : null}
             <h1>{title}</h1>
             <p className="knowledge-article-hero__lead">{lead}</p>
             {publishedAt || updatedAt || basisDate ? (
