@@ -27,13 +27,16 @@ jobs:
           npm --prefix /tmp/omg-main run build
       - name: Install headless browser
         run: |
-          npm install --no-save --package-lock=false playwright@1.58.2
-          npx playwright install --with-deps chromium
+          mkdir -p /tmp/omg-playwright
+          npm install --prefix /tmp/omg-playwright --no-save playwright@1.58.2
+          /tmp/omg-playwright/node_modules/.bin/playwright install --with-deps chromium
       - name: Start both builds
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/feature-preview.log 2>&1 &
           (cd /tmp/omg-main && npm run preview -- --host 127.0.0.1 --port 4174 --strictPort > /tmp/main-preview.log 2>&1) &
       - name: Screenshot all 12 routes PC+mobile; protect simulator and top
+        env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
         run: node scripts/editorial-visual-audit.mjs
       - name: Upload visual evidence
         if: always()
