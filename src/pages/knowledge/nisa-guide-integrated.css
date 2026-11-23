@@ -1435,9 +1435,19 @@
   }
 
   .nisa-bank-tax__difference {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    justify-items: center;
     gap: 7px;
     text-align: center;
+  }
+
+  .nisa-bank-tax__difference span {
+    width: 100%;
+    max-width: 32ch;
+    flex-basis: auto;
+    text-wrap: pretty;
   }
 
   .nisa-bank-tax__compare {
