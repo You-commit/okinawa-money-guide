@@ -62,7 +62,7 @@ function KnowledgePage() {
 
         <div className="info-main"><div className="info-shell">
           <section className="info-section">
-            <div className="info-section-heading"><div><p className="info-eyebrow">確認の順序</p><h2>初めての方は、3つの順序で確認</h2></div><p>知識を増やすこと自体ではなく、次の判断が落ち着いてできることを目指します。</p></div>
+            <div className="info-section-heading"><div><h2>初めての方は、3つの順序で確認</h2></div><p>知識を増やすこと自体ではなく、次の判断が落ち着いてできることを目指します。</p></div>
             <div className="start-path info-surface">
               <article><b>1</b><strong>目的を選ぶ</strong><p>借りる・貯める・増やす・備えるから、今の関心に近いものを選びます。</p></article>
               <article><b>2</b><strong>基礎と注意点を知る</strong><p>仕組み、費用、リスク、確認すべき条件を短く整理します。</p></article>
@@ -71,7 +71,7 @@ function KnowledgePage() {
           </section>
 
           <section className="info-section">
-            <div className="info-section-heading"><div><p className="info-eyebrow">公開中の記事</p><h2>公開中の記事</h2></div><p>制度の数字とシミュレーターの結果を、次の判断につなげるための読み方を整理しました。</p></div>
+            <div className="info-section-heading"><div><h2>公開中の記事</h2></div><p>制度の数字とシミュレーターの結果を、次の判断につなげるための読み方を整理しました。</p></div>
             <div className="knowledge-latest-list">
               <article>
                 <p>NISA・資産形成</p>
@@ -89,7 +89,7 @@ function KnowledgePage() {
           </section>
 
           <section className="info-section">
-            <div className="info-section-heading"><div><p className="info-eyebrow">目的別のテーマ</p><h2>目的から探す</h2></div><p>未公開の知識コンテンツは、存在する記事のように見せず「準備中」と明示します。</p></div>
+            <div className="info-section-heading"><div><h2>目的から探す</h2></div><p>未公開の知識コンテンツは、存在する記事のように見せず「準備中」と明示します。</p></div>
             <div className="knowledge-grid">
               {categories.map((category) => (
                 <article className={`knowledge-card knowledge-card--${category.id} info-surface`} id={category.id} key={category.id}>
@@ -107,7 +107,7 @@ function KnowledgePage() {
 
           <section className="info-section">
             <div className="okinawa-panel info-surface">
-              <div className="okinawa-intro"><p className="info-eyebrow">沖縄の暮らし</p><h2>沖縄で暮らすからこそ、確認したいこと</h2><p>全国共通の制度を土台にしつつ、沖縄の暮らしや資産に関わるテーマを分けて整理します。</p></div>
+              <div className="okinawa-intro"><h2>沖縄で暮らすからこそ、確認したいこと</h2><p>全国共通の制度を土台にしつつ、沖縄の暮らしや資産に関わるテーマを分けて整理します。</p></div>
               <div className="okinawa-topics">
                 {[
                   ['軍用地', '倍率・年間借地料・利回りを判断するための基礎。'],
@@ -120,7 +120,7 @@ function KnowledgePage() {
           </section>
 
           <section className="info-section">
-            <div className="info-section-heading"><div><p className="info-eyebrow">無料で試算</p><h2>数字を確かめる</h2></div><p>基礎を確認したら、実装済みの無料シミュレーターで自分の条件に置き換えられます。</p></div>
+            <div className="info-section-heading"><div><h2>数字を確かめる</h2></div><p>基礎を確認したら、実装済みの無料シミュレーターで自分の条件に置き換えられます。</p></div>
             <div className="simulator-links">
               <Link to={routes.militaryLand}>軍用地利回り <span aria-hidden="true">→</span></Link>
               <Link to={routes.mortgage}>住宅ローン <span aria-hidden="true">→</span></Link>

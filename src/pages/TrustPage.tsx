@@ -13,7 +13,7 @@ function TrustPage() {
       <main id="main-content">
         <section className="info-hero trust-hero"><div className="info-hero__inner trust-hero__inner">
           <div><p className="info-eyebrow">運営の透明性</p><h1>判断材料を届けるための、<br />情報と運営の方針</h1><p className="info-hero__lead">情報源、基準時点、計算結果、データ、広告・提携について、利用前に確認できる形で明示します。</p></div>
-          <div className="trust-console" aria-label="信頼方針の概要"><div><span>情報公開の基本姿勢</span></div><div className="trust-console__grid"><span>一次資料</span><span>更新・訂正</span><span>計算方針</span><span>データ保護</span><span>広告・提携</span><span>問い合わせ</span></div><p><span aria-hidden="true" />基準時点：2026年8月</p></div>
+          <div className="trust-console" aria-label="信頼方針の概要"><div><span>このページで確認できること</span></div><div className="trust-console__grid"><span>一次資料</span><span>更新・訂正</span><span>計算方針</span><span>データ保護</span><span>広告・提携</span><span>問い合わせ</span></div><p><span aria-hidden="true" />基準時点：2026年8月</p></div>
         </div></section>
 
         <div className="info-main"><div className="info-shell">
@@ -33,7 +33,7 @@ function TrustPage() {
             </div>
           </div></section>
 
-          <section className="info-section"><div className="info-section-heading"><div><p className="info-eyebrow">広告・提携の原則</p><h2>収益化より先に守る5つの原則</h2></div><p>提携先が0社でも、利用者が必要な情報を得て判断できる状態を維持します。</p></div><div className="principles">{[
+          <section className="info-section"><div className="info-section-heading"><div><h2>収益化より先に守る5つの原則</h2></div><p>提携先が0社でも、利用者が必要な情報を得て判断できる状態を維持します。</p></div><div className="principles">{[
             ['原則01', '無料の中核情報を削らない'], ['原則02', '支払いによる順位操作をしない'], ['原則03', 'スポンサーを順位化しない'], ['原則04', '広告より先に安全情報を置く'], ['原則05', '提携先なしでも判断体験を成立させる'],
           ].map(([title, body]) => <article key={title}><b>{title}</b><p>{body}</p></article>)}</div></section>
         </div></div>

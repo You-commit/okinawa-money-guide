@@ -104,7 +104,7 @@ describe('dedicated page routing', () => {
     const { container } = renderAt('/trust')
     const trustConsole = container.querySelector<HTMLElement>('.trust-console')!
 
-    expect(within(trustConsole).getByText('情報公開の基本姿勢')).toBeTruthy()
+    expect(within(trustConsole).getByText('このページで確認できること')).toBeTruthy()
     expect(within(trustConsole).getAllByText(
       /一次資料|更新・訂正|計算方針|データ保護|広告・提携|問い合わせ/,
     )).toHaveLength(6)
@@ -121,17 +121,22 @@ describe('dedicated page routing', () => {
 
   it('uses natural Japanese labels on informational pages', () => {
     renderAt('/knowledge')
-    expect(screen.getByText('確認の順序')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '初めての方は、3つの順序で確認' })).toBeTruthy()
+    expect(screen.queryByText('確認の順序')).toBeNull()
+    expect(screen.getAllByText('公開中の記事')).toHaveLength(1)
     expect(screen.queryByText('START HERE')).toBeNull()
 
     cleanup()
     renderAt('/about')
     expect(screen.getByText('大切にしていること')).toBeTruthy()
+    expect(screen.queryByText('対象となる方')).toBeNull()
+    expect(screen.queryByText('沖縄の視点')).toBeNull()
     expect(screen.queryByText('STORY & MISSION')).toBeNull()
 
     cleanup()
     renderAt('/trust')
-    expect(screen.getByText('情報公開の基本姿勢')).toBeTruthy()
+    expect(screen.getByText('このページで確認できること')).toBeTruthy()
+    expect(screen.queryByText('広告・提携の原則')).toBeNull()
     expect(screen.queryByText('TRUST CENTER')).toBeNull()
   })
 
