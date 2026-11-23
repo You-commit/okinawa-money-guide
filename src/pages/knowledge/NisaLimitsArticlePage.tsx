@@ -389,9 +389,10 @@ function NisaLimitsArticlePage() {
                     </div>
                   </section>
 
-                  <aside className="nisa-bank-tax__difference">
+                  <aside className="nisa-bank-tax__difference" aria-label="税額差のまとめ">
                     <small>税額差</small>
                     <strong>203,150円</strong>
+                    <span>同じ100万円の利益でも、NISAでは差し引かれない税額です。</span>
                   </aside>
                 </div>
 
