@@ -273,3 +273,62 @@
     border-top-right-radius: 0;
   }
 }
+
+
+/* Visual QA refinement: PR #14 fixed action bar obscured mobile article text.
+ * Keep both action links, but return them to normal document flow. */
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sticky-cta {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  margin: 24px auto 0;
+  padding: 28px var(--omg-page-gutter) 34px;
+  border-top: 1px solid var(--editorial-line);
+  background: #f5f9fb;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sticky-cta__primary,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sticky-cta__secondary {
+  min-height: 50px;
+  font-size: .875rem;
+  font-weight: 700;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-section__heading h2 {
+  font-weight: 700;
+  letter-spacing: -.012em;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-section__heading > span {
+  font-weight: 700;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-section__intro {
+  font-size: .9375rem;
+  line-height: 1.9;
+}
+
+@media (max-width: 760px) {
+  /* A concise 3-tab row instead of three full-width stacked menu bars. */
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a {
+    min-height: 54px;
+    padding: 8px 6px;
+    border-top: 1px solid var(--editorial-line);
+    border-right: 1px solid var(--editorial-line);
+    font-size: .8125rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a:first-child {
+    border-top-right-radius: 0;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a:last-child {
+    border-top-right-radius: var(--editorial-control-radius);
+    border-right: 0;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-sticky-cta__inner {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
