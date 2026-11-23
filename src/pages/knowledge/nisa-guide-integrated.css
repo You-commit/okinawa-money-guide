@@ -1460,8 +1460,125 @@
     width: auto;
   }
 
+  /* Preserve the semantic table in markup; present each row as a complete
+     readable comparison card on small screens rather than an offscreen grid. */
+  .nisa-bank-table-wrap {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
   .nisa-bank-table {
-    min-width: 640px;
+    display: block;
+    width: 100%;
+    min-width: 0;
+    font-size: .8125rem;
+  }
+
+  .nisa-bank-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .nisa-bank-table tbody {
+    display: grid;
+    gap: 14px;
+  }
+
+  .nisa-bank-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
+    border: 1px solid #cedfe6;
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .nisa-bank-table tbody th {
+    grid-column: 1 / -1;
+    width: auto;
+    padding: 13px 14px;
+    border: 0;
+    border-bottom: 1px solid #cedfe6;
+    background: #e8f3f6;
+    color: #143c5a;
+    font-size: .875rem;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .nisa-bank-table tbody td {
+    display: flex;
+    min-width: 0;
+    min-height: 76px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 5px;
+    padding: 13px 12px;
+    border: 0;
+    border-bottom: 1px solid #dfebef;
+    color: #2a4862;
+    font-size: .8125rem;
+    line-height: 1.65;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .nisa-bank-table tbody td:nth-child(2):not([colspan])::before {
+    content: "つみたて投資枠";
+  }
+
+  .nisa-bank-table tbody td:nth-child(3)::before {
+    content: "成長投資枠";
+  }
+
+  .nisa-bank-table tbody td:nth-child(4)::before {
+    content: "合計";
+  }
+
+  .nisa-bank-table tbody td::before {
+    display: block;
+    color: #4d6979;
+    font-size: .75rem;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .nisa-bank-table tbody td:nth-child(4) {
+    grid-column: 1 / -1;
+    min-height: 52px;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 14px;
+    border-bottom: 0;
+    background: #eff9f5;
+  }
+
+  .nisa-bank-table tbody td[colspan] {
+    display: block;
+    grid-column: 1 / -1;
+    min-height: 0;
+    padding: 16px 14px;
+    border-bottom: 0;
+  }
+
+  .nisa-bank-table tbody td strong {
+    font-size: .9375rem;
+    font-weight: 700;
+  }
+
+  .nisa-bank-table tbody td small {
+    font-size: .75rem;
+    line-height: 1.55;
   }
 
   .nisa-bank-chart-grid {
