@@ -345,3 +345,99 @@
     gap: 12px;
   }
 }
+
+
+/*
+ * OMG editorial material depth v0.3
+ * A bank-grade layered neutral system: cool-grey canvas, white reading sheet,
+ * warmer elevated grey on supporting panels, and restrained navy/teal markers.
+ * Avoid artificial gradients, repeating boxed cards, or calculator changes.
+ */
+.site.info-page,
+.site.knowledge-article-page {
+  --editorial-canvas: #f2f5f7;
+  --editorial-canvas-soft: #f7f9fa;
+  --editorial-surface: #ffffff;
+  --editorial-keyline: #dde7ec;
+  --editorial-depth-shadow: 0 7px 24px rgb(15 49 76 / 4%);
+}
+
+/* Article pages: white editorial reading surface floating subtly above grey. */
+.site.knowledge-article-page {
+  background: var(--editorial-canvas);
+}
+.site.knowledge-article-page.nisa-guide-page.nisa-bank-page {
+  background: var(--editorial-canvas);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-article {
+  min-width: 0;
+  padding: 38px 38px 42px;
+  border: 1px solid var(--editorial-keyline);
+  border-radius: 12px;
+  background: var(--editorial-surface);
+  box-shadow: var(--editorial-depth-shadow);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-section + .nisa-bank-section {
+  margin-top: 55px;
+  padding-top: 48px;
+  border-top: 1px solid #e7edf1;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sidebar section {
+  background: var(--editorial-canvas-soft);
+  box-shadow: none;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-tax {
+  background: #f5f8fa;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-reading-note {
+  border-left-color: #0c9484;
+  background: #f7faf9;
+  padding: 16px 18px;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-update {
+  background: #f5f8fa;
+  border-color: var(--editorial-keyline);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero {
+  border-bottom-color: var(--editorial-keyline);
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-body {
+  min-width: 0;
+  padding: 38px 40px 48px;
+  border: 1px solid var(--editorial-keyline);
+  border-radius: 12px;
+  background: var(--editorial-surface);
+  box-shadow: var(--editorial-depth-shadow);
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-aside section {
+  background: var(--editorial-canvas-soft);
+}
+
+/* Supporting pages use tonal sections; cards themselves remain white. */
+.site.info-page--knowledge .info-main {
+  background: linear-gradient(180deg, #f3f6f8 0%, #f8fafb 54%, #f3f6f8 100%);
+}
+.site.info-page--about .info-main {
+  background: linear-gradient(180deg, #f5f7f8 0%, #f1f5f7 100%);
+}
+.site.info-page--knowledge .info-surface,
+.site.info-page--about .info-surface {
+  background: var(--editorial-surface);
+  border-color: var(--editorial-keyline);
+}
+
+/* Preserve already-accepted Trust dark hero and its original body contrast. */
+@media (max-width: 760px) {
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-article {
+    padding: 28px 18px 34px;
+    border-radius: 10px;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-section + .nisa-bank-section {
+    margin-top: 44px;
+    padding-top: 36px;
+  }
+  .site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-body {
+    padding: 28px 19px 34px;
+    border-radius: 10px;
+  }
+}
