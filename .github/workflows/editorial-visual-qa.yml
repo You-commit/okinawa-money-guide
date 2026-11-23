@@ -1,0 +1,47 @@
+name: OMG full-site visual guard
+on:
+  push:
+    branches:
+      - feature/editorial-consistency-sitewide-20261123
+  workflow_dispatch:
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Build feature
+        run: npm ci && npm run build
+      - name: Build protected main baseline
+        run: |
+          git worktree add --detach /tmp/omg-main origin/main
+          npm --prefix /tmp/omg-main ci
+          npm --prefix /tmp/omg-main run build
+      - name: Install headless browser
+        run: |
+          npm install --no-save --package-lock=false playwright@1.58.2
+          npx playwright install --with-deps chromium
+      - name: Start both builds
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/feature-preview.log 2>&1 &
+          (cd /tmp/omg-main && npm run preview -- --host 127.0.0.1 --port 4174 --strictPort > /tmp/main-preview.log 2>&1) &
+      - name: Screenshot all 12 routes PC+mobile; protect simulator and top
+        run: node scripts/editorial-visual-audit.mjs
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: omg-editorial-visual-20261123
+          path: |
+            qa/editorial-visual/
+            /tmp/feature-preview.log
+            /tmp/main-preview.log
+          if-no-files-found: warn
