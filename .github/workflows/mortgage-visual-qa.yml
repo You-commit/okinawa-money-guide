@@ -1,0 +1,38 @@
+name: Mortgage special-case visual gate
+on:
+  push:
+    branches:
+      - fix/mortgage-trajectory-metadata-20261124
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install dependencies and build
+        run: npm ci && npm run build
+      - name: Install Chromium test tooling separately
+        run: |
+          mkdir -p /tmp/omg-playwright
+          npm install --prefix /tmp/omg-playwright --no-save playwright@1.58.2
+          /tmp/omg-playwright/node_modules/.bin/playwright install --with-deps chromium
+      - name: Start preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort > /tmp/mortgage-preview.log 2>&1 &
+      - name: Test zero-interest and monthly crossover at two viewports
+        env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
+        run: node scripts/mortgage-special-case-visual-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mortgage-special-case-visual-evidence
+          path: qa/mortgage-regression/
+          if-no-files-found: warn
