@@ -1,0 +1,27 @@
+name: Editorial integration strict regression
+on:
+  push:
+    branches:
+      - feature/editorial-consistency-sitewide-20261123
+      - feature/editorial-unified-nisa-review-20261123
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  required-full-suite:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked packages
+        run: npm ci
+      - name: Lint all source
+        run: npm run lint
+      - name: Build with TypeScript check
+        run: npm run build
+      - name: Full tests strict (no continue on error)
+        run: npm test
