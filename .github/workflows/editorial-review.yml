@@ -1,0 +1,39 @@
+name: OMG editorial draft validation
+on:
+  push:
+    branches:
+      - feature/editorial-consistency-sitewide-20261123
+  pull_request:
+    paths:
+      - "src/styles/editorial-consistency.css"
+      - "src/App.tsx"
+      - "scripts/check-editorial-scope.mjs"
+      - ".github/workflows/editorial-review.yml"
+jobs:
+  quality:
+    name: CSS scope, tests, lint, build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Protected scope
+        run: node scripts/check-editorial-scope.mjs
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      - name: Route and article tests
+        run: npm test -- src/AppRouter.test.tsx
+      - name: Full suite (baseline deviations visible)
+        id: full_suite
+        continue-on-error: true
+        run: npm test
+      - name: Full suite result summary
+        if: always()
+        run: echo "Full suite result = ${{ steps.full_suite.outcome }}" >> "$GITHUB_STEP_SUMMARY"
