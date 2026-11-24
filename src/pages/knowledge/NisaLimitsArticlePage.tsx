@@ -219,7 +219,6 @@ function NisaLimitsArticlePage() {
             </nav>
 
             <div className="nisa-bank-hero__copy">
-              <p className="nisa-bank-hero__eyebrow">NISA / DECISION GUIDE</p>
               <h1>NISAの非課税枠と、<br />積立額・将来額の考え方</h1>
               <p className="nisa-bank-hero__lead">
                 NISAの制度を理解し、年間の投資枠や非課税保有限度額、
@@ -276,7 +275,7 @@ function NisaLimitsArticlePage() {
             <a href="#benefits" onClick={(event) => navigateToSection(event, 'benefits')}>NISAのメリット</a>
             <a href="#compare" onClick={(event) => navigateToSection(event, 'compare')}>投資枠の違い・活用例</a>
             <a href="#caution" onClick={(event) => navigateToSection(event, 'caution')}>制度の注意点</a>
-            <a href="#faq" onClick={(event) => navigateToSection(event, 'faq')}>Q&amp;A</a>
+            <a href="#faq" onClick={(event) => navigateToSection(event, 'faq')}>よくある質問</a>
           </nav>
         </div>
 
@@ -389,9 +388,10 @@ function NisaLimitsArticlePage() {
                     </div>
                   </section>
 
-                  <aside className="nisa-bank-tax__difference">
+                  <aside className="nisa-bank-tax__difference" aria-label="税額差のまとめ">
                     <small>税額差</small>
                     <strong>203,150円</strong>
+                    <span>同じ100万円の利益でも、NISAでは差し引かれない税額です。</span>
                   </aside>
                 </div>
 
@@ -465,7 +465,6 @@ function NisaLimitsArticlePage() {
 
               <div className="nisa-bank-frame-details">
                 <section id="tsumitate">
-                  <p className="nisa-bank-frame-details__label">TSUMITATE</p>
                   <h3>つみたて投資枠</h3>
                   <p>
                     年間120万円まで。長期の積立・分散投資に適した一定の投資信託等が対象で、
@@ -479,7 +478,6 @@ function NisaLimitsArticlePage() {
                 </section>
 
                 <section id="growth">
-                  <p className="nisa-bank-frame-details__label">GROWTH</p>
                   <h3>成長投資枠</h3>
                   <p>
                     年間240万円まで。上場株式や投資信託等が対象で、
@@ -596,7 +594,7 @@ function NisaLimitsArticlePage() {
               <section className="nisa-bank-section nisa-bank-faq" id="faq">
                 <header className="nisa-bank-section__heading">
                   <span>07</span>
-                  <h2>よくある質問（Q&amp;A）</h2>
+                  <h2>よくある質問</h2>
                 </header>
 
                 <details>

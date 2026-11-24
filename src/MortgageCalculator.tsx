@@ -325,7 +325,11 @@ function MortgageTrajectoryDifferenceChart({
     points[0],
   )
   const firstNegativePoint = points.find((point) => point.difference < 0) ?? null
-
+  const hasMonthlyCrossover =
+    summary.crossoverMonth !== null && summary.crossoverMonth % 12 !== 0
+  const mobileCrossoverLabel = summary.crossoverMonth === null
+    ? '期間内のマイナス転換なし'
+    : `${formatMortgageTermMonth(summary.crossoverMonth)}からマイナス（破線）`
 
   return (
     <article
@@ -382,6 +386,8 @@ function MortgageTrajectoryDifferenceChart({
       <div
         className="mortgage-trajectory-difference__visual"
         aria-label="元金均等返済と元利均等返済の累計返済額の差額推移"
+        data-mobile-axis-layout={hasMonthlyCrossover ? 'months' : 'years'}
+        data-mobile-crossover-label={mobileCrossoverLabel}
       >
         <div className="mortgage-trajectory-difference__axis" aria-hidden="true">
           {axisValues.map((value) => (

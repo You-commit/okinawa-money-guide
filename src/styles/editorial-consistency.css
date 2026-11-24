@@ -1,0 +1,443 @@
+/*
+ * OMG Editorial Consistency v0.2 — Draft PR / independent review.
+ * SCOPED: Knowledge, article, About, Trust, NotFound. Never calculators/top.
+ * Design reference: OMG-DL v1.0; approved hero/finance computations remain untouched.
+ */
+.site.info-page,
+.site.knowledge-article-page,
+.site.not-found-page {
+  --editorial-text: #263a4d;
+  --editorial-heading: #15365c;
+  --editorial-muted: #536a7c;
+  --editorial-line: #dce6ed;
+  --editorial-teal: #0f766e;
+  --editorial-radius: 12px;
+  --editorial-control-radius: 8px;
+  --editorial-shadow: 0 6px 20px rgb(12 48 78 / 5%);
+  font-family: var(--omg-font-sans);
+}
+
+/* Typography: readable Japanese financial editorial, not dashboard cards. */
+.site.info-page .info-hero h1,
+.site.knowledge-article-page .knowledge-article-hero h1,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero h1 {
+  color: var(--editorial-heading);
+  font-size: clamp(2rem, 3.25vw, 3.05rem);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  line-height: 1.36;
+  text-wrap: balance;
+}
+
+.site.info-page .info-eyebrow,
+.site.knowledge-article-page .info-eyebrow,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__eyebrow {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+
+.site.info-page .info-hero__lead,
+.site.knowledge-article-page .knowledge-article-hero__lead,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__lead {
+  color: var(--editorial-muted);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0;
+}
+
+.site.info-page .info-section-heading h2,
+.site.knowledge-article-page .knowledge-article-body h2,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-main h2 {
+  color: var(--editorial-heading);
+  font-weight: 700;
+  letter-spacing: -.012em;
+  line-height: 1.5;
+}
+
+.site.knowledge-article-page .knowledge-article-intro,
+.site.knowledge-article-page .knowledge-article-body > p,
+.site.knowledge-article-page .knowledge-article-body > section > p,
+.site.info-page .mission-story > p:not(.info-eyebrow),
+.site.info-page .policy-body > p {
+  color: var(--editorial-text);
+  font-size: .9375rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.94;
+}
+
+.site.knowledge-article-page .knowledge-article-breadcrumb,
+.site.knowledge-article-page .knowledge-article-meta div,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__meta dt,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__meta dd {
+  font-size: .8125rem;
+  line-height: 1.6;
+}
+
+.site.knowledge-article-page .knowledge-article-aside h2,
+.site.knowledge-article-page .knowledge-article-aside li a,
+.site.knowledge-article-page .knowledge-article-related-link {
+  font-size: .875rem;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.site.knowledge-article-page .knowledge-article-aside p,
+.site.knowledge-article-page .knowledge-article-aside li small,
+.site.knowledge-article-page .knowledge-data-table th,
+.site.knowledge-article-page .knowledge-data-table td {
+  font-size: .8125rem;
+  line-height: 1.7;
+}
+
+.site.knowledge-article-page .knowledge-data-table thead th,
+.site.knowledge-article-page .knowledge-data-table tbody th {
+  font-weight: 700;
+}
+
+/* Shared article and information surfaces. Flat tables retain square edges. */
+.site.info-page .info-surface,
+.site.info-page .knowledge-hero-tile,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sidebar section {
+  border-radius: var(--editorial-radius);
+  border-color: var(--editorial-line);
+  box-shadow: var(--editorial-shadow);
+}
+.site.info-page .knowledge-hero-tile,
+.site.info-page .knowledge-card,
+.site.info-page .policy-card {
+  box-shadow: none;
+}
+.site.info-page .knowledge-card {
+  border-top-width: 3px;
+}
+.site.info-page .knowledge-hero-tile {
+  border-color: var(--editorial-line);
+}
+.site.info-page .policy-card {
+  border-left: 4px solid #b8cdd5;
+}
+.site.info-page .knowledge-hero-tile span,
+.site.info-page .knowledge-card h3 {
+  font-weight: 700;
+}
+.site.info-page .knowledge-hero-tile small,
+.site.info-page .knowledge-card > p,
+.site.info-page .info-section-heading > p {
+  font-size: .875rem;
+  line-height: 1.7;
+}
+
+/* About: return the warm prototype palette to the OMG navy/teal family. */
+.site.info-page--about,
+.site.info-page--about .info-main {
+  background: #fbfcfe;
+}
+.site.info-page--about .about-hero {
+  background: linear-gradient(112deg, #fff 0%, #f5f9fc 59%, #f0f8f5 100%);
+}
+.site.info-page--about .about-hero .info-eyebrow {
+  color: var(--editorial-teal);
+}
+
+/* Trust dark hero is already accepted: preserve white heading and light copy. */
+.site.info-page--trust .trust-hero h1 { color: #fff; }
+.site.info-page--trust .trust-hero .info-hero__lead { color: #bfd3e2; }
+
+/* Brand editorial signature: restrained 4px navy → turquoise → sea-green line,
+ * not a decorative full-screen gradient. Shared article pages only. */
+.site.knowledge-article-page .knowledge-article-hero,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero {
+  background:
+    linear-gradient(90deg, #0c3264 0%, #0d75a3 54%, #0d9282 100%)
+      top / 100% 4px no-repeat,
+    #fff;
+  border-bottom: 1px solid var(--editorial-line);
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-body h2 {
+  padding-left: 15px;
+  border-left: 3px solid #0d9282;
+}
+.site.info-page .info-section-heading h2 {
+  text-decoration-color: #0d9282;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 10px;
+}
+
+/* PR #14 integration: retains structure; reduces weight and graph-label scale. */
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs {
+  border-bottom-color: var(--editorial-heading);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a {
+  color: var(--editorial-heading);
+  font-size: .875rem;
+  font-weight: 600;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a:first-child {
+  border-top-left-radius: var(--editorial-control-radius);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a:last-child {
+  border-top-right-radius: var(--editorial-control-radius);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a.is-active {
+  border-color: var(--editorial-heading);
+  background: var(--editorial-heading);
+  color: #fff;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a.is-active::after {
+  display: none;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-anchor-nav a,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sidebar nav a {
+  font-size: .8125rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sidebar h2,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart figcaption strong {
+  font-weight: 700;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart {
+  min-width: 0;
+  background: #fff;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart figcaption > span,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart__year,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart__unit,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart__callout small,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart__callout span,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-facts dd small,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart-reading span,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-note,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sources a small {
+  font-size: .75rem;
+  line-height: 1.5;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart__callout {
+  position: static;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  margin: 6px 0 13px auto;
+  padding: 8px 11px;
+  border: 1px solid #b6cdd9;
+  border-radius: var(--editorial-control-radius);
+  background: #fff;
+  text-align: left;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart__callout::after { display: none; }
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart__callout strong {
+  font-size: .9375rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-facts dt {
+  font-size: .8125rem;
+  font-weight: 600;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-facts dd,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-chart-reading strong {
+  font-size: .875rem;
+  font-weight: 700;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-faq summary {
+  font-size: .875rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-faq details p {
+  font-size: .875rem;
+  line-height: 1.8;
+}
+.site.not-found-page .not-found-page__main h1 {
+  color: var(--editorial-heading);
+  font-weight: 700;
+}
+
+/* Keyboard accessibility is essential, but never affects calculator styles. */
+.site.info-page a:focus-visible,
+.site.info-page button:focus-visible,
+.site.knowledge-article-page a:focus-visible,
+.site.knowledge-article-page button:focus-visible,
+.site.knowledge-article-page summary:focus-visible,
+.site.not-found-page a:focus-visible {
+  outline: 2px solid var(--editorial-teal);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .site.info-page .info-hero h1,
+  .site.knowledge-article-page .knowledge-article-hero h1,
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero h1 {
+    font-size: clamp(1.85rem, 7vw, 2.5rem);
+    line-height: 1.42;
+    letter-spacing: -.005em;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-chart__callout {
+    margin-top: 12px;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a:first-child {
+    border-top-right-radius: var(--editorial-control-radius);
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a:last-child {
+    border-top-right-radius: 0;
+  }
+}
+
+
+/* Visual QA refinement: PR #14 fixed action bar obscured mobile article text.
+ * Keep both action links, but return them to normal document flow. */
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sticky-cta {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  margin: 24px auto 0;
+  padding: 28px var(--omg-page-gutter) 34px;
+  border-top: 3px solid #0d9282;
+  background: linear-gradient(100deg, #edf6fb 0%, #e9f8f4 100%);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sticky-cta__primary,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sticky-cta__secondary {
+  min-height: 50px;
+  font-size: .875rem;
+  font-weight: 700;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-section__heading h2 {
+  font-weight: 700;
+  letter-spacing: -.012em;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-section__heading > span {
+  font-weight: 700;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-section__intro {
+  font-size: .9375rem;
+  line-height: 1.9;
+}
+
+@media (max-width: 760px) {
+  /* A concise 3-tab row instead of three full-width stacked menu bars. */
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a {
+    min-height: 54px;
+    padding: 8px 6px;
+    border-top: 1px solid var(--editorial-line);
+    border-right: 1px solid var(--editorial-line);
+    font-size: .8125rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a:first-child {
+    border-top-right-radius: 0;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-tabs a:last-child {
+    border-top-right-radius: var(--editorial-control-radius);
+    border-right: 0;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-sticky-cta__inner {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+
+/*
+ * OMG editorial material depth v0.3
+ * A bank-grade layered neutral system: cool-grey canvas, white reading sheet,
+ * warmer elevated grey on supporting panels, and restrained navy/teal markers.
+ * Avoid artificial gradients, repeating boxed cards, or calculator changes.
+ */
+.site.info-page,
+.site.knowledge-article-page {
+  --editorial-canvas: #f2f5f7;
+  --editorial-canvas-soft: #f7f9fa;
+  --editorial-surface: #ffffff;
+  --editorial-keyline: #dde7ec;
+  --editorial-depth-shadow: 0 7px 24px rgb(15 49 76 / 4%);
+}
+
+/* Article pages: white editorial reading surface floating subtly above grey. */
+.site.knowledge-article-page {
+  background: var(--editorial-canvas);
+}
+.site.knowledge-article-page.nisa-guide-page.nisa-bank-page {
+  background: var(--editorial-canvas);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-article {
+  min-width: 0;
+  padding: 38px 38px 42px;
+  border: 1px solid var(--editorial-keyline);
+  border-radius: 12px;
+  background: var(--editorial-surface);
+  box-shadow: var(--editorial-depth-shadow);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-section + .nisa-bank-section {
+  margin-top: 55px;
+  padding-top: 48px;
+  border-top: 1px solid #e7edf1;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-sidebar section {
+  background: var(--editorial-canvas-soft);
+  box-shadow: none;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-tax {
+  background: #f5f8fa;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-reading-note {
+  border-left-color: #0c9484;
+  background: #f7faf9;
+  padding: 16px 18px;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-update {
+  background: #f5f8fa;
+  border-color: var(--editorial-keyline);
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero {
+  border-bottom-color: var(--editorial-keyline);
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-body {
+  min-width: 0;
+  padding: 38px 40px 48px;
+  border: 1px solid var(--editorial-keyline);
+  border-radius: 12px;
+  background: var(--editorial-surface);
+  box-shadow: var(--editorial-depth-shadow);
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-aside section {
+  background: var(--editorial-canvas-soft);
+}
+
+/* Supporting pages use tonal sections; cards themselves remain white. */
+.site.info-page--knowledge .info-main {
+  background: linear-gradient(180deg, #f3f6f8 0%, #f8fafb 54%, #f3f6f8 100%);
+}
+.site.info-page--about .info-main {
+  background: linear-gradient(180deg, #f5f7f8 0%, #f1f5f7 100%);
+}
+.site.info-page--knowledge .info-surface,
+.site.info-page--about .info-surface {
+  background: var(--editorial-surface);
+  border-color: var(--editorial-keyline);
+}
+
+/* Preserve already-accepted Trust dark hero and its original body contrast. */
+@media (max-width: 760px) {
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-article {
+    padding: 28px 18px 34px;
+    border-radius: 10px;
+  }
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-section + .nisa-bank-section {
+    margin-top: 44px;
+    padding-top: 36px;
+  }
+  .site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-body {
+    padding: 28px 19px 34px;
+    border-radius: 10px;
+  }
+}
