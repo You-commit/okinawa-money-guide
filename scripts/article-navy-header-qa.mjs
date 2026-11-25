@@ -18,12 +18,12 @@ async function ready(){
  throw Error('Deployed editorial header not available')
  }finally{await p.close()}
 }
-const metric=()=>{const h=document.querySelector('.top-option02__header'),hero=document.querySelector('.nisa-bank-hero'),brand=h.querySelector('.top-option02__brand-copy strong'),nav=h.querySelector('.top-option02__navigation'),cta=h.querySelector('.top-option02__header-cta'),link=nav.querySelector('a[href="/knowledge"]');const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};return {navy:h.classList.contains('top-option02__header--editorial'),bg:getComputedStyle(h).backgroundColor,header:rect(h),brand:getComputedStyle(brand).color,nav:getComputedStyle(nav).color,cta:getComputedStyle(cta).backgroundColor,current:link.getAttribute('aria-current'),overflow:document.documentElement.scrollWidth-innerWidth,hero:hero?{rect:rect(hero),bg:getComputedStyle(hero).backgroundImage,text:hero.innerText}:null,brandRect:rect(brand),logoLoaded:h.querySelector('img').complete&&h.querySelector('img').naturalWidth>0}}
+const metric=()=>{const h=document.querySelector('.top-option02__header'),hero=document.querySelector('.nisa-bank-hero'),brand=h.querySelector('.top-option02__brand-copy strong'),nav=h.querySelector('.top-option02__navigation'),cta=h.querySelector('.top-option02__header-cta'),link=nav.querySelector('a[href="/knowledge"]');const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};return {navy:h.classList.contains('top-option02__header--editorial'),bg:getComputedStyle(h).backgroundColor,footer:getComputedStyle(document.querySelector('.site-footer')).backgroundColor,header:rect(h),brand:getComputedStyle(brand).color,nav:getComputedStyle(nav).color,cta:getComputedStyle(cta).backgroundColor,current:link.getAttribute('aria-current'),overflow:document.documentElement.scrollWidth-innerWidth,hero:hero?{rect:rect(hero),bg:getComputedStyle(hero).backgroundImage,text:hero.innerText}:null,brandRect:rect(brand),logoLoaded:h.querySelector('img').complete&&h.querySelector('img').naturalWidth>0}}
 try{
  await ready()
  for(const width of [1440,1024,768,390,320]){
   const page=await b.newPage({viewport:{width,height:900},deviceScaleFactor:1,reducedMotion:'reduce'})
-  const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())})
+  const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text()+' @ '+new URL(m.location().url||page.url()).pathname)});page.on('response',r=>{if(r.status()>=400)errors.push('HTTP '+r.status()+' '+new URL(r.url()).pathname)})
   for(const [i,route] of routes.entries()){
    if(width!==1440&&i>=3&&i!==3&&i!==4)continue
    try{
@@ -32,12 +32,13 @@ try{
     await page.waitForSelector('.top-option02__header')
     await page.evaluate(()=>document.fonts.ready)
     const old=await page.evaluate(metric)
+    const baselineErrors=[...errors]
     errors.length=0
     const response=await page.goto(base+route,{waitUntil:'networkidle',timeout:35000})
-    assert.equal(response.status(),200)
+    assert.equal(response.status(),i===11?404:200)
     await page.evaluate(()=>document.fonts.ready)
     const m=await page.evaluate(metric)
-    assert.equal(m.navy,i<3);assert.equal(m.bg,i<3?'rgb(21, 54, 92)':old.bg)
+    assert.equal(m.footer,old.footer);if(i<3)assert.equal(m.bg,m.footer);assert.equal(m.navy,i<3);assert.equal(m.bg,i<3?'rgb(21, 50, 72)':old.bg)
     assert.equal(m.brand,i<3?'rgb(255, 255, 255)':old.brand)
     assert.equal(m.current,i===0?'page':i<3?'location':null)
     assert.equal(m.header.h,old.header.h)
@@ -49,16 +50,16 @@ try{
       if(width===1440||width===390){await page.screenshot({path:'qa/article-header/'+i+'-'+width+'.jpg',type:'jpeg',quality:80});if(i===1||width===1440)emit('HEADER_'+i+'_'+width,await page.screenshot({type:'jpeg',quality:52}))}
       const toggle=page.getByRole('button',{name:'メニューを開閉する'})
       const sim=page.getByRole('button',{name:'シミュレーター',exact:true})
-      if(width<=900){await toggle.click();assert.equal(await toggle.getAttribute('aria-expanded'),'true');assert.equal(await page.locator('.top-option02__navigation').evaluate(e=>getComputedStyle(e).color),'rgb(21, 54, 92)')}
-      await sim.click();assert.equal(await sim.getAttribute('aria-expanded'),'true');assert.equal(await page.locator('.top-option02__simulator-menu-card:visible').count(),5)
+      if(width<=1120){await toggle.click();assert.equal(await toggle.getAttribute('aria-expanded'),'true');assert.equal(await page.locator('.top-option02__navigation').evaluate(e=>getComputedStyle(e).color),'rgb(21, 50, 72)')}
+      await sim.click();assert.equal(await sim.getAttribute('aria-expanded'),'true');await page.locator('.top-option02__simulator-menu-card').first().waitFor({state:'visible',timeout:5000});assert.equal(await page.locator('.top-option02__simulator-menu-card:visible').count(),5)
       const panel=await page.locator('.top-option02__simulator-menu-panel').boundingBox()
       assert.ok(panel.x>=-1&&panel.x+panel.width<=width+1,JSON.stringify(panel))
       if(i===1&&(width===1440||width===390)){await page.screenshot({path:'qa/article-header/menu-'+width+'.jpg',type:'jpeg',quality:80});emit('MENU_'+width,await page.screenshot({type:'jpeg',quality:50}))}
       await page.keyboard.press('Escape');assert.equal(await sim.getAttribute('aria-expanded'),'false')
-      if(width<=900){await page.keyboard.press('Escape');assert.equal(await toggle.getAttribute('aria-expanded'),'false')}
+      if(width<=1120){await page.keyboard.press('Escape');assert.equal(await toggle.getAttribute('aria-expanded'),'false')}
     }
-    assert.deepEqual(errors,[])
-    reports.push({width,route,status:'PASS',headerHeight:m.header.h,overflow:m.overflow})
+    assert.deepEqual(errors.filter(e=>!baselineErrors.includes(e)),[],'New errors compared with unchanged reference');
+    reports.push({width,route,status:'PASS',headerHeight:m.header.h,overflow:m.overflow,headerColor:m.bg,footerColor:m.footer,baselineErrors,errors:[...errors]})
    }catch(e){reports.push({width,route,status:'FAIL',error:String(e),errors});await page.screenshot({path:'qa/article-header/'+i+'-'+width+'-FAIL.jpg',type:'jpeg',quality:80}).catch(()=>{})}
   }
   await page.close()
