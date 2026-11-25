@@ -34,6 +34,8 @@ for(const width of [1440,1024,768,390,320]){
   const results=[]
   for(const year of [5,10,15,20]){
     await page.getByRole('group',{name:'積立期間'}).getByRole('button',{name:year+'年',exact:true}).click()
+    await page.waitForFunction(y=>[...document.querySelectorAll('.nisa-comparison__row')].every(r=>Number(r.dataset.year)===y),year)
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))))
     const result=await page.evaluate(()=>{
       const chart=document.querySelector('#cases')
       const bars=[...chart.querySelectorAll('.nisa-comparison__bar')].map(bar=>{
@@ -53,8 +55,8 @@ for(const width of [1440,1024,768,390,320]){
       let expected=0;for(let k=0;k<year*12;k++)expected=expected*(1+m)+b.monthly
       assert.equal(b.year,year);assert.equal(b.axis,3000)
       assert.ok(Math.abs(b.value-expected)<0.01)
-      assert.ok(Math.abs(b.width/b.trackWidth-b.value/30000000)<0.002)
-      assert.ok(Math.abs(b.parts[0]/b.trackWidth-b.monthly*year*12/30000000)<0.002)
+      assert.ok(Math.abs(b.width/b.trackWidth-b.value/30000000)<0.002,'Bar geometry: '+JSON.stringify(b))
+      assert.ok(Math.abs(b.parts[0]/b.trackWidth-b.monthly*year*12/30000000)<0.002,'Principal geometry: '+JSON.stringify(b))
       assert.ok(Math.abs(b.parts.reduce((s,v)=>s+v,0)-b.width)<1)
       assert.ok(Math.abs(b.left)<1)
       assert.equal(b.amount,'約'+Math.round(expected/10000).toLocaleString('ja-JP')+'万円')
@@ -62,7 +64,14 @@ for(const width of [1440,1024,768,390,320]){
     }
     results.push({year,barCount:result.bars.length,overflow:result.overflow})
   }
-  if(width===1440||width===390)await page.locator('.nisa-comparison__figure').screenshot({path:'qa/nisa-chart/'+width+'-20-year.png',animations:'disabled'})
+  if(width===1440||width===390){
+    const img=await page.locator('.nisa-comparison__figure').screenshot({path:'qa/nisa-chart/'+width+'-20-year.jpg',type:'jpeg',quality:45,animations:'disabled'})
+    const b64=img.toString('base64')
+    for(let i=0;i<b64.length;i+=3500)console.log('VISUAL20_'+width+'_'+String(i/3500).padStart(3,'0')+'='+b64.slice(i,i+3500))
+    const tbl=await page.locator('.nisa-comparison__table').screenshot({type:'jpeg',quality:45,animations:'disabled'})
+    const tb=tbl.toString('base64')
+    for(let i=0;i<tb.length;i+=3500)console.log('VISUALTABLE_'+width+'_'+String(i/3500).padStart(3,'0')+'='+tb.slice(i,i+3500))
+  }
   await page.evaluate(()=>document.getElementById('reuse').scrollIntoView({behavior:'instant',block:'start'}))
   await page.waitForTimeout(300)
   assert.equal(await nav.getAttribute('href'),'#reuse','Scroll-linked TOC state')

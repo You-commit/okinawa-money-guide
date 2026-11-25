@@ -72,13 +72,15 @@ function FutureValueComparison() {
                 {point ? <strong className="nisa-comparison__amount">約{yenToMan(point.total)}<small>万円</small></strong> : <strong className="nisa-comparison__unmodeled">試算対象外</strong>}
               </div>
               {point ? <>
-                <div className="nisa-comparison__track" data-axis-max={ARTICLE_CHART_MAX_MAN} aria-hidden="true">
-                  {axisTicks.map(tick => <i key={tick} className="nisa-comparison__gridline" style={{ left: `${tick / ARTICLE_CHART_MAX_MAN * 100}%` }} />)}
-                  <div className="nisa-comparison__bar" data-total={point.total} style={{ width: `${point.total / (ARTICLE_CHART_MAX_MAN * 10000) * 100}%` }}>
-                    <span className="nisa-comparison__principal" style={{ width: `${point.principal / point.total * 100}%` }} />
-                    <span className="nisa-comparison__gain" style={{ width: `${point.gain / point.total * 100}%` }} />
-                  </div>
-                </div>
+                <svg className="nisa-comparison__track" data-axis-max={ARTICLE_CHART_MAX_MAN} aria-hidden="true"
+                  viewBox={`0 0 ${ARTICLE_CHART_MAX_MAN} 26`} preserveAspectRatio="none" width="100%" height="26">
+                  <rect x="0" y="0" width={ARTICLE_CHART_MAX_MAN} height="26" fill="#f4f7f9" />
+                  {axisTicks.map(tick => <line key={tick} x1={tick} x2={tick} y1="0" y2="26" stroke="#d4e1e8" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
+                  <g className="nisa-comparison__bar" data-total={point.total}>
+                    <rect x="0" y="0" width={point.principal / 10000} height="26" fill="#bed5df" />
+                    <rect x={point.principal / 10000} y="0" width={point.gain / 10000} height="26" fill="#0e5d88" />
+                  </g>
+                </svg>
                 <div className="nisa-comparison__breakdown"><span>元本 {yenToMan(point.principal)}万円</span><span>運用益 {yenToMan(point.gain)}万円</span></div>
               </> : <p className="nisa-comparison__excluded">15年で積立元本1,800万円に到達するため、20年間の継続積立は試算していません。保有・運用は継続できます。</p>}
             </div>
