@@ -468,7 +468,7 @@
   border-top-color: #bfced8; gap: 10px 20px;
 }
 .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__meta dt { color: #4c6677; }
-.nisa-editorial-keyfacts {
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts {
   position: relative;
   align-self: stretch;
   display: flex; flex-direction: column; justify-content: center;
@@ -477,43 +477,43 @@
   border-top: 4px solid #70c8bd;
   font-variant-numeric: tabular-nums;
 }
-.nisa-editorial-keyfacts__heading {
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__heading {
   display: flex; justify-content: space-between; align-items: center;
   gap: 8px; flex-wrap: wrap;
   padding-bottom: 13px; border-bottom: 1px solid #4e6883;
   font-size: .75rem; line-height: 1.5; color: #cee1e9;
 }
-.nisa-editorial-keyfacts__heading > span:first-child { font-weight: 700; color: #a9e4da; }
-.nisa-editorial-keyfacts dl { margin: 0; }
-.nisa-editorial-keyfacts dt { font-size: .75rem; line-height: 1.55; color: #d9e6ee; font-weight: 400; }
-.nisa-editorial-keyfacts dd { margin: 0; color: #fff; font-size: .8125rem; line-height: 1.1; white-space: nowrap; }
-.nisa-editorial-keyfacts dd strong { font-size: 1.75rem; font-weight: 650; letter-spacing: -.035em; }
-.nisa-editorial-keyfacts dd span { margin-left: 4px; }
-.nisa-editorial-keyfacts__total { padding-block: 17px; }
-.nisa-editorial-keyfacts__total dd { margin-block: 7px 9px; }
-.nisa-editorial-keyfacts__total dd strong { font-size: 3.15rem; font-weight: 650; }
-.nisa-editorial-keyfacts__total p { margin: 0; font-size: .75rem; color: #d9e6ee; line-height: 1.6; }
-.nisa-editorial-keyfacts__annual { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); border-top: 1px solid #4e6883; padding-top: 15px; gap: 10px; }
-.nisa-editorial-keyfacts__annual > div + div { padding-left: 10px; border-left: 1px solid #4e6883; }
-.nisa-editorial-keyfacts__annual dt { font-size: .6875rem; white-space: nowrap; }
-.nisa-editorial-keyfacts__annual dd { margin-top: 7px; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__heading > span:first-child { font-weight: 700; color: #a9e4da; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts dl { margin: 0; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts dt { font-size: .75rem; line-height: 1.55; color: #d9e6ee; font-weight: 400; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts dd { margin: 0; color: #fff; font-size: .8125rem; line-height: 1.1; white-space: nowrap; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts dd strong { font-size: 1.75rem; font-weight: 650; letter-spacing: -.035em; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts dd span { margin-left: 4px; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__total { padding-block: 17px; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__total dd { margin-block: 7px 9px; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__total dd strong { font-size: 3.15rem; font-weight: 650; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__total .nisa-editorial-keyfacts__detail { margin: 0; font-size: .75rem; color: #d9e6ee; line-height: 1.6; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__annual { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); border-top: 1px solid #4e6883; padding-top: 15px; gap: 10px; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__annual > div + div { padding-left: 10px; border-left: 1px solid #4e6883; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__annual dt { font-size: .6875rem; white-space: nowrap; }
+.site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__annual dd { margin-top: 7px; }
 @media (max-width: 1050px) {
   .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__inner { grid-template-columns: minmax(0, 1fr); gap: 22px; }
   .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero .knowledge-article-breadcrumb { margin-bottom: 0; }
-  .nisa-editorial-keyfacts { display: grid; grid-template-columns: minmax(0,1fr); padding: 16px 20px 20px; }
-  .nisa-editorial-keyfacts dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 22px; }
-  .nisa-editorial-keyfacts__total { padding: 14px 0 0; }
-  .nisa-editorial-keyfacts__total dd strong { font-size: 2.5rem; }
-  .nisa-editorial-keyfacts__annual { border-top: 0; border-left: 1px solid #4e6883; padding: 0 0 0 18px; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts { display: grid; grid-template-columns: minmax(0,1fr); padding: 16px 20px 20px; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 22px; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__total { padding: 14px 0 0; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__total dd strong { font-size: 2.5rem; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__annual { border-top: 0; border-left: 1px solid #4e6883; padding: 0 0 0 18px; }
 }
 @media (max-width: 640px) {
   .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__inner { padding-block: 18px 24px; gap: 20px; }
   .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero h1 { text-wrap: pretty; }
   .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__meta { margin-top: 20px; padding-top: 12px; gap: 6px 14px; }
-  .nisa-editorial-keyfacts dl { display: block; }
-  .nisa-editorial-keyfacts { padding: 15px 17px 17px; }
-  .nisa-editorial-keyfacts__total { padding: 14px 0; }
-  .nisa-editorial-keyfacts__total dd strong { font-size: 2.55rem; }
-  .nisa-editorial-keyfacts__annual { border-left: 0; border-top: 1px solid #4e6883; padding: 12px 0 0; }
-  .nisa-editorial-keyfacts__annual dt { white-space: normal; font-size: .75rem; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts dl { display: block; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts { padding: 15px 17px 17px; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__total { padding: 14px 0; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__total dd strong { font-size: 2.55rem; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__annual { border-left: 0; border-top: 1px solid #4e6883; padding: 12px 0 0; }
+  .site.knowledge-article-page.nisa-bank-page .nisa-editorial-keyfacts__annual dt { white-space: normal; font-size: .75rem; }
 }

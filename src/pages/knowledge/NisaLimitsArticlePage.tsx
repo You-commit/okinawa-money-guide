@@ -251,7 +251,7 @@ function NisaLimitsArticlePage() {
                 <div className="nisa-editorial-keyfacts__total">
                   <dt>非課税保有限度額</dt>
                   <dd><strong>1,800</strong><span>万円</span></dd>
-                  <p>うち成長投資枠は1,200万円まで</p>
+                  <dd className="nisa-editorial-keyfacts__detail">うち成長投資枠は1,200万円まで</dd>
                 </div>
                 <div className="nisa-editorial-keyfacts__annual">
                   <div><dt>つみたて投資枠（年間）</dt><dd><strong>120</strong><span>万円</span></dd></div>

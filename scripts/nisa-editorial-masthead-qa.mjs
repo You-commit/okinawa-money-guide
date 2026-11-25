@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 const {chromium}=await import(process.env.OMG_PLAYWRIGHT_MODULE??'playwright')
 const route='/knowledge/nisa-limits-and-future-value'
-const base='https://preview-nisa-editorial-masthead-20261125.okinawa-money-guide.pages.dev'
+const base='https://preview-nisa-editorial-masth.okinawa-money-guide.pages.dev'
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']})
 fs.mkdirSync('qa/nisa-masthead',{recursive:true})
 const report=[]
