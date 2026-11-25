@@ -324,6 +324,15 @@ function NisaLimitsArticlePage() {
                 2024年から非課税保有期間が無期限となり、制度自体も恒久化されました。
               </p>
 
+              <figure className="nisa-bank-editorial-illustration">
+                <img
+                  src="/article-media/nisa-questions-illustration.webp"
+                  alt="NISAを始める時期、毎月の積立額、制度の使い分け、損失への不安について考える二人のイラスト"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+
               <dl className="nisa-bank-facts" aria-label="NISA利用の基本条件">
                 <div><dt>対象者</dt><dd>日本国内に住む18歳以上<br /><small>利用する年の1月1日時点</small></dd></div>
                 <div><dt>口座数</dt><dd>1人につき1口座</dd></div>

@@ -1657,3 +1657,20 @@
     min-width: 88px;
   }
 }
+
+/* Illustration inserted into the EXISTING article; no other sections styled. */
+.nisa-bank-page .nisa-bank-editorial-illustration {
+  width: 100%;
+  max-width: 760px;
+  margin: 28px auto 32px;
+}
+.nisa-bank-page .nisa-bank-editorial-illustration img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #dbe5eb;
+  border-radius: 8px;
+}
+@media (max-width: 760px) {
+  .nisa-bank-page .nisa-bank-editorial-illustration { margin: 22px auto 26px; }
+}
