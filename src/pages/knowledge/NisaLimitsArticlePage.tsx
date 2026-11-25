@@ -242,6 +242,23 @@ function NisaLimitsArticlePage() {
                 </div>
               </dl>
             </div>
+            <aside className="nisa-editorial-keyfacts" aria-label="現行NISAの投資枠">
+              <div className="nisa-editorial-keyfacts__heading">
+                <span>制度の要点</span>
+                <span>2024年以降のNISA</span>
+              </div>
+              <dl>
+                <div className="nisa-editorial-keyfacts__total">
+                  <dt>非課税保有限度額</dt>
+                  <dd><strong>1,800</strong><span>万円</span></dd>
+                  <dd className="nisa-editorial-keyfacts__detail">うち成長投資枠は1,200万円まで</dd>
+                </div>
+                <div className="nisa-editorial-keyfacts__annual">
+                  <div><dt>つみたて投資枠（年間）</dt><dd><strong>120</strong><span>万円</span></dd></div>
+                  <div><dt>成長投資枠（年間）</dt><dd><strong>240</strong><span>万円</span></dd></div>
+                </div>
+              </dl>
+            </aside>
           </div>
         </header>
 

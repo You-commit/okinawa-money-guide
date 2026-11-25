@@ -1,0 +1,44 @@
+name: NISA editorial masthead acceptance
+on:
+  push:
+    branches: [preview/nisa-editorial-masthead-20261125]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Protect all unrelated source
+        run: git diff --exit-code 5d0e2b4aa0ca6b2f1b2fd18d44961023f40a6b11 HEAD -- src ':!src/pages/knowledge/NisaLimitsArticlePage.tsx' ':!src/styles/editorial-consistency.css'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - run: |
+          npm install --prefix /tmp/omg-playwright --no-save playwright@1.58.2
+          /tmp/omg-playwright/node_modules/.bin/playwright install --with-deps chromium
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort >/tmp/nisa-editorial-preview.log 2>&1 &
+      - name: Verify existing chart and navigation
+        env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
+        run: node scripts/nisa-chart-accuracy-qa.mjs
+      - name: Verify deployed masthead and capture review screenshots
+        env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
+        run: node scripts/nisa-editorial-masthead-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nisa-masthead-visual-review
+          path: |
+            qa/nisa-masthead/
+            qa/nisa-chart/report.json
