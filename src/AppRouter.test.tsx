@@ -88,7 +88,8 @@ describe('dedicated page routing', () => {
     expect(screen.queryByText('NISA / DECISION GUIDE')).toBeNull()
     expect(screen.queryByText('TSUMITATE')).toBeNull()
     expect(screen.queryByText('GROWTH')).toBeNull()
-    expect(screen.getByRole('link', { name: 'よくある質問' })).toBeTruthy()
+    expect(document.querySelector('.nisa-bank-anchor-nav a[href="#faq"]')?.textContent?.trim()).toBe('よくある質問')
+    expect(document.querySelector('.nisa-bank-sidebar nav a[href="#faq"]')?.textContent?.trim()).toBe('よくある質問')
     expect(screen.getByRole('heading', { name: 'よくある質問' })).toBeTruthy()
 
     cleanup()
@@ -99,6 +100,29 @@ describe('dedicated page routing', () => {
     })).toBeTruthy()
     expect(screen.queryByText('MORTGAGE BASICS')).toBeNull()
     expect(document.querySelector('.knowledge-article-hero .info-eyebrow')).toBeNull()
+  })
+
+  it('keeps eight NISA article sections without decorative chapter numbers', () => {
+    renderAt('/knowledge/nisa-limits-and-future-value')
+
+    const tocLinks = document.querySelectorAll('.nisa-bank-sidebar nav a')
+    expect(tocLinks).toHaveLength(8)
+    expect(document.querySelectorAll('.nisa-bank-sidebar nav a > span')).toHaveLength(0)
+
+    const sections = Array.from(document.querySelectorAll('.nisa-bank-section[id]'))
+    expect(sections.map((section) => section.id)).toEqual([
+      'basic', 'benefits', 'compare', 'cases', 'reuse', 'caution', 'faq', 'sources',
+    ])
+    expect(document.querySelectorAll('.nisa-bank-section__heading > span')).toHaveLength(0)
+    expect(sections.map((section) => section.querySelector('h2')?.textContent?.trim())).toEqual([
+      'NISAとは', 'NISAのメリットは「利益に税金がかからない」こと',
+      '年間投資枠と非課税保有限度額', '積立額からみる将来額の例',
+      '売却したとき、非課税保有限度額はどうなる？',
+      'NISAを利用する際の注意点', 'よくある質問', '参考・一次資料',
+    ])
+    expect(document.querySelector('#faq')?.nextElementSibling?.id).toBe('sources')
+    expect(document.querySelectorAll('#sources a[href^="https://www.fsa.go.jp/"]')).toHaveLength(5)
+    expect(document.querySelector('.nisa-bank-editorial-illustration img')).not.toBeNull()
   })
 
   it('renders factual article dates, article navigation, and primary-source links', () => {

@@ -1,0 +1,51 @@
+name: NISA headings and source flow strict QA
+on:
+  push:
+    branches:
+      - feature/nisa-headings-sources-flow-20261125
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install, lint, build and all tests
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+          npm test
+      - name: Build original article for exact comparison
+        run: |
+          git worktree add --detach /tmp/nisa-before 31f92fff42395b04c56a47b38970e0d4a846de4d
+          npm --prefix /tmp/nisa-before ci
+          npm --prefix /tmp/nisa-before run build
+      - name: Install browser testing dependencies
+        run: |
+          mkdir -p /tmp/omg-playwright
+          npm install --prefix /tmp/omg-playwright --no-save playwright@1.58.2
+          /tmp/omg-playwright/node_modules/.bin/playwright install --with-deps chromium
+      - name: Serve old and revised pages
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort >/tmp/nisa-new.log 2>&1 &
+          (cd /tmp/nisa-before && npm run preview -- --host 127.0.0.1 --port 4174 --strictPort >/tmp/nisa-before.log 2>&1) &
+      - name: Compare unchanged article and verify geometry across viewports
+        env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
+        run: node scripts/nisa-unnumbered-heading-qa.mjs
+      - name: Upload visual QA screenshots and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nisa-unnumbered-article-visual-qa
+          path: qa/nisa-headings/
+          if-no-files-found: warn
