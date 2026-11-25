@@ -284,14 +284,14 @@ function NisaLimitsArticlePage() {
             <section>
               <h2>この記事の内容</h2>
               <nav>
-                <a className="is-current" href="#basic" onClick={(event) => navigateToSection(event, 'basic')}><span>01</span>NISAとは</a>
-                <a href="#benefits" onClick={(event) => navigateToSection(event, 'benefits')}><span>02</span>NISAのメリット</a>
-                <a href="#compare" onClick={(event) => navigateToSection(event, 'compare')}><span>03</span>投資枠と使い分け</a>
-                <a href="#cases" onClick={(event) => navigateToSection(event, 'cases')}><span>04</span>積立額と将来額</a>
-                <a href="#reuse" onClick={(event) => navigateToSection(event, 'reuse')}><span>05</span>売却と枠の再利用</a>
-                <a href="#caution" onClick={(event) => navigateToSection(event, 'caution')}><span>06</span>制度の注意点</a>
-                <a href="#faq" onClick={(event) => navigateToSection(event, 'faq')}><span>07</span>よくある質問</a>
-                <a href="#sources" onClick={(event) => navigateToSection(event, 'sources')}><span>08</span>参考・一次資料</a>
+                <a className="is-current" href="#basic" onClick={(event) => navigateToSection(event, 'basic')}>NISAとは</a>
+                <a href="#benefits" onClick={(event) => navigateToSection(event, 'benefits')}>NISAのメリット</a>
+                <a href="#compare" onClick={(event) => navigateToSection(event, 'compare')}>投資枠と使い分け</a>
+                <a href="#cases" onClick={(event) => navigateToSection(event, 'cases')}>積立額と将来額</a>
+                <a href="#reuse" onClick={(event) => navigateToSection(event, 'reuse')}>売却と枠の再利用</a>
+                <a href="#caution" onClick={(event) => navigateToSection(event, 'caution')}>制度の注意点</a>
+                <a href="#faq" onClick={(event) => navigateToSection(event, 'faq')}>よくある質問</a>
+                <a href="#sources" onClick={(event) => navigateToSection(event, 'sources')}>参考・一次資料</a>
               </nav>
             </section>
 
@@ -315,7 +315,7 @@ function NisaLimitsArticlePage() {
           <article className="nisa-bank-article">
             <section className="nisa-bank-section" id="basic">
               <header className="nisa-bank-section__heading">
-                <span>01</span>
+                
                 <h2>NISAとは</h2>
               </header>
               <p className="nisa-bank-section__intro">
@@ -352,7 +352,7 @@ function NisaLimitsArticlePage() {
 
             <section className="nisa-bank-section" id="benefits">
               <header className="nisa-bank-section__heading">
-                <span>02</span>
+                
                 <h2>NISAのメリットは「利益に税金がかからない」こと</h2>
               </header>
               <p className="nisa-bank-section__intro">
@@ -421,7 +421,7 @@ function NisaLimitsArticlePage() {
 
             <section className="nisa-bank-section" id="compare">
               <header className="nisa-bank-section__heading">
-                <span>03</span>
+                
                 <h2>年間投資枠と非課税保有限度額</h2>
               </header>
               <p className="nisa-bank-section__intro">
@@ -511,7 +511,7 @@ function NisaLimitsArticlePage() {
 
             <section className="nisa-bank-section" id="cases">
               <header className="nisa-bank-section__heading">
-                <span>04</span>
+                
                 <h2>積立額からみる将来額の例</h2>
               </header>
               <p className="nisa-bank-section__intro">
@@ -553,7 +553,7 @@ function NisaLimitsArticlePage() {
 
             <section className="nisa-bank-section" id="reuse">
               <header className="nisa-bank-section__heading">
-                <span>05</span>
+                
                 <h2>売却したとき、非課税保有限度額はどうなる？</h2>
               </header>
               <p className="nisa-bank-section__intro">
@@ -581,7 +581,7 @@ function NisaLimitsArticlePage() {
 
             <section className="nisa-bank-section" id="caution">
               <header className="nisa-bank-section__heading">
-                <span>06</span>
+                
                 <h2>NISAを利用する際の注意点</h2>
               </header>
 
@@ -602,7 +602,7 @@ function NisaLimitsArticlePage() {
             <div className="nisa-bank-bottom-grid">
               <section className="nisa-bank-section nisa-bank-faq" id="faq">
                 <header className="nisa-bank-section__heading">
-                  <span>07</span>
+                  
                   <h2>よくある質問</h2>
                 </header>
 
@@ -649,7 +649,7 @@ function NisaLimitsArticlePage() {
 
               <section className="nisa-bank-section nisa-bank-sources" id="sources">
                 <header className="nisa-bank-section__heading">
-                  <span>08</span>
+                  
                   <h2>参考・一次資料</h2>
                 </header>
                 <p className="nisa-bank-sources__intro">

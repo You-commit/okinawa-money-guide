@@ -198,12 +198,9 @@
 }
 
 .nisa-bank-sidebar nav a {
-  display: grid;
-  grid-template-columns: 30px minmax(0, 1fr);
-  gap: 6px;
+  display: block;
   min-height: 44px;
-  align-items: center;
-  padding: 9px 14px;
+  padding: 12px 17px;
   border-left: 3px solid transparent;
   color: #334e64;
   font-size: 0.78rem;
@@ -222,12 +219,6 @@
   border-left-color: var(--omg-color-brand);
   background: #eaf4f7;
   color: #0d2f63;
-}
-
-.nisa-bank-sidebar nav a span {
-  color: #0d2f63;
-  font-size: 0.7rem;
-  font-weight: 850;
 }
 
 .nisa-bank-sidebar__related a {
@@ -286,36 +277,18 @@
 }
 
 .nisa-bank-section__heading {
-  display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.nisa-bank-section__heading > span {
-  position: relative;
-  color: var(--omg-color-brand);
-  font-size: 0.98rem;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-}
-
-.nisa-bank-section__heading > span::after {
-  content: "";
   display: block;
-  width: 22px;
-  height: 2px;
-  margin-top: 7px;
-  background: var(--omg-color-brand);
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #dce6ec;
 }
 
 .nisa-bank-section__heading h2 {
   margin: 0;
   color: #0d2f63;
-  font-size: clamp(1.48rem, 2.5vw, 2rem);
-  font-weight: 850;
-  line-height: 1.35;
+  font-size: clamp(1.48rem, 2.3vw, 1.88rem);
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .nisa-bank-section__intro {
@@ -1060,14 +1033,22 @@
 }
 
 .nisa-bank-bottom-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.85fr);
-  gap: 28px;
-  align-items: start;
+  display: block;
+  width: 100%;
 }
 
 .nisa-bank-bottom-grid .nisa-bank-section {
   margin-top: 0;
+}
+
+.nisa-bank-bottom-grid .nisa-bank-section + .nisa-bank-section {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid #dce6ec;
+}
+
+.nisa-bank-sources ul {
+  max-width: 820px;
 }
 
 .nisa-bank-faq details {
@@ -1085,7 +1066,7 @@
   align-items: center;
   padding: 13px 2px;
   color: #17344f;
-  font-size: 0.72rem;
+  font-size: 0.875rem;
   font-weight: 780;
   cursor: pointer;
   list-style: none;
@@ -1109,14 +1090,14 @@
 .nisa-bank-faq details p {
   margin: 0 0 14px 32px;
   color: #5a6f80;
-  font-size: 0.7rem;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 
 .nisa-bank-sources__intro {
-  margin: 0 0 12px;
-  color: #637887;
-  font-size: 0.68rem;
+  margin: 0 0 18px;
+  color: #526a7d;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 
@@ -1147,15 +1128,15 @@
 }
 
 .nisa-bank-sources a span {
-  font-size: 0.68rem;
-  font-weight: 760;
+  font-size: 0.875rem;
+  font-weight: 700;
   line-height: 1.45;
 }
 
 .nisa-bank-sources a small {
   grid-column: 1;
-  color: #81909b;
-  font-size: 0.56rem;
+  color: #697f8b;
+  font-size: 0.75rem;
 }
 
 .nisa-bank-sources a b {
@@ -1401,8 +1382,8 @@
   }
 
   .nisa-bank-section__heading {
-    grid-template-columns: 34px minmax(0, 1fr);
-    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
   }
 
   .nisa-bank-section__heading h2 {
@@ -1599,9 +1580,9 @@
     top: 74px;
   }
 
-  .nisa-bank-bottom-grid {
-    grid-template-columns: 1fr;
-    gap: 56px;
+  .nisa-bank-bottom-grid .nisa-bank-section + .nisa-bank-section {
+    margin-top: 48px;
+    padding-top: 28px;
   }
 
   .nisa-bank-caution {
