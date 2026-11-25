@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 const {chromium}=await import(process.env.OMG_PLAYWRIGHT_MODULE??'playwright')
-const base='https://preview-editorial-common-poli.okinawa-money-guide.pages.dev'
-const alternate='https://preview-editorial-common-polish.okinawa-money-guide.pages.dev'
+const base='https://preview-editorial-common-pol.okinawa-money-guide.pages.dev'
+const alternate='https://564ca95f.okinawa-money-guide.pages.dev'
 const old='https://73d07fb8.okinawa-money-guide.pages.dev'
 const routes=['/knowledge','/knowledge/mortgage-comparison','/knowledge/nisa-limits-and-future-value','/','/simulators/nisa','/simulators/mortgage','/simulators/ideco','/simulators/military-land','/simulators/taxable-income','/about','/trust']
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']})
