@@ -441,3 +441,46 @@
     border-radius: 10px;
   }
 }
+
+
+/* OMG editorial hero / 潮目 (Tide) — NISA preview only.
+   A quiet tonal field and two cropped, continuous coastal contours.
+   All layout, text, global navigation and article content are unchanged. */
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero {
+  --omg-editorial-tide-v1: 1;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, #0c3264 0%, #0d75a3 54%, #0d9282 100%) top / 100% 4px no-repeat,
+    linear-gradient(108deg, #f7fafb 0%, #edf5f6 58%, #deedeb 100%);
+  border-bottom-color: #d3e3e5;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 4px 0 0 auto;
+  width: min(35%, 560px);
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22560%22%20height%3D%22450%22%20viewBox%3D%220%200%20560%20450%22%20preserveAspectRatio%3D%22xMaxYMax%20slice%22%3E%3Cpath%20d%3D%22M560%20100V450H24C164%20447%20232%20399%20300%20322C377%20237%20444%20161%20560%20100Z%22%20fill%3D%22%23d1e5e5%22%2F%3E%3Cpath%20d%3D%22M560%20206V450H153C291%20427%20353%20369%20420%20300C467%20253%20509%20225%20560%20206Z%22%20fill%3D%22%23c1dcdc%22%20opacity%3D%22.62%22%2F%3E%3Cpath%20d%3D%22M560%2049C408%20108%20330%20195%20248%20289C168%20380%2089%20419%200%20427%22%20fill%3D%22none%22%20stroke%3D%22%238bb9bd%22%20stroke-opacity%3D%22.60%22%20stroke-width%3D%221.25%22%2F%3E%3Cpath%20d%3D%22M560%2076C423%20133%20351%20215%20270%20306C194%20391%20116%20435%2020%20450%22%20fill%3D%22none%22%20stroke%3D%22%239dc6c9%22%20stroke-opacity%3D%22.76%22%20stroke-width%3D%221.25%22%2F%3E%3C%2Fsvg%3E") right bottom / cover no-repeat;
+  pointer-events: none;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__meta {
+  border-top-color: #cfdee2;
+}
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero__meta dt,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero .knowledge-article-breadcrumb,
+.site.knowledge-article-page.nisa-bank-page .nisa-bank-hero .knowledge-article-breadcrumb a {
+  color: #536b7b;
+}
+@media (max-width: 1024px) {
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero::after {
+    width: 32%;
+    opacity: .62;
+  }
+}
+@media (max-width: 760px) {
+  .site.knowledge-article-page.nisa-bank-page .nisa-bank-hero::after {
+    display: none;
+  }
+}
