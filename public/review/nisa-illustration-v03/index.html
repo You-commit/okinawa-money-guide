@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="description" content="沖縄マネーガイド記事共通ページ 理想モック v0.3・記事イラスト導入。金融記事を読むための編集型デザイン検証。">
+<title>理想記事ページ v0.3｜沖縄マネーガイド デザイン検証</title>
+<style>
+/* OMG article editorial study v0.3. This is a design proposal, not approved production CSS. */
+:root{
+  --paper:#ffffff;--canvas:#f4f6f7;--canvas-deep:#eef2f4;--ink:#172d40;--body:#344a5a;
+  --muted:#697b88;--rule:#dce4e8;--rule-soft:#edf0f2;--navy:#183e61;
+  --teal:#187d78;--mint:#e9f5f2;--soft:#f6f9fa;
+  --font-ja:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Noto Sans JP",Meiryo,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:36px}
+body{margin:0;color:var(--body);background:var(--canvas);font-family:var(--font-ja);font-size:16px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,a{font:inherit}button{cursor:pointer}a{color:var(--navy);text-underline-offset:3px}
+a:hover{color:var(--teal)}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #277e9b;outline-offset:4px}
+.review-panel{background:#223447;color:#f2f5f7;position:relative;z-index:10}
+.review-panel__inner{max-width:1192px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:58px;padding:7px 24px}
+.review-panel__tag{font-size:12px;font-weight:600;white-space:nowrap;letter-spacing:.025em}.review-panel__tag span{opacity:.58;font-weight:400}
+.review-segments{display:flex;align-items:center;gap:3px;background:#172838;padding:3px;border:1px solid #536575;border-radius:6px}
+.review-segment{border:0;border-radius:4px;background:transparent;color:#d3e0e9;padding:8px 17px;font-size:13px;min-height:36px;font-weight:600}
+.review-segment[aria-pressed="true"]{background:white;color:#172c40}
+.review-hide{color:#d6e3e9;background:none;border:0;font-size:13px;white-space:nowrap;padding:8px}
+.review-hide span{font-size:18px;margin-left:8px;vertical-align:-1px}
+.review-show{position:fixed;z-index:20;bottom:20px;right:20px;background:#1b3045;color:white;border:1px solid #50697a;border-radius:6px;box-shadow:0 9px 26px #12253835;padding:10px 16px;font-size:13px}
+.site-header{background:var(--paper);border-bottom:1px solid #e6eaed}
+.site-header__inner{max-width:1192px;margin:0 auto;min-height:78px;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:28px}
+.brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);flex:none}.brand:hover{color:var(--ink)}
+.brand__mark{position:relative;display:block;width:36px;height:36px;border:2px solid #1e4f72;border-radius:50%;overflow:hidden;flex:none}
+.brand__mark span{position:absolute;left:-4px;width:42px;height:10px;border-radius:100% 35% 100% 30%;transform:rotate(-19deg)}
+.brand__mark span:nth-child(1){background:#276a97;top:8px}.brand__mark span:nth-child(2){background:#149d8c;top:18px}.brand__mark span:nth-child(3){background:white;top:23px;height:5px}
+.brand__name{display:flex;flex-direction:column;gap:3px}.brand__name strong{font-size:17px;letter-spacing:.01em;line-height:1.2}.brand__name small{font-family:Arial,sans-serif;letter-spacing:.13em;font-size:9px;font-weight:600;color:#758391}
+.site-nav{display:flex;align-items:center;gap:29px;color:#3c5265;font-size:13px;font-weight:600}.site-nav span{white-space:nowrap}.site-nav .is-current{color:#153e60;position:relative}.site-nav .is-current::after{position:absolute;content:"";height:2px;background:var(--teal);bottom:-27px;left:0;right:0}
+.site-header__context{display:none;color:var(--navy);font-size:13px;font-weight:600}
+.hero{background:#fff;border-bottom:1px solid var(--rule)}.hero__inner{max-width:1144px;margin:auto;padding:35px 24px 40px;position:relative}
+.hero__inner::before{content:"";position:absolute;left:24px;top:0;width:112px;height:3px;background:linear-gradient(90deg,var(--navy),var(--teal))}
+.breadcrumb{display:flex;flex-wrap:wrap;gap:9px;align-items:center;color:var(--muted);font-size:12px;line-height:1.7;margin:0 0 20px}
+.breadcrumb a{color:#6a7b88;text-decoration:none}.breadcrumb span[aria-hidden]{color:#a7b3bb}
+.hero h1{max-width:880px;margin:0;color:var(--ink);font-size:clamp(30px,3.2vw,43px);line-height:1.48;font-weight:700;letter-spacing:-.025em;word-break:normal;overflow-wrap:anywhere}
+.hero__lead{max-width:830px;color:#4c6170;font-size:16px;line-height:1.9;margin:15px 0 22px}
+.hero__meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px 23px;color:#5a7181;font-size:12px;line-height:1.7}
+.hero__meta span+span{position:relative}.hero__meta span+span::before{content:"";position:absolute;left:-12px;top:5px;height:13px;border-left:1px solid #cfd8dc}
+.main-band{background:var(--canvas)}
+.content-grid{display:grid;grid-template-columns:minmax(0,784px) 235px;gap:56px;align-items:start;max-width:1144px;margin:0 auto;padding:0 24px 65px}
+.article-paper{background:white;min-width:0;padding:34px 52px 56px;box-shadow:0 12px 36px rgb(26 56 73 / 2%);border-left:1px solid #e9eef0;border-right:1px solid #e9eef0;border-bottom:1px solid #e9eef0}
+.article-paper > :first-child{margin-top:0}
+.intro{font-size:16px;line-height:1.95;color:#334b59}
+.intro strong{color:var(--ink)}
+.answer{display:flex;gap:16px;align-items:start;border-left:3px solid var(--teal);padding:5px 0 5px 20px;margin:23px 0 30px}
+.answer__label{font-weight:700;color:var(--teal);font-size:13px;flex:none;line-height:1.9}
+.answer__content{font-size:15px;line-height:1.85;color:var(--ink);margin:0}
+.mobile-toc{display:none}
+.article-section{margin-top:51px;scroll-margin-top:35px}
+.article-section h2{font-size:26px;line-height:1.55;letter-spacing:-.018em;margin:0 0 20px;color:var(--ink);font-weight:700}
+.article-section h2::after{content:"";display:block;width:35px;height:2px;background:#6aafaa;margin-top:14px}
+.article-section h3{font-size:18px;line-height:1.65;margin:31px 0 10px;color:var(--ink);font-weight:700}
+.article-section p{line-height:1.95;font-size:16px;margin:0 0 18px;overflow-wrap:anywhere}
+.article-section p.note{font-size:13px;line-height:1.8;color:#657985}
+.article-section ul{padding-left:1.5em;margin:0 0 20px}.article-section li{line-height:1.95;padding-left:3px;margin:6px 0}
+strong{font-weight:700}
+.side{position:sticky;top:28px;padding-top:42px;color:var(--body);align-self:start}
+.side__heading{font-size:13px;color:#355468;font-weight:700;margin:0 0 15px;line-height:1.7}
+.side__rule{height:1px;background:#d6e0e6;margin-bottom:15px}
+.side__list{display:flex;flex-direction:column;gap:1px}.side__list a{display:flex;text-decoration:none;color:#516878;font-size:13px;line-height:1.55;padding:11px 9px 11px 13px;border-left:2px solid transparent}.side__list a:hover,.side__list a.is-active{color:#144f5d;background:#e9f0f2;border-left-color:var(--teal)}
+.side__sources{margin-top:38px;padding-top:18px;border-top:1px solid #dce4e8;color:#6a7b86;font-size:12px;line-height:1.8}
+.side__sources strong{display:block;font-weight:700;color:#435f6e;margin-bottom:5px}
+.figure{margin:29px 0 15px;padding:24px 27px 22px;background:var(--soft);border:1px solid #dfe8ec}
+.figure__heading{margin:0 0 17px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.figure__heading strong{font-size:16px;color:var(--ink);font-weight:700;line-height:1.6}
+.figure__heading span{font-size:13px;color:#647886;line-height:1.6}
+.figure__caption{color:#6a7f8a;font-size:12.5px;line-height:1.75;margin:15px 0 0}
+.tax-columns{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.tax-column{min-width:0}.tax-column__label{font-size:13px;font-weight:700;color:#405a6b;margin:0 0 10px}
+.tax-column__value{font-variant-numeric:tabular-nums;font-size:25px;letter-spacing:-.02em;line-height:1.45;color:var(--ink);font-weight:700;margin:0 0 13px}
+.tax-column__value span{display:block;font-size:12px;color:#637a88;letter-spacing:0;font-weight:400}
+.tax-column__bar{height:19px;display:flex;background:#e1e8eb;overflow:hidden;border-radius:2px}
+.tax-column__bar .net{background:#2d526b}.tax-column__bar .tax{background:#bed0d7}.tax-column--nisa .tax-column__bar .net{background:#168b82}
+.tax-column__micro{font-size:12.5px;line-height:1.6;color:#687d89;margin:7px 0 0}
+.tax-figure__takeaway{margin-top:22px;padding-top:16px;border-top:1px solid #d7e1e6;display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 13px}
+.tax-figure__takeaway span{font-size:13px;color:#4b6573}.tax-figure__takeaway strong{font-size:24px;color:#087870;letter-spacing:-.025em;white-space:nowrap}
+.comparison-table{width:100%;border-collapse:collapse;border-top:2px solid #517d8b;border-bottom:1px solid #cbd7de;margin:24px 0 13px;table-layout:fixed}
+.comparison-table caption{caption-side:top;color:var(--ink);text-align:left;font-size:16px;font-weight:700;line-height:1.6;margin-bottom:14px}
+.comparison-table thead th{font-size:13px;text-align:left;color:#294c60;font-weight:700;background:#edf3f5;padding:14px 13px;line-height:1.65;border-bottom:1px solid #d5e0e5}
+.comparison-table tbody th,.comparison-table td{padding:15px 13px;border-bottom:1px solid #e3e9ec;text-align:left;vertical-align:top;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
+.comparison-table tbody th{font-weight:600;color:#365163;width:27%}.comparison-table tbody td{color:#2d4859}
+.comparison-table .number{font-variant-numeric:tabular-nums;font-weight:700;color:#1d4764;font-size:17px}
+.comparison-table--nisa thead th:first-child{width:29%}.comparison-table--nisa thead th:nth-child(2){width:35.5%}.comparison-table--nisa thead th:nth-child(3){width:35.5%}
+.comparison-table--mortgage thead th:first-child{width:28%}.comparison-table--mortgage thead th:nth-child(2),.comparison-table--mortgage thead th:nth-child(3){width:36%}
+.inline-reference{border-left:2px solid #bed7d4;padding:9px 14px;margin:12px 0 24px;background:#f7faf9;color:#526a77;font-size:13px;line-height:1.75}
+.inline-reference a{color:#235e7c}
+.figure--loanchart{padding-bottom:16px}
+.chart-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.chart-legend{display:flex;gap:17px;flex-wrap:wrap}.chart-legend span{display:flex;gap:6px;align-items:center;color:#405c6e;font-size:12px}.chart-legend i{display:inline-block;width:14px;height:3px;border-radius:4px}.chart-legend .line1{background:#2a5877}.chart-legend .line2{background:#2a9289}
+.loan-chart{height:170px;width:100%;display:block;margin-top:12px}.loan-chart__grid{stroke:#d9e3e8;stroke-width:1}.loan-chart__line{fill:none;stroke-width:4;stroke-linejoin:round;stroke-linecap:round}.loan-chart__axis{display:flex;justify-content:space-between;font-size:12px;color:#687d89;padding-left:2px}.loan-chart__scale{font-size:12px;color:#687d89;margin:0 0 -5px}
+.topic-subtle{margin:27px 0;background:#f8fafb;padding:17px 20px;border-left:3px solid #9abec0}.topic-subtle strong{font-size:14px;color:#2b4e61;display:block;margin-bottom:7px}.topic-subtle p{font-size:14px;margin:0;line-height:1.85}
+.sources{margin-top:54px;border-top:1px solid #ccd8dd;padding-top:29px}.sources h2,.next-step h2{font-size:19px;font-weight:700;color:var(--ink);margin:0 0 15px;line-height:1.6}
+.sources ul{list-style:none;padding:0;margin:0}.sources li{margin-bottom:10px;font-size:13px;line-height:1.85}.sources a{color:#1d6480}
+.sources__date{font-size:12px;color:#788995;margin:19px 0 0}
+.next-step{margin-top:42px;padding:24px 27px;background:#eef5f6;border-top:3px solid #2c807d}
+.next-step h2{font-size:17px;margin:0 0 9px}.next-step p{font-size:14px;line-height:1.85;margin:0 0 17px}
+.next-step__link{display:inline-flex;align-items:center;justify-content:center;min-height:43px;padding:10px 18px;color:white!important;background:#164f6b;text-decoration:none;border:1px solid #164f6b;font-size:13px;font-weight:700;border-radius:3px}
+.next-step__link::after{content:"›";font-size:18px;margin-left:16px;line-height:1}
+.note-end{font-size:12.5px;line-height:1.8;color:#6b7b87;margin:20px 0 0}
+.site-footer{background:#243c4f;color:#eef2f4;margin-top:0}.site-footer__inner{max-width:1144px;margin:0 auto;padding:36px 24px;display:flex;justify-content:space-between;gap:24px}.site-footer__inner strong{font-size:15px}.site-footer__inner p{font-size:12px;color:#c0ced6;line-height:1.8;margin:8px 0 0}.site-footer__links{display:flex;gap:22px;align-items:start;font-size:12px;color:#cbd8df;flex-wrap:wrap}.site-footer__bottom{border-top:1px solid #455b69;max-width:100%;padding:17px max(24px,calc((100vw - 1096px)/2));font-size:11px;color:#c5d0d7;display:flex;justify-content:space-between;gap:14px}
+@media(max-width:1080px){.site-nav{gap:16px}.content-grid{grid-template-columns:minmax(0,1fr) 210px;gap:26px}.article-paper{padding:32px 35px 46px}.hero__inner{padding-right:32px;padding-left:32px}.hero__inner::before{left:32px}}
+@media(max-width:830px){.site-nav{display:none}.site-header__context{display:block}.content-grid{display:block;padding:0 24px 42px}.side{display:none}.article-paper{max-width:760px;margin:0 auto}.mobile-toc{display:block;border-top:1px solid #dce5e8;border-bottom:1px solid #dce5e8;margin:25px 0 32px}.mobile-toc summary{list-style:none;cursor:pointer;padding:15px 0;color:#304d61;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:space-between}.mobile-toc summary::-webkit-details-marker{display:none}.mobile-toc summary::after{content:"＋";font-size:18px;font-weight:400;color:#597383}.mobile-toc[open] summary::after{content:"−"}.mobile-toc__links{display:flex;flex-direction:column;padding:0 0 14px}.mobile-toc__links a{padding:9px 12px;font-size:13px;line-height:1.5;text-decoration:none;color:#4c6678}}
+@media(max-width:620px){.review-panel__inner{padding:6px 12px;gap:8px;flex-wrap:wrap;justify-content:center}.review-panel__tag{display:none}.review-segments{flex:1;max-width:310px}.review-segment{flex:1;padding:8px 4px;font-size:12px}.review-hide{font-size:11px}.review-hide span{display:none}.site-header__inner{min-height:66px;padding:10px 19px}.brand__mark{width:31px;height:31px}.brand__name strong{font-size:15px}.brand__name small{font-size:8px}.hero__inner{padding:25px 21px 32px}.hero__inner::before{left:21px;width:84px}.breadcrumb{font-size:11.5px;margin-bottom:15px}.hero h1{font-size:clamp(26px,6.8vw,34px);line-height:1.45;letter-spacing:-.02em}.hero__lead{font-size:14.5px;margin:14px 0 19px;line-height:1.8}.hero__meta{gap:5px 17px;font-size:11.5px}.hero__meta span+span::before{left:-9px;height:11px}.content-grid{padding:0 0 32px}.article-paper{padding:27px 21px 43px;border:0;box-shadow:none}.intro,.article-section p{font-size:15.5px;line-height:1.95}.answer{gap:10px;padding-left:13px;margin:19px 0 20px}.answer__label{font-size:12.5px}.answer__content{font-size:14px}.article-section{margin-top:39px}.article-section h2{font-size:22px;margin-bottom:18px;line-height:1.55}.article-section h3{font-size:17px}.figure{margin:21px 0 13px;padding:20px 16px 18px}.figure__heading{margin-bottom:15px}.figure__heading strong{font-size:15px}.figure__heading span{font-size:12px}.tax-columns{gap:12px}.tax-column__value{font-size:19px}.tax-column__label{font-size:12px}.tax-figure__takeaway strong{font-size:22px}.comparison-table thead{display:none}.comparison-table{display:block;border-top:2px solid #517d8b;border-bottom:0;margin-top:16px}.comparison-table tbody{display:grid;gap:0}.comparison-table tbody tr{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #dce4e8}.comparison-table tbody th{grid-column:1 / -1;padding:12px 11px 9px;background:#f2f6f7;width:100%;border-bottom:0;font-size:13px}.comparison-table tbody td{display:grid;gap:5px;min-width:0;padding:9px 11px 15px;border:0;font-size:13px;line-height:1.7}.comparison-table tbody td::before{content:attr(data-label);display:block;font-size:12px;color:#607685;font-weight:600}.comparison-table tbody td .number{font-size:15px}.comparison-table--mortgage tbody td{font-size:12.8px}.topic-subtle{padding:14px 15px}.sources{margin-top:38px}.next-step{padding:20px 18px}.site-footer__inner{padding:30px 21px;flex-direction:column;gap:20px}.site-footer__bottom{padding:18px 21px;display:block}.site-footer__bottom span{display:block;margin-top:6px}}
+@media(max-width:360px){.brand__name strong{font-size:14px}.site-header__context{font-size:11.5px}.tax-column__value{font-size:17px}.tax-columns{gap:8px}.figure{padding:16px 11px}.article-paper{padding-left:17px;padding-right:17px}.comparison-table tbody td{padding-right:7px;padding-left:7px}}
+@media print{.review-panel,.review-show,.site-nav,.side,.mobile-toc{display:none!important}body,.main-band{background:white}.site-header__inner{min-height:54px}.hero__inner{padding-top:20px;padding-bottom:25px}.content-grid{display:block;padding:0}.article-paper{width:100%;box-shadow:none;border:0;padding:15px 22px}.site-footer{background:white;color:#445;}.site-footer *{color:#445!important}.figure,.comparison-table{break-inside:avoid}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+
+/* NISA article illustration v0.3 — confined to editorial content. */
+.illustrated-intro{margin:34px 0 46px;max-width:100%;}
+.illustrated-intro h2{font-size:clamp(19px,2.1vw,23px);font-weight:700;line-height:1.6;letter-spacing:-.01em;color:#1b3449;margin:0 0 13px;}
+.illustrated-intro__figure{margin:0;border:0;padding:0;background:transparent;}
+.illustrated-intro__figure picture,.illustrated-intro__figure img{display:block;width:100%;}
+.illustrated-intro__figure img{height:auto;aspect-ratio:4 / 3;object-fit:contain;background:#fff;}
+.illustrated-intro__figure figcaption{font-size:13px;color:#576f7c;line-height:1.8;margin:9px 0 0;}
+.illustrated-intro__mobile-questions{display:none;}
+@media(max-width:620px){
+  .illustrated-intro{margin:24px 0 37px;}
+  .illustrated-intro h2{font-size:19px;}
+  .illustrated-intro__figure figcaption{font-size:12.5px;margin:10px 0 0;}
+  .illustrated-intro__mobile-questions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;margin-top:16px;border-top:1px solid #e3eaed;}
+  .illustrated-intro__mobile-questions p{min-width:0;font-size:13px;line-height:1.6;color:#294961;margin:0;padding:10px 0;border-bottom:1px solid #e3eaed;}
+}
+</style>
+</head>
+<body>
+<div class="review-panel" id="review-panel" aria-label="モック確認用操作">
+  <div class="review-panel__inner">
+    <span class="review-panel__tag">デザイン検証用 <span>v0.2</span></span>
+    <div class="review-segments" role="group" aria-label="表示する記事">
+      <button type="button" class="review-segment" data-article="nisa" aria-pressed="true">NISA記事</button>
+      <button type="button" class="review-segment" data-article="mortgage" aria-pressed="false">住宅ローン記事</button>
+    </div>
+    <button type="button" id="review-hide" class="review-hide" aria-label="確認用操作を隠す">記事だけを見る <span aria-hidden="true">×</span></button>
+  </div>
+</div>
+<button id="review-show" class="review-show" type="button" hidden>記事を切り替える</button>
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="#page-top" aria-label="沖縄マネーガイド・ページ先頭へ">
+      <span class="brand__mark" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span class="brand__name"><strong>沖縄マネーガイド</strong><small>okinawa money guide</small></span>
+    </a>
+    <nav class="site-nav" aria-label="サイトメニュー（モック表示）"><span>シミュレーター</span><span class="is-current">記事・コラム</span><span>はじめての方へ</span><span>信頼情報</span></nav>
+    <span class="site-header__context">記事・コラム</span>
+  </div>
+</header>
+<div id="page-top"></div>
+<div id="app" aria-live="off"></div>
+<footer class="site-footer">
+ <div class="site-footer__inner">
+   <div><strong>沖縄マネーガイド</strong><p>暮らしとお金の判断を、正確に、分かりやすく。</p></div>
+   <div class="site-footer__links"><span>このサイトについて</span><span>情報の取り扱い</span><span>お問い合わせ</span></div>
+ </div>
+ <div class="site-footer__bottom">© 沖縄マネーガイド <span>このページはデザイン検証用モックです。実際の公開記事ではありません。</span></div>
+</footer>
+<script>
+/* Interactive editorial mock — for user visual acceptance only. No repository writes. */
+const formatYen = value => Math.round(value).toLocaleString('ja-JP') + '円';
+const conditions = { principal: 30000000, annualRate: 0.01, months: 35 * 12 };
+const monthlyRate = conditions.annualRate / 12;
+const equalPayment = conditions.principal * monthlyRate / (1 - Math.pow(1 + monthlyRate, -conditions.months));
+const principalPart = conditions.principal / conditions.months;
+const principalFirst = principalPart + conditions.principal * monthlyRate;
+const principalLast = principalPart + principalPart * monthlyRate;
+const equalPaymentInterest = equalPayment * conditions.months - conditions.principal;
+const equalPrincipalInterest = principalPart * monthlyRate * conditions.months * (conditions.months + 1) / 2;
+const financialFigures = {
+  equalPayment:formatYen(equalPayment),principalFirst:formatYen(principalFirst),principalLast:formatYen(principalLast),
+  equalPaymentInterest:formatYen(equalPaymentInterest),equalPrincipalInterest:formatYen(equalPrincipalInterest),
+};
+const articles = {
+  nisa: {
+    path:'NISA',title:'NISAの非課税枠と税金の仕組み。積立額を決める前に確認したいこと',
+    description:'利益が非課税になる仕組みから、年間投資枠と生涯の非課税保有限度額まで。最初に確認したい制度の違いを整理します。',
+    published:'2026年9月21日',revised:'2026年10月14日',basis:'2026年11月25日',
+    answer:'NISAは対象商品の運用益が非課税になる制度です。ただし、投資できる金額には「1年間の枠」と「保有できる総枠」があり、両者は別のものです。',
+    sections:[
+      ['benefit','利益にかかる税金は、どれだけ変わる？'],
+      ['limit','投資枠は「年間」と「総額」で分けて考える'],
+      ['reuse','売却したら、非課税枠はいつ戻る？'],
+      ['decision','積立額を決める前に確認したいこと'],
+    ],
+    content: () => `
+      <section class="illustrated-intro" aria-labelledby="illustrated-intro-title">
+        <h2 id="illustrated-intro-title">NISAを始める前に、気になること</h2>
+        <figure class="illustrated-intro__figure">
+          <picture>
+            <source srcset="assets/nisa-questions-illustration.webp" type="image/webp">
+            <img src="assets/nisa-questions-illustration.webp" width="1200" height="900"
+                 alt="NISAを始めたい2人が、始めるタイミング、毎月の積立額、損失の可能性、制度の選び方について考えているイラスト"
+                 loading="lazy" decoding="async">
+          </picture>
+          <figcaption>始めるタイミング・積立額・値動きのリスク・制度の使い分け。気になることから確認していきましょう。</figcaption>
+        </figure>
+        <div class="illustrated-intro__mobile-questions" aria-label="NISAでよくある疑問">
+          <p>今から始めても大丈夫？</p>
+          <p>毎月いくら積み立てればいい？</p>
+          <p>損しないかな？</p>
+          <p>どの制度を使えばいい？</p>
+        </div>
+      </section>
+      <section class="article-section" id="benefit" data-section><h2>利益にかかる税金は、どれだけ変わる？</h2>
+        <p>通常の課税口座では、上場株式等の譲渡益や配当などに原則20.315％の税率がかかります。一方、NISA口座で保有する対象商品の利益は、制度の条件を満たす範囲で非課税です。</p>
+        <p>例えば、<strong>利益が100万円</strong>出た場合、税額の差は次のようになります。</p>
+        <figure class="figure tax-figure" aria-labelledby="tax-title">
+          <figcaption class="figure__heading"><strong id="tax-title">利益100万円を受け取った場合</strong><span>所得税・復興特別所得税・住民税の合計20.315％で比較した例</span></figcaption>
+          <div class="tax-columns">
+            <div class="tax-column"><div class="tax-column__label">通常の課税口座</div><div class="tax-column__value"><span>税引後に残る利益</span>796,850円</div>
+              <div class="tax-column__bar" role="img" aria-label="税引後79.685％、税額20.315％"><span class="net" style="width:79.685%"></span><span class="tax" style="width:20.315%"></span></div>
+              <div class="tax-column__micro">税額 203,150円</div></div>
+            <div class="tax-column tax-column--nisa"><div class="tax-column__label">NISA口座</div><div class="tax-column__value"><span>税引後に残る利益</span>1,000,000円</div>
+              <div class="tax-column__bar" role="img" aria-label="非課税対象の利益100％"><span class="net" style="width:100%"></span></div><div class="tax-column__micro">対象となる利益は非課税</div></div>
+          </div><div class="tax-figure__takeaway"><span>税額の差</span><strong>203,150円</strong></div>
+          <p class="figure__caption">※ 比較用の単純例です。実際の課税は商品・取引状況・配当の受取方法などによって異なります。損失が出た場合にNISAの損益通算ができない点にも注意が必要です。</p>
+        </figure>
+        <p class="inline-reference">制度の説明：<a href="https://www.fsa.go.jp/policy/nisa2/know/" target="_blank" rel="noopener noreferrer">金融庁「NISAを知る」</a>。税額の計算例は説明のためのもので、特定の運用成果を示しません。</p>
+      </section>
+      <section class="article-section" id="limit" data-section><h2>投資枠は「年間」と「総額」で分けて考える</h2>
+        <p>年間で購入できる金額と、NISA口座で非課税保有できる金額の上限は別です。2つの投資枠は併用できます。</p>
+        <table class="comparison-table comparison-table--nisa">
+          <caption>2024年からのNISA制度・主な上限</caption>
+          <thead><tr><th scope="col">比較する項目</th><th scope="col">つみたて投資枠</th><th scope="col">成長投資枠</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">年間に購入できる金額</th><td data-label="つみたて投資枠"><span class="number">120万円</span>まで</td><td data-label="成長投資枠"><span class="number">240万円</span>まで</td></tr>
+            <tr><th scope="row">対象商品</th><td data-label="つみたて投資枠">一定の投資信託</td><td data-label="成長投資枠">上場株式・投資信託等（除外条件あり）</td></tr>
+            <tr><th scope="row">非課税保有期間</th><td data-label="つみたて投資枠">無期限</td><td data-label="成長投資枠">無期限</td></tr>
+          </tbody>
+        </table>
+        <p class="note">両枠の年間合計は最大360万円。非課税保有限度額の総枠は1,800万円で、成長投資枠はそのうち1,200万円が上限です。総枠は買付時の取得金額（簿価）で管理されます。</p>
+        <p class="inline-reference">出典：<a href="https://www.fsa.go.jp/policy/nisa2/know/" target="_blank" rel="noopener noreferrer">金融庁「NISAを知る」</a>。商品には制度・金融機関による取扱条件があります。</p>
+      </section>
+      <section class="article-section" id="reuse" data-section><h2>売却したら、非課税枠はいつ戻る？</h2>
+        <p>保有商品を売却すると、<strong>翌年以降</strong>に売却した商品の取得金額（簿価）に相当する分を、非課税保有限度額として再利用できます。</p>
+        <div class="topic-subtle"><strong>注意したい違い</strong><p>再利用できるのは非課税保有限度額（総枠）です。その年の年間投資枠が売却によって復活するわけではありません。</p></div>
+        <p>売却益が大きい場合でも、戻るのは売却時価ではなく取得金額が基準です。投資枠を使い切ることだけを目的に買い進める必要はありません。</p>
+      </section>
+      <section class="article-section" id="decision" data-section><h2>積立額を決める前に確認したいこと</h2>
+        <p>非課税枠の上限がそのまま、家計に適した積立額を示すわけではありません。生活費の備えと、将来使う予定のあるお金を分けたうえで、無理なく続けられる金額から検討します。</p>
+        <ul><li>近い将来に使う資金を、価格変動のある商品へ入れすぎていないか。</li><li>毎月の積立額を増減した場合、生活費に無理はないか。</li><li>損失が生じた場合も、計画を続けられるか。</li></ul>
+        <p class="note">NISAは元本を保証する制度ではありません。非課税であっても、保有商品の価格は変動します。</p>
+      </section>
+      <div class="sources" id="sources"><h2>参考資料・制度の根拠</h2><ul>
+        <li><a href="https://www.fsa.go.jp/policy/nisa2/know/" target="_blank" rel="noopener noreferrer">金融庁｜NISAを知る</a></li>
+        <li><a href="https://www.fsa.go.jp/policy/nisa2/question/" target="_blank" rel="noopener noreferrer">金融庁｜NISAのよくある質問</a></li>
+      </ul><p class="sources__date">モック内の制度情報確認：2026年11月25日。正式公開時は再確認が必要です。</p></div>
+      <section class="next-step" aria-labelledby="nisa-next-title"><h2 id="nisa-next-title">積立額を変えて、将来額の違いを確かめる</h2>
+        <p>制度の上限を理解したら、毎月の積立額・期間・想定利回りを変え、家計に合う条件を探します。試算結果は将来の利益を保証するものではありません。</p>
+        <a class="next-step__link" href="/simulators/nisa" target="_blank" rel="noopener noreferrer">NISAシミュレーターを見る</a>
+      </section>
+      <p class="note-end">※この画面は記事共通デザインを検討するためのモックです。記述の粒度・制度更新日は正式記事の監修時に確定します。</p>
+    `
+  },
+  mortgage: {
+    path:'住宅ローン',title:'住宅ローンは返済方式で何が変わる？ 月々の負担と総返済額を比較',
+    description:'元利均等返済と元金均等返済の違いを、同じ借入条件で比較。目先の返済額だけでなく、利息と諸費用の見方を整理します。',
+    published:'2026年9月21日',revised:'2026年10月4日',basis:'2026年11月25日',
+    answer:'元利均等返済は毎月の支払額が原則一定で、家計の見通しを立てやすい方法です。元金均等返済は返済当初の負担が大きい一方、同条件なら総利息を抑えやすい方法です。',
+    sections:[
+      ['method','2つの返済方式は、何が違う？'],
+      ['example','同じ条件で比べると毎月いくら変わる？'],
+      ['cost','金利以外に確認すべき費用'],
+      ['decision','どちらの方法を選ぶか'],
+    ],
+    content: () => `
+      <section class="article-section" id="method" data-section><h2>2つの返済方式は、何が違う？</h2>
+        <p>返済方式によって「毎月一定になるもの」が異なります。<strong>元利均等返済</strong>は元金と利息の合計額が原則一定、<strong>元金均等返済</strong>は返済する元金部分が一定です。</p>
+        <table class="comparison-table comparison-table--mortgage">
+          <caption>元利均等返済と元金均等返済の比較</caption>
+          <thead><tr><th scope="col">比較する項目</th><th scope="col">元利均等返済</th><th scope="col">元金均等返済</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">毎月の返済額</th><td data-label="元利均等返済">原則一定</td><td data-label="元金均等返済">返済が進むほど減少</td></tr>
+            <tr><th scope="row">返済開始時の負担</th><td data-label="元利均等返済">比較的小さい</td><td data-label="元金均等返済">比較的大きい</td></tr>
+            <tr><th scope="row">総支払利息</th><td data-label="元利均等返済">同条件では多くなりやすい</td><td data-label="元金均等返済">同条件では少なくなりやすい</td></tr>
+          </tbody>
+        </table>
+        <p class="inline-reference">参考：<a href="https://www.smbc.co.jp/kojin/jutaku_loan/column/during-purchase-choose/" target="_blank" rel="noopener noreferrer">三井住友銀行「住宅ローンの選び方」</a>。比較は金利・期間・借入額等をそろえることが前提です。</p>
+      </section>
+      <section class="article-section" id="example" data-section><h2>同じ条件で比べると毎月いくら変わる？</h2>
+        <p>借入3,000万円、年1.0％、35年間、ボーナス返済なし、全期間を通じて金利一定とした単純な試算例です。端数処理は金融機関の実務と異なる場合があります。</p>
+        <table class="comparison-table comparison-table--mortgage">
+          <caption>借入条件をそろえた試算（概算）</caption>
+          <thead><tr><th scope="col">比較する項目</th><th scope="col">元利均等返済</th><th scope="col">元金均等返済</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">返済開始時の月額</th><td data-label="元利均等返済"><span class="number">約${financialFigures.equalPayment}</span></td><td data-label="元金均等返済"><span class="number">約${financialFigures.principalFirst}</span></td></tr>
+            <tr><th scope="row">完済直前の月額</th><td data-label="元利均等返済">約${financialFigures.equalPayment}</td><td data-label="元金均等返済">約${financialFigures.principalLast}</td></tr>
+            <tr><th scope="row">総利息</th><td data-label="元利均等返済">約${financialFigures.equalPaymentInterest}</td><td data-label="元金均等返済">約${financialFigures.equalPrincipalInterest}</td></tr>
+          </tbody>
+        </table>
+        <figure class="figure figure--loanchart" aria-labelledby="loan-chart-title"><figcaption class="figure__heading"><strong id="loan-chart-title">毎月返済額の変化</strong><span>年1.0％・35年間・金利一定の例</span></figcaption>
+          <div class="chart-head"><p class="loan-chart__scale">月額の目安（6万円〜11万円）</p><div class="chart-legend"><span><i class="line1"></i>元利均等</span><span><i class="line2"></i>元金均等</span></div></div>
+          <svg class="loan-chart" id="loan-graph" viewBox="0 0 650 170" preserveAspectRatio="none" role="img" aria-label="元利均等は月々約84,686円で横ばい。元金均等は当初約96,429円から完済時約71,488円に減少する例"></svg>
+          <div class="loan-chart__axis"><span>返済開始</span><span>約15年後</span><span>約35年後</span></div>
+          <p class="figure__caption">※ 支払利息や返済額は、金利変動・端数処理・融資条件により異なります。図は一定金利の説明用モデルであり、将来の返済額を保証するものではありません。</p>
+        </figure>
+      </section>
+      <section class="article-section" id="cost" data-section><h2>金利以外に確認すべき費用</h2>
+        <p>総支払額には返済する元金と利息のほか、契約時の手数料、保証に関する費用、団体信用生命保険の条件、登記費用などが影響します。</p>
+        <ul><li>比較する金利に、優遇条件や適用期間の違いがないか。</li><li>事務手数料・保証料などの金額と支払時期。</li><li>繰上返済の条件、手数料、返済後の選択肢。</li><li>金利変動時に返済額と総支払額がどう変わるか。</li></ul>
+        <p class="note">実際の申込条件や商品による差は、各金融機関の最新の商品説明・契約書類で確認してください。</p>
+      </section>
+      <section class="article-section" id="decision" data-section><h2>どちらの方法を選ぶか</h2>
+        <p>毎月の家計負担を安定させたいのか、返済開始時の負担を許容して総利息の縮小を重視したいのかで判断が異なります。借入額・金利・期間を同じ条件にして比較すると、違いを理解しやすくなります。</p>
+        <div class="topic-subtle"><strong>判断の前に</strong><p>ここでは返済方式の特徴だけを比較しています。金融機関によって取扱方法・実際の返済額・契約条件が異なります。</p></div>
+      </section>
+      <div class="sources" id="sources"><h2>参考資料・確認先</h2><ul>
+        <li><a href="https://www.smbc.co.jp/kojin/jutaku_loan/column/during-purchase-choose/" target="_blank" rel="noopener noreferrer">三井住友銀行｜住宅ローンの選び方</a></li>
+        <li><a href="https://www.flat35.com/simulation/simu_01.html" target="_blank" rel="noopener noreferrer">住宅金融支援機構｜返済シミュレーション</a></li>
+      </ul><p class="sources__date">説明・数値例の確認：2026年11月25日。正式公開前に再検証します。</p></div>
+      <section class="next-step" aria-labelledby="mortgage-next-title"><h2 id="mortgage-next-title">実際の借入条件で返済方法を比較する</h2>
+        <p>借入金額・金利・期間を入力し、元利均等返済と元金均等返済の違いを確かめられます。計算結果は概算です。</p>
+        <a class="next-step__link" href="/simulators/mortgage" target="_blank" rel="noopener noreferrer">住宅ローンシミュレーターを見る</a>
+      </section>
+      <p class="note-end">※この画面は記事共通デザインを検討するためのモックです。正式公開前に数値・説明・根拠資料を監査します。</p>
+    `
+  }
+};
+const app = document.getElementById('app');
+const controls = [...document.querySelectorAll('.review-segment')];
+let observer;
+const esc = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+function renderChart(){
+  const svg = document.getElementById('loan-graph'); if(!svg)return;
+  const min=60000,max=110000,width=650,height=170;
+  const y = value => (height - 12 - (value - min) / (max-min) * (height-24)).toFixed(1);
+  const x = month => (month/conditions.months * width).toFixed(1);
+  const path1 = `M0 ${y(equalPayment)} L${width} ${y(equalPayment)}`;
+  const path2 = Array.from({length:conditions.months+1}, (_,i)=>{
+    const currentBalance=Math.max(0,conditions.principal-(i*principalPart));
+    const pay=principalPart + currentBalance*monthlyRate;
+    return `${i===0?'M':'L'}${x(i)} ${y(pay)}`;
+  }).join(' ');
+  const grid = [0,1,2,3,4].map(i=>`<line x1="0" x2="${width}" y1="${12+i*36.5}" y2="${12+i*36.5}" class="loan-chart__grid"/>`).join('');
+  svg.innerHTML=`${grid}<path d="${path1}" class="loan-chart__line" stroke="#2a5877"/><path d="${path2}" class="loan-chart__line" stroke="#2a9289"/>`;
+}
+function renderArticle(id, keepFocus=false){
+  const a=articles[id]||articles.nisa;
+  document.title=`${a.title}｜沖縄マネーガイド 理想記事モック`;
+  const links=a.sections.map(([sid,text])=>`<a href="#${sid}" data-anchor="${sid}">${esc(text)}</a>`).join('');
+  app.innerHTML=`
+    <header class="hero" id="article-hero"><div class="hero__inner">
+      <nav class="breadcrumb" aria-label="パンくずリスト"><a href="#page-top">ホーム</a><span aria-hidden="true">›</span><span>お金の知識</span><span aria-hidden="true">›</span><span>${esc(a.path)}</span></nav>
+      <h1 id="article-title" tabindex="-1">${esc(a.title)}</h1>
+      <p class="hero__lead">${esc(a.description)}</p>
+      <div class="hero__meta"><span>公開：${esc(a.published)}</span><span>更新：${esc(a.revised)}</span><span>情報確認：${esc(a.basis)}</span></div>
+    </div></header>
+    <div class="main-band"><div class="content-grid">
+      <article class="article-paper" aria-label="${esc(a.path)}解説記事"><p class="intro">${id==='nisa'?'NISAを考えるとき、まず押さえたいのは「税金」と「使える枠」の違いです。制度を正しく理解し、自分の家計に合う積立額を考えるためのポイントを整理します。':'住宅ローンを比較するとき、金利だけを見ていませんか。返済方式による月々の負担と総利息の違いを理解してから、同じ条件で試算することが重要です。'}</p>
+        <div class="answer" aria-label="記事の要点"><span class="answer__label">結論</span><p class="answer__content">${esc(a.answer)}</p></div>
+        <details class="mobile-toc"><summary>この記事の目次</summary><nav class="mobile-toc__links" aria-label="モバイル記事目次">${links}</nav></details>
+        ${a.content()}
+      </article>
+      <aside class="side" aria-label="この記事の目次"><h2 class="side__heading">この記事の目次</h2><div class="side__rule"></div><nav class="side__list" aria-label="記事目次">${links}</nav><div class="side__sources"><strong>情報の確認</strong>出典・条件・注意点を本文の近くに表示しています。</div></aside>
+    </div></div>`;
+  if(id==='mortgage')renderChart();
+  for(const control of controls)control.setAttribute('aria-pressed',String(control.dataset.article===id));
+  if(observer)observer.disconnect();
+  const sideLinks=[...document.querySelectorAll('.side__list [data-anchor]')];
+  observer=new IntersectionObserver(entries=>{
+    const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0];
+    if(!visible)return;for(const link of sideLinks)link.classList.toggle('is-active',link.dataset.anchor===visible.target.id);
+  },{rootMargin:'-80px 0px -65% 0px',threshold:0});
+  for(const el of document.querySelectorAll('[data-section]'))observer.observe(el);
+  for(const el of document.querySelectorAll('.mobile-toc [data-anchor]'))el.addEventListener('click',()=>{
+    const details=el.closest('details');if(details)details.open=false;
+  });
+  window.scrollTo({top:0,behavior:'instant'});
+  if(keepFocus)document.getElementById('article-title').focus({preventScroll:true});
+  const url=new URL(location.href);url.searchParams.set('article',id);try { history.replaceState(null,'',url.href); } catch { /* file:// での閲覧時は表示を優先 */ }
+}
+controls.forEach(el=>el.addEventListener('click',()=>renderArticle(el.dataset.article,true)));
+const panel=document.getElementById('review-panel'),show=document.getElementById('review-show');
+function setReviewShown(visible){panel.hidden=!visible;show.hidden=visible;const u=new URL(location.href);if(!visible)u.searchParams.set('mode','clean');else u.searchParams.delete('mode');try { history.replaceState(null,'',u.href); } catch { /* file:// での閲覧時は表示を優先 */ }}
+document.getElementById('review-hide').addEventListener('click',()=>setReviewShown(false));
+show.addEventListener('click',()=>setReviewShown(true));
+const params=new URL(location.href).searchParams;
+renderArticle(params.get('article')==='mortgage'?'mortgage':'nisa');
+if(params.get('mode')==='clean')setReviewShown(false);
+
+</script>
+</body>
+</html>
