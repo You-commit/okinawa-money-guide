@@ -27,3 +27,27 @@ jobs:
           npm run lint
           npm run build
           npm test
+      - name: Build original baseline
+        run: |
+          npm --prefix /tmp/omg-nisa-original ci
+          npm --prefix /tmp/omg-nisa-original run build
+      - name: Install independent browser
+        run: |
+          mkdir -p /tmp/omg-playwright
+          npm install --prefix /tmp/omg-playwright --no-save playwright@1.58.2
+          /tmp/omg-playwright/node_modules/.bin/playwright install --with-deps chromium
+      - name: Start both pages
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort >/tmp/nisa-feature.log 2>&1 &
+          (cd /tmp/omg-nisa-original && npm run preview -- --host 127.0.0.1 --port 4174 --strictPort >/tmp/nisa-baseline.log 2>&1) &
+      - name: Assert image loads and original article text is untouched on desktop/mobile
+        env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
+        run: node scripts/nisa-original-illustration-browser-qa.mjs
+      - name: Upload screenshots and results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nisa-original-illustration-PC-mobile
+          path: qa/nisa-illustration/
+          if-no-files-found: warn
