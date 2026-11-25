@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const before=fs.readFileSync('/tmp/omg-nisa-original/src/pages/knowledge/NisaLimitsArticlePage.tsx','utf8');
+const after=fs.readFileSync('src/pages/knowledge/NisaLimitsArticlePage.tsx','utf8');
+const fig=/<figure className="nisa-bank-editorial-illustration">[\s\S]*?<\/figure>\s*/;
+assert.equal((after.match(fig)||[]).length,1);
+assert.equal(after.replace(fig,''),before);
+const data=fs.readFileSync('public/article-media/nisa-questions-illustration.webp');
+assert.ok(data.length>10000);
+assert.equal(data.subarray(0,4).toString(),'RIFF');
+assert.equal(data.subarray(8,12).toString(),'WEBP');
+console.log('PASS: Entire original React article is identical after removing only new image figure.');
