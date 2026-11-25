@@ -441,6 +441,25 @@ describe('dedicated page routing', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
+  it.each([
+    '/knowledge', '/knowledge/', '/knowledge/nisa-limits-and-future-value', '/knowledge/mortgage-comparison',
+  ])('uses the editorial shared header only on article routes: %s', (path) => {
+    renderAt(path)
+    const header = document.querySelector('.top-option02__header')!
+    expect(header.classList.contains('top-option02__header--editorial')).toBe(true)
+    const nav = screen.getByRole('navigation', { name: 'メインメニュー' })
+    expect(within(nav).getByRole('link', { name: '記事・コラム' }).getAttribute('aria-current'))
+      .toBe(path.replace(/\/$/, '') === '/knowledge' ? 'page' : 'location')
+  })
+
+  it.each([
+    '/', '/simulators/nisa', '/simulators/ideco', '/simulators/mortgage', '/simulators/military-land',
+    '/simulators/taxable-income', '/about', '/trust', '/knowledge/does-not-exist',
+  ])('retains the existing header outside the article routes: %s', (path) => {
+    renderAt(path)
+    expect(document.querySelector('.top-option02__header--editorial')).toBeNull()
+  })
+
   it('keeps the existing mobile navigation trigger and nested simulator links', async () => {
     const user = userEvent.setup()
     renderAt('/simulators/nisa')
