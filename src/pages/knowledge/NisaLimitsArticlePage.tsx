@@ -142,7 +142,13 @@ function NisaLimitsArticlePage() {
       setActiveSection(articleSectionFromHash(window.location.hash))
     }
     const syncScroll = () => {
-      const threshold = Math.min(180, window.innerHeight * 0.30)
+      const first = document.getElementById(articleSections[0][0])
+      if (!first) return
+      // The global page already reserves the sticky header via scroll-padding.
+      // Match the browser's real anchor position rather than a hard-coded viewport threshold.
+      const scrollPadding = Number.parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0
+      const scrollMargin = Number.parseFloat(getComputedStyle(first).scrollMarginTop) || 0
+      const threshold = scrollPadding + scrollMargin + 24
       const sections = articleSections.flatMap(([id]) => {
         const node = document.getElementById(id)
         return node ? [{ id, rect: node.getBoundingClientRect() }] : []

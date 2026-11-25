@@ -19,6 +19,7 @@ for(const width of [1440,1024,768,390,320]){
   const heading=await page.locator('#cases h2').boundingBox()
   const header=await page.evaluate(()=>{const els=[...document.querySelectorAll('header')].filter(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.top<=1&&r.height>0&&['sticky','fixed'].includes(s.position)});return Math.max(0,...els.map(e=>e.getBoundingClientRect().bottom))})
   assert.ok(heading.y>=header-2&&heading.y>=0&&heading.y<330,'Anchor heading obscured or not reached: '+JSON.stringify({heading,header}))
+  console.log('ANCHOR_'+width+' '+JSON.stringify({headingY:heading.y,header,scrollY:await page.evaluate(()=>scrollY),sectionY:await page.locator('#cases').evaluate(e=>e.getBoundingClientRect().top),scrollPadding:await page.evaluate(()=>getComputedStyle(document.documentElement).scrollPaddingTop),scrollMargin:await page.locator('#cases').evaluate(e=>getComputedStyle(e).scrollMarginTop)}))
   const nav=page.locator('.nisa-bank-sidebar nav a[aria-current=location]')
   assert.equal(await nav.getAttribute('href'),'#cases','Sidebar current state')
   assert.equal(await page.locator('.nisa-comparison__control button[aria-pressed=true]').textContent(),'15年')

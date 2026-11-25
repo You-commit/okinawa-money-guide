@@ -1660,7 +1660,7 @@
 /* NISA article: one comparable, readable chart; no fixed-size card triplication. */
 .nisa-bank-page .nisa-bank-section,
 .nisa-bank-page .nisa-bank-frame-details > section {
-  scroll-margin-top: calc(var(--omg-sticky-header-offset, 80px) + 24px);
+  scroll-margin-top: 24px; /* Global html scroll-padding already accounts for the sticky header. */
 }
 .nisa-bank-page .nisa-bank-sidebar__related a {
   grid-template-columns: 26px minmax(0, 1fr); gap: 8px; padding-inline: 11px;
