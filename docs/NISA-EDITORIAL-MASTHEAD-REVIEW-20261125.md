@@ -1,0 +1,3 @@
+# NISA editorial masthead review — 2026-11-25
+Rejected design: PR #22 "Tide" (generic wave and washed-out tonal field), no merge.
+Alternative: information-led editorial composition; flat blue-gray canvas, no waves, no gradient, navy fact typography and restrained teal accent. Original article heading/lead/dates retained. Right-side facts summarize already-existing article figures; FSA NISA overview: https://www.fsa.go.jp/policy/nisa2/know/ . This is a new design proposal, not yet formally approved. Article body, chart, navigation, other pages, all simulators unchanged. Compare from PR #21 verified HEAD 5d0e2b4aa0ca6b2f1b2fd18d44961023f40a6b11. Main/production unchanged.
