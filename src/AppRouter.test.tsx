@@ -193,8 +193,9 @@ describe('dedicated page routing', () => {
     expect(screen.getByRole('img', {
       name: '利益100万円が非課税で100万円',
     })).toBeTruthy()
-    expect(document.querySelectorAll('.nisa-bank-chart')).toHaveLength(3)
-    expect(document.querySelectorAll('.nisa-bank-chart__column')).toHaveLength(11)
+    expect(document.querySelectorAll('.nisa-comparison__figure')).toHaveLength(1)
+    expect(document.querySelectorAll('.nisa-comparison__bar')).toHaveLength(3)
+    expect(document.querySelectorAll('.nisa-comparison__table tbody tr')).toHaveLength(4)
 
     const tabs = screen.getByRole('navigation', { name: 'NISA制度メニュー' })
     const tabLinks = within(tabs).getAllByRole('link')
@@ -243,6 +244,24 @@ describe('dedicated page routing', () => {
     expect(screen.getByRole('region', {
       name: 'NISA売却後の非課税保有限度額再利用例',
     })).toBeTruthy()
+  })
+
+  it('compares all monthly amounts at the same selected year and explains the unavailable twenty-year case', async () => {
+    const user = userEvent.setup()
+    renderAt('/knowledge/nisa-limits-and-future-value#cases')
+    const section = document.querySelector('#cases')!
+    const nav = document.querySelector('.nisa-bank-sidebar nav')!
+    expect(nav.querySelector('[aria-current="location"]')?.getAttribute('href')).toBe('#cases')
+    const period = within(section as HTMLElement).getByRole('group', { name: '積立期間' })
+    expect(within(period).getByRole('button', { name: '15年' }).getAttribute('aria-pressed')).toBe('true')
+    expect(section.querySelectorAll('.nisa-comparison__bar')).toHaveLength(3)
+    await user.click(within(period).getByRole('button', { name: '20年' }))
+    expect(section.querySelectorAll('.nisa-comparison__bar')).toHaveLength(2)
+    expect(section.querySelector('.nisa-comparison__excluded')?.textContent).toContain('保有・運用は継続できます')
+    await user.click(within(period).getByRole('button', { name: '5年' }))
+    expect(section.querySelectorAll('.nisa-comparison__bar')).toHaveLength(3)
+    await user.click(within(nav as HTMLElement).getByRole('link', { name: 'NISAのメリット' }))
+    expect(nav.querySelector('[aria-current="location"]')?.getAttribute('href')).toBe('#benefits')
   })
 
   it('updates the active NISA tab when a tab is clicked', async () => {

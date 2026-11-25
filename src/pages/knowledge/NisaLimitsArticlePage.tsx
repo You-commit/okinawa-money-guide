@@ -9,6 +9,7 @@ import {
   TrustReliableIcon,
 } from '../../components/top/TopIcons'
 import SiteLayout from '../../layouts/SiteLayout'
+import { ARTICLE_CHART_MAX_MAN, ARTICLE_CHART_YEARS, articleFutureValueSeries } from './nisaArticleFutureValue'
 import './nisa-guide-integrated.css'
 
 const sources = [
@@ -39,111 +40,86 @@ const sources = [
   },
 ] as const
 
-type FutureValuePoint = {
-  years: number
-  principal: number
-  total: number
-}
+const yenToMan = (yen: number) => Math.round(yen / 10000).toLocaleString('ja-JP')
+const axisTicks = [0, 1000, 2000, 3000] as const
+type ChartYear = typeof ARTICLE_CHART_YEARS[number]
 
-type FutureValueChartProps = {
-  monthly: number
-  points: FutureValuePoint[]
-  maxValue: number
-}
-
-function FutureValueChart({
-  monthly,
-  points,
-  maxValue,
-}: FutureValueChartProps) {
-  const finalPoint = points[points.length - 1]
-
+function FutureValueComparison() {
+  const [year, setYear] = useState<ChartYear>(15)
   return (
-    <figure
-      className="nisa-bank-chart"
-      aria-label={`毎月${monthly.toLocaleString('ja-JP')}円を年率5%で積み立てた場合の将来額`}
-    >
-      <figcaption>
-        <strong>毎月{(monthly / 10000).toLocaleString('ja-JP')}万円を積み立てた場合</strong>
-        <span>
-          <i className="is-principal" aria-hidden="true" />
-          積立元本
-          <i className="is-growth" aria-hidden="true" />
-          運用後の資産額（年率5%）
-        </span>
-      </figcaption>
-
-      <div className="nisa-bank-chart__callout">
-        <small>{finalPoint.years}年後</small>
-        <strong>約{finalPoint.total.toLocaleString('ja-JP')}万円</strong>
-        <span>元本 {finalPoint.principal.toLocaleString('ja-JP')}万円</span>
-      </div>
-
-      <div
-        className="nisa-bank-chart__plot"
-        style={{ gridTemplateColumns: `repeat(${points.length}, minmax(0, 1fr))` }}
-      >
-        <div className="nisa-bank-chart__grid" aria-hidden="true" />
-        {points.map((point) => {
-          const totalHeight = Math.max((point.total / maxValue) * 100, 3)
-          const principalRatio = point.principal / point.total
-
-          return (
-            <div className="nisa-bank-chart__column" key={point.years}>
-              <div className="nisa-bank-chart__bar-wrap">
-                <div
-                  className="nisa-bank-chart__bar"
-                  style={{ height: `${totalHeight}%` }}
-                  aria-hidden="true"
-                >
-                  <span
-                    className="nisa-bank-chart__principal"
-                    style={{ height: `${principalRatio * 100}%` }}
-                  />
-                  <span className="nisa-bank-chart__growth" />
-                </div>
+    <div className="nisa-comparison">
+      <figure className="nisa-bank-chart nisa-comparison__figure" aria-labelledby="nisa-comparison-title">
+        <figcaption>
+          <h3 id="nisa-comparison-title">同じ積立期間で将来額を比較</h3>
+          <p>毎月末積立・想定年率5%（概算）</p>
+        </figcaption>
+        <div className="nisa-comparison__control" role="group" aria-label="積立期間">
+          {ARTICLE_CHART_YEARS.map(y => <button type="button" key={y} aria-pressed={year === y} onClick={() => setYear(y)}>{y}年</button>)}
+        </div>
+        <div className="nisa-comparison__legend">
+          <span><i className="nisa-comparison__principal" aria-hidden="true" />積立元本</span>
+          <span><i className="nisa-comparison__gain" aria-hidden="true" />運用益</span>
+          <span className="nisa-comparison__unit">単位：万円</span>
+        </div>
+        <div className="nisa-comparison__axis" aria-hidden="true">
+          {axisTicks.map(tick => <span key={tick} style={{ left: `${tick / ARTICLE_CHART_MAX_MAN * 100}%` }}>{tick.toLocaleString('ja-JP')}</span>)}
+        </div>
+        <div className="nisa-comparison__results" aria-live="polite" aria-atomic="true">
+          {articleFutureValueSeries.map(series => {
+            const point = series.points.find(p => p.years === year)
+            return <div className="nisa-comparison__row" key={series.monthly} data-monthly={series.monthly} data-year={year}>
+              <div className="nisa-comparison__row-heading"><strong>月{series.monthly / 10000}万円</strong>
+                {point ? <strong className="nisa-comparison__amount">約{yenToMan(point.total)}<small>万円</small></strong> : <strong className="nisa-comparison__unmodeled">試算対象外</strong>}
               </div>
-              <span className="nisa-bank-chart__year">{point.years}年</span>
+              {point ? <>
+                <svg className="nisa-comparison__track" data-axis-max={ARTICLE_CHART_MAX_MAN} aria-hidden="true"
+                  viewBox={`0 0 ${ARTICLE_CHART_MAX_MAN} 26`} preserveAspectRatio="none" width="100%" height="26">
+                  <rect x="0" y="0" width={ARTICLE_CHART_MAX_MAN} height="26" fill="#f4f7f9" />
+                  {axisTicks.map(tick => <line key={tick} x1={tick} x2={tick} y1="0" y2="26" stroke="#d4e1e8" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
+                  <g className="nisa-comparison__bar" data-total={point.total}>
+                    <rect x="0" y="0" width={point.principal / 10000} height="26" fill="#bed5df" />
+                    <rect x={point.principal / 10000} y="0" width={point.gain / 10000} height="26" fill="#0e5d88" />
+                  </g>
+                </svg>
+                <div className="nisa-comparison__breakdown"><span>元本 {yenToMan(point.principal)}万円</span><span>運用益 {yenToMan(point.gain)}万円</span></div>
+              </> : <p className="nisa-comparison__excluded">15年で積立元本1,800万円に到達するため、20年間の継続積立は試算していません。保有・運用は継続できます。</p>}
             </div>
-          )
-        })}
-      </div>
-      <div className="nisa-bank-chart__unit">（万円）</div>
-    </figure>
+          })}
+        </div>
+        <p className="nisa-comparison__scale-note">すべての積立額・期間で同じ金額軸（0〜3,000万円）を使用しています。</p>
+      </figure>
+      <table className="nisa-comparison__table">
+        <caption>積立期間別の将来資産額<span>（万円、概算）</span></caption>
+        <thead><tr><th scope="col">期間</th>{articleFutureValueSeries.map(s => <th key={s.monthly} scope="col">月{s.monthly / 10000}万円</th>)}</tr></thead>
+        <tbody>{ARTICLE_CHART_YEARS.map(y => <tr key={y} className={year === y ? 'is-selected' : undefined}>
+          <th scope="row">{y}年</th>{articleFutureValueSeries.map(s => {
+            const point = s.points.find(p => p.years === y)
+            return <td key={s.monthly}>{point ? yenToMan(point.total) : <span className="nisa-comparison__excluded-cell">対象外<sup>※</sup></span>}</td>
+          })}
+        </tr>)}</tbody>
+      </table>
+      <p className="nisa-comparison__table-note">※ 月10万円の20年は、売却・枠の再利用をしない前提では非課税保有限度額を超えるため対象外です。15年後も非課税で保有・運用を継続できます。</p>
+    </div>
   )
 }
 
-const futureValueSeries = [
-  {
-    monthly: 10000,
-    maxValue: 450,
-    points: [
-      { years: 5, principal: 60, total: 68 },
-      { years: 10, principal: 120, total: 155 },
-      { years: 15, principal: 180, total: 267 },
-      { years: 20, principal: 240, total: 411 },
-    ],
-  },
-  {
-    monthly: 50000,
-    maxValue: 2200,
-    points: [
-      { years: 5, principal: 300, total: 340 },
-      { years: 10, principal: 600, total: 776 },
-      { years: 15, principal: 900, total: 1336 },
-      { years: 20, principal: 1200, total: 2055 },
-    ],
-  },
-  {
-    monthly: 100000,
-    maxValue: 2900,
-    points: [
-      { years: 5, principal: 600, total: 680 },
-      { years: 10, principal: 1200, total: 1553 },
-      { years: 15, principal: 1800, total: 2673 },
-    ],
-  },
+const articleSections = [
+  ['basic', 'NISAとは'],
+  ['benefits', 'NISAのメリット'],
+  ['compare', '投資枠と使い分け'],
+  ['cases', '積立額と将来額'],
+  ['reuse', '売却と枠の再利用'],
+  ['caution', '制度の注意点'],
+  ['faq', 'よくある質問'],
+  ['sources', '参考・一次資料'],
 ] as const
+type ArticleSectionId = typeof articleSections[number][0]
+
+function articleSectionFromHash(hash: string): ArticleSectionId {
+  const id = hash.slice(1)
+  if (id === 'tsumitate' || id === 'growth') return 'compare'
+  return articleSections.find(([key]) => key === id)?.[0] ?? 'basic'
+}
 
 type TabKey = 'basic' | 'tsumitate' | 'growth'
 
@@ -158,19 +134,44 @@ function NisaLimitsArticlePage() {
     typeof window === 'undefined' ? 'basic' : tabFromHash(window.location.hash)
   ))
 
+  const [activeSection, setActiveSection] = useState<ArticleSectionId>(() => (
+    typeof window === 'undefined' ? 'basic' : articleSectionFromHash(window.location.hash)
+  ))
+
   useEffect(() => {
-    const syncTab = () => setActiveTab(tabFromHash(window.location.hash))
+    const syncTab = () => {
+      setActiveTab(tabFromHash(window.location.hash))
+      setActiveSection(articleSectionFromHash(window.location.hash))
+    }
+    const syncScroll = () => {
+      const first = document.getElementById(articleSections[0][0])
+      if (!first) return
+      // The global page already reserves the sticky header via scroll-padding.
+      // Match the browser's real anchor position rather than a hard-coded viewport threshold.
+      const scrollPadding = Number.parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0
+      const scrollMargin = Number.parseFloat(getComputedStyle(first).scrollMarginTop) || 0
+      const threshold = scrollPadding + scrollMargin + 24
+      const sections = articleSections.flatMap(([id]) => {
+        const node = document.getElementById(id)
+        return node ? [{ id, rect: node.getBoundingClientRect() }] : []
+      })
+      if (!sections.some(s => s.rect.height > 0)) return
+      const current = [...sections].reverse().find(s => s.rect.top <= threshold)
+      setActiveSection(current?.id ?? 'basic')
+    }
+    window.addEventListener('scroll', syncScroll, { passive: true })
     window.addEventListener('hashchange', syncTab)
     window.addEventListener('popstate', syncTab)
 
     if (window.location.hash) {
       requestAnimationFrame(() => {
-        const target = document.querySelector<HTMLElement>(window.location.hash)
+        const target = document.getElementById(window.location.hash.slice(1))
         target?.scrollIntoView({ behavior: 'auto', block: 'start' })
       })
     }
 
     return () => {
+      window.removeEventListener('scroll', syncScroll)
       window.removeEventListener('hashchange', syncTab)
       window.removeEventListener('popstate', syncTab)
     }
@@ -197,6 +198,7 @@ function NisaLimitsArticlePage() {
     const nextHash = `#${sectionId}`
     window.history.pushState({}, '', nextHash)
     setActiveTab(tabFromHash(nextHash))
+    setActiveSection(articleSectionFromHash(nextHash))
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     target.scrollIntoView({
@@ -284,14 +286,9 @@ function NisaLimitsArticlePage() {
             <section>
               <h2>この記事の内容</h2>
               <nav>
-                <a className="is-current" href="#basic" onClick={(event) => navigateToSection(event, 'basic')}>NISAとは</a>
-                <a href="#benefits" onClick={(event) => navigateToSection(event, 'benefits')}>NISAのメリット</a>
-                <a href="#compare" onClick={(event) => navigateToSection(event, 'compare')}>投資枠と使い分け</a>
-                <a href="#cases" onClick={(event) => navigateToSection(event, 'cases')}>積立額と将来額</a>
-                <a href="#reuse" onClick={(event) => navigateToSection(event, 'reuse')}>売却と枠の再利用</a>
-                <a href="#caution" onClick={(event) => navigateToSection(event, 'caution')}>制度の注意点</a>
-                <a href="#faq" onClick={(event) => navigateToSection(event, 'faq')}>よくある質問</a>
-                <a href="#sources" onClick={(event) => navigateToSection(event, 'sources')}>参考・一次資料</a>
+                {articleSections.map(([id, label]) => (
+                  <a key={id} className={activeSection === id ? 'is-current' : undefined} aria-current={activeSection === id ? 'location' : undefined} href={`#${id}`} onClick={(event) => navigateToSection(event, id)}>{label}</a>
+                ))}
               </nav>
             </section>
 
@@ -299,7 +296,7 @@ function NisaLimitsArticlePage() {
               <h2>関連コンテンツ</h2>
               <Link to={routes.nisa}>
                 <StepCalculatorIcon />
-                <span><strong>NISAシミュレーター</strong><small>将来額を試算する</small></span>
+                <span><strong className="nisa-bank-related-nisa">NISA<wbr />シミュレーター</strong><small>将来額を試算する</small></span>
               </Link>
               <Link to={routes.knowledge}>
                 <TrustReliableIcon />
@@ -519,16 +516,7 @@ function NisaLimitsArticlePage() {
                 NISAそのものが利回りを生むわけではなく、実際の結果は選ぶ商品・市場環境・投資期間によって変わります。
               </p>
 
-              <div className="nisa-bank-chart-grid">
-                {futureValueSeries.map((series) => (
-                  <FutureValueChart
-                    key={series.monthly}
-                    monthly={series.monthly}
-                    points={series.points.map((point) => ({ ...point }))}
-                    maxValue={series.maxValue}
-                  />
-                ))}
-              </div>
+              <FutureValueComparison />
 
               <div className="nisa-bank-chart-reading">
                 <div><strong>月1万円</strong><span>年間12万円。少額から長く続ける場合の例。</span></div>
@@ -537,9 +525,9 @@ function NisaLimitsArticlePage() {
               </div>
 
               <p className="nisa-bank-note">
-                ※ 毎月末に積み立て、年率5%を月次換算して複利運用した場合の概算です。
+                ※ 毎月末に積み立て、年率5%（実効年率）を月利（1.05の12乗根−1）に換算して複利運用した場合の概算です。
                 手数料・税金等は考慮していません。将来の運用成果を保証するものではありません。
-                月10万円の例は、現行NISAの非課税保有限度額1,800万円に元本が到達する15年までを表示しています。
+                既存のNISA利用額は0円とし、つみたて投資枠のみを利用し、売却による枠の再利用は行わない前提です。
               </p>
 
               <Link className="nisa-bank-inline-cta" to={routes.nisa}>

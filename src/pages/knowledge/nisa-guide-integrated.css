@@ -1655,3 +1655,66 @@
 @media (max-width: 760px) {
   .nisa-bank-page .nisa-bank-editorial-illustration { margin: 22px auto 26px; }
 }
+
+
+/* NISA article: one comparable, readable chart; no fixed-size card triplication. */
+.nisa-bank-page .nisa-bank-section,
+.nisa-bank-page .nisa-bank-frame-details > section {
+  scroll-margin-top: 24px; /* Global html scroll-padding already accounts for the sticky header. */
+}
+.nisa-bank-page .nisa-bank-sidebar__related a {
+  grid-template-columns: 26px minmax(0, 1fr); gap: 8px; padding-inline: 11px;
+}
+.nisa-bank-page .nisa-bank-sidebar__related a > *:first-child,
+.nisa-bank-page .nisa-bank-sidebar__related a img:first-child { width: 24px; height: 24px; }
+.nisa-bank-related-nisa { overflow-wrap: normal; word-break: keep-all; }
+.nisa-comparison { color: #334e64; }
+.nisa-bank-page #cases .nisa-comparison__figure {
+  min-height: 0; padding: clamp(16px, 3vw, 28px); margin: 0;
+  background: #fff; border: 1px solid #d7e4eb; border-radius: 10px;
+}
+.nisa-bank-page #cases .nisa-comparison__figure figcaption { min-height: 0; display: block; }
+.nisa-comparison__figure h3 { margin: 0; color: #0d2f63; font-size: 1.125rem; font-weight: 700; line-height: 1.5; }
+.nisa-comparison__figure figcaption p { margin: 4px 0 0; font-size: .875rem; line-height: 1.6; color: #536a7c; }
+.nisa-comparison__control { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; margin: 20px 0 22px; }
+.nisa-comparison__control button { appearance: none; border: 1px solid #c6d7e1; background: #fff; color: #173a56; border-radius: 6px; min-height: 44px; font: inherit; font-weight: 600; font-size: .875rem; cursor: pointer; }
+.nisa-comparison__control button[aria-pressed="true"] { background: #0e5d88; border-color: #0e5d88; color: #fff; }
+.nisa-comparison__control button:focus-visible { outline: 2px solid #0b8598; outline-offset: 3px; }
+.nisa-comparison__legend { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; margin: 0 0 14px; font-size: .8125rem; line-height: 1.5; }
+.nisa-comparison__legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.nisa-comparison__legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; }
+.nisa-comparison__principal { background: #bed5df; }
+.nisa-comparison__gain { background: #0e5d88; }
+.nisa-comparison__unit { margin-left: auto; color: #536a7c; }
+.nisa-comparison__axis { position: relative; height: 18px; margin-bottom: 6px; font-size: .75rem; color: #536a7c; font-variant-numeric: tabular-nums; }
+.nisa-comparison__axis > span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.nisa-comparison__axis > span:first-child { transform: none; }
+.nisa-comparison__axis > span:last-child { transform: translateX(-100%); }
+.nisa-comparison__row { padding: 12px 0 14px; }
+.nisa-comparison__row + .nisa-comparison__row { border-top: 1px solid #e5edf1; }
+.nisa-comparison__row-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; color: #0d2f63; }
+.nisa-comparison__row-heading > strong:first-child { font-size: .9375rem; font-weight: 700; white-space: nowrap; }
+.nisa-comparison__amount { font-size: clamp(1.125rem, 2.4vw, 1.5rem); line-height: 1.2; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.nisa-comparison__amount small { font-size: .75rem; margin-left: 3px; }
+.nisa-comparison__track { display: block; width: 100%; height: 26px; overflow: hidden; border-radius: 2px; }
+.nisa-comparison__breakdown { display: flex; gap: 6px 16px; flex-wrap: wrap; font-size: .8125rem; line-height: 1.5; margin-top: 7px; font-variant-numeric: tabular-nums; }
+.nisa-comparison__unmodeled { color: #536a7c; font-size: .875rem; }
+.nisa-comparison__excluded { margin: 0; padding: 9px 12px; background: #f4f7f9; color: #435e70; font-size: .8125rem; line-height: 1.7; }
+.nisa-comparison__scale-note, .nisa-comparison__table-note { font-size: .8125rem; color: #536a7c; line-height: 1.7; }
+.nisa-comparison__scale-note { margin: 12px 0 0; }
+.nisa-comparison__table { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 28px; font-size: .875rem; font-variant-numeric: tabular-nums; }
+.nisa-comparison__table caption { text-align: left; margin-bottom: 9px; font-weight: 700; color: #0d2f63; font-size: 1rem; }
+.nisa-comparison__table caption span { font-size: .75rem; font-weight: 400; color: #536a7c; margin-left: 6px; }
+.nisa-comparison__table th, .nisa-comparison__table td { padding: 12px 8px; border-bottom: 1px solid #dbe6ec; text-align: right; white-space: nowrap; }
+.nisa-comparison__table th:first-child { text-align: left; }
+.nisa-comparison__table thead { background: #edf4f7; color: #173a56; }
+.nisa-comparison__table tbody th { font-weight: 600; }
+.nisa-comparison__table tbody .is-selected { background: #f2f8fa; }
+.nisa-comparison__excluded-cell { color: #536a7c; font-size: .75rem; }
+.nisa-comparison__table-note { margin: 8px 0 0; }
+@media (max-width: 420px) {
+  .nisa-comparison__table th, .nisa-comparison__table td { padding: 10px 3px; font-size: .75rem; }
+  .nisa-comparison__legend { gap: 8px 10px; }
+  .nisa-comparison__breakdown { gap: 5px 10px; font-size: .75rem; }
+  .nisa-comparison__figure h3 { font-size: 1rem; }
+}

@@ -1,0 +1,35 @@
+name: NISA chart accuracy and visual regression
+on:
+  push:
+    branches: [fix/nisa-chart-accuracy-20261125]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - run: |
+          npm install --prefix /tmp/omg-playwright --no-save playwright@1.58.2
+          /tmp/omg-playwright/node_modules/.bin/playwright install --with-deps chromium
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort >/tmp/nisa-chart-preview.log 2>&1 &
+      - name: Verify chart geometry, values and screenshots
+        env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
+        run: node scripts/nisa-chart-accuracy-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nisa-chart-visual-qa
+          path: qa/nisa-chart/
+          if-no-files-found: warn
