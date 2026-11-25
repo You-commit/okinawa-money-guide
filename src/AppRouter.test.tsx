@@ -88,7 +88,8 @@ describe('dedicated page routing', () => {
     expect(screen.queryByText('NISA / DECISION GUIDE')).toBeNull()
     expect(screen.queryByText('TSUMITATE')).toBeNull()
     expect(screen.queryByText('GROWTH')).toBeNull()
-    expect(screen.getByRole('link', { name: 'よくある質問' })).toBeTruthy()
+    expect(document.querySelector('.nisa-bank-anchor-nav a[href="#faq"]')?.textContent?.trim()).toBe('よくある質問')
+    expect(document.querySelector('.nisa-bank-sidebar nav a[href="#faq"]')?.textContent?.trim()).toBe('よくある質問')
     expect(screen.getByRole('heading', { name: 'よくある質問' })).toBeTruthy()
 
     cleanup()
