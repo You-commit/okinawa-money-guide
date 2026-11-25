@@ -1,0 +1,26 @@
+name: External editorial reference visual research
+on:
+  push:
+    branches: [review/editorial-reference-20261125]
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          mkdir -p /tmp/editorial-reference
+          npm install --prefix /tmp/editorial-reference --no-save playwright@1.58.2
+          /tmp/editorial-reference/node_modules/.bin/playwright install chromium
+          cp scripts/editorial-reference-research.mjs /tmp/editorial-reference/research.mjs
+          node /tmp/editorial-reference/research.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: editorial-reference-screenshots
+          path: qa/reference/
