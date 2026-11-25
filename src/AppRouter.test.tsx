@@ -330,6 +330,27 @@ describe('dedicated page routing', () => {
     )).toBeTruthy()
   })
 
+  it('puts published articles first and lists actual article dates', () => {
+    renderAt('/knowledge')
+    const main = document.querySelector('.info-shell')!
+    expect(main.firstElementChild?.id).toBe('published')
+    expect(main.querySelectorAll('#published article')).toHaveLength(2)
+    expect(Array.from(main.querySelectorAll('#published time')).map(el => el.getAttribute('datetime')))
+      .toEqual(['2026-10-14', '2026-09-21'])
+  })
+
+  it('uses the common reading layout with valid mortgage anchors and sources after FAQ', () => {
+    renderAt('/knowledge/mortgage-comparison')
+    const article = document.querySelector('.knowledge-article-body')!
+    const toc = document.querySelector('.knowledge-article-aside nav')!
+    const links = Array.from(toc.querySelectorAll('a'))
+    expect(links).toHaveLength(7)
+    for (const link of links) expect(document.getElementById(link.hash.slice(1))).toBeTruthy()
+    expect(article.querySelector('#mortgage-faq')?.querySelectorAll('details')).toHaveLength(3)
+    expect(article.querySelector('#article-sources')?.querySelectorAll('a')).toHaveLength(3)
+    expect(article.querySelector('#mortgage-faq')!.compareDocumentPosition(article.querySelector('#article-sources')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('uses natural Japanese labels on informational pages', () => {
     renderAt('/knowledge')
     expect(screen.getByRole('heading', { name: '初めての方は、3つの順序で確認' })).toBeTruthy()

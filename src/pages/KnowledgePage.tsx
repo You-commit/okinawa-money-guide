@@ -45,9 +45,9 @@ function KnowledgePage() {
         <section className="info-hero knowledge-hero">
           <div className="info-hero__inner knowledge-hero__inner">
             <div>
-              <p className="info-eyebrow">お金の知識</p>
+              <nav className="knowledge-article-breadcrumb" aria-label="パンくずリスト"><Link to={routes.home}>ホーム</Link><span aria-hidden="true">›</span><span aria-current="page">お金の知識</span></nav>
               <h1>今の目的から、<br />知るべきお金のことへ</h1>
-              <p className="info-hero__lead">記事を探し回る前に、「何を判断したいか」から基礎知識とシミュレーターを選べる入口です。</p>
+              <p className="info-hero__lead">住宅ローンやNISAなど、お金の制度・仕組みを理解し、今の目的に合わせた判断に役立てるための記事をまとめています。</p>
             </div>
             <nav className="knowledge-hero-nav" aria-label="目的別カテゴリ">
               {categories.map((category) => (
@@ -61,6 +61,23 @@ function KnowledgePage() {
         </section>
 
         <div className="info-main"><div className="info-shell">
+          <section className="info-section" id="published">
+            <div className="info-section-heading"><div><h2>公開中の記事</h2></div><p>制度と数字を理解するための解説記事です。</p></div>
+            <div className="knowledge-latest-list">
+              {[
+                { category: 'NISA・資産形成', title: 'NISAの非課税枠と、積立額・将来額の考え方', description: '年間投資枠、非課税保有限度額、将来額の違いを整理します。', href: routes.knowledgeNisaLimits, date: '2026-10-14', dateLabel: '更新日' },
+                { category: '住宅・ローン', title: '住宅ローン比較で見るべき項目', description: '返済方式、金利、総返済額、諸費用、保証、団信を同じ順序で比べます。', href: routes.knowledgeMortgageComparison, date: '2026-09-21', dateLabel: '公開日' },
+              ].map((article) => (
+                <article key={article.href}>
+                  <div className="knowledge-list-meta"><span>{article.category}</span><small>{article.dateLabel} <time dateTime={article.date}>{article.date.replaceAll('-', '.')}</time></small></div>
+                  <h3><Link to={article.href}>{article.title}</Link></h3>
+                  <p className="knowledge-list-description">{article.description}</p>
+                  <Link className="knowledge-list-read" to={article.href} aria-label={`${article.title}を読む`}>記事を読む <span aria-hidden="true">→</span></Link>
+                </article>
+              ))}
+            </div>
+          </section>
+
           <section className="info-section">
             <div className="info-section-heading"><div><h2>初めての方は、3つの順序で確認</h2></div><p>知識を増やすこと自体ではなく、次の判断が落ち着いてできることを目指します。</p></div>
             <div className="start-path info-surface">
@@ -71,25 +88,7 @@ function KnowledgePage() {
           </section>
 
           <section className="info-section">
-            <div className="info-section-heading"><div><h2>公開中の記事</h2></div><p>制度の数字とシミュレーターの結果を、次の判断につなげるための読み方を整理しました。</p></div>
-            <div className="knowledge-latest-list">
-              <article>
-                <p>NISA・資産形成</p>
-                <h3><Link to={routes.knowledgeNisaLimits}>NISAの非課税枠と、積立額・将来額の考え方</Link></h3>
-                <span>年間投資枠、非課税保有限度額、将来額の違いを整理します。</span>
-                <Link to={routes.knowledgeNisaLimits}>記事を読む <span aria-hidden="true">→</span></Link>
-              </article>
-              <article>
-                <p>住宅・ローン</p>
-                <h3><Link to={routes.knowledgeMortgageComparison}>住宅ローン比較で見るべき項目</Link></h3>
-                <span>返済方式、金利、総返済額、諸費用、保証、団信を同じ順序で比べます。</span>
-                <Link to={routes.knowledgeMortgageComparison}>記事を読む <span aria-hidden="true">→</span></Link>
-              </article>
-            </div>
-          </section>
-
-          <section className="info-section">
-            <div className="info-section-heading"><div><h2>目的から探す</h2></div><p>未公開の知識コンテンツは、存在する記事のように見せず「準備中」と明示します。</p></div>
+            <div className="info-section-heading"><div><h2>目的から探す</h2></div><p>気になるテーマから、公開中の記事や今後公開予定の内容を確認できます。</p></div>
             <div className="knowledge-grid">
               {categories.map((category) => (
                 <article className={`knowledge-card knowledge-card--${category.id} info-surface`} id={category.id} key={category.id}>
@@ -120,12 +119,13 @@ function KnowledgePage() {
           </section>
 
           <section className="info-section">
-            <div className="info-section-heading"><div><h2>数字を確かめる</h2></div><p>基礎を確認したら、実装済みの無料シミュレーターで自分の条件に置き換えられます。</p></div>
+            <div className="info-section-heading"><div><h2>数字を確かめる</h2></div><p>無料シミュレーターで、自分の条件に置き換えて確認できます。</p></div>
             <div className="simulator-links">
               <Link to={routes.militaryLand}>軍用地利回り <span aria-hidden="true">→</span></Link>
               <Link to={routes.mortgage}>住宅ローン <span aria-hidden="true">→</span></Link>
               <Link to={routes.nisa}>NISA積立 <span aria-hidden="true">→</span></Link>
               <Link to={routes.ideco}>iDeCo節税 <span aria-hidden="true">→</span></Link>
+              <Link to={routes.taxableIncome}>課税所得 <span aria-hidden="true">→</span></Link>
             </div>
           </section>
         </div></div>
