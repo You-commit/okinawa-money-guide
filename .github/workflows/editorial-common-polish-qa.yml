@@ -1,0 +1,51 @@
+name: Editorial common polish acceptance
+on:
+  push:
+    branches: [preview/editorial-common-polish]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: |
+          git diff --exit-code d7f988dba150160bf115f29f02bf178a25c2b8da HEAD -- src ':!src/pages/KnowledgePage.tsx' ':!src/components/knowledge/KnowledgeArticleLayout.tsx' ':!src/pages/knowledge/MortgageComparisonArticlePage.tsx' ':!src/styles/editorial-consistency.css' ':!src/AppRouter.test.tsx'
+          node scripts/check-editorial-scope.mjs
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install browser and Japanese font
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+          fc-match :lang=ja
+          npm install --prefix /tmp/omg-playwright --no-save playwright@1.58.2
+          /tmp/omg-playwright/node_modules/.bin/playwright install chromium
+      - name: Verify deployed article family
+        env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
+        run: node scripts/editorial-common-polish-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: editorial-common-polish-evidence
+          path: qa/editorial-common/

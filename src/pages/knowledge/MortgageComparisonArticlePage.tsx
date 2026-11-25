@@ -20,10 +20,21 @@ const sources = [
   },
 ] as const
 
+const sections = [
+  { id: 'overview', label: 'この記事で分かること' },
+  { id: 'repayment-methods', label: '返済方式の違い' },
+  { id: 'interest-and-total', label: '金利と総返済額' },
+  { id: 'fees', label: '諸費用・保障' },
+  { id: 'questions', label: '金融機関への確認事項' },
+  { id: 'mortgage-faq', label: 'よくある質問' },
+] as const
+
 function MortgageComparisonArticlePage() {
   return (
     <KnowledgeArticleLayout
       title="住宅ローン比較で見るべき項目"
+      topic="住宅ローン"
+      sections={sections}
       lead="返済方式、金利、総返済額、諸費用、保証、団信。月々の返済額だけでは見えにくい比較の順序を整理します。"
       publishedAt="2026-09-21"
       basisDate="2026-10-04"
@@ -39,7 +50,7 @@ function MortgageComparisonArticlePage() {
         住宅ローンを比べるとき、低い金利や小さい月額だけを見ても、家計への影響は判断しきれません。返済方式の違いを理解したうえで、借入期間全体の金額と契約に伴う費用を同じ条件で比べることが出発点です。
       </p>
 
-      <section className="knowledge-article-takeaways" aria-labelledby="mortgage-article-takeaways">
+      <section id="overview" className="knowledge-article-takeaways" aria-labelledby="mortgage-article-takeaways">
         <h2 id="mortgage-article-takeaways">この記事で分かること</h2>
         <ul>
           <li>表示金利や月々の返済額だけで住宅ローンを比較しない理由</li>
@@ -95,6 +106,13 @@ function MortgageComparisonArticlePage() {
           <li><strong>万一のときの保障範囲はどこまでか</strong><span>団信の対象事由、免責、上乗せ金利や保険料の扱いを確認します。</span></li>
           <li><strong>金利上昇や繰上返済で何が変わるか</strong><span>返済額の見直し方法と、期間短縮・返済額軽減の条件を確認します。</span></li>
         </ol>
+      </section>
+
+      <section id="mortgage-faq" className="knowledge-article-faq">
+        <h2>よくある質問</h2>
+        <details><summary>月々の返済額が少ない方が有利ですか？</summary><p>月々の返済額だけでは判断できません。借入期間全体の総返済額と、手数料や保証料などの費用も同じ条件で比較します。</p></details>
+        <details><summary>元利均等返済と元金均等返済はどちらがよいですか？</summary><p>同条件では元金均等返済の総返済額が少なくなる傾向がありますが、返済開始時の負担が大きくなります。家計の余裕と将来の支出を含めて比較します。</p></details>
+        <details><summary>シミュレーターの総返済額に諸費用は含まれますか？</summary><p>総返済額は借入元金と利息を中心にした概算です。契約・住宅取得に伴う費用は別に確認してください。</p></details>
       </section>
 
       <p className="knowledge-article-disclaimer">この記事は一般的な比較項目を整理したものです。実際の適用金利、審査、費用、保障条件は金融機関・商品・申込時期によって異なります。</p>
