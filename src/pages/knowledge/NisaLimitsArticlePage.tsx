@@ -9,6 +9,7 @@ import {
   TrustReliableIcon,
 } from '../../components/top/TopIcons'
 import SiteLayout from '../../layouts/SiteLayout'
+import { ARTICLE_CHART_MAX_MAN, ARTICLE_CHART_YEARS, articleFutureValueSeries, type ArticleFutureValueSeries } from './nisaArticleFutureValue'
 import './nisa-guide-integrated.css'
 
 const sources = [
@@ -39,111 +40,59 @@ const sources = [
   },
 ] as const
 
-type FutureValuePoint = {
-  years: number
-  principal: number
-  total: number
-}
+const yenToMan = (yen: number) => Math.round(yen / 10000).toLocaleString('ja-JP')
+const axisTicks = [3000, 2000, 1000, 0] as const
 
-type FutureValueChartProps = {
-  monthly: number
-  points: FutureValuePoint[]
-  maxValue: number
-}
-
-function FutureValueChart({
-  monthly,
-  points,
-  maxValue,
-}: FutureValueChartProps) {
-  const finalPoint = points[points.length - 1]
-
+function FutureValueChart({ monthly, points }: ArticleFutureValueSeries) {
+  const finalPoint = points[points.length - 1]!
   return (
-    <figure
-      className="nisa-bank-chart"
-      aria-label={`毎月${monthly.toLocaleString('ja-JP')}円を年率5%で積み立てた場合の将来額`}
-    >
+    <figure className="nisa-bank-chart nisa-accurate-chart" aria-label={`月${monthly / 10000}万円の積立例`}>
       <figcaption>
-        <strong>毎月{(monthly / 10000).toLocaleString('ja-JP')}万円を積み立てた場合</strong>
-        <span>
-          <i className="is-principal" aria-hidden="true" />
-          積立元本
-          <i className="is-growth" aria-hidden="true" />
-          運用後の資産額（年率5%）
-        </span>
+        <strong>毎月{monthly / 10000}万円</strong>
+        <div className="nisa-accurate-chart__summary">
+          <small>{finalPoint.years}年後の資産額</small>
+          <strong>約{yenToMan(finalPoint.total)}<small>万円</small></strong>
+          <span>元本 {yenToMan(finalPoint.principal)}万円 ／ 運用益 {yenToMan(finalPoint.gain)}万円</span>
+        </div>
       </figcaption>
-
-      <div className="nisa-bank-chart__callout">
-        <small>{finalPoint.years}年後</small>
-        <strong>約{finalPoint.total.toLocaleString('ja-JP')}万円</strong>
-        <span>元本 {finalPoint.principal.toLocaleString('ja-JP')}万円</span>
-      </div>
-
-      <div
-        className="nisa-bank-chart__plot"
-        style={{ gridTemplateColumns: `repeat(${points.length}, minmax(0, 1fr))` }}
-      >
-        <div className="nisa-bank-chart__grid" aria-hidden="true" />
-        {points.map((point) => {
-          const totalHeight = Math.max((point.total / maxValue) * 100, 3)
-          const principalRatio = point.principal / point.total
-
-          return (
-            <div className="nisa-bank-chart__column" key={point.years}>
-              <div className="nisa-bank-chart__bar-wrap">
-                <div
-                  className="nisa-bank-chart__bar"
-                  style={{ height: `${totalHeight}%` }}
-                  aria-hidden="true"
-                >
-                  <span
-                    className="nisa-bank-chart__principal"
-                    style={{ height: `${principalRatio * 100}%` }}
-                  />
-                  <span className="nisa-bank-chart__growth" />
+      <div className="nisa-accurate-chart__axis-unit">（万円）</div>
+      <div className="nisa-accurate-chart__layout" aria-hidden="true">
+        <div className="nisa-accurate-chart__ticks">
+          {axisTicks.map(tick => (
+            <span key={tick} style={{ bottom: `${tick / ARTICLE_CHART_MAX_MAN * 100}%` }}>{tick.toLocaleString('ja-JP')}</span>
+          ))}
+        </div>
+        <div className="nisa-accurate-chart__plot" data-axis-max={ARTICLE_CHART_MAX_MAN}>
+          {axisTicks.map(tick => (
+            <div className="nisa-accurate-chart__gridline" key={tick} style={{ bottom: `${tick / ARTICLE_CHART_MAX_MAN * 100}%` }} />
+          ))}
+          {ARTICLE_CHART_YEARS.map(year => {
+            const point = points.find(p => p.years === year)
+            return point ? (
+              <div className="nisa-bank-chart__column nisa-accurate-chart__column" key={year} data-year={year} data-monthly={monthly}>
+                <div className="nisa-accurate-chart__bar" data-total={point.total} style={{ height: `${point.total / (ARTICLE_CHART_MAX_MAN * 10000) * 100}%` }}>
+                  <span className="nisa-accurate-chart__principal" style={{ height: `${point.principal / point.total * 100}%` }} />
+                  <span className="nisa-accurate-chart__gain" style={{ height: `${point.gain / point.total * 100}%` }} />
                 </div>
               </div>
-              <span className="nisa-bank-chart__year">{point.years}年</span>
-            </div>
-          )
-        })}
+            ) : <div className="nisa-accurate-chart__unmodeled" key={year}>—</div>
+          })}
+        </div>
+        <div className="nisa-accurate-chart__years">
+          {ARTICLE_CHART_YEARS.map(year => <span key={year}>{year}年</span>)}
+        </div>
       </div>
-      <div className="nisa-bank-chart__unit">（万円）</div>
+      <table className="nisa-accurate-chart__data">
+        <caption>年別内訳（万円、概算）</caption>
+        <thead><tr><th scope="col">期間</th><th scope="col">元本</th><th scope="col">運用益</th><th scope="col">合計</th></tr></thead>
+        <tbody>
+          {points.map(point => <tr key={point.years}><th scope="row">{point.years}年</th><td>{yenToMan(point.principal)}</td><td>{yenToMan(point.gain)}</td><td>{yenToMan(point.total)}</td></tr>)}
+        </tbody>
+      </table>
+      {points.length < ARTICLE_CHART_YEARS.length && <p className="nisa-accurate-chart__limit">15年で非課税保有限度額に到達。20年後はこの試算の対象外です。</p>}
     </figure>
   )
 }
-
-const futureValueSeries = [
-  {
-    monthly: 10000,
-    maxValue: 450,
-    points: [
-      { years: 5, principal: 60, total: 68 },
-      { years: 10, principal: 120, total: 155 },
-      { years: 15, principal: 180, total: 267 },
-      { years: 20, principal: 240, total: 411 },
-    ],
-  },
-  {
-    monthly: 50000,
-    maxValue: 2200,
-    points: [
-      { years: 5, principal: 300, total: 340 },
-      { years: 10, principal: 600, total: 776 },
-      { years: 15, principal: 900, total: 1336 },
-      { years: 20, principal: 1200, total: 2055 },
-    ],
-  },
-  {
-    monthly: 100000,
-    maxValue: 2900,
-    points: [
-      { years: 5, principal: 600, total: 680 },
-      { years: 10, principal: 1200, total: 1553 },
-      { years: 15, principal: 1800, total: 2673 },
-    ],
-  },
-] as const
 
 type TabKey = 'basic' | 'tsumitate' | 'growth'
 
@@ -519,15 +468,13 @@ function NisaLimitsArticlePage() {
                 NISAそのものが利回りを生むわけではなく、実際の結果は選ぶ商品・市場環境・投資期間によって変わります。
               </p>
 
+              <div className="nisa-accurate-chart__legend">
+                <span><i className="nisa-accurate-chart__principal" aria-hidden="true" />積立元本</span>
+                <span><i className="nisa-accurate-chart__gain" aria-hidden="true" />運用益</span>
+                <span>全グラフ共通の縦軸：0〜3,000万円</span>
+              </div>
               <div className="nisa-bank-chart-grid">
-                {futureValueSeries.map((series) => (
-                  <FutureValueChart
-                    key={series.monthly}
-                    monthly={series.monthly}
-                    points={series.points.map((point) => ({ ...point }))}
-                    maxValue={series.maxValue}
-                  />
-                ))}
+                {articleFutureValueSeries.map(series => <FutureValueChart key={series.monthly} {...series} />)}
               </div>
 
               <div className="nisa-bank-chart-reading">
@@ -537,7 +484,7 @@ function NisaLimitsArticlePage() {
               </div>
 
               <p className="nisa-bank-note">
-                ※ 毎月末に積み立て、年率5%を月次換算して複利運用した場合の概算です。
+                ※ 毎月末に積み立て、年率5%（実効年率）を月利（1.05の12乗根−1）に換算して複利運用した場合の概算です。
                 手数料・税金等は考慮していません。将来の運用成果を保証するものではありません。
                 月10万円の例は、現行NISAの非課税保有限度額1,800万円に元本が到達する15年までを表示しています。
               </p>

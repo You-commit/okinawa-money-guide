@@ -1655,3 +1655,50 @@
 @media (max-width: 760px) {
   .nisa-bank-page .nisa-bank-editorial-illustration { margin: 22px auto 26px; }
 }
+
+/* NISA article only: shared zero-based scale and exact stack proportions. */
+.nisa-bank-page .nisa-accurate-chart {
+  display: flex; flex-direction: column; min-height: 0; padding: 16px 12px;
+  background: #fff; border: 1px solid #dbe6ec; border-radius: 10px;
+}
+.nisa-accurate-chart__legend {
+  display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+  color: #38536a; font-size: .8125rem; margin: 0 0 14px;
+}
+.nisa-accurate-chart__legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.nisa-accurate-chart__legend i { width: 12px; height: 12px; display: inline-block; flex: 0 0 12px; border-radius: 2px; }
+.nisa-bank-page .nisa-accurate-chart figcaption { display: flex; flex-direction: column; min-height: 0; gap: 12px; }
+.nisa-bank-page .nisa-accurate-chart figcaption > strong { font-size: .9375rem; font-weight: 700; }
+.nisa-accurate-chart__summary { display: grid; gap: 3px; min-height: 90px; color: #0d2f63; align-content: start; }
+.nisa-accurate-chart__summary > small { font-size: .75rem; color: #536a7c; }
+.nisa-bank-page .nisa-accurate-chart__summary > strong { font-size: 1.375rem; font-weight: 750; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.nisa-accurate-chart__summary > strong > small { font-size: .75rem; padding-left: 3px; }
+.nisa-accurate-chart__summary > span { font-size: .75rem; line-height: 1.5; color: #38536a; }
+.nisa-accurate-chart__axis-unit { font-size: .75rem; color: #536a7c; margin-bottom: 10px; }
+.nisa-accurate-chart__layout { display: grid; grid-template-columns: 42px minmax(0,1fr); grid-template-rows: 184px auto; column-gap: 5px; row-gap: 8px; }
+.nisa-accurate-chart__ticks { position: relative; grid-row: 1; grid-column: 1; font-variant-numeric: tabular-nums; }
+.nisa-accurate-chart__ticks > span { position: absolute; right: 0; transform: translateY(50%); color: #536a7c; font-size: .6875rem; line-height: 1; }
+.nisa-accurate-chart__plot { position: relative; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); grid-row: 1; grid-column: 2; gap: 4px; border-left: 1px solid #a6bdc9; }
+.nisa-accurate-chart__gridline { position: absolute; left: 0; right: 0; height: 1px; background: #dbe6ec; pointer-events: none; }
+.nisa-accurate-chart__gridline:last-of-type { background: #a6bdc9; }
+.nisa-bank-page .nisa-accurate-chart__column { display: flex; align-items: flex-end; justify-content: center; min-height: 0; height: 100%; }
+.nisa-accurate-chart__bar { display: flex; flex-direction: column-reverse; width: min(30px, 76%); flex-shrink: 0; min-height: 0; z-index: 1; }
+.nisa-accurate-chart__principal { background: #bed5df; }
+.nisa-accurate-chart__gain { background: #0e5d88; }
+.nisa-accurate-chart__bar > span { display: block; flex: 0 0 auto; width: 100%; }
+.nisa-accurate-chart__unmodeled { align-self: end; padding-bottom: 5px; text-align: center; font-size: .75rem; color: #536a7c; }
+.nisa-accurate-chart__years { grid-row: 2; grid-column: 2; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 4px; text-align: center; font-size: .6875rem; color: #38536a; white-space: nowrap; }
+.nisa-accurate-chart__data { border-collapse: collapse; width: 100%; table-layout: fixed; font-size: .6875rem; font-variant-numeric: tabular-nums; color: #38536a; margin-top: 18px; }
+.nisa-accurate-chart__data caption { text-align: left; color: #536a7c; font-size: .75rem; padding-bottom: 6px; }
+.nisa-accurate-chart__data th, .nisa-accurate-chart__data td { padding: 6px 1px; border-bottom: 1px solid #dbe6ec; text-align: right; white-space: nowrap; }
+.nisa-accurate-chart__data th:first-child { text-align: left; font-weight: 600; }
+.nisa-accurate-chart__data td:last-child { color: #0d2f63; font-weight: 700; }
+.nisa-accurate-chart__data thead { background: #f3f7fa; }
+.nisa-accurate-chart__limit { margin: 9px 0 0; color: #536a7c; font-size: .75rem; line-height: 1.55; }
+@media (max-width: 1100px) {
+  .nisa-bank-page #cases .nisa-bank-chart-grid { grid-template-columns: 1fr; }
+  .nisa-accurate-chart__layout { grid-template-rows: 224px auto; }
+  .nisa-accurate-chart__data { font-size: .8125rem; }
+  .nisa-accurate-chart__ticks > span, .nisa-accurate-chart__years { font-size: .75rem; }
+  .nisa-accurate-chart__summary { min-height: 0; }
+}
