@@ -805,3 +805,113 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Approved theme-specific artwork: no redraw or recoloring. */
+.site.info-page--knowledge .knowledge-hero__inner:has(.editorial-approved-illustration) {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
+  column-gap: 28px;
+  align-items: center;
+}
+.site.info-page--knowledge .knowledge-hero-nav {
+  grid-column: 1 / -1;
+}
+.site.info-page--knowledge .editorial-approved-illustration,
+.site.knowledge-article-page:not(.nisa-bank-page) .editorial-approved-illustration {
+  margin: 0;
+  min-width: 0;
+}
+.site.info-page--knowledge .editorial-approved-illustration img,
+.site.knowledge-article-page:not(.nisa-bank-page) .editorial-approved-illustration img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.site.info-page--knowledge .editorial-approved-illustration figcaption {
+  margin-top: 5px;
+  font-size: .75rem;
+  color: var(--editorial-muted);
+  text-align: center;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .editorial-approved-illustration {
+  width: min(100%, 800px);
+  margin: 8px auto 36px;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-example {
+  margin: 24px 0;
+  padding: 22px;
+  border: 1px solid var(--editorial-keyline);
+  border-radius: 10px;
+  background: #f5f8fa;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-example figcaption {
+  display: grid;
+  gap: 8px;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-example figcaption strong {
+  color: var(--editorial-heading);
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-example figcaption span,
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-note {
+  color: var(--editorial-muted);
+  font-size: .8125rem;
+  line-height: 1.8;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-example .knowledge-data-table {
+  margin: 18px 0 14px;
+  background: #fff;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-example td {
+  font-variant-numeric: tabular-nums;
+  color: var(--editorial-heading);
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .knowledge-article-body h3 {
+  margin: 28px 0 12px;
+  color: var(--editorial-heading);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-budget-example {
+  margin: 18px 0;
+  background: #fff;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-budget-example div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 13px 10px;
+  border-bottom: 1px solid var(--editorial-line);
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-budget-example dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .mortgage-budget-example div:last-child {
+  color: var(--editorial-heading);
+  background: #eaf4f7;
+}
+@media (max-width: 900px) {
+  .site.info-page--knowledge .knowledge-hero__inner:has(.editorial-approved-illustration) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site.info-page--knowledge .editorial-approved-illustration {
+    width: min(100%, 520px);
+    justify-self: center;
+  }
+}
+@media (max-width: 760px) {
+  .site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-example {
+    padding: 12px;
+  }
+  .site.knowledge-article-page:not(.nisa-bank-page) .editorial-approved-illustration {
+    margin: 8px auto 24px;
+  }
+  .site.knowledge-article-page:not(.nisa-bank-page) .mortgage-editorial-example td {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+}

@@ -80,7 +80,7 @@ const routeSeoInputs: RouteSeoInput[] = [
   {
     path: routes.knowledgeMortgageComparison,
     title: `住宅ローン比較で見るべき項目 | ${siteName}`,
-    description: '元利均等・元金均等、金利、総返済額、事務手数料、保証料、登記費用、団信など、住宅ローン比較の確認順序を整理します。',
+    description: '3,000万円・35年の具体例で元利均等・元金均等、金利、総返済額、諸費用、団信、沖縄の住宅維持費まで比較します。',
     article: { publishedAt: '2026-09-21' },
   },
   {
