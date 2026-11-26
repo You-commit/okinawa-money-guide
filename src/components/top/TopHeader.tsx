@@ -55,8 +55,6 @@ function BrandMark() {
 
 function TopHeader() {
   const location = useLocation()
-  const isEditorial = [routes.knowledge, routes.knowledgeNisaLimits, routes.knowledgeMortgageComparison]
-    .some(path => path === location.pathname.replace(/\/$/, ''))
   const [isOpen, setIsOpen] = useState(false)
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false)
   const menuToggleRef = useRef<HTMLButtonElement>(null)
@@ -123,7 +121,7 @@ function TopHeader() {
 
   return (
     <>
-      <header className={isEditorial ? 'top-option02__header top-option02__header--editorial' : 'top-option02__header'}>
+      <header className="top-option02__header">
         <div className="top-option02__header-inner">
         <Link
           className="top-option02__brand"
@@ -225,7 +223,7 @@ function TopHeader() {
               </div>
             </div>
           </div>
-          <Link to={routes.knowledge} aria-current={isEditorial ? (location.pathname.replace(/\/$/, '') === routes.knowledge ? 'page' : 'location') : undefined} onClick={closeNavigation}>記事・コラム</Link>
+          <Link to={routes.knowledge} onClick={closeNavigation}>記事・コラム</Link>
           <span aria-disabled="true">比較・ランキング<span className="sr-only">（準備中）</span></span>
           <Link to={routes.about} onClick={closeNavigation}>はじめての方へ</Link>
           <Link to={routes.trust} onClick={closeNavigation}>信頼情報</Link>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { routes } from '../../app/routes'
 import KnowledgeArticleLayout from '../../components/knowledge/KnowledgeArticleLayout'
+import EditorialQuestionsIllustration from '../../components/knowledge/EditorialQuestionsIllustration'
 
 const sources = [
   {
@@ -49,6 +50,8 @@ function MortgageComparisonArticlePage() {
       <p className="knowledge-article-intro">
         住宅ローンを比べるとき、低い金利や小さい月額だけを見ても、家計への影響は判断しきれません。返済方式の違いを理解したうえで、借入期間全体の金額と契約に伴う費用を同じ条件で比べることが出発点です。
       </p>
+
+      <EditorialQuestionsIllustration topic="mortgage" />
 
       <section id="overview" className="knowledge-article-takeaways" aria-labelledby="mortgage-article-takeaways">
         <h2 id="mortgage-article-takeaways">この記事で分かること</h2>

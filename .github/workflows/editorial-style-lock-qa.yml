@@ -1,0 +1,55 @@
+name: Editorial illustration style lock acceptance
+on:
+  push:
+    branches: [preview/editorial-style-lock]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify original header and source illustration
+        run: |
+          git diff --exit-code 5d0e2b4aa0ca6b2f1b2fd18d44961023f40a6b11 HEAD -- src/components/top/TopHeader.tsx src/styles/top-redesign-option02.css
+          test "$(git rev-parse HEAD:public/article-media/nisa-questions-illustration.webp)" = "b61a8ab6eafaf3d1e4b7f167e022d2c2a346069e"
+          git diff --exit-code 27a0e642abe36e136b0ea2fa20c8da0024ebcb93 HEAD -- src ':!src/components/top/TopHeader.tsx' ':!src/styles/top-redesign-option02.css' ':!src/pages/KnowledgePage.tsx' ':!src/pages/knowledge/MortgageComparisonArticlePage.tsx' ':!src/styles/editorial-consistency.css' ':!src/AppRouter.test.tsx' ':!src/components/knowledge/EditorialQuestionsIllustration.tsx'
+          node scripts/check-editorial-scope.mjs
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-noto-cjk
+          fc-match :lang=ja
+          npm ci
+          npm run build
+          npm install --prefix /tmp/omg-playwright --no-save playwright@1.58.2
+          /tmp/omg-playwright/node_modules/.bin/playwright install chromium
+          npm run preview -- --host 127.0.0.1 --port 4173 --strictPort >/tmp/style-lock-preview.log 2>&1 &
+      - env:
+          OMG_PLAYWRIGHT_MODULE: /tmp/omg-playwright/node_modules/playwright/index.mjs
+        run: node scripts/editorial-style-lock-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: style-lock-browser-evidence
+          path: qa/style-lock/
