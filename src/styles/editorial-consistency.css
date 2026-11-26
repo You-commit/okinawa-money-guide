@@ -805,3 +805,41 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Original NISA drawing, with editable question text only. */
+.site.info-page--knowledge .knowledge-hero__inner {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+  column-gap: 36px;
+  align-items: center;
+}
+.site.info-page--knowledge .knowledge-hero-nav {
+  grid-column: 1 / -1;
+}
+.site.info-page--knowledge .editorial-questions-illustration,
+.site.knowledge-article-page:not(.nisa-bank-page) .editorial-questions-illustration {
+  margin: 0;
+  min-width: 0;
+}
+.site.info-page--knowledge .editorial-questions-illustration svg,
+.site.knowledge-article-page:not(.nisa-bank-page) .editorial-questions-illustration svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.site.knowledge-article-page:not(.nisa-bank-page) .editorial-questions-illustration {
+  width: min(100%, 680px);
+  margin: 12px auto 34px;
+}
+@media (max-width: 760px) {
+  .site.info-page--knowledge .knowledge-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .site.info-page--knowledge .editorial-questions-illustration {
+    width: min(100%, 400px);
+    justify-self: center;
+  }
+  .site.knowledge-article-page:not(.nisa-bank-page) .editorial-questions-illustration {
+    margin: 8px auto 24px;
+  }
+}

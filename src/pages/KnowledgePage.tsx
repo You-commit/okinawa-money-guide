@@ -7,6 +7,7 @@ import {
   PurposeShieldIcon,
 } from '../components/top/TopIcons'
 import SiteLayout from '../layouts/SiteLayout'
+import EditorialQuestionsIllustration from '../components/knowledge/EditorialQuestionsIllustration'
 
 type KnowledgeCategoryId = 'borrow' | 'save' | 'grow' | 'protect'
 
@@ -49,6 +50,7 @@ function KnowledgePage() {
               <h1>今の目的から、<br />知るべきお金のことへ</h1>
               <p className="info-hero__lead">住宅ローンやNISAなど、お金の制度・仕組みを理解し、今の目的に合わせた判断に役立てるための記事をまとめています。</p>
             </div>
+            <EditorialQuestionsIllustration topic="knowledge" />
             <nav className="knowledge-hero-nav" aria-label="目的別カテゴリ">
               {categories.map((category) => (
                 <a className={`knowledge-hero-tile knowledge-hero-tile--${category.id}`} href={`#${category.id}`} key={category.id}>
