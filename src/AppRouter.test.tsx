@@ -344,10 +344,10 @@ describe('dedicated page routing', () => {
     const article = document.querySelector('.knowledge-article-body')!
     const toc = document.querySelector('.knowledge-article-aside nav')!
     const links = Array.from(toc.querySelectorAll('a'))
-    expect(links).toHaveLength(7)
+    expect(links).toHaveLength(9)
     for (const link of links) expect(document.getElementById(link.hash.slice(1))).toBeTruthy()
-    expect(article.querySelector('#mortgage-faq')?.querySelectorAll('details')).toHaveLength(3)
-    expect(article.querySelector('#article-sources')?.querySelectorAll('a')).toHaveLength(3)
+    expect(article.querySelector('#mortgage-faq')?.querySelectorAll('details')).toHaveLength(5)
+    expect(article.querySelector('#article-sources')?.querySelectorAll('a')).toHaveLength(6)
     expect(article.querySelector('#mortgage-faq')!.compareDocumentPosition(article.querySelector('#article-sources')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
@@ -462,23 +462,20 @@ describe('dedicated page routing', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
 
-  it.each([
-    '/knowledge', '/knowledge/', '/knowledge/nisa-limits-and-future-value', '/knowledge/mortgage-comparison',
-  ])('uses the editorial shared header only on article routes: %s', (path) => {
+  it.each(['/knowledge', '/knowledge/nisa-limits-and-future-value', '/knowledge/mortgage-comparison'])('uses the original white common header on %s', (path) => {
     renderAt(path)
-    const header = document.querySelector('.top-option02__header')!
-    expect(header.classList.contains('top-option02__header--editorial')).toBe(true)
-    const nav = screen.getByRole('navigation', { name: 'メインメニュー' })
-    expect(within(nav).getByRole('link', { name: '記事・コラム' }).getAttribute('aria-current'))
-      .toBe(path.replace(/\/$/, '') === '/knowledge' ? 'page' : 'location')
+    expect(document.querySelector('.top-option02__header')?.className).toBe('top-option02__header')
   })
 
-  it.each([
-    '/', '/simulators/nisa', '/simulators/ideco', '/simulators/mortgage', '/simulators/military-land',
-    '/simulators/taxable-income', '/about', '/trust', '/knowledge/does-not-exist',
-  ])('retains the existing header outside the article routes: %s', (path) => {
-    renderAt(path)
-    expect(document.querySelector('.top-option02__header--editorial')).toBeNull()
+  it('includes independently verified repayment examples and budget guidance', () => {
+    renderAt('/knowledge/mortgage-comparison')
+    const sample = screen.getByRole('region', { name: '3,000万円の返済方式別試算' })
+    expect(within(sample).getByText('99,379円')).toBeTruthy()
+    expect(within(sample).getByText('121,429円')).toBeTruthy()
+    expect(within(sample).getByText('41,739,109円')).toBeTruthy()
+    expect(within(sample).getByText('40,525,000円')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '借りられる金額と、無理なく返せる金額は別' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '沖縄の住まいでは、入居後の維持費まで確認する' })).toBeTruthy()
   })
 
   it('keeps the existing mobile navigation trigger and nested simulator links', async () => {

@@ -7,6 +7,7 @@ import {
   PurposeShieldIcon,
 } from '../components/top/TopIcons'
 import SiteLayout from '../layouts/SiteLayout'
+import EditorialIllustration from '../components/knowledge/EditorialIllustration'
 
 type KnowledgeCategoryId = 'borrow' | 'save' | 'grow' | 'protect'
 
@@ -49,6 +50,7 @@ function KnowledgePage() {
               <h1>今の目的から、<br />知るべきお金のことへ</h1>
               <p className="info-hero__lead">住宅ローンやNISAなど、お金の制度・仕組みを理解し、今の目的に合わせた判断に役立てるための記事をまとめています。</p>
             </div>
+            <EditorialIllustration topic="knowledge" />
             <nav className="knowledge-hero-nav" aria-label="目的別カテゴリ">
               {categories.map((category) => (
                 <a className={`knowledge-hero-tile knowledge-hero-tile--${category.id}`} href={`#${category.id}`} key={category.id}>
@@ -65,8 +67,8 @@ function KnowledgePage() {
             <div className="info-section-heading"><div><h2>公開中の記事</h2></div><p>制度と数字を理解するための解説記事です。</p></div>
             <div className="knowledge-latest-list">
               {[
-                { category: 'NISA・資産形成', title: 'NISAの非課税枠と、積立額・将来額の考え方', description: '年間投資枠、非課税保有限度額、将来額の違いを整理します。', href: routes.knowledgeNisaLimits, date: '2026-10-14', dateLabel: '更新日' },
-                { category: '住宅・ローン', title: '住宅ローン比較で見るべき項目', description: '返済方式、金利、総返済額、諸費用、保証、団信を同じ順序で比べます。', href: routes.knowledgeMortgageComparison, date: '2026-09-21', dateLabel: '公開日' },
+                { category: 'NISA・資産形成', title: 'NISAの非課税枠と、積立額・将来額の考え方', description: '年間投資枠と非課税保有限度額の違い、積立額ごとの将来額、注意点まで具体例で理解できます。', href: routes.knowledgeNisaLimits, date: '2026-10-14', dateLabel: '更新日' },
+                { category: '住宅・ローン', title: '住宅ローン比較で見るべき項目', description: '3,000万円・35年の試算で返済方式と金利の違いを比較。諸費用・保障・沖縄の住まいにかかる費用まで整理します。', href: routes.knowledgeMortgageComparison, date: '2026-09-21', dateLabel: '公開日' },
               ].map((article) => (
                 <article key={article.href}>
                   <div className="knowledge-list-meta"><span>{article.category}</span><small>{article.dateLabel} <time dateTime={article.date}>{article.date.replaceAll('-', '.')}</time></small></div>
